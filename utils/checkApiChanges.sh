@@ -33,17 +33,18 @@
 aCvsBase=$1
 aCvsRepos=$2
 aReleaseRev=$3
+aLocalBase=../../../gnome.org
 shift 3
 aFileList=$@
 
 MYDIR=REV-$aReleaseRev.tmp
 rm -rf $MYDIR
-if [ -e ../../../gnome.org/gnome-xml/include/libxml/CVS/Entries ] ; then
+if [ -e $aLocalBase/$aCvsRepos/CVS/Entries ] ; then
 	echo Reading C headers from local, hopefuly up-to-date, revision...
-	cp -rf ../../../gnome.org/gnome-xml/include/libxml $MYDIR
+	cp -rf $aLocalBase/$aCvsRepos $MYDIR
 else
 	echo Reading C headers from "$aReleaseRev" revision...
-	cvs -z4 -d $aCvsBase co -r $aReleaseRev -d $MYDIR gnome-xml/include/libxml
+	cvs -z4 -d $aCvsBase co -r $aReleaseRev -d $MYDIR $aCvsRepos
 fi
 
 if [ ! -d $MYDIR/CVS ] ; then
