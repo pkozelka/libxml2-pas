@@ -631,7 +631,7 @@ begin
 end;
 
 // IDOMNode
-function TGDOMNode.get_nodeName: DOMString; 
+function TGDOMNode.get_nodeName: DOMString;
 var
   temp,prefix: String;
 begin
@@ -1076,35 +1076,40 @@ end;
 
 function TGDOMNamedNodeMap.setNamedItem(const newItem: IDOMNode): IDOMNode;
 var
-  node,node1: xmlNodePtr;
-  found: boolean;
   attr,attr1: xmlAttrPtr;
+  node,node1: xmlNodePtr;
+  slocalname,value:pchar;
 begin
+  attr:=nil;
   node:=GNamedNodeMap;
   node1:=GetGNode(newItem);
-  // if the nodemap is empty, replace it by the
-  // passed node
-  if node=nil then begin
-    node:=node1;
-    FGNamedNodeMap.properties:=xmlAttrPtr(node1);
-  end
-  else begin
-    found:=false;
-    while node.next<>nil do begin
-      if node.name=node1.name then
-        begin
-          found:=true;
-          break
+  attr1:=xmlAttrPtr(node1);
+  slocalName:=node1.name;
+  attr:=xmlHasProp(FGNamedNodeMap,slocalName);
+  //if the NamedNodeMap is empty, replace its first element with the newItem
+  if node=nil
+    then begin
+      node:=node1;
+      FGNamedNodeMap.properties:=xmlAttrPtr(node1);
+    end
+    else begin
+      // if the newItem does exit, replace it
+      if attr<>nil
+        then begin
+          node:=xmlReplaceNode(node,node1);
+          attr:=xmlAttrPtr(node);
+        end
+        // if the newItem doesn't exist, add it
+        else begin
+          if node1.children<>nil
+            then value:=node1.children.content
+            else value:='';
+          attr:=xmlSetProp(FGNamedNodeMap,slocalName,value);
         end;
-      node:=node.next
     end;
-    if found
-      then node:=xmlReplaceNode(node,node1)
-      else node:=nil;
-  end;
-  if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
-    else result:=nil;
+    if attr<>nil
+      then result:=TGDomAttr.Create(attr,FOwnerDocument) as IDOMNode
+      else result:=nil;
 end;
 
 function TGDOMNamedNodeMap.removeNamedItem(const name: DOMString): IDOMNode;
@@ -1157,7 +1162,7 @@ begin
       else namespace:='';
     slocalName:=localName(xmlNewattr.name);
     attr:=xmlHasNSProp(FGNamedNodeMap,pchar(slocalName),namespace); // Check if the Element has
-                                                                        // already an attribute with this name
+                                                                    // already an attribute with this name
     if attr=nil then begin
       temp:=(newItem as IDOMAttr).value;
       if xmlnewAttr.children<>nil
