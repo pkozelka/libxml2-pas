@@ -11,7 +11,7 @@ unit MSXML3;
 // manual modifications will be lost.                                         
 // ************************************************************************ //
 
-// PASTLWTR : $Revision: 1.1 $
+// PASTLWTR : $Revision: 1.2 $
 // File generated on 01/08/2001 12:38:00 PM from Type Library described below.
 
 // ************************************************************************ //
