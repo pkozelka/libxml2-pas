@@ -44,6 +44,12 @@ type
       procedure createCDATASectionTest;
       (* converted from: documentCreateComment.js *)
       procedure createCommentTest;
+      (* converted from: documentCreateDocumentFragment.js *)
+      procedure createDocumentFragmentTest;
+      (* converted from: documentCreateElement.js *)
+      procedure createElementTest;
+      (* converted from: documentCreateElementCaseSensitive.js *)
+      procedure createElementCaseSensitiveTest;
 
   end;
 
@@ -222,8 +228,7 @@ var
 begin
   document := fDomImplementation.createDocument('', '', nil);
   cDataSection := document.createCDataSection(SECTION_NAME);
-  check(cDataSection.nodeName = '#cdata-section',
-          'CDATASection nodeName <> #cdata-section');
+  check(cDataSection.nodeName = '#cdata-section', 'nodeName <> #cdata-section');
   check(cDataSection.nodeValue = SECTION_NAME, 'nodevalue not correct');
   check(cDataSection.nodeType = CDATA_SECTION_NODE);
 end;
@@ -239,10 +244,67 @@ var
 begin
   document := fDomImplementation.createDocument('', '', nil);
   comment := document.createComment(COMMENT_NAME);
-  check(comment.nodeName = '#comment',
-          'comment nodeName <> #comment');
+  check(comment.nodeName = '#comment', 'nodeName <> #comment');
   check(comment.nodeValue = COMMENT_NAME, 'nodevalue not correct');
   check(comment.nodeType = COMMENT_NODE);
+end;
+
+
+(* creates a documentFragment and checks its properties *)
+procedure TDomDocumentFundamentalTests.createDocumentFragmentTest;
+var
+  document : IDomDocument;
+  fragment : IDomDocumentFragment;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  fragment := document.createDocumentFragment;
+  check(fragment.childNodes.length = 0, 'number of childs <> 0');
+  check(fragment.nodeName = '#document-fragment', 'nodeName <> #comment');
+  check(fragment.nodeValue = '', 'nodevalue not correct');
+  check(fragment.nodeType = DOCUMENT_FRAGMENT_NODE);
+end;
+
+
+(* creates an element and checks its properties *)
+procedure TDomDocumentFundamentalTests.createElementTest;
+const
+  ELEMENT_NAME = 'somename';
+var
+  document : IDomDocument;
+  node     : IDomElement;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  node := document.createElement(ELEMENT_NAME);
+  check(node.nodeName = ELEMENT_NAME, 'nodeName <> #comment');
+  check(node.nodeValue = '', 'nodevalue not correct');
+  check(node.nodeType = ELEMENT_NODE);
+  check(node.localName = '', 'localname <> ''''');
+  check(node.prefix = '', 'prefix <> ''''');
+  check(node.namespaceURI = '', 'namespaceURI <> ''''');
+end;
+
+
+(* creates an element and checks its properties *)
+procedure TDomDocumentFundamentalTests.createElementCaseSensitiveTest;
+const
+  ELEMENT_NAME_LC = 'somename';
+  ELEMENT_NAME_UC = 'SOMENAME';
+  ATTR_NAME_1     = 'city';
+  ATTR_NAME_2     = 'country';
+  ATTR_VALUE_1    = 'amsterdam';
+  ATTR_VALUE_2    = 'netherlands';
+var
+  document : IDomDocument;
+  nodeLC   : IDomElement;
+  nodeUC   : IDomElement;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  nodeLC := document.createElement(ELEMENT_NAME_LC);
+  nodeUC := document.createElement(ELEMENT_NAME_UC);
+  nodeLC.setAttribute(ATTR_NAME_1, ATTR_VALUE_1);
+  nodeUC.setAttribute(ATTR_NAME_2, ATTR_VALUE_2);
+  check(nodeLC.getAttribute(ATTR_NAME_1) = ATTR_VALUE_1);
+  check(nodeUC.getAttribute(ATTR_NAME_2) = ATTR_VALUE_2);
 end;
 
 
