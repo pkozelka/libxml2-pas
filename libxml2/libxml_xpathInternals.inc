@@ -424,44 +424,23 @@ function  xmlXPathNewValueTree(val:xmlNodePtr):xmlXPathObjectPtr;cdecl;external 
 procedure xmlXPathNodeSetAdd(cur:xmlNodeSetPtr; val:xmlNodePtr);cdecl;external LIBXML2_SO;
 procedure xmlXPathNodeSetAddUnique(cur:xmlNodeSetPtr; val:xmlNodePtr);cdecl;external LIBXML2_SO;
 procedure xmlXPathNodeSetSort(nodeset:xmlNodeSetPtr);cdecl;external LIBXML2_SO;
-procedure xmlXPathIdFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathRoot(ctxt:xmlXPathParserContextPtr);cdecl;external LIBXML2_SO;
 procedure xmlXPathEvalExpr(ctxt:xmlXPathParserContextPtr);cdecl;external LIBXML2_SO;
 function  xmlXPathParseName(ctxt:xmlXPathParserContextPtr):PxmlChar;cdecl;external LIBXML2_SO;
 function  xmlXPathParseNCName(ctxt:xmlXPathParserContextPtr):PxmlChar;cdecl;external LIBXML2_SO;
-(*
- * Debug
- *)
-{$ifdef LIBXML_DEBUG_ENABLED}
-//[pk] see the same declaration above: procedure xmlXPathDebugDumpObject(var output:TextFile; cur:xmlXPathObjectPtr; depth:longint);cdecl;external LIBXML2_SO;
-{$endif}
 
 (*
  * Existing functions
  *)
 function  xmlXPathStringEvalNumber(str:PxmlChar):double;cdecl;external LIBXML2_SO;
 function  xmlXPathEvaluatePredicateResult(ctxt:xmlXPathParserContextPtr; res:xmlXPathObjectPtr):longint;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathInit;cdecl;external LIBXML2_SO;
-procedure xmlXPathStringFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathRegisterAllFunctions(ctxt:xmlXPathContextPtr);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": function  xmlXPathNodeSetCreate(val:xmlNodePtr):xmlNodeSetPtr;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathNodeSetAdd(cur:xmlNodeSetPtr; val:xmlNodePtr);cdecl;external LIBXML2_SO;
 function  xmlXPathNodeSetMerge(val1:xmlNodeSetPtr; val2:xmlNodeSetPtr):xmlNodeSetPtr;cdecl;external LIBXML2_SO;
 procedure xmlXPathNodeSetDel(cur:xmlNodeSetPtr; val:xmlNodePtr);cdecl;external LIBXML2_SO;
 procedure xmlXPathNodeSetRemove(cur:xmlNodeSetPtr; val:longint);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathFreeNodeSet(obj:xmlNodeSetPtr);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": function  xmlXPathNewNodeSet(val:xmlNodePtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
 function  xmlXPathNewNodeSetList(val:xmlNodeSetPtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
 function  xmlXPathWrapNodeSet(val:xmlNodeSetPtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
 function  xmlXPathWrapExternal(val:pointer):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathFreeNodeSetList(obj:xmlXPathObjectPtr);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": function  xmlXPathNewFloat(val:double):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": function  xmlXPathNewBoolean(val:longint):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": function  xmlXPathNewString(val:PxmlChar):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": function  xmlXPathNewCString(val:Pchar):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathFreeObject(obj:xmlXPathObjectPtr);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": function  xmlXPathNewContext(doc:xmlDocPtr):xmlXPathContextPtr;cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathFreeContext(ctxt:xmlXPathContextPtr);cdecl;external LIBXML2_SO;
 function  xmlXPathEqualValues(ctxt:xmlXPathParserContextPtr):longint;cdecl;external LIBXML2_SO;
 function  xmlXPathCompareValues(ctxt:xmlXPathParserContextPtr; inf:longint; strict:longint):longint;cdecl;external LIBXML2_SO;
 procedure xmlXPathValueFlipSign(ctxt:xmlXPathParserContextPtr);cdecl;external LIBXML2_SO;
@@ -492,14 +471,13 @@ function  xmlXPathNextPrecedingSibling(ctxt:xmlXPathParserContextPtr; cur:xmlNod
 (*
  * The official core of XPath functions
  *)
-//[pk] see "xpath": procedure xmlXPathRoot(ctxt:xmlXPathParserContextPtr);cdecl;external LIBXML2_SO;
 procedure xmlXPathLastFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathPositionFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathCountFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathIdFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
+procedure xmlXPathIdFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathLocalNameFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathNamespaceURIFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathStringFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
+procedure xmlXPathStringFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathStringLengthFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathConcatFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathContainsFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
