@@ -1,0 +1,45 @@
+[API]
+Name=libxml2-pas
+Version=2.4.15
+Date=12 Feb 2002
+Originated=libxml2-2.4.15
+URL=http://xmlsoft.org
+Description=The XML C library for Gnome
+
+[CONVERSION]
+Number=2
+[CONVERSION1]
+FileName=libxml2.pas
+Status=READY-FOR-TESTING
+Version=2.4.15
+LastModify=12 Feb 2002
+OriginalFile=libxml2.h
+
+[CONVERSION2]
+FileName=iconv.pas
+Status=WORK-IN-PROGRESS
+Version=0.7
+OriginalFile=iconv.h
+
+[Platform] 
+Win95=YES
+Win98=YES
+Win2000=YES
+WinNT3=UNKNOWN
+WinNT4=YES
+Linux=YES
+Kylix=YES
+
+[Requirements]
+Req1=libxml2.dll version 2.4.15
+Req2=iconv.dll
+
+[Captain]
+Name=Petr Kozelka
+Email=pkozelka@email.cz
+
+[Converters]
+Converter1="Petr Kozelka";pkozelka@email.cz;http://kozelka.hyperlink.cz
+
+[Testers]
+Tester1="Petr Kozelka";pkozelka@email.cz;http://kozelka.hyperlink.cz
