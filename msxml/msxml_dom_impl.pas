@@ -40,10 +40,6 @@ type
 	TAttrNodeMap = class;
 	TXMLDOMParser = class;
 
-	ILibXml2Node = interface ['{1D4BD646-0AB9-4810-B4BD-7277FB0CFA30}']
-		function  NodePtr: xmlNodePtr;
-	end;
-
 	TUniNode = record
 		case integer of
 		0: (ptr: pointer);
@@ -63,7 +59,7 @@ type
 		FPtr: TUniNode;
 		FChildren_OnDemand: TChildNodeList;
 	protected //ILibXml2Node
-		function  NodePtr: xmlNodePtr; virtual;
+		function  LibXml2NodePtr: xmlNodePtr; virtual;
 	protected //IXMLDOMNode
 		function  Get_nodeName: WideString; safecall;
 		function  Get_nodeValue: OleVariant; safecall;
@@ -191,7 +187,7 @@ type
 		function  requestDocPtr: xmlDocPtr;
 		procedure releaseDocPtr;
 	protected //ILibXml2Node
-		function  NodePtr: xmlNodePtr; override;
+		function  LibXml2NodePtr: xmlNodePtr; override;
 	protected //IXMLDOMDocument
 		function  Get_doctype: IXMLDOMDocumentType; safecall;
 		function  Get_implementation_: IXMLDOMImplementation; safecall;
@@ -364,7 +360,7 @@ end;
 
 function GetNodePtr(aDOMNode: IXMLDOMNode): xmlNodePtr;
 begin
-	Result := (aDOMNode as ILibXml2Node).NodePtr;
+	Result := (aDOMNode as ILibXml2Node).LibXml2NodePtr;
 end;
 
 function GetDOMObject(const aNode: pointer): IUnknown;
@@ -671,7 +667,7 @@ begin
 	Result := newChild;
 end;
 
-function TXMLDOMNode.NodePtr: xmlNodePtr;
+function TXMLDOMNode.LibXml2NodePtr: xmlNodePtr;
 begin
 	Result := FPtr.node;
 end;
@@ -1120,15 +1116,16 @@ var
 begin
 	if (namespaceURI<>'') then begin
 		SplitQualifiedName(qualifiedName, prefix, localname);
-		pfx := prefix;
-		lname := localname;
-		href := namespaceURI;
-		ns := xmlNewGlobalNs(requestDocPtr, PChar(href), PChar(pfx));
+		pfx := UTF8Decode(prefix);
+		lname := UTF8Decode(localname);
+		href := UTF8Decode(namespaceURI);
+		node := xmlNewDocNode(requestDocPtr, nil, PChar(lname), nil);
+		ns := xmlNewNs(node, PChar(href), PChar(pfx));
+		xmlSetNs(node, ns);
 	end else begin
-		ns := nil;
-		lname := qualifiedName;
+		lname := UTF8Decode(qualifiedName);
+		node := xmlNewDocNode(requestDocPtr, nil, PChar(lname), nil);
 	end;
-	node := xmlNewDocNode(requestDocPtr, ns, PChar(lname), nil);
 	Result := GetDOMObject(node) as IXMLDOMElement;
 end;
 
@@ -1294,7 +1291,7 @@ begin
 	Result := GetDOMObject(attr.parent) as IXMLDOMNode;
 end;
 
-function TXMLDOMDocument.NodePtr: xmlNodePtr;
+function TXMLDOMDocument.LibXml2NodePtr: xmlNodePtr;
 begin
 	Result := xmlNodePtr(requestDocPtr);
 end;
