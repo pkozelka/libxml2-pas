@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Classes, TestFrameWork, libxmldom, xdom2, Dialogs, msxml_impl,
-  ActiveX,GUITestRunner,StrUtils,jkDomTest, ComObj;
+  ActiveX,GUITestRunner,StrUtils,jkDomTest,ComObj,IniFiles;
 
 const
 
@@ -21,10 +21,9 @@ const
             ']>'+
             '<root />';
 
-type EUnknownDomVendor = Exception;
-
 type TTestDOM2Methods = class(TTestCase)
   private
+    impl: IDOMImplementation;
     doc: IDOMDocument;
     doc1: IDOMDocument;
   protected
@@ -47,8 +46,22 @@ type TTestDOM2Methods = class(TTestCase)
 
 type TTestDomExceptions = class(TTestCase)
   private
+    impl: IDOMImplementation;
     doc: IDOMDocument;
     doc1: IDOMDocument;
+    elem: IDOMElement;
+    prefix: string;
+    name: string;
+    nsuri: string;
+    data: string;
+    attr: IDOMAttr;
+    node: IDOMNode;
+    select: IDOMNodeSelect;
+    nodelist: IDOMNodeList;
+    pci: IDOMProcessingInstruction;
+    entref: IDOMEntityReference;
+    noex: boolean;
+    function getFqname: string;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -57,11 +70,38 @@ type TTestDomExceptions = class(TTestCase)
     procedure AppendNilNode;
     procedure InsertNilNode;
     procedure InsertAnchestor;
+    procedure appendChild1;
+    procedure appendChild2;
+    procedure appendChild3;
+    procedure appendChild4;
+    procedure createAttribute1;
+    procedure createAttributeNS1;
+    procedure createAttributeNS2;
+    procedure createAttributeNS3;
+    procedure createAttributeNS4;
+    procedure createAttributeNS5;
+    procedure createDocument;
+    procedure createDocument1;
+    procedure createDocument2;
+    procedure createDocument3;
+    procedure createElement1;
+    procedure createElementNS1;
+    procedure createElementNS2;
+    procedure createElementNS3;
+    procedure createEntityReference1;
+    procedure createProcessingInstruction1;
+    procedure insertBefore1;
+    procedure insertBefore2;
+    procedure insertBefore3;
+    procedure insertBefore4;
+    procedure selectNodes3;
+    property fqname: string read getFqname;
   end;
 
 
 type TTestMemoryLeaks = class(TTestCase)
   private
+    impl: IDOMImplementation;
     doc: IDOMDocument;
     doc1: IDOMDocument;
   protected
@@ -87,6 +127,7 @@ type TTestMemoryLeaks = class(TTestCase)
 
 type TSimpleTests = class(TTestCase)
   private
+    impl: IDOMImplementation;
     doc: IDOMDocument;
     node: IDOMNode;
     elem: IDOMElement;
@@ -115,32 +156,16 @@ type TSimpleTests = class(TTestCase)
     procedure documentElement;
     procedure domImplementation;
     procedure docType;
-    procedure createDocument;
-    procedure createDocument1;
-    procedure createDocument2;
-    procedure createDocument3;
     procedure createElement;
-    procedure createElement1;
     procedure createElementNS;
-    procedure createElementNS1;
-    procedure createElementNS2;
-    procedure createElementNS3;
     procedure createAttribute;
-    procedure createAttribute1;
     procedure createAttributeNS;
-    procedure createAttributeNS1;
-    procedure createAttributeNS2;
-    procedure createAttributeNS3;
-    procedure createAttributeNS4;
-    procedure createAttributeNS5;
     procedure createTextNode;
     procedure createCDATASection;
     procedure createComment;
     procedure createDocumentFragment;
     procedure createProcessingInstruction;
-    procedure createProcessingInstruction1;
     procedure createEntityReference;
-    procedure createEntityReference1;
     procedure getAttribute_setAttribute;
     procedure getAttributeNS_setAttributeNS;
     procedure getAttributeNode_setAttributeNode;
@@ -158,16 +183,8 @@ type TSimpleTests = class(TTestCase)
     procedure previousSibling;
     procedure cloneNode;
     procedure insertBefore;
-    procedure insertBefore1;
-    procedure insertBefore2;
-    procedure insertBefore3;
-    procedure insertBefore4;
     procedure removeChild;
     procedure appendChild;
-    procedure appendChild1;
-    procedure appendChild2;
-    procedure appendChild3;
-    procedure appendChild4;
     procedure replaceChild;
     procedure isSupported;
     procedure normalize;
@@ -178,56 +195,104 @@ type TSimpleTests = class(TTestCase)
     procedure ownerElement;
     procedure selectNodes;
     procedure selectNodes2;
-    procedure selectNodes3;
     procedure namedNodeMap;
     procedure namedNodeMapNS;
     procedure persist;
     procedure documentFragment;
+    procedure valid;
+    procedure valid1;
+    procedure valid2;
     property fqname: string read getFqname;
   end;
 
+  function getUnitTests: ITestSuite;
+  function domvendor: string;
 
 implementation
 
-var
-  impl: IDOMImplementation;
-  datapath: string ='';
+uses domSetup;
+
+var datapath: string ='';
+
+{ TTestDom2Methods }
 
 procedure TTestDom2Methods.SetUp;
 begin
   inherited;
-  impl := GetDom(domvendor);
+  impl := DomSetup.getCurrentDomSetup.getDocumentBuilder.domImplementation;
   doc := impl.createDocument('','',nil);
   (doc as IDOMPersist).loadxml(xmlstr);
   doc1 := impl.createDocument('','',nil);
   (doc1 as IDOMPersist).loadxml(xmlstr1);
 end;
 
-procedure TTestMemoryLeaks.SetUp;
+procedure TTestDom2Methods.TearDown;
 begin
+  doc := nil;
+  doc1:= nil;
   inherited;
-  impl := GetDom(domvendor);
-  doc := impl.createDocument('','',nil);
-  (doc as IDOMPersist).loadxml(xmlstr);
-  doc1 := impl.createDocument('','',nil);
-  (doc1 as IDOMPersist).loadxml(xmlstr1);
 end;
 
-procedure TTestDomExceptions.SetUp;
-begin
-  inherited;
-  impl := GetDom(domvendor);
-  doc := impl.createDocument('','',nil);
-  (doc as IDOMPersist).loadxml(xmlstr);
-  doc1 := impl.createDocument('','',nil);
-  (doc1 as IDOMPersist).loadxml(xmlstr1);
-end;
-
-procedure TTestMemoryLeaks.createElement10000Times;
+procedure TTestDOM2Methods.LoadFiles;
 var
-  i: integer;
+  builder: IDomDocumentBuilder;
+  mydoc: IDomDocument;
+  fd: string; // file directory
+  fn: string; // file name
+  sr: TSearchRec;
+  rv: integer; // returned value
+  cnt: integer; // tested file counter
 begin
-  for i := 0 to 10000 do doc.createElement('test');
+  fd := datapath;
+  try
+    cnt := 0;
+    rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
+    while (rv=0) do begin
+      Inc(cnt);
+      builder := getDocumentBuilderFactory(DomVendor).newDocumentBuilder;
+      fn := fd + '/' + sr.Name;
+      mydoc := builder.load(fn);
+      check(mydoc<>nil, fn+': document not loaded');
+      check(mydoc.documentElement<>nil, fn+': documentElement is nil');
+      rv := FindNext(sr);
+    end;
+    if (cnt=0) then begin
+      check(false, 'No XML file available for testing in directory '+fd);
+    end;
+  finally
+    FindClose(sr);
+  end;
+end;
+
+procedure TTestDOM2Methods.LoadFilesII;
+var
+  mydoc: IDomDocument;
+  fd: string; // file directory
+  fn: string; // file name
+  sr: TSearchRec;
+  rv: integer; // returned value
+  cnt: integer; // tested file counter
+begin
+  impl := GetDom(domvendor);
+  mydoc := impl.createDocument('','',nil);
+  fd := datapath;
+  try
+    cnt := 0;
+    rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
+    while (rv=0) do begin
+      Inc(cnt);
+      fn := fd + '/' + sr.Name;
+      (mydoc as IDOMPersist).load(fn);
+      check(mydoc<>nil, fn+': document not loaded');
+      check(mydoc.documentElement<>nil, fn+': documentElement is nil');
+      rv := FindNext(sr);
+    end;
+    if (cnt=0) then begin
+      check(false, 'No XML file available for testing in directory '+fd);
+    end;
+  finally
+    FindClose(sr);
+  end;
 end;
 
 procedure TTestDom2Methods.TestDocCount;
@@ -237,46 +302,9 @@ begin
   Check(doccount=0,'documents not released');
 end;
 
-procedure TTestMemoryLeaks.TearDown;
-begin
-  doc := nil;
-  doc1 := nil;
-end;
-
-procedure TTestDomExceptions.TearDown;
-begin
-  doc := nil;
-  doc1 := nil;
-end;
-
-procedure TTestMemoryLeaks.AppendElement10000Times;
-var
-  i: integer;
-  node: IDOMNode;
-begin
-  for i := 0 to 10000 do begin
-    node := (doc.createElement('test') as IDOMNode);
-    doc.documentElement.appendChild(node);
-
-  end;
-end;
-
 procedure TTestDom2Methods.TestDocumentElement;
 begin
   Check(doc.documentElement<>nil,'documentElement is nil');
-end;
-
-procedure TTestDomExceptions.AppendAttribute;
-var
-  attr: IDOMAttr;
-begin
-  try
-    attr := doc.createAttribute('test');
-    doc.documentElement.appendChild(attr);
-    Check(False,'There should have been an EDomException');
-  except
-    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
-  end;
 end;
 
 procedure TTestDom2Methods.AppendExistingChild;
@@ -305,50 +333,136 @@ begin
   elem := doc.getElementById('110');
 end;
 
-procedure TTestDomExceptions.AppendNilNode;
-begin
-  try
-    doc.documentElement.appendChild(nil);
-    Check(False,'There should have been an EDomError');
-  except
-    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
-  end;
-end;
-
-procedure TTestDomExceptions.InsertNilNode;
+procedure TTestDom2Methods.createElementNS;
+const
+  CRLF=#13#10;
 var
   node: IDOMNode;
+  temp: string;
 begin
-  node := doc.createElement('sub1');
+  node:=doc.createElementNS('http://ns.4ct.de','ct:test');
   doc.documentElement.appendChild(node);
-  try
-    doc.documentElement.insertBefore(nil,node);
-    Check(False,'There should have been an EDomError');
-  except
-    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
-  end;
+  temp:=(doc as IDOMPersist).xml;
+  temp:=getCont(temp);
+  check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
 end;
 
-procedure TTestDomExceptions.InsertAnchestor;
-var node1,node2: IDOMNode;
+procedure TTestDom2Methods.createElementNS1;
+const
+  CRLF=#13#10;
+var
+  node: IDOMNode;
+  temp: string;
 begin
-  node1 := doc.createElement('sub1');
-  node2 := doc.createElement('sub2');
-  node1.appendChild(node2);
-  doc.documentElement.appendChild(node1);
-  try
-    node1.insertBefore(doc.documentElement,node2);
-    Check(False,'There should have been an EDomError');
-  except
-    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
+  node:=doc1.createElementNS('http://ns.4ct.de','ct:test');
+  doc1.documentElement.appendChild(node);
+  temp:=(doc1 as IDOMPersist).xml;
+  temp:=getCont(temp);
+  check(temp='<test xmlns="http://ns.4ct.de"><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
+end;
+
+procedure TTestDom2Methods.createAttributeNS;
+var
+  attr: IDOMAttr;
+  temp: String;
+begin
+  attr:=doc.createAttributeNS('http://ns.4ct.de','ct:name1');
+  attr.value:='hund';
+  doc.documentElement.setAttributeNodeNS(attr);
+  temp:=(doc as IDOMPersist).xml;
+  temp:=getCont(temp);
+  check(temp='<test xmlns:ct="http://ns.4ct.de" ct:name1="hund"/>','failed')
+end;
+
+procedure TTestDOM2Methods.append_100_attributes_with_different_namespaces;
+var
+  attr: IDOMAttr;
+  i: integer;
+  attrval,temp: string;
+  ok: boolean;
+begin
+  // create attributes
+  for i := 0 to 2 do begin
+    attr := doc.createAttributeNS('http://test'+IntToStr(i)+'.invalid','test'+IntToStr(i)+':attr');
+    attr.value := IntToStr(i);
+    doc.documentElement.setAttributeNodeNS(attr);
+    attr := nil;
+  end;
+  temp:=(doc as IDOMPersist).xml;
+  temp:=getCont(temp);
+  //jk: OutLog(temp);
+  ok:=false;
+  if temp='<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>'
+    then ok:=true;
+  if temp='<test xmlns:test0="http://test0.invalid" xmlns:test1="http://test1.invalid" xmlns:test2="http://test2.invalid" test0:attr="0" test1:attr="1" test2:attr="2"/>'
+    then ok:=true;
+  Check(ok,'Test failed!');
+  // check attributes
+  for i := 0 to 2 do begin
+    attrval := doc.documentElement.getAttributeNS('http://test'+IntToStr(i)+'.invalid','attr');
+    check(attrval = IntToStr(i),'expected '+IntToStr(i)+' but found '+attrval);
   end;
 end;
 
-procedure TTestDom2Methods.TearDown;
+function TTestDOM2Methods.getCont(xml:string):string;
+// this function cuts the first line and
+// the leading crlf
+// ToDo: should be replaced by a more general implementation
+begin
+  if domvendor='LIBXML' then begin
+    result:=rightstr(xml,length(xml)-44);
+    result:=leftstr(result,length(result)-1);
+  end else begin
+    result:=rightstr(xml,length(xml)-23);
+    result:=leftstr(result,length(result)-2);
+  end;
+end;
+
+procedure TTestDOM2Methods.ShowDom;
+var
+  el: IDOMElement;
+  temp: string;
+begin
+  el:=doc.createElement('books');
+  doc.documentElement.appendChild(el);
+  temp:=((doc as IDOMPersist).xml);
+end;
+
+{ TTestMemoryLeaks }
+
+procedure TTestMemoryLeaks.SetUp;
+begin
+  inherited;
+  impl := DomSetup.getCurrentDomSetup.getDocumentBuilder.domImplementation;
+  doc := impl.createDocument('','',nil);
+  (doc as IDOMPersist).loadxml(xmlstr);
+  doc1 := impl.createDocument('','',nil);
+  (doc1 as IDOMPersist).loadxml(xmlstr1);
+end;
+
+procedure TTestMemoryLeaks.TearDown;
 begin
   doc := nil;
-  doc1:= nil;
-  inherited;
+  doc1 := nil;
+end;
+
+procedure TTestMemoryLeaks.createElement10000Times;
+var
+  i: integer;
+begin
+  for i := 0 to 10000 do doc.createElement('test');
+end;
+
+procedure TTestMemoryLeaks.AppendElement10000Times;
+var
+  i: integer;
+  node: IDOMNode;
+begin
+  for i := 0 to 10000 do begin
+    node := (doc.createElement('test') as IDOMNode);
+    doc.documentElement.appendChild(node);
+
+  end;
 end;
 
 procedure TTestMemoryLeaks.createComment10000Times;
@@ -428,121 +542,6 @@ begin
   end;
 end;
 
-procedure TTestDom2Methods.createElementNS;
-const
-  CRLF=#13#10;
-var
-  node: IDOMNode;
-  temp: string;
-begin
-  node:=doc.createElementNS('http://ns.4ct.de','ct:test');
-  doc.documentElement.appendChild(node);
-  temp:=(doc as IDOMPersist).xml;
-  temp:=getCont(temp);
-  check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
-end;
-
-procedure TTestDom2Methods.createElementNS1;
-const
-  CRLF=#13#10;
-var
-  node: IDOMNode;
-  temp: string;
-begin
-  node:=doc1.createElementNS('http://ns.4ct.de','ct:test');
-  doc1.documentElement.appendChild(node);
-  temp:=(doc1 as IDOMPersist).xml;
-  temp:=getCont(temp);
-  check(temp='<test xmlns="http://ns.4ct.de"><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
-end;
-
-procedure TTestDom2Methods.createAttributeNS;
-var
-  attr: IDOMAttr;
-  temp: String;
-begin
-  attr:=doc.createAttributeNS('http://ns.4ct.de','ct:name1');
-  attr.value:='hund';
-  doc.documentElement.setAttributeNodeNS(attr);
-  temp:=(doc as IDOMPersist).xml;
-  temp:=getCont(temp);
-  check(temp='<test xmlns:ct="http://ns.4ct.de" ct:name1="hund"/>','failed')
-end;
-
-procedure TTestDOM2Methods.append_100_attributes_with_different_namespaces;
-var
-  attr: IDOMAttr;
-  i: integer;
-  attrval,temp: string;
-  ok: boolean;
-begin
-  // create attributes
-  for i := 0 to 2 do begin
-    attr := doc.createAttributeNS('http://test'+IntToStr(i)+'.invalid','test'+IntToStr(i)+':attr');
-    attr.value := IntToStr(i);
-    doc.documentElement.setAttributeNodeNS(attr);
-    attr := nil;
-  end;
-  temp:=(doc as IDOMPersist).xml;
-  temp:=getCont(temp);
-  OutLog(temp);
-  ok:=false;
-  if temp='<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>'
-    then ok:=true;
-  if temp='<test xmlns:test0="http://test0.invalid" xmlns:test1="http://test1.invalid" xmlns:test2="http://test2.invalid" test0:attr="0" test1:attr="1" test2:attr="2"/>'
-    then ok:=true;
-  Check(ok,'Test failed!');
-  // check attributes
-  for i := 0 to 2 do begin
-    attrval := doc.documentElement.getAttributeNS('http://test'+IntToStr(i)+'.invalid','attr');
-    check(attrval = IntToStr(i),'expected '+IntToStr(i)+' but found '+attrval);
-  end;
-end;
-
-function TTestDOM2Methods.getCont(xml:string):string;
-// this function cuts the first line and
-// the leading crlf
-// ToDo: should be replaced by a more general implementation
-begin
-  if domvendor='LIBXML' then begin
-    result:=rightstr(xml,length(xml)-44);
-    result:=leftstr(result,length(result)-1);
-  end else begin
-    result:=rightstr(xml,length(xml)-23);
-    result:=leftstr(result,length(result)-2);
-  end;
-end;
-
-procedure TTestDOM2Methods.ShowDom;
-var
-  el: IDOMElement;
-  temp: string;
-begin
-  el:=doc.createElement('books');
-  doc.documentElement.appendChild(el);
-  temp:=((doc as IDOMPersist).xml);
-  outlog(getCont(temp));
-end;
-
-procedure TTestMemoryLeaks.jkTestDocument;
-var
-  TestSet: integer;
-  TestsOK: integer;
-  i,j: integer;
-  temp:string;
-begin
-  temp:=includetrailingpathdelimiter(datapath);
-  TestSet:=0;
-  for j:=1 to 50 do begin
-    for i:=1 to 100 do begin
-      TestsOK:=TestDocument(temp+'test.xml',domvendor,TestSet);
-      //OutLog('Passed OK: '+inttostr(TestsOK));
-      Check((TestsOK >= 15),(inttostr(15-TestsOK)+' Tests failed!')); //15
-    end;
-    OutLog('Passed OK: '+inttostr(j*100));
-  end;
-end;
-
 procedure TTestMemoryLeaks.jkTestElement;
 var
   TestSet: integer;
@@ -555,10 +554,8 @@ begin
   for j:=1 to 50 do begin
     for i:=1 to 100 do begin
       TestsOK:=TestElement0(temp+'test.xml',domvendor,TestSet);
-      //OutLog('Passed OK: '+inttostr(TestsOK));
       Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!'));
     end;
-    OutLog('Passed OK: '+inttostr(j*100));
   end;
 end;
 
@@ -576,7 +573,6 @@ begin
     //test('element.setAttributeNode',(element.hasAttribute('loop')));
     element.hasAttribute('loop');
     element:=nil;
-    //outLog (inttostr(elementcount));
   end;
 end;
 
@@ -592,94 +588,167 @@ begin
   for j:=1 to 50 do begin
     for i:=1 to 1 do begin
       TestsOK:=TestNamedNodemap(temp+'test.xml',domvendor,TestSet);
-      //OutLog('Passed OK: '+inttostr(TestsOK));
       Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!')); //15
     end;
-    OutLog('Passed OK: '+inttostr(j*100));
   end;
 end;
 
-{ TSimpleTests }
-
-procedure TSimpleTests.appendChild;
+procedure TTestMemoryLeaks.jkTestDocument;
+var
+  TestSet: integer;
+  TestsOK: integer;
+  i,j: integer;
+  temp:string;
 begin
-  elem := doc.createElement(name);
-  doc.documentElement.appendChild(elem);
-  check(doc.documentElement.hasChildNodes, 'is false');
-  check(myIsSameNode(elem,doc.documentElement.firstChild) ,'wrong node');
+  temp:=includetrailingpathdelimiter(datapath);
+  TestSet:=0;
+  for j:=1 to 50 do begin
+    for i:=1 to 100 do begin
+      TestsOK:=TestDocument(temp+'test.xml',domvendor,TestSet);
+      Check((TestsOK >= 15),(inttostr(15-TestsOK)+' Tests failed!')); //15
+    end;
+  end;
 end;
 
-procedure TSimpleTests.appendChild1;
+{ TTestDomExceptions }
+
+procedure TTestDomExceptions.SetUp;
+begin
+  inherited;
+  impl := DomSetup.getCurrentDomSetup.getDocumentBuilder.domImplementation;
+  doc := impl.createDocument('','',nil);
+  (doc as IDOMPersist).loadxml(xmlstr);
+  doc1 := impl.createDocument('','',nil);
+  (doc1 as IDOMPersist).loadxml(xmlstr1);
+  nsuri := 'http://ns.4commerce.de';
+  prefix := 'ct';
+  name := 'test';
+  data := 'Dies ist ein Beispiel-Text.';
+  noex := False;
+end;
+
+procedure TTestDomExceptions.TearDown;
+begin
+  doc := nil;
+  doc1 := nil;
+end;
+
+function TTestDomExceptions.getFqname: string;
+begin
+  if prefix = '' then result := name else result := prefix + ':' + name;
+end;
+
+procedure TTestDomExceptions.AppendAttribute;
+var
+  attr: IDOMAttr;
+begin
+  try
+    attr := doc.createAttribute('test');
+    doc.documentElement.appendChild(attr);
+    fail('There should have been an EDomException');
+  except
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
+  end;
+end;
+
+procedure TTestDomExceptions.AppendNilNode;
+begin
+  try
+    doc.documentElement.appendChild(nil);
+    fail('There should have been an EDomError');
+  except
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
+  end;
+end;
+
+procedure TTestDomExceptions.InsertNilNode;
+var
+  node: IDOMNode;
+begin
+  node := doc.createElement('sub1');
+  doc.documentElement.appendChild(node);
+  try
+    doc.documentElement.insertBefore(nil,node);
+    fail('There should have been an EDomError');
+  except
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
+  end;
+end;
+
+procedure TTestDomExceptions.InsertAnchestor;
+var node1,node2: IDOMNode;
+begin
+  node1 := doc.createElement('sub1');
+  node2 := doc.createElement('sub2');
+  node1.appendChild(node2);
+  doc.documentElement.appendChild(node1);
+  try
+    node1.insertBefore(doc.documentElement,node2);
+    fail('There should have been an EDomError');
+  except
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
+  end;
+end;
+
+procedure TTestDomExceptions.appendChild1;
 begin
   elem := doc.createElement(name);
   // node is of a type that does not allow children of the type of the newChild node
   try
     elem.appendChild(doc as IDOMNode);
-    check(False, 'exception not raised');
+    noex := True;
   except
     on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
+      if E is EDomException then begin
+        check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
       end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
+        fail('wrong exception: '+E.Message);
       end;
     end;
   end;
+  if noex then fail('exception not raised');
 end;
 
-procedure TSimpleTests.appendChild2;
+procedure TTestDomExceptions.appendChild2;
 begin
   elem := doc.createElement(name);
   doc.documentElement.appendChild(elem);
   // node to append is one of this node's ancestors
   try
     elem.appendChild(doc.documentElement);
-    check(False, 'exception not raised');
+    noex := True;
   except
     on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
+      if E is EDomException then begin
+        check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
       end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
+        fail('wrong exception: '+E.Message);
       end;
     end;
   end;
+  if noex then fail('exception not raised');
 end;
 
-procedure TSimpleTests.appendChild3;
+procedure TTestDomExceptions.appendChild3;
 begin
   elem := doc.createElement(name);
   // node to append is this node itself
   try
     elem.appendChild(elem);
-    check(False, 'exception not raised');
+    noex := True;
   except
     on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
+      if E is EDomException then begin
+        check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
       end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
+        fail('wrong exception: '+E.Message);
       end;
     end;
   end;
+  if noex then fail('exception not raised');
 end;
 
-procedure TSimpleTests.appendChild4;
+procedure TTestDomExceptions.appendChild4;
 var
   doc2: IDOMDocument;
 begin
@@ -690,21 +759,423 @@ begin
   // than the one that created this node
   try
     doc.documentElement.appendChild(elem);
-    check(False, 'exception not raised');
+    noex := True;
   except
     on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = WRONG_DOCUMENT_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
+      if E is EDomException then begin
+        check((E as EDomException).code = WRONG_DOCUMENT_ERR, 'wrong exception raised');
       end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
+        fail('wrong exception: '+E.Message);
       end;
     end;
   end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createAttribute1;
+begin
+  // the specified name contains an illegal character
+  try
+    attr := doc.createAttribute('!@"#');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createAttributeNS1;
+begin
+  // the specified name contains an illegal character
+  try
+    attr := doc.createAttributeNS(nsuri,'!@"#');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createAttributeNS2;
+begin
+  // the qualifiedName has a prefix and the namespaceURI is null
+  try
+    attr := doc.createAttributeNS('','ct:test');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createAttributeNS3;
+begin
+  // the qualifiedName has a prefix that is "xml" and
+  // the namespaceURI is different from "http://www.w3.org/XML/1998/namespace"
+  try
+    attr := doc.createAttributeNS(nsuri,'xml:test');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createAttributeNS4;
+begin
+  // the qualifiedName is "xmlns"
+  // and the namespaceURI is different from "http://www.w3.org/2000/xmlns/".
+  try
+    attr := doc.createAttributeNS(nsuri,'xmlns');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createAttributeNS5;
+begin
+  // the prefix is "xmlns"
+  // and the namespaceURI is different from "http://www.w3.org/2000/xmlns/".
+  try
+    attr := doc.createAttributeNS(nsuri,'xmlns:test');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createDocument;
+begin
+  // the specified qualified name contains an illegal character
+  try
+    doc := impl.createDocument('','"',nil);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createDocument1;
+begin
+  // the qualifiedName has a prefix and the namespaceURI is null
+  try
+    doc := impl.createDocument('',fqname,nil);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createDocument2;
+begin
+  // the qualifiedName is null and the namespaceURI is different from null
+  try
+    doc := impl.createDocument(nsuri,'',nil);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createDocument3;
+begin
+  // the qualifiedName has a prefix that is "xml" and
+  // the namespaceURI is different from "http://www.w3.org/XML/1998/namespace"
+  try
+    doc := impl.createDocument(nsuri,'xml:test',nil);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createElement1;
+begin
+  // the specified name contains an illegal character
+  try
+    elem := doc.createElement('!@#"');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createElementNS1;
+begin
+  // the specified qualified name contains an illegal character
+  try
+    elem := doc.createElementNS(nsuri,'"');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createElementNS2;
+begin
+  // the qualifiedName has a prefix and the namespaceURI is null
+  try
+    elem := doc.createElementNS('',fqname);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createElementNS3;
+begin
+  // the qualifiedName has a prefix that is "xml" and
+  // the namespaceURI is different from "http://www.w3.org/XML/1998/namespace"
+  try
+    elem := doc.createElementNS(nsuri,'xml:test');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createEntityReference1;
+begin
+  // the specified name contains an illegal character
+  try
+    entref := doc.createEntityReference('"');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.createProcessingInstruction1;
+begin
+  // the specified name contains an illegal character
+  try
+    pci := doc.createProcessingInstruction('!@#"',data);
+    //don't know, what an illegal character in the target is
+    //noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.insertBefore1;
+begin
+  elem := doc.createElement(name);
+  node := doc.createElement(name);
+  elem.appendChild(node);
+  // node is of a type that does not allow children of the type of the newChild node
+  try
+    elem.insertBefore(doc as IDOMNode,node);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.insertBefore2;
+begin
+  elem := doc.createElement(name);
+  node := doc.createElement(name);
+  elem.appendChild(node);
+  doc.documentElement.appendChild(elem);
+  // node to insert is one of this node's ancestors
+  try
+    elem.insertBefore(doc.documentElement,node);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.insertBefore3;
+begin
+  elem := doc.createElement(name);
+  node := doc.createElement(name);
+  elem.appendChild(node);
+  // node to insert is this node itself
+  try
+    elem.insertBefore(elem,node);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.insertBefore4;
+begin
+  elem := doc.createElement(name);
+  // node if of type Document and the DOM application
+  // attempts to insert a second Element node
+  try
+    doc.insertBefore(elem,doc.documentElement);
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+procedure TTestDomExceptions.selectNodes3;
+begin
+  select := doc.documentElement as IDOMNodeSelect;
+  try
+    nodelist := select.selectNodes('"');
+    noex := True;
+  except
+    on E: Exception do begin
+      if E is EDomException then begin
+        check((E as EDomException).code = SYNTAX_ERR, 'wrong exception raised: '+E.Message);
+      end else begin
+        fail('wrong exception: '+E.Message);
+      end;
+    end;
+  end;
+  if noex then fail('exception not raised');
+end;
+
+{ TSimpleTests }
+
+procedure TSimpleTests.appendChild;
+begin
+  elem := doc.createElement(name);
+  doc.documentElement.appendChild(elem);
+  check(doc.documentElement.hasChildNodes, 'is false');
+  check(myIsSameNode(elem,doc.documentElement.firstChild) ,'wrong node');
 end;
 
 procedure TSimpleTests.attributes;
@@ -782,28 +1253,6 @@ begin
   check(attr.ownerDocument = doc, 'wrong ownerDocument');
 end;
 
-procedure TSimpleTests.createAttribute1;
-begin
-  // the specified name contains an illegal character
-  try
-    attr := doc.createAttribute('!@"#');
-    check(False, 'exception not raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
 procedure TSimpleTests.createAttributeNS;
 begin
   attr := doc.createAttributeNS(nsuri,fqname);
@@ -817,119 +1266,6 @@ begin
   check(attr.localName = name, 'wrong localName');
   check(attr.specified, 'is false');
   check(attr.value = 'kamel', 'wrong value');
-end;
-
-procedure TSimpleTests.createAttributeNS1;
-begin
-  // the specified name contains an illegal character
-  try
-    attr := doc.createAttributeNS(nsuri,'!@"#');
-    check(False, 'exception not raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createAttributeNS2;
-begin
-  // the qualifiedName has a prefix and the namespaceURI is null
-  try
-    attr := doc.createAttributeNS('','ct:test');
-    check(False, 'exception not raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createAttributeNS3;
-begin
-  // the qualifiedName has a prefix that is "xml" and
-  // the namespaceURI is different from "http://www.w3.org/XML/1998/namespace"
-  try
-    attr := doc.createAttributeNS(nsuri,'xml:test');
-    check(False, 'exception not raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createAttributeNS4;
-begin
-  // the qualifiedName is "xmlns"
-  // and the namespaceURI is different from "http://www.w3.org/2000/xmlns/".
-  try
-    attr := doc.createAttributeNS(nsuri,'xmlns');
-    check(False, 'exception not raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createAttributeNS5;
-begin
-  // the prefix is "xmlns"
-  // and the namespaceURI is different from "http://www.w3.org/2000/xmlns/".
-  try
-    attr := doc.createAttributeNS(nsuri,'xmlns:test');
-    check(False, 'exception not raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
 end;
 
 procedure TSimpleTests.createCDATASection;
@@ -963,95 +1299,6 @@ begin
   check(comment.nodeType = COMMENT_NODE, 'wrong nodeType');
 end;
 
-procedure TSimpleTests.createDocument;
-begin
-  // the specified qualified name contains an illegal character
-  try
-    doc := impl.createDocument('','"',nil);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createDocument1;
-begin
-  // the qualifiedName has a prefix and the namespaceURI is null
-  try
-    doc := impl.createDocument('',fqname,nil);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createDocument2;
-begin
-  // the qualifiedName is null and the namespaceURI is different from null
-  try
-    doc := impl.createDocument(nsuri,'',nil);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createDocument3;
-begin
-  // the qualifiedName has a prefix that is "xml" and
-  // the namespaceURI is different from "http://www.w3.org/XML/1998/namespace"
-  try
-    doc := impl.createDocument(nsuri,'xml:test',nil);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
 procedure TSimpleTests.createDocumentFragment;
 begin
   docfrag := doc.createDocumentFragment;
@@ -1072,28 +1319,6 @@ begin
   check(elem.localName = '', 'wrong localName');
 end;
 
-procedure TSimpleTests.createElement1;
-begin
-  // the specified name contains an illegal character
-  try
-    elem := doc.createElement('!@#"');
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
 procedure TSimpleTests.createElementNS;
 begin
   elem := doc.createElementNS(nsuri,fqname);
@@ -1106,101 +1331,12 @@ begin
   check(elem.localName = name, 'wrong name');
 end;
 
-procedure TSimpleTests.createElementNS1;
-begin
-  // the specified qualified name contains an illegal character
-  try
-    elem := doc.createElementNS(nsuri,'"');
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createElementNS2;
-begin
-  // the qualifiedName has a prefix and the namespaceURI is null
-  try
-    elem := doc.createElementNS('',fqname);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.createElementNS3;
-begin
-  // the qualifiedName has a prefix that is "xml" and
-  // the namespaceURI is different from "http://www.w3.org/XML/1998/namespace"
-  try
-    elem := doc.createElementNS(nsuri,'xml:test');
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = NAMESPACE_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
 procedure TSimpleTests.createEntityReference;
 begin
   entref := doc.createEntityReference(name);
   check(entref <> nil, 'is nil');
   check(entref.nodeName = name, 'wrong nodeName');
   check(entref.nodeType = ENTITY_REFERENCE_NODE, 'wrong nodeType');
-end;
-
-procedure TSimpleTests.createEntityReference1;
-begin
-  // the specified name contains an illegal character
-  try
-    entref := doc.createEntityReference('"');
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
 end;
 
 procedure TSimpleTests.createProcessingInstruction;
@@ -1212,29 +1348,6 @@ begin
   check(pci.nodeName = name, 'wrong nodeName');
   check(pci.nodeValue = data, 'wrong nodeValue');
   check(pci.nodeType = PROCESSING_INSTRUCTION_NODE, 'wrong nodeType');
-end;
-
-procedure TSimpleTests.createProcessingInstruction1;
-begin
-  // the specified name contains an illegal character
-  try
-    pci := doc.createProcessingInstruction('!@#"',data);
-    //don't know, what an illegal character in the target is
-    //check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
 end;
 
 procedure TSimpleTests.createTextNode;
@@ -1493,106 +1606,6 @@ begin
   check(node.ownerDocument = doc, 'wrong ownerDocument');
 end;
 
-procedure TSimpleTests.insertBefore1;
-begin
-  elem := doc.createElement(name);
-  node := doc.createElement(name);
-  elem.appendChild(node);
-  // node is of a type that does not allow children of the type of the newChild node
-  try
-    elem.insertBefore(doc as IDOMNode,node);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.insertBefore2;
-begin
-  elem := doc.createElement(name);
-  node := doc.createElement(name);
-  elem.appendChild(node);
-  doc.documentElement.appendChild(elem);
-  // node to insert is one of this node's ancestors
-  try
-    elem.insertBefore(doc.documentElement,node);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.insertBefore3;
-begin
-  elem := doc.createElement(name);
-  node := doc.createElement(name);
-  elem.appendChild(node);
-  // node to insert is this node itself
-  try
-    elem.insertBefore(elem,node);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
-procedure TSimpleTests.insertBefore4;
-begin
-  elem := doc.createElement(name);
-  // node if of type Document and the DOM application
-  // attempts to insert a second Element node
-  try
-    doc.insertBefore(elem,doc.documentElement);
-    check(False, 'no exception raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = HIERARCHY_REQUEST_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
-  end;
-end;
-
 procedure TSimpleTests.isSupported;
 begin
   check(doc.isSupported('Core','2.0'), 'is false');
@@ -1762,45 +1775,49 @@ var
   sl: TStrings;
   tmp: string;
 begin
-  // get a textual representation of the dom
-  data := (doc as IDOMPersist).xml;
-  // save the dom to a file and load it as a textfile
-  (doc as IDOMPersist).save('temp.xml');
-  sl := TSTringList.create;
-  sl.LoadFromFile('temp.xml');
-  tmp := sl.Text;
-  // adjust contents of the textfile
-  if domvendor = 'LIBXML' then begin
-    // libxml xml-method adds LF
-    tmp := AdjustLineBreaks(tmp,tlbsLF);
-  end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-    // ms save-method saves the encoding-attribute
-    // but ms xml-method doesn't hides it
-    // ms xml-method adds CRLF
-    tmp := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
-  end else begin
-    raise EUnknownDomVendor.create('unknown dom vendor '+domvendor);
+  try
+    // get a textual representation of the dom
+    data := (doc as IDOMPersist).xml;
+    // save the dom to a file and load it as a textfile
+    (doc as IDOMPersist).save('temp.xml');
+    sl := TSTringList.create;
+    sl.LoadFromFile('temp.xml');
+    tmp := sl.Text;
+    // adjust contents of the textfile
+    if domvendor = 'LIBXML' then begin
+      // libxml xml-method adds LF
+      tmp := AdjustLineBreaks(tmp,tlbsLF);
+    end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+      // ms save-method saves the encoding-attribute
+      // but ms xml-method hides it
+      // ms xml-method adds CRLF
+      tmp := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
+    end else begin
+      fail('unknown dom vendor '+domvendor);
+    end;
+    // compare the textual representation of the dom to the contents of the textfile
+    check(data = tmp, 'wrong content');
+    // load the dom from a textfile
+    (doc as IDOMPersist).load('temp.xml');
+    // get a textual representation of the dom
+    tmp := (doc as IDOMPersist).xml;
+    // adjust the textual representation of the dom
+    if domvendor = 'LIBXML' then begin
+      // libxml xml-method adds LF
+      tmp := AdjustLineBreaks(tmp,tlbsLF);
+    end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+      // ms save-method saves the encoding-attribute
+      // but ms xml-method doesn't hides it
+      // ms xml-method adds CRLF
+      tmp := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
+    end else begin
+      fail('unknown dom vendor '+domvendor);
+    end;
+    // compare the old textual representation of the dom with the new loaded
+    check(data = tmp, 'wrong content');
+  finally
+    if FileExists('temp.xml') then DeleteFile('temp.xml');
   end;
-  // compare the textual representation of the dom to the contents of the textfile
-  check(data = tmp, 'wrong content');
-  // load the dom from a textfile
-  (doc as IDOMPersist).load('temp.xml');
-  // get a textual representation of the dom
-  tmp := (doc as IDOMPersist).xml;
-  // adjust the textual representation of the dom
-  if domvendor = 'LIBXML' then begin
-    // libxml xml-method adds LF
-    tmp := AdjustLineBreaks(tmp,tlbsLF);
-  end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-    // ms save-method saves the encoding-attribute
-    // but ms xml-method doesn't hides it
-    // ms xml-method adds CRLF
-    tmp := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
-  end else begin
-    raise EUnknownDomVendor.create('unknown dom vendor '+domvendor);
-  end;
-  // compare the old textual representation of the dom with the new loaded
-  check(data = tmp, 'wrong content');
 end;
 
 
@@ -1940,32 +1957,88 @@ begin
   end;
 end;
 
-procedure TSimpleTests.selectNodes3;
+procedure TSimpleTests.valid;
+var tmp: string;
 begin
-  select := doc.documentElement as IDOMNodeSelect;
-  try
-    nodelist := select.selectNodes('"');
-    check(False, 'exception not raised');
-  except
-    on E: Exception do begin
-      if E is ETestFailure then check(False, 'exception not raised');
-      if domvendor = 'LIBXML' then begin
-        if E is EDomException then begin
-          check((E as EDomException).code = SYNTAX_ERR, 'wrong exception raised');
-        end;
-      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
-        check(E is EOleException, 'wrong exception raised');
-      end else begin
-        raise EUnknownDomVendor.create('unknown domvendor '+domvendor);
-      end;
-    end;
+  data := '<?xml version="1.0" encoding="iso-8859-1"?>'+
+          '<!DOCTYPE root ['+
+          '<!ELEMENT root (test*)>'+
+          '<!ELEMENT test (#PCDATA)>'+
+          '<!ATTLIST test name CDATA #IMPLIED>'+
+          ']>'+
+          '<root />';
+
+  (doc as IDOMParseOptions).validate := True;
+  (doc as IDOMPersist).loadxml(data);
+  check(doc <> nil, 'is nil');
+  tmp := (doc as IDOMPersist).xml;
+  // adjust contents of the text
+  if domvendor = 'LIBXML' then begin
+    // libxml xml-method adds LF
+    data := AdjustLineBreaks(tmp,tlbsLF);
+  end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+    // ms save-method saves the encoding-attribute
+    // but ms xml-method hides it
+    // ms xml-method adds CRLF
+    data := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
+  end else begin
+    fail('unknown dom vendor '+domvendor);
   end;
+  check(tmp = data, 'wrong content');
+end;
+
+procedure TSimpleTests.valid1;
+var
+  tmp: string;
+  ok: boolean;
+begin
+  data := '<?xml version="1.0" encoding="iso-8859-1"?>'+
+          '<!DOCTYPE root ['+
+          '<!ELEMENT root (test*)>'+
+          '<!ELEMENT test (#PCDATA)>'+
+          '<!ATTLIST test name CDATA #IMPLIED>'+
+          ']>'+
+          '<egon />';
+
+  (doc as IDOMParseOptions).validate := True;
+  ok:=(doc as IDOMPersist).loadxml(data);
+  check(ok=false, 'result of load is not false');
+end;
+
+procedure TSimpleTests.valid2;
+var tmp: string;
+begin
+  data := '<?xml version="1.0" encoding="iso-8859-1"?>'+
+          '<!DOCTYPE root ['+
+          '<!ELEMENT root (test*)>'+
+          '<!ELEMENT test (#PCDATA)>'+
+          '<!ATTLIST test name CDATA #IMPLIED>'+
+          ']>'+
+          '<egon />';
+
+  (doc as IDOMParseOptions).validate := False;
+  (doc as IDOMPersist).loadxml(data);
+  check(doc <> nil, 'is nil');
+  tmp := (doc as IDOMPersist).xml;
+  // adjust contents of the textfile
+  if domvendor = 'LIBXML' then begin
+    // libxml xml-method adds LF
+    data := AdjustLineBreaks(tmp,tlbsLF);
+  end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+    // ms save-method saves the encoding-attribute
+    // but ms xml-method hides it
+    // ms xml-method adds CRLF
+    data := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
+  end else begin
+    fail('unknown dom vendor '+domvendor);
+  end;
+  check(tmp = data, 'wrong content');
 end;
 
 procedure TSimpleTests.SetUp;
 begin
   inherited;
-  impl := GetDom(domvendor);
+  impl := DomSetup.getCurrentDomSetup.getDocumentBuilder.domImplementation;
   doc := impl.createDocument('','',nil);
   (doc as IDOMPersist).loadxml('<?xml version="1.0" encoding="iso-8859-1"?><root />');
   nsuri := 'http://ns.4commerce.de';
@@ -1994,81 +2067,35 @@ begin
   inherited;
 end;
 
-procedure TTestDOM2Methods.LoadFiles;
-var
-	builder: IDomDocumentBuilder;
-	mydoc: IDomDocument;
-	fd: string; // file directory
-	fn: string; // file name
-	sr: TSearchRec;
-	rv: integer; // returned value
-	cnt: integer; // tested file counter
+{ *** all *** }
+
+function domvendor: string;
 begin
-	fd := datapath;
-	try
-		cnt := 0;
-		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
-		while (rv=0) do begin
-			Inc(cnt);
-			builder := getDocumentBuilderFactory(DomVendor).newDocumentBuilder;
-			fn := fd + '/' + sr.Name;
-			mydoc := builder.load(fn);
-			check(mydoc<>nil, fn+': document not loaded');
-			check(mydoc.documentElement<>nil, fn+': documentElement is nil');
-			rv := FindNext(sr);
-		end;
-		if (cnt=0) then begin
-			check(false, 'No XML file available for testing in directory '+fd);
-		end;
-	finally
-		FindClose(sr);
-	end;
+  result := domSetup.getCurrentDomSetup.getVendorID;
 end;
 
-procedure TTestDOM2Methods.LoadFilesII;
+function getUnitTests: ITestSuite;
 var
-	mydoc: IDomDocument;
-	fd: string; // file directory
-	fn: string; // file name
-	sr: TSearchRec;
-	rv: integer; // returned value
-	cnt: integer; // tested file counter
+  suite: TTestSuite;
 begin
-  impl := GetDom(domvendor);
-  mydoc := impl.createDocument('','',nil);
-	fd := datapath;
-	try
-		cnt := 0;
-		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
-		while (rv=0) do begin
-			Inc(cnt);
-			fn := fd + '/' + sr.Name;
-      (mydoc as IDOMPersist).load(fn);
-			check(mydoc<>nil, fn+': document not loaded');
-			check(mydoc.documentElement<>nil, fn+': documentElement is nil');
-			rv := FindNext(sr);
-		end;
-		if (cnt=0) then begin
-			check(false, 'No XML file available for testing in directory '+fd);
-		end;
-	finally
-		FindClose(sr);
-	end;
+  suite := TTestSuite.Create;
+  suite.AddSuite(TSimpleTests.Suite);
+  suite.AddSuite(TTestDOM2Methods.Suite);
+  suite.AddSuite(TTestDomExceptions.Suite);
+  suite.AddSuite(TTestMemoryLeaks.Suite);
+  result := suite;
+end;
+
+function getDataPath: string;
+var ini: TIniFile;
+begin
+  ini := TIniFile.Create('./XPTestSuite_xdom2.ini');
+  result := Ini.ReadString('TestDocuments','DataPath','../../data');
+  Ini.WriteString('TestDocuments','DataPath',result);
 end;
 
 initialization
-  {$ifdef WIN32}
-    if DirectoryExists('L:\@Demos\Open_xdom\Data')
-      then datapath:='L:\@Demos\Open_xdom\Data'
-      else datapath:='../../data';
-  {$endif}
-  {$ifdef LINUX}
-    datapath:='../../data';
-  {$endif}
-  RegisterTest('', TTestDom2Methods.Suite);
-  RegisterTest('', TTestMemoryLeaks.Suite);
-  RegisterTest('', TTestDomExceptions.Suite);
-  RegisterTest('', TSimpleTests.Suite);
+  datapath := getDataPath;
   CoInitialize(nil);
 end.
 
