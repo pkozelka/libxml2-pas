@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.96 2002-01-30 00:03:48 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.97 2002-01-30 09:59:10 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -80,6 +80,7 @@ type
     function createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
     function createDocument(const namespaceURI, qualifiedName: DomString; doctype: IDomDocumentType): IDomDocument;
   public
+    class function featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
   end;
 
   { TGDOMNode }
@@ -119,6 +120,7 @@ type
     function  hasAttributes : Boolean;
     function  cloneNode(deep: Boolean): IDomNode;
     procedure normalize;
+    function  isSupported(const feature, version: DomString): Boolean;
   protected //IDomNodeSelect
     function  selectNode(const nodePath: DomString): IDomNode;
     function  selectNodes(const nodePath: DomString): IDomNodeList;
@@ -132,7 +134,6 @@ type
     constructor Create(aLibXml2Node: pointer); virtual;
     function  requestNodePtr: xmlNodePtr; virtual;
     //function supports(const feature, version: DomString): Boolean;
-    function  isSupported(const feature, version: DomString): Boolean;
     function  IsReadOnly: boolean;
     function  IsAncestorOrSelf(newNode:xmlNodePtr): boolean; //new
     property  GNode: xmlNodePtr read FGNode;
@@ -483,6 +484,13 @@ resourcestring
   SNodeExpected = 'Node cannot be null';
   SGDOMNotInstalled = 'GDOME2 is not installed';
 
+const
+  IMPLEMENTATION_FEATURES: array [0..9] of DomString = (
+    'CORE', '2.0',
+    'CORE', '',
+    'XML', '2.0',
+    'XML', '1.0',
+    'XML', '');
 const
   DEFAULT_IMPL_FREE_THREADED = false;
 var
@@ -840,37 +848,6 @@ end;
 
 { TGDOMImplementation }
 
-class function TGDOMImplementation.getInstance(aFreeThreading: boolean): IDomImplementation;
-begin
-  Result := GDOMImplementation[aFreeThreading];
-  if (Result = nil) then begin
-    Result := TGDOMImplementation.Create; // currently, the same imlementation for both cases
-    GDOMImplementation[aFreeThreading] := Result;
-  end;
-end;
-
-function TGDOMImplementation.hasFeature(const feature, version: DomString): Boolean;
-const
-  FEATURES: array [1..5, 1..2] of string = (
-    ('CORE', '2.0'),
-    ('CORE', ''),
-    ('XML', '2.0'),
-    ('XML', '1.0'),
-    ('XML', ''));
-var
-  i: integer;
-  fea: string;
-  ver: string;
-begin
-  Result := true;
-  fea := UpperCase(feature);
-  ver := UpperCase(version);
-  for i:=Low(FEATURES) to High(FEATURES) do begin
-    if (fea=FEATURES[i][1]) and (ver=FEATURES[i][2]) then exit;
-  end;
-  Result := false;
-end;
-
 function TGDOMImplementation.createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
 var
   dtd:xmlDtdPtr;
@@ -898,7 +875,40 @@ begin
   end;
 end;
 
-{ TGDomeNode }
+class function TGDOMImplementation.featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
+var
+  i: integer;
+  fea: string;
+  ver: string;
+begin
+  fea := UpperCase(aFeature);
+  ver := UpperCase(aVersion);
+  i := Low(aFeatures);
+  while (i<High(aFeatures)) do begin
+    Result := (fea = aFeatures[i]);
+    Inc(i);
+    Result := Result and (ver=aFeatures[i]);
+    if Result then exit;
+    Inc(i);
+  end;
+  Result := false;
+end;
+
+class function TGDOMImplementation.getInstance(aFreeThreading: boolean): IDomImplementation;
+begin
+  Result := GDOMImplementation[aFreeThreading];
+  if (Result = nil) then begin
+    Result := TGDOMImplementation.Create; // currently, the same imlementation for both cases
+    GDOMImplementation[aFreeThreading] := Result;
+  end;
+end;
+
+function TGDOMImplementation.hasFeature(const feature, version: DomString): Boolean;
+begin
+  Result := featureIsSupported(feature, version, IMPLEMENTATION_FEATURES);
+end;
+
+{ TGDOMNode }
 
 constructor TGDOMNode.Create(aLibXml2Node: pointer);
 begin
@@ -1330,10 +1340,7 @@ end;
 
 function TGDOMNode.isSupported(const feature, version: DomString): Boolean;
 begin
-  if (((upperCase(feature)='CORE') and (version='2.0')) or
-     (upperCase(feature)='XML')  and (version='2.0')) //[pk] ??? what ???
-    then Result:=true
-  else Result:=false;
+  Result := TGDOMImplementation.featureIsSupported(feature, version, IMPLEMENTATION_FEATURES);
 end;
 
 function TGDOMNode.selectNode(const nodePath: DomString): IDomNode;
