@@ -48,9 +48,6 @@ uses
   {$else}
     MSXML_TLB,
   {$endif}
-  {$ifdef VER140} //delphi6
-    variants,
-  {$endif}
   windows,
   ComObj,
   xDom2;
@@ -85,7 +82,10 @@ implementation
 uses
   SysUtils,
   Classes,
-  ActiveX;            
+  {$ifdef VER140} {delphi6}
+    variants,
+  {$endif}
+  ActiveX;
 
 type
 
@@ -483,54 +483,205 @@ type
       function  get_SystemId : DomString;
   end;
 
-(* creates a M$ type node based on nodetype *)
-function createXMLNode(msNode : IXMLDOMNode) : IDomNode;
+
+  (*
+   * Some sort of memory manager that keeps a link between M$ COM interfaces
+   * and the Dom wrappers. It is used to get from a M$ interface to the wrapper
+   * (if there is already a wrapper created)
+  *)
+  TDomWrapperRepository = class(Tobject)
+    private
+      fWrapperList : TList;
+      fMsIntfList  : TList;
+
+    public
+      constructor create;
+      destructor destroy; override;
+
+      procedure registerWrapper(msIntf : IUnknown; wrapper : TObject);
+      procedure deRegisterWrapper(msIntf : IUnknown);
+      function  getWrapper(msIntf : IUnknown) : TObject;
+  end;
+
+var
+  gDomWrapperRepository : TDomWrapperRepository;
+
+
+
+function domCreateImplementation(msIntf : IXMLDOMImplementation)
+        : IDomImplementation;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLImplementation;
+  if result <> nil then exit;
+  result := TMSXMLImplementation.create(msIntf);
+end;
+
+function domCreateNodeList(msIntf : IXMLDOMNodeList) : IDomNodeList;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLNodeList;
+  if result <> nil then exit;
+  result := TMSXMLNodeList.create(msIntf);
+end;
+
+function domCreateNamedNodeMap(msIntf : IXMLDOMNamedNodeMap) : IDomNamedNodeMap;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLNamedNodeMap;
+  if result <> nil then exit;
+  result := TMSXMLNamedNodeMap.create(msIntf);
+end;
+
+function domCreateElement(msIntf : IXMLDOMElement) : IDomElement;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLElement;
+  if result <> nil then exit;
+  result := TMSXMLElement.create(msIntf);
+end;
+
+function domCreateAttribute(msIntf : IXMLDOMAttribute) : IDomAttr;
+begin
+  result := gDomWrapperRepository.getWrapper(msIntf as IUnknown) as TMSXMLAttr;
+  if result <> nil then exit;
+  result := TMSXMLAttr.create(msIntf);
+end;
+
+(*
+ * because the MS interface does not adhere to w3c specs we must use
+ * TMSXMLCharacterData instead of IXMLDOMText. For some methods the
+ * MS interface returns IXMLDOMCharacterData where it should return
+ * IXMLDOMText (eg. IXMLDOMDocument.createTextNode).
+*)
+function domCreateText(msIntf : IXMLDOMCharacterData) : IDomText;
+begin
+  result := gDomWrapperRepository.getWrapper(msIntf as IUnknown) as TMSXMLText;
+  if result <> nil then exit;
+  result := TMSXMLText.create(msIntf);
+end;
+
+function domCreateCDataSection(msIntf : IXMLDOMCDATASection) : IDomCDataSection;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLCDataSection;
+  if result <> nil then exit;
+  result := TMSXMLCDataSection.create(msIntf);
+end;
+
+function domCreateEntityReference(msIntf : IXMLDOMEntityReference)
+        : IDomEntityReference;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLEntityReference;
+  if result <> nil then exit;
+  result := TMSXMLEntityReference.create(msIntf);
+end;
+
+function domCreateEntity(msIntf : IXMLDOMEntity) : IDomEntity;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLEntity;
+  if result <> nil then exit;
+  result := TMSXMLEntity.create(msIntf);
+end;
+
+function domCreateProcessingInstruction(msIntf : IXMLDOMProcessingInstruction)
+        : IDomProcessingInstruction;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLProcessingInstruction;
+  if result <> nil then exit;
+  result := TMSXMLProcessingInstruction.create(msIntf);
+end;
+
+function domCreateComment(msIntf : IXMLDOMComment) : IDomComment;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLComment;
+  if result <> nil then exit;
+  result := TMSXMLComment.create(msIntf);
+end;
+
+function domCreateDocument(msIntf : IXMLDOMDocument) : IDomDocument;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLDocument;
+  if result <> nil then exit;
+  result := TMSXMLDocument.create(msIntf);
+end;
+
+function domCreateDocumentType(msIntf : IXMLDOMDocumentType) : IDomDocumentType;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLDocumentType;
+  if result <> nil then exit;
+  result := TMSXMLDocumentType.create(msIntf);
+end;
+
+function domCreateDocumentFragment(msIntf : IXMLDOMDocumentFragment)
+        : IDomDocumentFragment;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLDocumentFragment;
+  if result <> nil then exit;
+  result := TMSXMLDocumentFragment.create(msIntf);
+end;
+
+function domCreateNotation(msIntf : IXMLDOMNotation) : IDomNotation;
+begin
+  result := gDomWrapperRepository.getWrapper(
+          msIntf as IUnknown) as TMSXMLNotation;
+  if result <> nil then exit;
+  result := TMSXMLNotation.create(msIntf);
+end;
+
+
+(* creates a DomNode wrapper for the M$ node *)
+function domCreateNode(msNode : IXMLDOMNode) : IDomNode;
 begin
   case msNode.nodeType of
     NODE_ELEMENT :
-      result := TMSXMLElement.create(msNode as IXMLDOMElement);
+      result := domCreateElement(msNode as IXMLDOMElement);
 
     NODE_ATTRIBUTE :
-      result := TMSXMLAttr.create(msNode as IXMLDOMAttribute);
+      result := domCreateAttribute(msNode as IXMLDOMAttribute);
 
     NODE_TEXT :
-      result := TMSXMLText.create(msNode as IXMLDOMText);
+      result := domCreateText(msNode as IXMLDOMText);
 
     NODE_CDATA_SECTION :
-      result := TMSXMLCDataSection.create(msNode as IXMLDOMCDataSection);
+      result := domCreateCDataSection(msNode as IXMLDOMCDataSection);
 
     NODE_ENTITY_REFERENCE :
-      result := TMSXMLEntityReference.create(
-              msNode as IXMLDOMEntityReference);
+      result := domCreateEntityReference(msNode as IXMLDOMEntityReference);
 
     NODE_ENTITY :
-      result := TMSXMLEntity.create(msNode as IXMLDOMEntity);
+      result := domCreateEntity(msNode as IXMLDOMEntity);
 
     NODE_PROCESSING_INSTRUCTION :
-      result := TMSXMLProcessingInstruction.create(
+      result := domCreateProcessingInstruction(
               msNode as IXMLDOMProcessingInstruction);
 
     NODE_COMMENT :
-      result := TMSXMLComment.create(msNode as IXMLDOMComment);
+      result := domCreateComment(msNode as IXMLDOMComment);
 
     NODE_DOCUMENT :
-      result := TMSXMLDocument.create(msNode as IXMLDOMDocument);
+      result := domCreateDocument(msNode as IXMLDOMDocument);
 
     NODE_DOCUMENT_TYPE :
-      result := TMSXMLDocumentType.create(msNode as IXMLDOMDocumentType);
+      result := domCreateDocumentType(msNode as IXMLDOMDocumentType);
 
     NODE_DOCUMENT_FRAGMENT :
-      result := TMSXMLDocumentFragment.create(
-              msNode as IXMLDOMDocumentFragment);
+      result := domCreateDocumentFragment(msNode as IXMLDOMDocumentFragment);
 
     NODE_NOTATION :
-      result := TMSXMLNotation.create(msNode as IXMLDOMNotation);
+      result := domCreateNotation(msNode as IXMLDOMNotation);
 
   else
     assert(false);
   end;
 end;
-
 
 (*
  * Tries to create a DOM object from a list of guids.
@@ -572,6 +723,53 @@ begin
     end;
   if not assigned(result) then
     raise EDOMException.create(etNotFoundErr,'MSDOM not installed!');
+end;
+
+
+constructor TDomWrapperRepository.create;
+begin
+  inherited create;
+  fWrapperList := TList.create;
+  fMsIntfList := TList.create;;
+end;
+
+destructor TDomWrapperRepository.destroy;
+begin
+  inherited destroy;
+  freeAndNil(fWrapperList);
+  freeAndNil(fMsIntfList);
+end;
+
+procedure TDomWrapperRepository.registerWrapper(msIntf : IUnknown; wrapper : TObject);
+begin
+  {explicit casting to IUnknown for interface identity}
+  fMsIntfList.add(Pointer(msIntf as IUnknown));
+  fWrapperList.add(wrapper);
+end;
+
+procedure TDomWrapperRepository.deRegisterWrapper(msIntf : IUnknown);
+var
+  index : Integer;
+begin
+  {get the iterator pointing to the ms intf in the map}
+  {explicit casting to IUnknown for interface identity}
+  index := fMsIntfList.indexOf(Pointer(msIntf as IUnknown));
+  assert(index <> -1);
+  fMsIntfList.delete(index);
+  fWrapperList.delete(index);
+end;
+
+function TDomWrapperRepository.getWrapper(msIntf : IUnknown) : TObject;
+var
+  index : Integer;
+begin
+  result := nil;
+  {explicit casting to IUnknown for interface identity}
+  index := fMsIntfList.indexOf(Pointer(msIntf as IUnknown));
+  if index <> -1 then
+  begin
+    result := fWrapperList.items[index];
+  end;
 end;
 
 
@@ -628,7 +826,7 @@ end;
 
 function TMSXMLDocumentBuilder.newDocument : IDomDocument;
 begin
-  result := TMSXMLDocument.create(createDOMDocument(fFreeThreading));
+  result := domCreateDocument(createDOMDocument(fFreeThreading));
 end;
 
 function TMSXMLDocumentBuilder.parse(const xml : DomString) : IDomDocument;
@@ -679,10 +877,14 @@ constructor TMSXMLImplementation.create(
 begin
   inherited create;
   fMSDomImplementation := msDomImplementation;
+  {register the wrapper}
+  gDomWrapperRepository.registerWrapper(msDomImplementation, self);
 end;
 
 destructor TMSXMLImplementation.destroy;
 begin
+  {de-register the wrapper}
+  gDomWrapperRepository.deRegisterWrapper(fMSDomImplementation);
   fMSDomImplementation := nil;
   inherited destroy;
 end;
@@ -714,11 +916,8 @@ function TMSXMLImplementation.createDocument(
         const namespaceURI  : DomString;
         const qualifiedName : DomString;
         docType             : IDomDocumentType) : IDomDocument;
-var
-  document: IXMLDOMDocument;
 begin
-  document := createDOMDocument(fFreeThreading);
-  result := TMSXMLDocument.create(document);
+  result := domCreateDocument(createDOMDocument(fFreeThreading));
 end;
 
 
@@ -729,6 +928,7 @@ constructor TMSXMLDocument.create(msDomDocument : IXMLDOMDocument);
 begin
   inherited create(msDomDocument);
   fMSDomDocument := msDomDocument;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLDocument.destroy;
@@ -745,7 +945,7 @@ begin
   if msDocType = nil then
     result := nil
   else
-    result := TMSXMLDocumentType.create(msDocType);
+    result := domCreateDocumentType(msDocType);
 end;
 
 function TMSXMLDocument.get_DomImplementation : IDomImplementation;
@@ -756,7 +956,7 @@ begin
   if msDomImplementation = nil then
     result := nil
   else
-    result := TMSXMLImplementation.create(msDomImplementation);
+    result := domCreateImplementation(msDomImplementation);
 end;
 
 function TMSXMLDocument.get_DocumentElement : IDomElement;
@@ -767,7 +967,7 @@ begin
   if msDomElement = nil then
     result := nil
   else
-    result := TMSXMLElement.create(msDomElement);
+    result := domCreateElement(msDomElement);
 end;
 
 function TMSXMLDocument.createElement(const tagName : DomString) : IDomElement;
@@ -778,7 +978,7 @@ begin
   if msDomElement = nil then
     result := nil
   else
-    result := TMSXMLElement.create(msDomElement);
+    result := domCreateElement(msDomElement);
 end;
 
 function TMSXMLDocument.createDocumentFragment : IDomDocumentFragment;
@@ -789,7 +989,7 @@ begin
   if msDocumentFragment = nil then
     result := nil
   else
-    result := TMSXMLDocumentFragment.create(msDocumentFragment);
+    result := domCreateDocumentFragment(msDocumentFragment);
 end;
 
 function TMSXMLDocument.createTextNode(const data : DomString) : IDomText;
@@ -800,7 +1000,7 @@ begin
   if msText = nil then
     result := nil
   else
-    result := TMSXMLText.create(msText);
+    result := domCreateText(msText);
 end;
 
 function TMSXMLDocument.createComment(const data : DomString) : IDomComment;
@@ -811,7 +1011,7 @@ begin
   if msComment = nil then
     result := nil
   else
-    result := TMSXMLComment.create(msComment);
+    result := domCreateComment(msComment);
 end;
 
 function TMSXMLDocument.createCDataSection(const data : DomString) : IDomCDataSection;
@@ -822,7 +1022,7 @@ begin
   if msCDataSection = nil then
     result := nil
   else
-    result := TMSXMLCDataSection.create(msCDataSection);
+    result := domCreateCDataSection(msCDataSection);
 end;
 
 function TMSXMLDocument.createProcessingInstruction(
@@ -836,7 +1036,7 @@ begin
   if msProcessingInstruction = nil then
     result := nil
   else
-    result := TMSXMLProcessingInstruction.create(msProcessingInstruction);
+    result := domCreateProcessingInstruction(msProcessingInstruction);
 end;
 
 function TMSXMLDocument.createAttribute(const name : DomString) : IDomAttr;
@@ -847,7 +1047,7 @@ begin
   if msAttr = nil then
     result := nil
   else
-    result := TMSXMLAttr.create(msAttr);
+    result := domCreateAttribute(msAttr);
 end;
 
 function TMSXMLDocument.createEntityReference(
@@ -859,7 +1059,7 @@ begin
   if msEntityReference = nil then
     result := nil
   else
-    result := TMSXMLEntityReference.create(msEntityReference);
+    result := domCreateEntityReference(msEntityReference);
 end;
 
 function TMSXMLDocument.getElementsByTagName(
@@ -871,7 +1071,7 @@ begin
   if msNodeList = nil then
     result := nil
   else
-    result := TMSXMLNodeList.create(msNodeList);
+    result := domCreateNodeList(msNodeList);
 end;
 
 function TMSXMLDocument.importNode(
@@ -883,7 +1083,7 @@ begin
   //dom2-compliant way.
   //Nodes are imported automatically by msdom, if node.appendChild
   //is used.
-  result:=importedNode;
+  result := importedNode;
   //raise EDomException.create(etNotSupportedErr, 'ImportNode is not supported');
 end;
 
@@ -894,13 +1094,12 @@ var
   msElement : IXMLDOMElement;
   node: IXMLDOMNode;
 begin
-  //Changes by FE
   node := fMSDomDocument.createNode(NODE_ELEMENT, qualifiedName, namespaceURI);
   msElement:=node as IXMLDOMElement;
   if msElement = nil then
     result := nil
   else
-    result := TMSXMLElement.create(msElement);
+    result := domCreateElement(msElement);
 end;
 
 function TMSXMLDocument.createAttributeNS(
@@ -908,28 +1107,29 @@ function TMSXMLDocument.createAttributeNS(
         const qualifiedName : DomString) : IDomAttr;
 var
   msAttr : IXMLDOMAttribute;
-  node: IXMLDOMNode;
+  node   : IXMLDOMNode;
 begin
   node := fMSDomDocument.createNode(NODE_ATTRIBUTE, qualifiedName, namespaceURI);
-  msAttr:=node as IXMLDOMAttribute;
+  msAttr := node as IXMLDOMAttribute;
   if msAttr = nil then
     result := nil
   else
-    result := TMSXMLAttr.create(msAttr);
+    result := domCreateAttribute(msAttr);
 end;
 
 function TMSXMLDocument.getElementsByTagNameNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomNodeList;
-var temp: IXMLDOMElement;
+var docElement : IXMLDOMElement;
 begin
-  (fMSDomDocument as IXMLDomDocument2).setProperty('SelectionNamespaces',
-    'xmlns:xyz4ct='''+namespaceURI+'''');
-  temp:=fMSDomDocument.DocumentElement;
-  //temp.selectNodes('xyz4ct:'+localName);
-  if temp<>nil
-    then result:=TMSXMLNodeList.create(temp.selectNodes('xyz4ct:'+localName))
-    else result:=nil;
+  (fMSDomDocument as IXMLDomDocument2).setProperty(
+          'SelectionNamespaces',
+          'xmlns:xyz4ct=''' + namespaceURI + '''');
+  docElement := fMSDomDocument.DocumentElement;
+  if docElement <> nil then
+    result := domCreateNodeList(docElement.selectNodes('xyz4ct:' + localName))
+  else
+    result := nil;
 end;
 
 function TMSXMLDocument.getElementById(
@@ -1067,11 +1267,15 @@ constructor TMSXMLNode.create(msDomNode : IXMLDOMNode);
 begin
   inherited create;
   fMSDomNode := msDomNode;
+  {register the wrapper}
+  gDomWrapperRepository.registerWrapper(msDomNode, self);
 end;
 
 destructor TMSXMLNode.destroy;
 begin
-  fMSDomNode := Nil;
+  {de-register the wrapper}
+  gDomWrapperRepository.deRegisterWrapper(fMSDomNode);
+  fMSDomNode := nil;
   inherited destroy;
 end;
 
@@ -1099,7 +1303,7 @@ begin
   if value = null then
     result := ''
   else
-    result := Value;
+    result := value;
 end;
 
 function TMSXMLNode.get_NodeType : DomNodeType;
@@ -1115,7 +1319,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNode.get_ChildNodes : IDomNodeList;
@@ -1126,7 +1330,7 @@ begin
   if msNodeList = nil then
     result := nil
   else
-    result := TMSXMLNodeList.create(msNodeList);
+    result := domCreateNodeList(msNodeList);
 end;
 
 function TMSXMLNode.get_FirstChild : IDomNode;
@@ -1137,7 +1341,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNode.get_LastChild : IDomNode;
@@ -1148,7 +1352,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNode.get_PreviousSibling : IDomNode;
@@ -1159,7 +1363,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNode.get_NextSibling : IDomNode;
@@ -1170,7 +1374,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNode.get_Attributes : IDomNamedNodeMap;
@@ -1181,18 +1385,18 @@ begin
   if msNamedNodeMap = nil then
     result := nil
   else
-    result := TMSXMLNamedNodeMap.create(msNamedNodeMap);
+    result := domCreateNamedNodeMap(msNamedNodeMap);
 end;
 
 function TMSXMLNode.get_OwnerDocument : IDomDocument;
 var
   msDocument : IXMLDOMDocument;
 begin
-  msDocument := fMSDomNode.ownerDocument;
-  if msDocument = nil then
-    result := nil
-  else
-    result := TMSXMLDocument.create(msDocument);
+    msDocument := fMSDomNode.ownerDocument;
+    if msDocument = nil then
+      result := nil
+    else
+      result := domCreateDocument(msDocument);
 end;
 
 function TMSXMLNode.get_NamespaceURI : DomString;
@@ -1227,7 +1431,7 @@ var
 begin
   msNewChild := (newChild as IMSXMLExtDomNode).getOrgInterface;
   msRefChild := (refChild as IMSXMLExtDomNode).getOrgInterface;
-  result := createXMLNode(fMSDomNode.insertBefore(msNewChild, msRefChild));
+  result := domCreateNode(fMSDomNode.insertBefore(msNewChild, msRefChild));
 end;
 
 function TMSXMLNode.replaceChild(
@@ -1239,7 +1443,7 @@ var
 begin
   msNewChild := (newChild as IMSXMLExtDomNode).getOrgInterface;
   msOldChild := (oldChild as IMSXMLExtDomNode).getOrgInterface;
-  result := createXMLNode(fMSDomNode.replaceChild(msNewChild, msOldChild));
+  result := domCreateNode(fMSDomNode.replaceChild(msNewChild, msOldChild));
 end;
 
 function TMSXMLNode.removeChild(const oldChild : IDomNode) : IDomNode;
@@ -1247,7 +1451,7 @@ var
   msOldChild : IXMLDOMNode;
 begin
   msOldChild := (oldChild as IMSXMLExtDomNode).getOrgInterface;
-  result := createXMLNode(fMSDomNode.removeChild(msOldChild));
+  result := domCreateNode(fMSDomNode.removeChild(msOldChild));
 end;
 
 function TMSXMLNode.appendChild(const newChild : IDomNode) : IDomNode;
@@ -1255,7 +1459,7 @@ var
   msNewChild : IXMLDOMNode;
 begin
   msNewChild := (newChild as IMSXMLExtDomNode).getOrgInterface;
-  result := createXMLNode(fMSDomNode.appendChild(msNewChild));
+  result := domCreateNode(fMSDomNode.appendChild(msNewChild));
 end;
 
 function TMSXMLNode.hasChildNodes : Boolean;
@@ -1275,7 +1479,7 @@ end;
 
 function TMSXMLNode.cloneNode(deep : Boolean) : IDomNode;
 begin
-  result := createXMLNode(fMSDomNode.cloneNode(deep));
+  result := domCreateNode(fMSDomNode.cloneNode(deep));
 end;
 
 procedure TMSXMLNode.normalize;
@@ -1300,10 +1504,14 @@ constructor TMSXMLNodeList.create(msDomNodeList : IXMLDOMNodeList);
 begin
   inherited create;
   fMSDomNodeList := msDomNodeList;
+  {register the wrapper}
+  gDomWrapperRepository.registerWrapper(msDomNodeList, self);
 end;
 
 destructor TMSXMLNodeList.destroy;
 begin
+  {de-register the wrapper}
+  gDomWrapperRepository.deRegisterWrapper(fMSDomNodeList);
   fMSDomNodeList := nil;
   inherited destroy;
 end;
@@ -1321,7 +1529,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 (*
@@ -1331,10 +1539,14 @@ constructor TMSXMLNamedNodeMap.create(msDomNamedNodeMap : IXMLDOMNamedNodeMap);
 begin
   inherited create;
   fMSDomNamedNodeMap := msDomNamedNodeMap;
+  {register the wrapper}
+  gDomWrapperRepository.registerWrapper(msDomNamedNodeMap, self);
 end;
 
 destructor TMSXMLNamedNodeMap.destroy;
 begin
+  {de-register the wrapper}
+  gDomWrapperRepository.deRegisterWrapper(fMSDomNamedNodeMap);
   fMSDomNamedNodeMap := nil;
   inherited destroy;
 end;
@@ -1347,7 +1559,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNamedNodeMap.get_Length : Integer;
@@ -1363,7 +1575,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNamedNodeMap.setNamedItem(const newItem : IDomNode) : IDomNode;
@@ -1375,7 +1587,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNamedNodeMap.removeNamedItem(const name : DomString) : IDomNode;
@@ -1386,7 +1598,7 @@ begin
   if msNode = nil then
     result := nil
   else
-    result := createXMLNode(msNode);
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNamedNodeMap.getNamedItemNS(
@@ -1416,6 +1628,7 @@ end;
 *)
 constructor TMSXMLDocumentType.create(msDocumentType : IXMLDOMDocumentType);
 begin
+  {wrapper registration will be done within TMSXMLDomNode}
   inherited create(msDocumentType);
   fMSDocumentType := msDocumentType;
 end;
@@ -1439,7 +1652,7 @@ begin
   if msNamedNodeMap = nil then
     result := nil
   else
-    result := TMSXMLNamedNodeMap.create(msNamedNodeMap);
+    result := domCreateNamedNodeMap(msNamedNodeMap);
 end;
 
 function TMSXMLDocumentType.get_Notations : IDomNamedNodeMap;
@@ -1450,7 +1663,7 @@ begin
   if msNamedNodeMap = nil then
     result := nil
   else
-  result := TMSXMLNamedNodeMap.create(msNamedNodeMap);
+    result := domCreateNamedNodeMap(msNamedNodeMap);
 end;
 
 function TMSXMLDocumentType.get_PublicId : DomString;
@@ -1478,6 +1691,7 @@ end;
 *)
 constructor TMSXMLElement.create(msElement : IXMLDOMElement);
 begin
+  {wrapper registration will be done within TMSXMLDomNode}
   inherited create(msElement);
   fMSElement := msElement;
 end;
@@ -1518,7 +1732,7 @@ begin
   if msAttr = nil then
     result := nil
   else
-    result := TMSXMLAttr.create(msAttr);
+    result := domCreateAttribute(msAttr);
 end;
 
 function TMSXMLElement.setAttributeNode(const newAttr : IDomAttr) : IDomAttr;
@@ -1530,7 +1744,7 @@ begin
   if msAttr = nil then
     result := nil
   else
-    result := TMSXMLAttr.create(msAttr);
+    result := domCreateAttribute(msAttr);
 end;
 
 function TMSXMLElement.removeAttributeNode(const oldAttr : IDomAttr) : IDomAttr;
@@ -1542,7 +1756,7 @@ begin
   if msAttr = nil then
     result := nil
   else
-    result := TMSXMLAttr.create(msAttr);
+    result := domCreateAttribute(msAttr);
 end;
 
 function TMSXMLElement.getElementsByTagName(
@@ -1554,20 +1768,20 @@ begin
   if msNodeList = nil then
     result := nil
   else
-    result := TMSXMLNodeList.create(msNodeList);
+    result := domCreateNodeList(msNodeList);
 end;
 
 function TMSXMLElement.getAttributeNS(
         const namespaceURI : DomString;
         const localName    : DomString) : DomString;
 var
-  Attr : IDOMAttr;
+  attr : IDOMAttr;
 begin
-  Attr := getAttributeNodeNS(namespaceURI, localName);
-  if Assigned(Attr) then
-    Result := Attr.NodeValue
+  attr := getAttributeNodeNS(namespaceURI, localName);
+  if assigned(attr) then
+    result := attr.nodeValue
   else
-    Result := '';
+    result := '';
 end;
 
 procedure TMSXMLElement.setAttributeNS(
@@ -1600,9 +1814,10 @@ function TMSXMLElement.getAttributeNodeNS(
 var attr : IXMLDomNode;
 begin
   attr := fMSElement.attributes.getQualifiedItem(localName, namespaceURI);
-  if attr <> nil
-    then result := createXMLNode(attr) as IDOMAttr
-    else result := nil;
+  if attr <> nil then
+    result := domCreateNode(attr) as IDOMAttr
+  else
+    result := nil;
 end;
 
 function TMSXMLElement.setAttributeNodeNS(const newAttr : IDomAttr) : IDomAttr;
@@ -1643,6 +1858,7 @@ constructor TMSXMLAttr.create(msAttribute : IXMLDOMAttribute);
 begin
   inherited create(msAttribute);
   fMSAttribute := msAttribute;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLAttr.destroy;
@@ -1693,6 +1909,7 @@ constructor TMSXMLDocumentFragment.create(
 begin
   inherited create(msDocumentFragment);
   fMSDocumentFragment := msDocumentFragment;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLDocumentFragment.destroy;
@@ -1709,6 +1926,7 @@ constructor TMSXMLCharacterData.create(msCharacterData : IXMLDOMCharacterData);
 begin
   inherited create(msCharacterData);
   fMSCharacterData := msCharacterData;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLCharacterData.destroy;
@@ -1774,6 +1992,7 @@ constructor TMSXMLText.create(msText : IXMLDOMCharacterData);
 begin
   inherited create(msText);
   fMSText := msText;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLText.destroy;
@@ -1794,7 +2013,7 @@ begin
     if msText = nil then
       result := nil
     else
-      result := TMSXMLText.create(msText);
+      result := domCreateText(msText);
   except
     on e : EIntfCastError do
     begin
@@ -1815,6 +2034,7 @@ constructor TMSXMLComment.create(msComment : IXMLDOMComment);
 begin
   inherited create(msComment);
   fMSComment := msComment;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLComment.destroy;
@@ -1831,6 +2051,7 @@ constructor TMSXMLCDataSection.create(msCDataSection : IXMLDOMCDATASection);
 begin
   inherited create(msCDataSection);
   fMSCDataSection := msCDataSection;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLCDataSection.destroy;
@@ -1848,6 +2069,7 @@ constructor TMSXMLProcessingInstruction.create(
 begin
   inherited create(msProcessingInstruction);
   fMSProcessingInstruction := msProcessingInstruction;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLProcessingInstruction.destroy;
@@ -1880,6 +2102,7 @@ constructor TMSXMLEntityReference.create(
 begin
   inherited create(msEntityReference);
   fMSEntityReference := msEntityReference;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLEntityReference.destroy;
@@ -1896,6 +2119,7 @@ constructor TMSXMLEntity.create(msEntity : IXMLDOMEntity);
 begin
   inherited create(msEntity);
   fMSEntity := msEntity;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLEntity.destroy;
@@ -1926,6 +2150,7 @@ constructor TMSXMLNotation.create(msNotation : IXMLDOMNotation);
 begin
   inherited create(msNotation);
   fMSNotation := msNotation;
+  {wrapper registration will be done within TMSXMLDomNode}
 end;
 
 destructor TMSXMLNotation.destroy;
@@ -1950,19 +2175,21 @@ var
   node : IXMLDOMNode;
 begin
   node := fMSDomNode.selectSingleNode(nodePath);
-  if assigned(node)
-    then result := createXMLNode(node)
-    else result := nil;
+  if assigned(node) then
+    result := domCreateNode(node)
+  else
+    result := nil;
 end;
 
 function TMSXMLNode.selectNodes(const nodePath : WideString): IDOMNodeList;
 var
-  nodeList : IXMLDOMNodeList;
+  msNodeList : IXMLDOMNodeList;
 begin
-  nodeList := fMSDomNode.selectNodes(nodePath);
-  if assigned(nodeList)
-    then result :=  TMSXMLNodeList.create(nodeList)
-    else result := nil;
+  msNodeList := fMSDomNode.selectNodes(nodePath);
+  if assigned(msNodeList) then
+    result := domCreateNodeList(msNodeList)
+  else
+    result := nil;
 end;
 
 procedure TMSXMLNode.registerNS(const prefix : DomString; const uri : DomString);
@@ -1976,4 +2203,5 @@ initialization
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(false));
   {register Free-threading factory}
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(true));
+  gDomWrapperRepository := TDomWrapperRepository.create;
 end.
