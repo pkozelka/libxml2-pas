@@ -2540,10 +2540,8 @@ var
   root: xmlNodePtr;
   ctxt: xmlParserCtxtPtr;
 begin
+  result:=true;
   temp:=TGdomString.create(Value);
-  xmlFreeDoc(FPGdomeDoc);
-  inherited Destroy;
-  FPGdomeDoc:=nil;
   xmlInitParser();
   ctxt := xmlCreateDocParserCtxt(temp.CString);
   if (ctxt <> nil) then begin
@@ -2556,21 +2554,26 @@ begin
     //todo: async (separate thread)
     //todo: resolveExternals
     xmlParseDocument(ctxt);
-    if (ctxt.wellFormed<>0) then begin
-      FPGdomeDoc := ctxt.myDoc;
-    end else begin
-      xmlFreeDoc(ctxt.myDoc);
-      ctxt.myDoc := nil;
-    end;
+    if (ctxt.wellFormed<>0) then
+      if not Fvalidate or (ctxt.valid<>0)
+        then begin
+          xmlFreeDoc(FPGdomeDoc);
+          inherited Destroy;
+          FPGdomeDoc := ctxt.myDoc
+        end
+        else begin
+          xmlFreeDoc(ctxt.myDoc);
+          ctxt.myDoc := nil;
+          result:=false;
+        end;
     xmlFreeParserCtxt(ctxt);
   end;
   temp.free;
-  if FPGdomeDoc<>nil
+  if result
     then
       begin
         root:= xmlNodePtr(FPGdomeDoc);
         inherited create(root,nil);
-        result:=true
       end
     else result:=false;
 end;
