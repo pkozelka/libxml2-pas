@@ -4,12 +4,8 @@ interface
 
 uses
   TestFrameWork,
-  {$ifdef FE}
-    libxmldomFE,
-  {$else}
-    libxmldom,
-  {$endif}
   idom2,
+  idom2_ext,
   SysUtils,
   domSetup,
   XPTest_idom2_Shared,
@@ -261,9 +257,8 @@ begin
   snode := xsl.documentElement as IDomNode;
   try
     (xnode as IDomNodeExt).transformNode(snode, result1);
-    fail('There should have been an EDomException');
+    fail('There should have been an EDomError');
   except
-    //on E: Exception do Check(E is EDomException, 'Warning: Wrong exception type!');
   end;
 end;
 

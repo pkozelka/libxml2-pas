@@ -4,18 +4,14 @@ interface
 
 uses
   TestFrameWork,
-  {$ifdef FE}
-    libxmldomFE,
-  {$else}
-    libxmldom,
-  {$endif}
   idom2,
+  idom2_ext,
   SysUtils,
   XPTest_idom2_Shared,
   Classes,
   domSetup,
   ActiveX,
-  Dialogs;
+  QDialogs;
 
 type
   TTestPersist = class(TTestCase)
@@ -45,6 +41,8 @@ type
     procedure filePrettyPrint;
     procedure LoadFiles;
     procedure LoadFilesII;
+    procedure loadXmlUml;
+    procedure loadXmlUnicode;
   end;
 
 implementation
@@ -342,9 +340,7 @@ begin
       tmp1:=Unify(tmp1,false);
       //showMessage(tmp+CRLF+tmp1);
       check(tmp=tmp1,'encoding error');
-      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='iso-8859-1','wrong parsed encoding');
-      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -375,9 +371,7 @@ begin
       tmp1:=Unify(tmp1,false);
       //showMessage(tmp+CRLF+tmp1);
       check(tmp<>tmp1,'encoding error');
-      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='','wrong parsed encoding');
-      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -404,18 +398,14 @@ begin
     try
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
-      {$ifdef FE}
       (doc as IDomOutputOptions).encoding:='utf-8';
-      {$endif}
       tmp1:= (doc as IDomPersist).xml;
       tmp1:=UTF8Decode(tmp1);
       tmp1:=Unify(tmp1);
       tmp:=Unify(tmp);
       //showMessage(tmp+CRLF+tmp1);
       check(tmp=tmp1,'encoding error');
-      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='iso-8859-1','wrong parsed encoding');
-      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -443,9 +433,7 @@ begin
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
       if FileExists('temp.xml') then DeleteFile('temp.xml');
-      {$ifdef FE}
       (doc as IDomOutputOptions).encoding:='utf-8';
-      {$endif}
       (doc as IDomPersist).save('temp.xml');
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
@@ -454,9 +442,7 @@ begin
       tmp1:=Unify(tmp1);
       tmp:=Unify(tmp);
       check(tmp=tmp1,'encoding error');
-      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='utf-8','wrong parsed encoding');
-      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -485,9 +471,7 @@ begin
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
       if FileExists('temp.xml') then DeleteFile('temp.xml');
-      {$ifdef FE}
       (doc as IDomOutputOptions).prettyPrint:=true;
-      {$endif}
       (doc as IDomPersist).save('temp.xml');
       sl := TStringList.Create;
       sl.LoadFromFile('temp.xml');
@@ -523,9 +507,7 @@ begin
       (doc as IDomParseOptions).preserveWhiteSpace:=false;
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
-      {$ifdef FE}
       (doc as IDomOutputOptions).prettyPrint:=true;
-      {$endif}
       tmp1:= (doc as IDomPersist).xml;
       //tmp1:=Unify(tmp1);
       //tmp:=Unify(tmp);
@@ -536,6 +518,42 @@ begin
   end else begin
     check(false,'DomVendor not supported!');
   end;
+end;
+
+procedure TTestPersist.loadXmlUml;
+begin
+  // test how loadxml behaves with 'umlauts'
+  (doc as IDOMPersist).loadxml(xmldecl+'<root><text>äöüß</text><text>ÄÖÜ</text></root>');
+  check(doc.documentElement.hasChildNodes, 'has no childNodes');
+  check(doc.documentElement.childNodes.length = 2, 'wrong length');
+  check(doc.documentElement.firstChild.firstChild.nodeType = TEXT_NODE, 'wrong nodeType');
+  check(doc.documentElement.lastChild.firstChild.nodeType = TEXT_NODE, 'wrong nodeType');
+  //showMessage(doc.documentElement.firstChild.firstChild.nodeValue);
+  check(doc.documentElement.firstChild.firstChild.nodeValue = 'äöüß', 'wrong nodeValue');
+  check(doc.documentElement.lastChild.firstChild.nodeValue = 'ÄÖÜ', 'wrong nodeValue');
+  //showMessage((doc as IDomPersist).xml);
+end;
+
+procedure TTestPersist.loadXmlUnicode;
+var
+  teststr: widestring;
+  parsestr: widestring;
+  ok: boolean;
+begin
+  teststr:= getunicodestr(1);
+  parsestr:='';
+  parsestr:=parsestr+'<?xml version="1.0" encoding="utf8"?><root><text>'+teststr+'</text><text>ÄÖÜ</text></root>';
+  //showMessage(parsestr);
+  ok:=(doc as IDOMPersist).loadxml(parsestr);
+  check(ok,'parse error');
+  check(doc.documentElement.hasChildNodes, 'has no childNodes');
+  check(doc.documentElement.childNodes.length = 2, 'wrong length');
+  check(doc.documentElement.firstChild.firstChild.nodeType = TEXT_NODE, 'wrong nodeType');
+  check(doc.documentElement.lastChild.firstChild.nodeType = TEXT_NODE, 'wrong nodeType');
+  //showMessage(doc.documentElement.firstChild.firstChild.nodeValue);
+  check(doc.documentElement.firstChild.firstChild.nodeValue = teststr, 'wrong nodeValue');
+  check(doc.documentElement.lastChild.firstChild.nodeValue = 'ÄÖÜ', 'wrong nodeValue');
+  //showMessage((doc as IDomPersist).xml);
 end;
 
 initialization

@@ -5,12 +5,8 @@ interface
 uses
   IniFiles,
   domSetup,
-  {$ifdef FE}
-    libxmldomFE,
-  {$else}
-    libxmldom,
-  {$endif}
   idom2,
+  idom2_ext,
   sysutils,
   strutils,
   TestFrameWork;
@@ -28,7 +24,10 @@ const
             '<!NOTATION type2 SYSTEM "program2">' +
             '<!ENTITY FOO2 SYSTEM "file.type2" NDATA type2>' + ']>' +
             '<root />';
-  xmlstr3 = xmldecl + '<test xmlns:ct=''http://ns.4ct.de''/>';
+  xmlstr3 = xmldecl +
+            '<xObject id="xcl.customers.list" executor="sql" xmlns:xob="http://xmlns.4commerce.de/xob" auth="xcl.customers.list" connection="ib.kis">' +
+            '  <result />' +
+            '</xObject>';
   xslstr  = xmldecl +
             '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"' +
             '                version="1.0">' + '  <xsl:output method="html"' +
@@ -108,8 +107,10 @@ function getDataPath: string;
 function domvendor: string;
 function myIsSameNode(node1, node2: IDomNode): boolean;
 function Unify(xml: string; removeEncoding: boolean = True): string;
+function GetHeader(xml: string): string;
 function StrCompare(str1, str2: WideString): integer;
 function getUnicodeStr(mode: integer = 0): WideString;
+function GetDoccount(impl:IDomImplementation):integer;
 
 var
   datapath: string = '';
@@ -157,7 +158,7 @@ begin
 end;
 
 function Unify(xml: string; removeEncoding: boolean = True): string;
-  // this procedure unifies the result of the method xml of IDOMPersist
+  // this procedure unifies the result of the method xml of IDomPersist
 var
   len : integer;
 begin
@@ -170,6 +171,11 @@ begin
       xml:=copy(xml,len,length(xml)-len+1);
     end;
   Result := xml;
+end;
+
+function GetHeader(xml: string): string;
+begin
+  result:=leftstr(xml,pos('>',xml));
 end;
 
 function StrCompare(str1, str2: WideString): integer;
@@ -200,13 +206,9 @@ end;
 function myIsSameNode(node1, node2: IDomNode): boolean;
   // compare if two nodes are the same (not equal)
 begin
-  {$ifdef FE}
   if (domvendor = 'LIBXML_4CT')
     then Result := (node1 as IDomNodeCompare).IsSameNode(node2)
     else Result := ((node1 as IUnknown) = (node2 as IUnknown));
-  {$else}
-  Result := ((node1 as IUnknown) = (node2 as IUnknown));
-  {$endif}
 end;
 
 { TMemoryTestCase }
@@ -224,6 +226,16 @@ begin
   inherited;
   delta := GetHeapStatus.TotalAllocated - mem;
   check(delta < 10000,'Memory leak, delta= ' + IntToStr(delta));
+end;
+
+function GetDoccount(impl:IDomImplementation):integer;
+var
+  domdebug: IDomDebug;
+begin
+  result:=0;
+  impl.queryInterface(IDomDebug,domdebug);
+  if domdebug<>nil
+    then result:=domdebug.doccount;
 end;
 
 end.

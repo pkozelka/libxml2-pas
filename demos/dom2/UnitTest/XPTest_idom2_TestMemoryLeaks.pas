@@ -4,12 +4,8 @@ interface
 
 uses
   TestFrameWork,
-  {$ifdef FE}
-    libxmldomFE,
-  {$else}
-    libxmldom,
-  {$endif}
   idom2,
+  idom2_ext,
   domSetup,
   SysUtils,
   XPTest_idom2_Shared,
@@ -38,10 +34,8 @@ type
     procedure CreateDocumentFragment10000Times;
     procedure CreateTextNode10000Times;
     procedure AppendElement10000Times;
-    {$ifdef FE}
     procedure xsltTransformToString1000Times;
     procedure xsltTransformToDoc1000Times;
-    {$endif}
     procedure jkTestDocument;
     procedure jkTestElement;
     procedure jkNamedNodemap;
@@ -929,9 +923,9 @@ var
 begin
   doc := nil;
   doc1 := nil;
+  check(GetDoccount(impl) = 0,'doccount<>0');
   impl := nil;
   delta := GetHeapStatus.TotalAllocated - mem;
-  check(doccount = 0,'doccount<>0');
   check(delta < 10000,'Memory leak, delta= ' + IntToStr(delta));
   inherited;
 end;
@@ -958,9 +952,6 @@ begin
     doc.documentElement.appendChild(node);
   end;
   node := nil;
-  doc := nil;
-  doc1 := nil;
-  impl := nil;
 end;
 
 procedure TTestMemoryLeaks.createComment10000Times;
@@ -1109,7 +1100,7 @@ begin
     end;
   end;
 end;
-{$ifdef FE}
+
 procedure TTestMemoryLeaks.xsltTransformToString1000Times;
 var
   Text:     widestring;
@@ -1121,7 +1112,6 @@ var
   persist:  IDomPersist;
   delement: IDomElement;
   exNode:   IDomNodeExt;
-
 begin
   for i := 1 to 1000 do begin
     // apply a stylesheet that produces html-output
@@ -1159,7 +1149,6 @@ var
 begin
   for i := 1 to 1000 do begin
     // apply a stylesheet that produces html-output
-    impl := DomSetup.getCurrentDomSetup.getDocumentBuilder.domImplementation;
     xml := impl.createDocument('', '', nil);
     persist := xml as IDomPersist;
     persist.loadxml(xmlstr);
@@ -1169,6 +1158,7 @@ begin
     persist.loadxml(xslstr2);
     persist := nil;
     xnode := xml as IDomNode;
+    doc:=xnode.ownerDocument;
     delement := xsl.documentElement;
     snode := delement as IDomNode;
     exNode := xnode as IDomNodeExt;
@@ -1179,6 +1169,5 @@ begin
     Text := '';
   end;
 end;
-{$endif}
 
 end.

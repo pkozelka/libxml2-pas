@@ -10,12 +10,8 @@ implementation
 uses
   TestFrameWork,
   DomSetup,
-  {$ifdef FE}
-    libxmldomFE,
-  {$else}
-    libxmldom,
-  {$endif}
   msxml_impl,
+  libxmldomFE,
 
   (* add new tests to uses class *)
 
@@ -23,9 +19,7 @@ uses
   XPTest_idom2_TestDomExceptions,
   XPTest_idom2_TestMemoryLeaks,
   XPTest_idom2_TestXPath,
-  {$ifdef FE}
   XPTest_idom2_TestXSLT,
-  {$endif}
   XPTest_idom2_TestPersist,
   DomImplementationTests,
   DomDocumentTests;
@@ -49,9 +43,7 @@ begin
   allTestSuite.addSuite(TTestDomExceptions.Suite);
   allTestSuite.addSuite(TTestMemoryLeaks.Suite);
   allTestSuite.addSuite(TTestXPath.Suite);
-  {$ifdef FE}
   allTestSuite.addSuite(TTestXSLT.Suite);
-  {$endif FE}
   allTestSuite.addSuite(TTestPersist.Suite);
   allTestSuite.addSuite(TDomImplementationFundamentalTests.Suite);
   allTestSuite.addSuite(TDomDocumentFundamentalTests.Suite);

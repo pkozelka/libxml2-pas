@@ -5,19 +5,15 @@ interface
 uses
   TestFrameWork,
   TestExtensions,
-  {$ifdef FE}
-    libxmldomFE,
-  {$else}
-    libxmldom,
-  {$endif}
   idom2,
+  idom2_ext,
   SysUtils,
   XPTest_idom2_Shared,
   StrUtils,
   ActiveX,
-  QDialogs;
+  Dialogs;
 
-type 
+type
   TTestDOM2Methods = class(TTestCase)
   private
     impl: IDomImplementation;
@@ -81,6 +77,7 @@ type
     procedure removeAttributeNode;
     procedure getElementsByTagName;
     procedure getElementsByTagNameNS;
+    procedure getElementsByTagNameNS1;
     procedure firstChild;
     procedure lastChild;
     procedure nextSibling;
@@ -93,6 +90,7 @@ type
     procedure isSupported;
     procedure normalize;
     procedure importNode;
+    procedure importNode_with_attribute;
     procedure hasChildNodes;
     procedure childNodes;
     procedure attributes;
@@ -102,10 +100,16 @@ type
     procedure documentFragment;
     procedure element;
     procedure nsdecl;
+    procedure setNsDecl;
     procedure unicode_TextNodeValue;
     procedure unicode_NodeName;
+    procedure setDocumentElement;
     property fqname: WideString read getFqname;
-
+    procedure hasAttributes;
+    procedure hasAttributesNS;
+    procedure append_remove;
+    procedure append_remove_AttributeNS;
+    procedure defaultNS;
   end;
 
 implementation
@@ -154,10 +158,11 @@ end;
 
 procedure TTestDom2Methods.TestDocCount;
 begin
+  check((GetDoccount(impl) = 3),'Doccount not supported!');
   doc0 := nil;
   doc1 := nil;
   doc := nil;
-  Check(doccount = 0,'documents not released');
+  check(GetDoccount(impl) = 0,'documents not released');
 end;
 
 procedure TTestDom2Methods.TestDocumentElement;
@@ -170,15 +175,14 @@ var
   node: IDomNode;
   temp: string;
 begin
-  {
-    DOM2: If the child is already in the tree, it
-    is first removed.
-    So there must be only one child sub1 after the
-    two calls of appendChild
-  }
+  check(doc0.documentElement.childNodes.length = 0, 'wrong length');
   node := doc0.createElement('sub1');
   doc0.documentElement.appendChild(node);
+  check(doc0.documentElement.childNodes.length = 1, 'wrong length');
   doc0.documentElement.appendChild(node);
+  // DOM2: If the child is already in the tree, it is first removed. So there
+  // must be only one child sub1 after the two calls of appendChild
+  check(doc0.documentElement.childNodes.length = 1, 'wrong length');
   temp := ((doc0 as IDomPersist).xml);
   temp := unify(temp);
   check(temp = '<test><sub1/></test>', 'appendChild Error');
@@ -192,14 +196,14 @@ begin
 end;
 
 procedure TTestDom2Methods.createElementNS0;
-const
-  CRLF = #13#10;
 var
   node: IDomNode;
   temp: string;
 begin
+  check(doc0.documentElement.childNodes.length = 0, 'wrong length');
   node := doc0.createElementNS('http://ns.4ct.de', 'ct:test');
   doc0.documentElement.appendChild(node);
+  check(doc0.documentElement.childNodes.length = 1, 'wrong length');
   temp := (doc0 as IDomPersist).xml;
   temp := unify(temp);
   check(temp = '<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>',
@@ -207,14 +211,14 @@ begin
 end;
 
 procedure TTestDom2Methods.createElementNS01;
-const
-  CRLF = #13#10;
 var
   node: IDomNode;
   temp: string;
 begin
+  check(doc1.documentElement.childNodes.length = 0, 'wrong length');
   node := doc1.createElementNS('http://ns.4ct.de', 'ct:test');
   doc1.documentElement.appendChild(node);
+  check(doc1.documentElement.childNodes.length = 1, 'wrong length');
   temp := (doc1 as IDomPersist).xml;
   temp := unify(temp);
   check(temp =
@@ -227,9 +231,11 @@ var
   attr: IDomAttr;
   temp: string;
 begin
+  check(not doc0.documentElement.hasAttributes, 'has attributes');
   attr := doc0.createAttributeNS('http://ns.4ct.de', 'ct:name1');
   attr.Value := 'hund';
   doc0.documentElement.setAttributeNodeNS(attr);
+  check(doc0.documentElement.attributes.length = 2, 'wrong length');
   temp := (doc0 as IDomPersist).xml;
   temp := unify(temp);
   check(temp = '<test xmlns:ct="http://ns.4ct.de" ct:name1="hund"/>',
@@ -245,28 +251,23 @@ var
 begin
   // create attributes
   for i := 0 to 2 do begin
-    attr := doc0.createAttributeNS('http://test' + IntToStr(i) + '.invalid',
-      'test' + IntToStr(i) + ':attr');
+    attr := doc0.createAttributeNS('http://test'+IntToStr(i)+'.invalid','test'+IntToStr(i)+':attr');
     attr.Value := IntToStr(i);
     doc0.documentElement.setAttributeNodeNS(attr);
     attr := nil;
   end;
   temp := (doc0 as IDomPersist).xml;
   temp := Unify(temp);
-  //jk: OutLog(temp);
   ok := False;
-  if temp =
-    '<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>'
+  if temp = '<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>'
     then ok := True;
-  if temp =
-    '<test xmlns:test0="http://test0.invalid" xmlns:test1="http://test1.invalid" xmlns:test2="http://test2.invalid" test0:attr="0" test1:attr="1" test2:attr="2"/>'
+  if temp = '<test xmlns:test0="http://test0.invalid" xmlns:test1="http://test1.invalid" xmlns:test2="http://test2.invalid" test0:attr="0" test1:attr="1" test2:attr="2"/>'
     then ok := True;
   Check(ok, 'Test failed!');
   // check attributes
   for i := 0 to 2 do begin
-    attrval := doc0.documentElement.getAttributeNS('http://test' + IntToStr(i) + '.invalid',
-      'attr');
-    check(attrval = IntToStr(i), 'expected ' + IntToStr(i) + ' but found ' + attrval);
+    attrval := doc0.documentElement.getAttributeNS('http://test'+IntToStr(i)+'.invalid','attr');
+    check(attrval = IntToStr(i),'expected '+IntToStr(i)+' but found '+attrval);
   end;
 end;
 
@@ -472,9 +473,7 @@ begin
   check(Text.nodeValue = Data, 'wrong nodeValue');
   check(Text.nodeType = TEXT_NODE, 'wrong nodeType');
   Text := Text.splitText(4);
-  check(Text.Data = Copy(Data, 5,Length(Data) - 1),
-    'wrong splitText - expected: "' + Copy(Data, 5,Length(Data) - 1) +
-    '" found: "' + Text.Data + '"');
+  check(Text.Data = Copy(Data,5,Length(Data)-1),'wrong splitText - expected: "'+Copy(Data,5,Length(Data)-1)+'" found: "'+Text.Data+'"');
 end;
 
 procedure TTestDom2Methods.docType;
@@ -655,6 +654,7 @@ end;
 procedure TTestDom2Methods.hasAttribute;
 begin
   elem := doc.createElement(Name);
+  check(not elem.hasAttribute(Name), 'is true');
   attr := doc.createAttribute(Name);
   elem.setAttributeNode(attr);
   check(elem.hasAttribute(Name), 'is false');
@@ -663,6 +663,7 @@ end;
 procedure TTestDom2Methods.hasAttributeNS;
 begin
   elem := doc.createElement(Name);
+  check(not elem.hasAttributeNS(nsuri,Name), 'is true');
   attr := doc.createAttributeNS(nsuri, fqname);
   elem.setAttributeNodeNS(attr);
   check(elem.hasAttributeNS(nsuri, Name), 'is false');
@@ -677,7 +678,7 @@ begin
 end;
 
 procedure TTestDom2Methods.importNode;
-var 
+var
   adoc: IDomDocument;
 begin
   // create a second dom
@@ -710,6 +711,28 @@ begin
   check(node.nodeName = Name, 'wrong nodeName');
   check(node.firstChild.nodeName = 'second', 'wrong nodeName');
 end;
+
+procedure TTestDOM2Methods.importNode_with_attribute;
+var
+  adoc: IDomDocument;
+  attr1,attr2: IDOMAttr;
+begin
+  // create a second dom
+  adoc := impl.createDocument('', '', nil);
+  check((adoc as IDomPersist).loadxml(xmlstr), 'parse error');
+  // append new attribute to documentElement of 2nd dom
+  attr1 := adoc.createAttribute(Name);
+  adoc.documentElement.setAttributeNode(attr1);
+  // clone the attribute => 2nd new attribute
+  attr2 := ((attr1 as IDOMNode).cloneNode(False)) as IDOMAttr;
+  // import the attribute => 3rd new attribute
+  attr := (doc.importNode(attr2,false)) as IDOMAttr;
+  // append the attribute to documentElement of 1st dom
+  doc.documentElement.setAttributeNode(attr);
+  check(attr <> nil, 'is nil');
+  check(attr.ownerDocument = doc, 'wrong ownerDocument');
+end;
+
 
 procedure TTestDom2Methods.insertBefore;
 begin
@@ -791,7 +814,7 @@ begin
   attr := doc.createAttributeNS(nsuri, fqname);
   attr.Value := Data;
   nnmap.setNamedItemNS(attr);
-  check(nnmap.length = 1, 'wrong length');
+  check(nnmap.length = 2, 'wrong length');
   node := nnmap.getNamedItemNS(nsuri, Name);
   check(myIsSameNode(node,attr), 'wrong node');
   check(nnmap.getNamedItemNS(nsuri, Name).nodeValue = Data, 'wrong nodeValue');
@@ -799,17 +822,17 @@ begin
   attr := doc.createAttributeNS(nsuri, fqname);
   attr.Value := Data;
   nnmap.setNamedItemNS(attr);
-  check(nnmap.length = 1, 'wrong length');
+  check(nnmap.length = 2, 'wrong length');
   // set a namedItem with a different name
   attr := doc.createAttributeNS(nsuri, prefix + ':snake');
   attr.Value := 'python';
   nnmap.setNamedItemNS(attr);
-  check(nnmap.length = 2, 'wrong length');
+  check(nnmap.length = 4, 'wrong length');
   check(myIsSameNode(nnmap.getNamedItemNS(nsuri, 'snake'), attr), 'wrong node');
   check(nnmap.getNamedItemNS(nsuri, 'snake').nodeValue = 'python', 'wrong nodeValue');
   nnmap.removeNamedItemNS(nsuri, Name);
-  check(nnmap.length = 1, 'wrong length');
-  check(nnmap.item[0].localName = 'snake', 'wrong localName');
+  check(nnmap.length = 3, 'wrong length');
+  check(nnmap.item[2].localName = 'snake', 'wrong localName');
   attr := nil;
   attr := nnmap.namedItem['snake'] as IDomAttr;
   check(attr.Value = 'python', 'wrong value');
@@ -942,7 +965,7 @@ begin
 end;
 
 procedure TTestDom2Methods.element;
-var 
+var
   tmp: string;
 begin
   // setting the nodeValue of an element node should have no effect (w3c.org)
@@ -955,7 +978,7 @@ begin
 end;
 
 procedure TTestDom2Methods.document1;
-var 
+var
   tmp: string;
 begin
   // setting the nodeValue of an document node should have no effect (w3c.org)
@@ -972,13 +995,19 @@ begin
   (doc as IDomPersist).loadxml(xmlstr3);
   nnmap := doc.documentElement.attributes;
   // if the namespace declaration is an attribute there must be one
-  check(nnmap.length = 1, 'if the namespace declaration is an attribute there must be one but there''s none');
+  check(nnmap.length = 5, 'if the namespace declaration is an attribute there must be one but there''s none');
+  // test standard attribute
+  attr := nnmap.item[1] as IDomAttr;
+  // test standard properties of the attribute
+  check(attr.Name = 'id', 'normal attr: wrong name');
+  check(attr.Value = 'xcl.customers.list', 'normal attr: wrong value');
+  // test namespace attribute
   attr := nnmap.item[0] as IDomAttr;
   // test standard properties of the attribute
-  check(attr.Name = 'xmlns:ct', 'wrong name');
-  check(attr.Value = 'http://ns.4ct.de', 'wrong value');
-  check(attr.prefix = 'xmlns', 'wrong prefix');
-  check(attr.localName = 'ct', 'wrong localName');
+  check(attr.Name = 'xmlns:xob', 'xmlns attr: wrong name');
+  check(attr.Value = 'http://xmlns.4commerce.de/xob', 'xmlns attr: wrong value');
+  check(attr.prefix = 'xmlns', 'xmlns attr: wrong prefix');
+  check(attr.localName = 'xob', 'xmlns attr: wrong localName');
   {
   Note: In the DOM, all namespace declaration attributes are BY DEFINITION bound
   to the namespace URI: "http://www.w3.org/2000/xmlns/". These are the attributes
@@ -987,7 +1016,7 @@ begin
   it is planned to be incorporated in a future revision. (w3c.org)
   }
   check(attr.namespaceURI = 'http://www.w3.org/2000/xmlns/',
-    'wrong namespaceURI - expected: "http://www.w3.org/2000/xmlns/" found: "' +
+    'xmlns attr: wrong namespaceURI - expected: "http://www.w3.org/2000/xmlns/" found: "' +
     attr.namespaceURI + '"');
 end;
 
@@ -1019,6 +1048,219 @@ begin
   ws := doc.documentElement.firstChild.nodeName;
   ok := WideSameStr(ws,getUnicodeStr(1));
   check(ok, 'incorrect unicode handling');
+end;
+
+procedure TTestDOM2Methods.setDocumentElement;
+const
+  header='<?xml version="1.0" encoding="iso-8859-1"?>';
+var
+  temp: string;
+begin
+  doc := impl.createDocument('','',nil);
+  check(doc.documentElement=nil,'docelement <> nil');
+  check((doc as IDomPersist).xml='','document isn''t empty');
+  pci := doc.createProcessingInstruction('xml','version="1.0" encoding="iso-8859-1"');
+  doc.appendChild(pci);
+  elem := doc.createElement('root');
+  doc.appendChild(elem);
+  check(doc.documentElement.nodeName = 'root', 'wrong documentElement');
+  temp:=((doc as IDOMPersist).xml);
+  temp:=GetHeader(temp);
+  check(temp=header,'wrong header')
+end;
+
+procedure TTestDOM2Methods.setNsDecl;
+begin
+  attr := doc.createAttributeNS('http://www.w3.org/2000/xmlns/','xmlns:frieda');
+  attr.nodeValue := 'http://frieda.org';
+  doc.documentElement.setAttributeNodeNs(attr);
+  check(doc.documentElement.attributes.length = 1, 'wrong length');
+  check(doc.documentElement.attributes[0].nodeName = 'xmlns:frieda', 'wrong nodeName');
+  check(doc.documentElement.attributes[0].nodeValue = 'http://frieda.org', 'wrong nodeValue');
+  check(doc.documentElement.attributes[0].prefix = 'xmlns', 'wrong prefix');
+  check(doc.documentElement.attributes[0].localName = 'frieda', 'wrong localName');
+  check(doc.documentElement.attributes[0].namespaceURI = 'http://www.w3.org/2000/xmlns/');
+end;
+
+procedure TTestDOM2Methods.getElementsByTagNameNS1;
+const
+  n = 10;
+  m = 5;
+var
+  i,j: integer;
+  s: string;
+begin
+  for i := 0 to n-1 do begin
+    for j := 0 to m-1 do begin
+      elem := doc.createElementNS(Format('http://www.%dcommerce.de/test',[i]),Format('test%d:elem',[i]));
+      elem.setAttribute('id',IntToStr(j));
+      doc.documentElement.appendChild(elem);
+    end;
+  end;
+  for i := 0 to n-1 do begin
+    for j := 0 to m-1 do begin
+      nodelist := doc.getElementsByTagNameNS(Format('http://www.%dcommerce.de/test',[i]),'elem');
+      s := (nodelist[j] as IDOMElement).getAttribute('id');
+      check(s=IntToStr(j),'wrong id');
+      check(nodelist.length = m, 'wrong length');
+    end;
+  end;
+end;
+
+procedure TTestDOM2Methods.hasAttributes;
+begin
+  elem := doc.createElement(Name);
+  check(not elem.hasAttributes, 'has attributes');
+  elem.setAttribute(Name,Data);
+  check(elem.hasAttributes, 'has no attributes');
+end;
+
+procedure TTestDOM2Methods.hasAttributesNS;
+var
+  err: boolean;
+begin
+  elem := doc.createElementNS(nsuri,fqname);
+    // there's a namespace declaration
+    // since it's an attribute there must be one
+    check(elem.hasAttributes, 'has attributes');
+    check(elem.attributes.length = 1, 'wrong length (I)');
+
+  elem.setAttributeNS('http://abc.org','abc:wauwau',Data);
+    // an attribute and a namespace declaration has been appended
+    check(elem.attributes.length = 3, 'wrong length (II)');
+
+  elem.setAttributeNS('http://abc.org','abc:mietze',Data);
+    // a second attribute has been appended, but not the namespace declaration
+    // because the namespace declaration already exists at this element
+    // caused by the previous appended attribute
+    check(elem.attributes.length = 4, 'wrong length (III)');
+
+  elem.setAttributeNS(nsuri,prefix+':bobo',Data);
+    // a third attribute has been appended, but not the namespace declaration
+    // because the namespace declaration already exists at this element
+    // caused by the element
+    check(elem.attributes.length = 5, 'wrong length (IV)');
+
+  elem.setAttributeNS('',Name,Data);
+    // i wish to set an attribute that is not bount to a namespace
+    // an attribute has been appended but not a namespace declaration
+
+  check(elem.attributes.length = 6, 'wrong length (V)');
+
+  {
+  elem.setAttributeNS('http://abc.org','def:zebra',Data);
+    // the namespace uri was previously bound to the prefix 'abc'
+    // is it an error ?
+
+  err := False;
+  try
+    elem.setAttributeNS('http://def.org','abc:zebra',Data);
+      // this should crash because the prefix 'abc' was previously used for a
+      // different namspace uri
+    err := True;
+  except
+    on E: Exception do begin
+      check(E is EDOMException, 'wrong exception class');
+      check((E as EDOMException).code = NAMESPACE_ERR, 'wrong exception code');
+    end;
+  end;
+  if err then fail('exception not raised');
+  }
+end;
+
+procedure TTestDOM2Methods.append_remove;
+var a,b,c,d,e: IDOMElement;
+begin
+  a := doc.createElement('el_A');
+  b := doc.createElement('el_B');
+  c := doc.createElement('el_C');
+  d := doc.createElement('el_D');
+  e := doc.createElement('el_E');
+    check(doc.documentElement.childNodes.length = 0, 'wrong length (I)');
+
+  // append a child to an empty list
+  doc.documentElement.appendChild(a);
+    check(doc.documentElement.childNodes.length = 1, 'wrong length (II)');
+
+  // remove child that is first and last
+  doc.documentElement.removeChild(a);
+    check(doc.documentElement.childNodes.length = 0, 'wrong length (III)');
+
+  doc.documentElement.appendChild(b);
+    check(doc.documentElement.childNodes.length = 1, 'wrong length (IV)');
+
+  // append child to a filled list
+  doc.documentElement.appendChild(c);
+    check(doc.documentElement.childNodes.length = 2, 'wrong length (V)');
+
+  // remove child that is last but not first
+  doc.documentElement.removeChild(c);
+    check(doc.documentElement.childNodes.length = 1, 'wrong length (VI)');
+
+  doc.documentElement.appendChild(d);
+    check(doc.documentElement.childNodes.length = 2, 'wrong length (VII)');
+
+  doc.documentElement.appendChild(e);
+    check(doc.documentElement.childNodes.length = 3, 'wrong length (VIII)');
+
+  // remove child that is in the middle of the list
+  doc.documentElement.removeChild(d);
+    check(doc.documentElement.childNodes.length = 2, 'wrong length (IX)');
+
+  // remove child that is first but not last
+  doc.documentElement.removeChild(b);
+    check(doc.documentElement.childNodes.length = 1, 'wrong length (X)');
+
+end;
+
+procedure TTestDOM2Methods.append_remove_AttributeNS;
+begin
+  elem := doc.createElementNS('','test');
+    check(not elem.hasAttributes, 'has attributes (I)');
+
+  elem.setAttributeNS('http://abc.org','abc:zebra',Data);
+    // append an attribute and nsdecl to an empty list
+    check(elem.hasAttributes, 'has no attributes');
+    check(elem.attributes.length = 2, 'wrong length (I)');
+
+  elem.removeAttributeNS('http://abc.org','zebra');
+    // remove an attribute that is the first and last
+    check(not elem.hasAttributes, 'has attributes (II)');
+
+  elem.setAttributeNS('http://abc.org','abc:zebra',Data);
+  elem.setAttributeNS('http://abc.org','abc:okapi',Data);
+    // remove an attribute that is the last but not first
+    // there must be 2 attributes and 1 nsdecl
+    check(elem.attributes.length = 3, 'wrong length (III)');
+
+  elem.setAttributeNS('http://def.org','def:spider',Data);
+    // there must be 2 attributes and 2 nsdecl
+    check(elem.attributes.length = 4, 'wrong length (IV)');
+
+  elem.removeAttributeNS('http://abc.org','zebra');
+    // remove an attribute that is the first but not last
+    check(elem.attributes.length = 2, 'wrong length (V)');
+
+  elem.setAttributeNS('http://abc.org','abc:zebra',Data);
+  elem.setAttributeNS('http://ghi.org','ghi:bear',Data);
+    // there must be 3 attributes and 3 nsdecl
+    check(elem.attributes.length = 6, 'wrong length (VI)');
+
+  elem.removeAttributeNS('http://abc.org','zebra');
+    // remove an attribute that is in the middle
+    check(elem.attributes.length = 4, 'wrong legth (VII)');
+end;
+
+procedure TTestDOM2Methods.defaultNS;
+begin
+  // xmlns:abc="..." declares a namespace
+  // xmlns="..." declares the default namespace
+  // is the default namespace copied to each child ?
+  check((doc as IDOMPersist).loadxml(xmldecl+'<root xmlns="http://orf.org" />'), 'parse error');
+  check(doc.documentElement.hasAttributes, 'has no attributes (I)');
+  elem := doc.createElementNS('','def');
+  doc.documentElement.appendChild(elem);
+  check(elem.hasAttributes, 'has no attributes (II)');
 end;
 
 initialization

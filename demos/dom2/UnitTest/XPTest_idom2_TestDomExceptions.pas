@@ -4,12 +4,8 @@ interface
 
 uses
   TestFrameWork,
-  {$ifdef FE}
-    libxmldomFE,
-  {$else}
-    libxmldom,
-  {$endif}
   idom2,
+  idom2_ext,
   domSetup,
   SysUtils,
   XPTest_idom2_Shared,
@@ -149,8 +145,8 @@ begin
   text := nil;
   doc := nil;
   doc1 := nil;
+  check(GetDoccount(impl) = 0,'doccount<>0');
   impl := nil;
-  check(doccount = 0,'doccount<>0');
   inherited;
 end;
 
