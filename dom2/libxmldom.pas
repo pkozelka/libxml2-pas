@@ -2346,12 +2346,13 @@ end;
 
 function TGDOMDocumentBuilder.newDocument: IDomDocument;
 begin
-  result:=nil;
+  result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
 end;
 
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
 begin
-  result:=nil;
+  result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
+  (result as IDOMPersist).loadxml(xml);
 end;
 
 initialization

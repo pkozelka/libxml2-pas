@@ -101,23 +101,6 @@ type
   end;
 
 
-  TMSXMLDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
-    private
-      fFreeThreading : Boolean;
-
-    public
-      constructor create(freeThreading : Boolean);
-      destructor destroy; override;
-      function  get_DomImplementation : IDomImplementation;
-      function  newDocument : IDomDocument;
-      function  parse(const xml : DomString) : IDomDocument;
-      function  load(const url : DomString) : IDomDocument;
-      function  get_IsNamespaceAware : Boolean;
-      function  get_IsValidating : Boolean;
-      function  get_HasAsyncSupport : Boolean;
-      function  get_HasAbsoluteURLSupport : Boolean;
-  end;
-
   TMSXMLImplementation = class(TInterfacedObject, IDomImplementation)
     private
       (*
@@ -147,6 +130,25 @@ type
               const qualifiedName : DomString;
               docType             : IDomDocumentType) : IDomDocument;
   end;
+
+  TMSXMLDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
+    private
+      fFreeThreading    : Boolean;
+      fDomImplementation: TMSXMLImplementation.create(nil);
+
+    public
+      constructor create(freeThreading : Boolean);
+      destructor destroy; override;
+      function  get_DomImplementation : IDomImplementation;
+      function  newDocument : IDomDocument;
+      function  parse(const xml : DomString) : IDomDocument;
+      function  load(const url : DomString) : IDomDocument;
+      function  get_IsNamespaceAware : Boolean;
+      function  get_IsValidating : Boolean;
+      function  get_HasAsyncSupport : Boolean;
+      function  get_HasAbsoluteURLSupport : Boolean;
+  end;
+
 
   TMSXMLNodeList = class(TInterfacedObject, IDomNodeList)
     private
@@ -585,6 +587,7 @@ constructor TMSXMLDocumentBuilder.create(freeThreading : Boolean);
 begin
   inherited create;
   fFreeThreading := freeThreading;
+  fDomImplementation:=TMSXMLImplemetation.
 end;
 
 destructor TMSXMLDocumentBuilder.destroy;
@@ -595,7 +598,7 @@ end;
 
 function TMSXMLDocumentBuilder.get_DomImplementation : IDomImplementation;
 begin
-  result:=TMSXMLImplementation.create(nil);
+  result:=fDOMImplementation;
 end;
 
 function TMSXMLDocumentBuilder.NewDocument : IDomDocument;
