@@ -992,11 +992,8 @@ uses
 { CoDOMDocument }
 
 class function CoDOMDocument.Create: IXMLDOMDocument;
-var
-	doc: xmlDocPtr;
 begin
-	doc := xmlNewDoc(XML_DEFAULT_VERSION);
-	Result := GetDOMObject(xmlNodePtr(doc)) as IXMLDOMDocument;
+	Result := TXMLDOMDocument.Create(nil);
 end;
 
 end.

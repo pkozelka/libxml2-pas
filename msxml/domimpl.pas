@@ -43,6 +43,7 @@ type
 
 	TUniNode = record
 		case integer of
+		0: (ptr: pointer);
 		1: (node: xmlNodePtr);
 		2: (doc: xmlDocPtr);
 		3: (notation: xmlNotationPtr);
@@ -59,7 +60,7 @@ type
 		FNode: TUniNode;
 		FChildren_OnDemand: TChildNodeList;
 	protected //ILibXml2Node
-		function  NodePtr: xmlNodePtr;
+		function  NodePtr: xmlNodePtr; virtual;
 	protected //IXMLDOMNode
 		function  Get_nodeName: WideString; safecall;
 		function  Get_nodeValue: OleVariant; safecall;
@@ -101,7 +102,7 @@ type
 		function  Get_data: WideString; safecall;
 		procedure Set_data(const data: WideString); safecall;
 	protected //
-		constructor Create(aNode: xmlNodePtr);
+		constructor Create(aLibXmlObj: pointer);
 	public
 		destructor Destroy; override;
 	end;
@@ -177,7 +178,12 @@ type
 	end;
 
 	TXMLDOMDocument = class(TXMLDOMNode,
+		ILibXml2Node,
 		IXMLDOMDocument)
+	private
+		function  requestDocPtr: xmlDocPtr;
+	protected //ILibXml2Node
+		function  NodePtr: xmlNodePtr; override;
 	protected //IXMLDOMDocument
 		function  Get_doctype: IXMLDOMDocumentType; safecall;
 		function  Get_implementation_: IXMLDOMImplementation; safecall;
@@ -212,8 +218,8 @@ type
 		procedure Set_onreadystatechange(Param1: OleVariant); safecall;
 		procedure Set_ondataavailable(Param1: OleVariant); safecall;
 		procedure Set_ontransformnode(Param1: OleVariant); safecall;
-	protected //
-		constructor Create(aNode: xmlNodePtr);
+	public
+		constructor Create(aLibXmlObj: xmlNodePtr);
 	end;
 
 	TXMLDOMDocumentType = class(TXMLDOMNode,
@@ -373,10 +379,12 @@ begin
 	Result := GetDOMObject(node) as IXMLDOMNode;
 end;
 
-constructor TXMLDOMNode.Create(aNode: xmlNodePtr);
+constructor TXMLDOMNode.Create(aLibXmlObj: pointer);
 begin
-	FNode.node := aNode;
-	pointer(FNode.node._private) := self; // establish weak reference
+	FNode.ptr := aLibXmlObj;
+	if (aLibXmlObj<>nil) then begin
+		pointer(FNode.node._private) := self; // establish weak reference
+	end;
 end;
 
 destructor TXMLDOMNode.Destroy;
@@ -391,8 +399,15 @@ begin
 end;
 
 function TXMLDOMNode.Get_baseName: WideString;
+var
+	prefixSize: integer;
 begin
-	Result := UTF8Decode(FNode.node.ns.prefix);
+	prefixSize := 0;
+	if (FNode.node.ns<>nil) then begin
+		prefixSize := Length(FNode.node.ns.prefix);
+		if (prefixSize > 0) then Inc(prefixSize);
+	end;
+	Result := UTF8Decode(FNode.node.name + prefixSize);
 end;
 
 function TXMLDOMNode.Get_dataType: OleVariant;
@@ -885,9 +900,9 @@ begin
 	ENotImpl('TXMLDOMDocument.abort');
 end;
 
-constructor TXMLDOMDocument.Create(aNode: xmlNodePtr);
+constructor TXMLDOMDocument.Create(aLibXmlObj: xmlNodePtr);
 begin
-	inherited Create(aNode);
+	inherited Create(aLibXmlObj);
 	// we have to ensure that this node does not just disappear when all
 	// object references are released, because it holds some data not present in
 	// the underlying xmlDoc object. One way of doing this is to pretend that
@@ -941,7 +956,7 @@ var
 	node: xmlNodePtr;
 begin
 	s := tagName;
-	node := xmlNewDocNode(FNode.doc, nil, PChar(s), nil);
+	node := xmlNewDocNode(requestDocPtr, nil, PChar(s), nil);
 	Result := GetDOMObject(node) as IXMLDOMElement;
 end;
 
@@ -951,7 +966,7 @@ var
 	node: xmlNodePtr;
 begin
 	s := name;
-	node := xmlNewReference(FNode.doc, PChar(s));
+	node := xmlNewReference(requestDocPtr, PChar(s));
 	Result := GetDOMObject(node) as IXMLDOMEntityReference;
 end;
 
@@ -977,7 +992,7 @@ var
 	node: xmlNodePtr;
 begin
 	d := data;
-	node := xmlNewDocText(FNode.doc, PChar(d));
+	node := xmlNewDocText(requestDocPtr, PChar(d));
 	Result := GetDOMObject(node) as IXMLDOMText;
 end;
 
@@ -995,7 +1010,7 @@ function TXMLDOMDocument.Get_documentElement: IXMLDOMElement;
 var
 	node: xmlNodePtr;
 begin
-	node := xmlDocGetRootElement(FNode.doc);
+	node := xmlDocGetRootElement(requestDocPtr);
 	Result := GetDOMObject(node) as IXMLDOMElement;
 end;
 
@@ -1028,7 +1043,7 @@ function TXMLDOMDocument.Get_url: WideString;
 var
 	s: string;
 begin
-	s := FNode.doc.URL;
+	s := requestDocPtr.URL;
 	Result := s;
 end;
 
@@ -1043,8 +1058,16 @@ begin
 end;
 
 function TXMLDOMDocument.load(xmlSource: OleVariant): WordBool;
+var
+	fn: string;
 begin
-	ENotImpl('TXMLDOMDocument.load');
+	fn := xmlSource;
+	if (FNode.doc <>nil) then begin
+		xmlFreeDoc(FNode.doc);
+		FNode.doc := nil;
+	end;
+	FNode.doc := xmlParseFile(PChar(fn));
+	//todo: update the ParseError object
 end;
 
 function TXMLDOMDocument.loadXML(const bstrXML: WideString): WordBool;
@@ -1053,8 +1076,13 @@ begin
 end;
 
 function TXMLDOMDocument.nodeFromID(const idString: WideString): IXMLDOMNode;
+var
+	s: string;
+	attr: xmlAttrPtr;
 begin
-	ENotImpl('TXMLDOMDocument.nodeFromID');
+	s := idString;
+	attr := xmlGetID(requestDocPtr, PChar(s));
+	Result := GetDOMObject(attr.parent) as IXMLDOMNode;
 end;
 
 procedure TXMLDOMDocument.save(destination: OleVariant);
@@ -1067,12 +1095,12 @@ begin
 	varEmpty,
 	varNull:
 		begin
-			rv := xmlSaveFile(FNode.doc.URL, FNode.doc);
+			rv := xmlSaveFile(requestDocPtr.URL, FNode.doc);
 		end;
 	varString:
 		begin
 			fn := destination;
-			rv := xmlSaveFile(PChar(fn), FNode.doc);
+			rv := xmlSaveFile(PChar(fn), requestDocPtr);
 		end;
 	else
 		rv := -1;
@@ -1121,6 +1149,19 @@ end;
 procedure TXMLDOMDocument.Set_validateOnParse(isValidating: WordBool);
 begin
 	ENotImpl('TXMLDOMDocument.Set_validateOnParse');
+end;
+
+function TXMLDOMDocument.requestDocPtr: xmlDocPtr;
+begin
+	if (FNode.doc=nil) then begin
+		FNode.doc := xmlNewDoc(XML_DEFAULT_VERSION);
+	end;
+	Result := FNode.doc;
+end;
+
+function TXMLDOMDocument.NodePtr: xmlNodePtr;
+begin
+	Result := xmlNodePtr(requestDocPtr);
 end;
 
 { TXMLDOMCharacterData }
@@ -1175,11 +1216,8 @@ end;
 { TXMLDOMEntity }
 
 function TXMLDOMEntity.Get_notationName: WideString;
-var
-	s: string;
 begin
-	s := FNode.notation.name;
-	Result := s;
+	ENotImpl('TXMLDOMEntity.Get_notationName');
 end;
 
 function TXMLDOMEntity.Get_publicId: OleVariant;
