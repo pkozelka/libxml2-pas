@@ -80,8 +80,17 @@ function  xmlSaveFormatFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pc
 procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePtr; level:longint; format:longint; encoding:Pchar);cdecl;external LIBXML2_SO;
 
 // xmlIO.h
-function xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
+function  xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
 
+type
+	(**
+	 * This interface is intended for libxml2 wrappers. It provides a way
+	 * back - i.e. from the wrapper object to the libxml2 node.
+	 *)
+	ILibXml2Node = interface ['{1D4BD646-0AB9-4810-B4BD-7277FB0CFA30}']
+		function  LibXml2NodePtr: xmlNodePtr;
+	end;
+	
 implementation
 
 // functions from globals.b
