@@ -4,7 +4,9 @@ distributed as dom2_demo.zip.
 To compile, you also need the files from the folders:
 dom2
 libxml2
-data
+
+And to run, you need the examples from:
+demos/data
 
 So far tested with Delphi 6 only.
 

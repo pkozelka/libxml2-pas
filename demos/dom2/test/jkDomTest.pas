@@ -34,8 +34,6 @@ function test(name: string; testexpr: boolean): boolean;
 
 implementation
 
-
-
 uses conapp,   // outLog
      SysUtils, // Format
      ComObj,   // EOleException
@@ -122,30 +120,35 @@ procedure TestGDom3b(name,vendorstr:string);
     test('element.getAttributeNodeNS/setAttributeNodeNS',(attr <> nil));
     attr := nil;
     element := nil;
-    if vendorstr<>'LIBXML' then begin
-      attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:loop');
-      element := document.createElement('iii');
-      attr := element.setAttributeNode(attr);
-      attr := nil;
-      test('element.setAttributeNode',(element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
-      element.removeAttributeNS('http://xmlns.4commerce.de/eva','loop');
-      test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
-      element := nil;
-
-      element := document.documentElement;
-      nodelist := element.getElementsByTagName('sometag');
-      test('element.getElementsByTagName',(nodelist <> nil));
-      test('element.getElementsByTagName (length)',(nodelist.length = 1));
-      nodelist := nil;
-      element := nil;
-
-      attr := document.createAttribute('nop');
-      element := document.createElement('hub');
-      attr := element.setAttributeNode(attr);
-      attr := element.getAttributeNode('nop');
-      attr := element.removeAttributeNode(attr);
-      test('element.removeAttributeNode',(not element.hasAttribute('hub')));
-    end;
+    attr := document.createAttribute('loop');
+    element := document.createElement('iii');
+    attr := element.setAttributeNode(attr);
+    attr := nil;
+    test('element.setAttributeNode',(element.hasAttribute('loop')));
+    element.removeAttributeNS('http://xmlns.4commerce.de/eva','loop');
+    test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
+    element := nil;
+    // setAttributeNodeNS
+    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','loop');
+    element := document.createElement('iii');
+    attr := element.setAttributeNodeNS(attr);
+    attr := nil;
+    test('element.setAttributeNodeNS2',(element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
+    element.removeAttributeNS('http://xmlns.4commerce.de/eva','loop');
+    test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
+    element := nil;
+    element := document.documentElement;
+    nodelist := element.getElementsByTagName('sometag');
+    test('element.getElementsByTagName',(nodelist <> nil));
+    test('element.getElementsByTagName (length)',(nodelist.length = 1));
+    nodelist := nil;
+    element := nil;
+    attr := document.createAttribute('nop');
+    element := document.createElement('hub');
+    attr := element.setAttributeNode(attr);
+    attr := element.getAttributeNode('nop');
+    attr := element.removeAttributeNode(attr);
+    test('element.removeAttributeNode',(not element.hasAttribute('hub')));
     attr := nil;
     element := nil;
   end;
@@ -198,30 +201,32 @@ procedure TestGDom3b(name,vendorstr:string);
     test('document.createTextNode (data)',(text.data ='eee'));
     text := nil;
 
-    if vendorstr<>'LIBXML' then begin
+    document.documentElement.appendChild(node);
+    node := nil;
 
-      document.documentElement.appendChild(node);
-      node := nil;
-
-      if vendorstr = 'MSXML' then begin
-        outLog('element.getElementsByTagNameNS doesn''t work with MSXML');
-      end else begin
-        //p=2
-        nodelist := document.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
-        test('document.getElementsByTagNameNS (length)',(nodelist.length = 1));
-        nodelist := nil;
-        //p=2
-        nodelist := document.documentElement.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
-        test('element.getElementsByTagNameNS (length)',(nodelist.length = 1));
-        nodelist := nil;
-      end;
-
+    if vendorstr = 'MSXML' then begin
+      outLog('element.getElementsByTagNameNS doesn''t work with MSXML');
+    end else begin
       //p=2
-      nodelist := document.getElementsByTagName('sometag');
+      nodelist := document.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
+      if nodelist<>nil
+        then test('document.getElementsByTagNameNS (length)',(nodelist.length = 1));
+      nodelist := nil;
+      //p=2
+      nodelist := document.documentElement.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
+      if nodelist <> nil
+        then test('element.getElementsByTagNameNS (length)',(nodelist.length = 1));
+      nodelist := nil;
+    end;
+
+    //p=2
+    nodelist := document.getElementsByTagName('sometag');
+    if nodelist <> nil then begin
       test('document.getElementsByTagName',(nodelist <> nil));
       test('document.getElementsByTagName (length)',(nodelist.length = 1)) ;
-      nodelist := nil;
-
+    end;
+    nodelist := nil;
+    if vendorstr<>'LIBXML' then begin
       //p=2
       dom := document.domImplementation;
       test('document.domImplementation',(dom <> nil)) ;
@@ -703,7 +708,7 @@ begin
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  outLog('Number of tests total:     100');
+  outLog('Number of tests total:     101');
   //outLog('doccount='+inttostr(doccount));
   //outLog('nodecount='+inttostr(nodecount));
   //outLog('elementcount='+inttostr(elementcount));
