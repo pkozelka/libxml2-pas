@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.27 2002-02-28 19:41:09 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.28 2002-03-02 18:02:33 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -319,7 +319,8 @@ type
     function  IDomNode.get_nodeValue = returnEmptyString;
     procedure set_nodeValue(const value: DomString);
     function  get_nodeType: DomNodeType;
-    function  IDomNode.get_childNodes = returnChildNodes;
+//    function  IDomNode.get_childNodes = returnChildNodes;
+    function  get_childNodes: IDomNodeList;
     function  IDomNode.get_parentNode = returnNullDomNode;
     function  IDomNode.get_previousSibling = returnNullDomNode;
     function  IDomNode.get_nextSibling = returnNullDomNode;
@@ -329,7 +330,7 @@ type
     function  IDomNode.get_localName = returnEmptyString;
   protected //IDomDocument
     function  IDomDocument.get_nodeValue = returnEmptyString;
-    function  IDomDocument.get_childNodes = returnChildNodes;
+//    function  IDomDocument.get_childNodes = returnChildNodes;
     function  IDomDocument.get_parentNode = returnNullDomNode;
     function  IDomDocument.get_previousSibling = returnNullDomNode;
     function  IDomDocument.get_nextSibling = returnNullDomNode;
@@ -1307,6 +1308,11 @@ end;
 function TLDomDocument.GetGDoc: xmlDocPtr;
 begin
   Result := xmlDocPtr(fMyNode);
+end;
+
+function TLDomDocument.get_childNodes: IDomNodeList;
+begin
+  Result := returnChildNodes;
 end;
 
 function TLDomDocument.get_doctype: IDomDocumentType;
