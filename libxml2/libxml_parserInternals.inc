@@ -47,7 +47,7 @@ const
 	any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
 }
 
-function  IS_CHAR(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsChar';
+function  IS_CHAR(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsChar';
 {
 	IS_BLANK:
 	@c:  an UNICODE value (int)
@@ -56,7 +56,7 @@ function  IS_CHAR(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsChar';
 
 	[3] S ::= (#x20 | #x9 | #xD | #xA)+
 }
-function  IS_BLANK(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsBlank';
+function  IS_BLANK(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsBlank';
 {
 	IS_BASECHAR:
 	@c:  an UNICODE value (int)
@@ -65,7 +65,7 @@ function  IS_BLANK(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsBlank
 
 	[85] BaseChar ::= ... long list see REC ...
 }
-function  IS_BASECHAR(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsBaseChar';
+function  IS_BASECHAR(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsBaseChar';
 {
 	IS_DIGIT:
 	@c:  an UNICODE value (int)
@@ -74,7 +74,7 @@ function  IS_BASECHAR(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsBa
 
 	[88] Digit ::= ... long list see REC ...
 }
-function  IS_DIGIT(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsDigit';
+function  IS_DIGIT(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsDigit';
 
 {
 	IS_COMBINING:
@@ -84,7 +84,7 @@ function  IS_DIGIT(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsDigit
 
 	[87] CombiningChar ::= ... long list see REC ...
 }
-function IS_COMBINING(c : longint) : longint; cdecl;external LIBXML2_SO name 'xmlIsCombining';
+function IS_COMBINING(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsCombining';
 
 {
 	IS_EXTENDER:
@@ -97,7 +97,7 @@ function IS_COMBINING(c : longint) : longint; cdecl;external LIBXML2_SO name 'xm
 							 #x0E46 | #x0EC6 | #x3005 | [#x3031-#x3035] |
 							 [#x309D-#x309E] | [#x30FC-#x30FE]
 }
-function IS_EXTENDER(c : longint) : longint; cdecl;external LIBXML2_SO name 'xmlIsExtender';
+function IS_EXTENDER(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsExtender';
 {
 	IS_IDEOGRAPHIC:
 	@c:  an UNICODE value (int)
@@ -107,7 +107,7 @@ function IS_EXTENDER(c : longint) : longint; cdecl;external LIBXML2_SO name 'xml
 
 	[86] Ideographic ::= [#x4E00-#x9FA5] | #x3007 | [#x3021-#x3029]
 }
-function IS_IDEOGRAPHIC(c : longint) : longint;cdecl;external LIBXML2_SO name 'xmlIsIdeographic';
+function IS_IDEOGRAPHIC(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsIdeographic';
 
 {
 	IS_LETTER:
@@ -117,7 +117,7 @@ function IS_IDEOGRAPHIC(c : longint) : longint;cdecl;external LIBXML2_SO name 'x
 
 	[84] Letter ::= BaseChar | Ideographic
 }
-function IS_LETTER(c : longint) : longint; cdecl;external LIBXML2_SO name 'xmlIsLetter';
+function IS_LETTER(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsLetter';
 {
 	IS_PUBIDCHAR:
 	@c:  an UNICODE value (int)
@@ -126,7 +126,7 @@ function IS_LETTER(c : longint) : longint; cdecl;external LIBXML2_SO name 'xmlIs
 
 	[13] PubidChar ::= #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;! #@$_%]
 }
-function IS_PUBIDCHAR(c : longint) : longint; cdecl;external LIBXML2_SO name 'xmlIsPubidChar';
+function IS_PUBIDCHAR(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsPubidChar';
 
 {
 	SKIP_EOL:
