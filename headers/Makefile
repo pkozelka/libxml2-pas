@@ -1,5 +1,5 @@
-all:
-	echo "Compilation currently not supported by Makefile."
+all: checkapi
+
 dist:
 	utils/mkrelease.sh dist
 upload:

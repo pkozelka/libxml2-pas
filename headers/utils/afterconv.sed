@@ -1,5 +1,6 @@
 s/\([[:alnum:]]*\)[[:space:]]*:[[:space:]]*\([[:alnum:]]\)/\1: \2/
 s/longint/Longint/gi
+s/dword/DWORD/gi
 s/(\* Const before type ignored \*)//g
 s/{ C++ end of extern C conditionnal removed }//g
 s/^[[:space:]]*Const/const/gi
@@ -10,6 +11,7 @@ s/;cdecl;/; cdecl;/gi
 s/;external/; external/gi
 s/external;/external UNKNOWN_SO;/gi
 s/\^xmlChar/PxmlChar/g
+s/\^char/PChar/g
 s/ file:/ aFile:/gi
 s/:\([[:alnum:]]\)/: \1/g
 s/ _type:/ aType:/g

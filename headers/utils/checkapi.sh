@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SPACES='                                                                        '
+
 #
 # Usage:
 # checkapi.sh <localroot> [<files>]
@@ -15,17 +17,18 @@ function toPascal()
 {
 	local aFileName=$1
 	local aOutputFile=${2?'output file not specified'}
+	local aSOPrefix=${3?'SO prefix not specified'}
+
 	if [ "$H2PAS" != "" ] ; then
 		echo "---------------- [$aFileName] -----------------" >>$TMP/h2pas.log
 		# translate
-		echo "  translating $aFileName to $aOutputFile.1"
+		echo "Translating ${aFileName/#*\/} to ${aOutputFile/#*\/}.1"
 		h2pas -d -c -i $aFileName -o $aOutputFile.1 1>&2 >>$TMP/h2pas.log
 
 		# apply known replacements
-		echo "  applying additional conversions --> $aOutputFile"
+		echo "  applying additional conversions --> ${aOutputFile/#*\/}"
 		sed -f "$LIBXML2_PAS/headers/utils/afterconv.sed" $aOutputFile.1 > $aOutputFile.2 || mv $aOutputFile.1 $aOutputFile.2 
-		local pfx=${aOutputFile/#*\//}
-		pfx=`echo ${pfx%_*} | tr [:lower:] [:upper:]`
+		local pfx=`echo ${aSOPrefix} | tr [:lower:] [:upper:]`
 		sed 's:UNKNOWN_SO:'${pfx}'_SO:' $aOutputFile.2 > $aOutputFile
 
 		# compare original translation and the one with replacements
@@ -87,9 +90,12 @@ TMP=$TMPBASE/$$
 RESULTFILE=checkapi-results.zip
 
 CHGCOUNT=0
-H2PAS=`which h2pas`
-if [ "x$H2PAS" = "x" ] ; then
-	echo "h2pas not found, Pascal conversion will not take place"
+H2PAS=`which h2pas 2>/dev/null`
+if [ "$H2PAS" = "" ] ; then
+	haveH2Pas="false"
+	echo "ERROR: h2pas not found, Pascal conversion will not take place" >&2
+else
+	haveH2Pas="true"
 fi
 
 
@@ -99,10 +105,10 @@ mkdir -p $TMP
 THISPATH=`pwd`
 for fn in $FILELIST ; do
 	cd $THISPATH
-	echo -n "  checking: $fn:  "
+	echo -n "  $fn:  ${SPACES:0:40-${#fn}}"
 	revInfo=`head $fn | sed -n '/CVS-REV/{s#.*CVS-REV:\([^:]*\):\([^:]*\):#\1:\2#;p;}'`
 	if [ "$revInfo" = "" ]; then
-		echo
+		echo "-         -"
 		echo "ERROR: no CVS-REV in $fn" >&2
 		continue
 	fi
@@ -122,7 +128,7 @@ for fn in $FILELIST ; do
 	cachePut "$LOCALROOT/$origFile" "$newRev"
 
 	if [ "$curRev" = "$newRev" ]; then
-		echo "ok, $newRev ($origFile)"
+		echo "${newRev}${SPACES:0:10-${#newRev}}$origFile"
 		continue
 	fi
 	echo "changed from $curRev to $newRev - gathering info:"
@@ -138,8 +144,10 @@ for fn in $FILELIST ; do
 	echo "Copying $origFileName to $TARGETFILE"
 	cp $LOCALROOT/$origFile $TARGETFILE
 
-	pasFile=$TMP/$dirPrefix/${origFileName%.h}.pas
-	toPascal "$TARGETFILE" "$pasFile"
+	if $haveH2Pas; then
+		pasFile=$TMP/$dirPrefix/${origFileName%.h}.pas
+		toPascal "$TARGETFILE" "$pasFile" "$dirPrefix"
+	fi
 
 	# find the CVSROOT for this file - it is stored with the CVS local copy
 	CVSROOT="`cat $LOCALROOT/$origFilePath/CVS/Root`"
@@ -147,8 +155,14 @@ for fn in $FILELIST ; do
 	oldHfile="$TMP/$dirPrefix/${origFileName%.h}-${curRev}.h"
 	if cacheGet "$LOCALROOT/$origFile" "$curRev" "$oldHfile"; then
 		diff -u4 $oldHfile $LOCALROOT/$origFile >$TARGETFILE.$curRev-$newRev.diff
+	else
+		cmd="cvs -z4 -d$CVSROOT diff -r $curRev -r $newRev $origFile"
+		echo "$cmd" >$TARGETFILE.$curRev-$newRev.diff
+		$cmd
+	fi
+	if $haveH2Pas; then
 		oldPasFile=${oldHfile%.h}.pas
-		toPascal "$oldHfile" "$oldPasFile"
+		toPascal "$oldHfile" "$oldPasFile" "$dirPrefix"
 		diff -u4 $oldPasFile $pasFile >$TMP/$dirPrefix/${origFileName%.h}.pas.$curRev-$newRev.diff
 		rm -f $oldPasFile
 	fi
@@ -163,11 +177,11 @@ for fn in $FILELIST ; do
 
 	# get log entries
 	cmd="cvs -z4 -d$CVSROOT log -N -r$curRev:$newRev $origFile"
-	echo "Extracting log file ($TARGETFILE.log):"
+#	echo "Extracting log file ($TARGETFILE.log):"
+	pushd $LOCALROOT >/dev/null
 	echo "$cmd"
-	cd $LOCALROOT
-	$cmd >$THISPATH/$TARGETFILE.log
-	cd $THISPATH
+	$cmd >$TARGETFILE.log
+	popd >/dev/null
 	CHGCOUNT=$((CHGCOUNT + 1))
 done
 
@@ -221,7 +235,7 @@ for dir in `cat $TMP/allPaths`; do
 		echo "  copying $origFileName to $HFILE"
 		cp $fn $HFILE
 
-		toPascal $HFILE $h2pasFn
+		toPascal $HFILE $h2pasFn "$dirPrefix"
 
 		cat >$newFn <<EOF
 // CVS-REV:$sfn:`getCvsRevision $fn`:
