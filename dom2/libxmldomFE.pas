@@ -53,6 +53,9 @@ unit libxmldomFE;
 
 interface
 
+// remove the following line, if you don't want namespace declaration
+// attributes to be visible as normal attributes (removing improves speed)
+{$define strict}
 
 uses
   {$ifdef VER130} //Delphi 5
@@ -870,7 +873,11 @@ begin
     XML_ELEMENT_NODE,
     XML_ATTRIBUTE_NODE:
       begin
-        if fXmlNode.ns = nil then exit;
+        if fXmlNode.ns = nil then begin
+          if pos('xmlns:',fXmlNode.name)=0 then exit;
+          result:='xmlns';
+          exit;
+        end;
         Result := UTF8Decode1(fXmlNode.ns.prefix);
       end;
   end;
@@ -887,11 +894,17 @@ begin
     XML_COMMENT_NODE,
     XML_DOCUMENT_FRAG_NODE: Result := '#' + UTF8Decode1(fXmlNode.Name);
     else begin
-        Result := UTF8Decode1(fXmlNode.Name);
+        Result := UTF8Decode1(fXmlNode.name);
         // this is neccessary, because according to the dom2
         // specification localName has to be nil for nodes,
         // that don't have a namespace
-        if fXmlNode.ns = nil then Result := '';
+        if fXmlNode.ns = nil then begin
+          if pos('xmlns:',fXmlNode.name)=0 then begin
+            Result := '';
+          end else begin
+            result:=localName(UTF8Decode1(fXmlNode.name));
+          end;
+        end;
       end;
   end;
 end;
@@ -1368,6 +1381,9 @@ begin
   name1 := UTF8Encode(namespaceURI);
   name2 := UTF8Encode(localName);
   node := xmlNodePtr(xmlHasNSProp(FOwnerElement, PChar(name2), PChar(name1)));
+  if (node=nil) and (namespaceURI='http://www.w3.org/2000/xmlns/') then begin
+    node := xmlNodePtr(xmlHasProp(FOwnerElement,PChar('xmlns:'+name2)));
+  end;
   if node <> nil then result := MakeNode(node, fOwnerDocument) as IDomNode;
 end;
 
@@ -1678,8 +1694,16 @@ begin
     sName:='xmlns:'+prefix;
     sValue:=namespaceURI;
     attr := xmlHasProp(node, pchar(sName));
-    removeAttr(node,attr);
-    xmlFreeProp(attr);
+    if attr<>nil then begin
+      removeAttr(node,attr);
+      xmlFreeProp(attr);
+    end else begin
+      attr :=xmlHasNsProp(node,prefix,pchar('http://www.w3.org/2000/xmlns/'));
+      if attr<>nil then begin
+        removeAttr(node,attr);
+        xmlFreeProp(attr);
+      end;
+    end;
     ns:=ns.next;
   end;
 end;
@@ -2496,11 +2520,11 @@ begin
       if fPrettyPrint then begin
         format := -1;
       end;
-      {$ifdef new}
+      {$ifdef strict}
       removeNsDecl(fXmlDocPtr);
       {$endif}
       xmlDocDumpFormatMemoryEnc(fXmlDocPtr, CString, @length, encoding, format);
-      {$ifdef new}
+      {$ifdef strict}
       copyNsDecl(fXmlDocPtr);
       {$endif}
       if encoding<>'utf8'
@@ -2604,7 +2628,7 @@ begin
     xmlFreeParserCtxt(ctxt);
   end;
   if Result then begin
-    {$ifdef new}
+    {$ifdef strict}
     // copy namespace declarations into the list of attributes
     copyNsDecl(fXmlDocPtr);
     {$endif}
@@ -3325,12 +3349,17 @@ begin
   styleNode := GetGNode(stylesheet);
   styleDoc := styleNode.doc;
   if (styleDoc = nil) or (doc = nil) then exit;
+  {$ifdef strict}
+  //remove added namespace attributes from stylesheet
+  removeNsDecl(styleDoc);
+  {$endif}
   tempXSL := xsltParseStyleSheetDoc(styleDoc);
   if tempXSL = nil then exit;
   // mark the document as stylesheetdocument;
   // it holds additional information, so a different free method must
   // be used
   (stylesheet.ownerDocument as IDomInternal).set_FtempXSL(tempXSL);
+
   outputDoc := xsltApplyStylesheet(tempXSL, doc, nil);
   if outputDoc = nil then exit;
   doctype := outputDoc.type_;
