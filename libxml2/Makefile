@@ -5,14 +5,15 @@ ARCHIVE=$(PACKAGE)-$(VERSION)
 TAG=`echo "LIBXML_$(VERSION)" | sed "s/\./_/g"`
 MYTMP=./$(TAG).tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
+DCCOPTS=-B -U../libxml2
 
 all: compile
 
 compile: compile-$(OSTYPE)
 compile-cygwin:
-	dcc32 $(LIBNAME).pas
+	dcc32 $(DCCOPTS) $(LIBNAME).pas
 compile-linux-gnu:
-	dcc $(LIBNAME).pas
+	dcc $(DCCOPTS) $(LIBNAME).pas
 
 checkapi:
 	../utils/checkApiChanges.sh :pserver:anonymous@anoncvs.gnome.org:/cvs/gnome gnome-xml/include/libxml HEAD *.inc

@@ -5,7 +5,7 @@ ARCHIVE=$(PACKAGE)-$(VERSION)
 TAG=`echo "LIBXSLT_$(VERSION)" | sed "s/\./_/g"`
 MYTMP=./$(TAG).tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
-DCCOPTS=-U../libxml2
+DCCOPTS=-B -U../libxml2
 
 all: compile
 
