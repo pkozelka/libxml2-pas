@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.51 2002-01-16 19:12:41 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.52 2002-01-16 19:36:31 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -63,6 +63,7 @@ type
 	TGDOMImplementation = class(TGDOMInterface,
 		IDomImplementation)
 	private
+		class function getInstance(aFreeThreading: boolean): IDomImplementation;
 	protected //IDomImplementation
 		function hasFeature(const feature, version: DOMString): Boolean;
 		function createDocumentType(const qualifiedName, publicId, systemId: DOMString): IDOMDocumentType;
@@ -408,8 +409,6 @@ type
 
 var
 	//[pk] following should be in implementation, or nowhere at all:
-	LIBXML_DOM: IDomDocumentBuilderFactory;
-
 	doccount: integer=0;
 	domcount: integer=0;
 	nodecount: integer=0;
@@ -423,6 +422,9 @@ type
 resourcestring
 	SNodeExpected = 'Node cannot be null';
 	SGDOMNotInstalled = 'GDOME2 is not installed';
+
+const
+	GDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
 
 function GetDOMObject(aNode: pointer): IUnknown;
 const
@@ -610,7 +612,7 @@ end;
 
 function TGDOMDocumentBuilder.Get_DomImplementation : IDomImplementation;
 begin
-	result:=TGDOMImplementation.Create;
+	Result := TGDOMImplementation.getInstance(FFreeThreading);
 end;
 
 function TGDOMDocumentBuilder.Get_IsNamespaceAware : Boolean;
@@ -631,6 +633,14 @@ end;
 function TGDOMDocumentBuilder.Get_HasAsyncSupport : Boolean;
 begin
 	Result := false;
+end;
+
+class function TGDOMImplementation.getInstance(aFreeThreading: boolean): IDomImplementation;
+begin
+	Result := GDOMImplementation[aFreeThreading];
+	if (Result = nil) then begin
+		Result := TGDOMImplementation.Create; // currently, the same imlementation for both cases
+	end;
 end;
 
 function TGDOMImplementation.hasFeature(const feature, version: DOMString): Boolean;
@@ -2416,5 +2426,12 @@ end;
 initialization
 	RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
 finalization
+	// release on-demand created instances
+	if GDOMImplementation[false]<>nil then begin
+		GDOMImplementation[false]._Release;
+	end;
+	if GDOMImplementation[true]<>nil then begin
+		GDOMImplementation[true]._Release;
+	end;
 end.
 
