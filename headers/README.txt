@@ -13,6 +13,11 @@ Contents:
 	LINKS
 	HOW TO HELP
 
+CONDITIONAL DEFINES
+-------------------
+USE_PASCAL_MM
+	activates the compiler's native memory manager, instead of making use of the MM already active in libxml2.
+	Use it only if you encounter MM-related problems. In that case, please report the circumstances to our mailing list.
 
 AUTHORS
 -------
@@ -25,6 +30,7 @@ Uwe Fechner <ufechner@4commerce.de>
 	- testing, demo application(s), initiated the libxslt translation
 Martijn Brinkers <martijn_brinkers@yahoo.co.uk>
 Mikhail Soukhanov <m.soukhanov@geosys.ru>
+Eric Zurchner <Eric.Zurcher@csiro.au>
 
 VERSION COMPLIANCE
 ------------------

@@ -89,12 +89,6 @@ function StrNextChar(p: PChar): PChar;
 {$I libxml2_xmlschemastypes.inc}
 {$I libxml2_xmlschemas.inc}
 
-{$IFDEF WIN32}
-{ this function should release memory using the same mem.manager that libxml2
-  uses for allocating it. Unfortunately it doesn't work...
-}
-{$ENDIF}
-
 // functions that reference symbols defined later - by header file:
 
 // tree.h
@@ -105,8 +99,13 @@ procedure xmlNodeDumpOutput(buf: xmlOutputBufferPtr; doc: xmlDocPtr; cur: xmlNod
 // xmlIO.h
 function xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl; external LIBXML2_SO;
 
-//
-procedure xmlFree(str: PxmlChar);
+procedure xmlFree(str: PxmlChar); cdecl;
+{$IFNDEF USE_PASCAL_MM}
+function xmlMalloc(size: size_t): Pointer; cdecl;
+function xmlRealloc(ptr: Pointer; size: size_t): Pointer; cdecl;
+function xmlMemStrdup(str: PChar): PChar; cdecl;
+{$ENDIF}
+
 
 type
   (**
@@ -122,10 +121,39 @@ implementation
 uses
   SysUtils;
 
-procedure xmlFree(str: PxmlChar);
+{$IFDEF USE_PASCAL_MM}
+procedure xmlFree(str: PxmlChar); cdecl;
 begin
   FreeMem(PChar(str)); //hopefully works under Kylix
 end;
+{$ELSE}
+var
+  libHandle: Cardinal;
+  pXmlFree: pXmlFreeFunc;
+  pXmlMalloc: pXmlMallocFunc;
+  pXmlRealloc: pXmlReallocFunc;
+  pXmlMemStrdup: pXmlStrdupFunc;
+
+procedure xmlFree(str: PxmlChar); cdecl;
+begin
+  pXmlFree^(str);
+end;
+
+function xmlMalloc(size: size_t): Pointer; cdecl;
+begin
+  Result := pXmlMalloc^(size);
+end;
+
+function xmlRealloc(ptr: Pointer; size: size_t): Pointer; cdecl;
+begin
+  Result := pXmlRealloc^(ptr, size);
+end;
+
+function xmlMemStrdup(str: PChar): PChar; cdecl;
+begin
+  Result := pXmlMemStrdup^(str);
+end;
+{$ENDIF}
 
 // macros from xpath.h
 
@@ -184,6 +212,7 @@ begin
   end;
 end;
 
+{$IFDEF USE_PASCAL_MM}
 // Delphi memory handling
 procedure DelphiFreeFunc(ptr: Pointer); cdecl;
 begin
@@ -208,6 +237,7 @@ begin
   Result := AllocMem(sz + 1);
   Move(str^, Result^, sz);
 end;
+{$ENDIF}
 
 {$IFDEF VER130}
 function StrNextChar(p: PChar): PChar;
@@ -217,8 +247,23 @@ end;
 {$ENDIF}
 
 initialization
+{$IFDEF USE_PASCAL_MM}
   // setup Delphi memory handler
   xmlMemSetup(@DelphiFreeFunc, @DelphiMallocFunc, @DelphiReallocFunc, @DelphiStrdupFunc);
-
+{$ELSE}
+  // The Delphi 'external' directive can only be used for functions and procedures,
+  // but here we need to obtain the addresses of POINTERS to functions. We can
+  // get to these addresses (and also those of other data values exported from
+  // the DLL) by using GetProcAddress.
+   libHandle := LoadLibrary(LIBXML2_SO);
+   if libHandle <> 0 then
+   begin
+     pXmlFree := pXmlFreeFunc(GetProcAddress(libHandle, 'xmlFree'));
+     pXmlMalloc := pXmlMallocFunc(GetProcAddress(libHandle, 'xmlMalloc'));
+     pXmlRealloc := pXmlReallocFunc(GetProcAddress(libHandle, 'xmlRealloc'));
+     pXmlMemStrdup := pXmlStrdupFunc(GetProcAddress(libHandle, 'xmlMemStrdup'));
+     FreeLibrary(libHandle);
+   end;
+{$ENDIF}
 end.
 
