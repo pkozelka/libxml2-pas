@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlschemastypes.h:1.1:
+// CVS-REV:gnome-xml/include/libxml/xmlschemastypes.h:1.2:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

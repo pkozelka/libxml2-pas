@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlautomata.h:1.6:
+// CVS-REV:gnome-xml/include/libxml/xmlautomata.h:1.7:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/nanohttp.h:1.12:
+// CVS-REV:gnome-xml/include/libxml/nanohttp.h:1.13:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/transform.h:1.21:
+// CVS-REV:libxslt/libxslt/transform.h:1.22:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

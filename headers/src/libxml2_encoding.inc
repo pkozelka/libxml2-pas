@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/encoding.h:1.30:
+// CVS-REV:gnome-xml/include/libxml/encoding.h:1.31:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
