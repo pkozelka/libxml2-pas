@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.90 2002-01-29 00:16:57 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.91 2002-01-29 01:02:11 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -501,7 +501,7 @@ end;
 
 function GetDomObject(aNode: pointer): IUnknown;
 const
-  NodeClasses: array[XML_ELEMENT_NODE..XML_NOTATION_NODE] of TGDOMNodeClass = (
+  NodeClasses: array[XML_ELEMENT_NODE..XML_ENTITY_DECL] of TGDOMNodeClass = (
     TGDOMElement,
     TGDOMAttr,
     TGDOMText,
@@ -513,7 +513,12 @@ const
     TGDOMDocument,
     TGDOMDocumentType,
     TGDOMDocumentFragment,
-    TGDOMNotation
+    TGDOMNotation,
+    TGDOMDocument,
+    TGDOMDocumentType,
+    nil,
+    nil,
+    TGDOMEntity
   );
 var
   obj: TGDOMNode;
