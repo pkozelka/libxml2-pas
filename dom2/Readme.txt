@@ -1,4 +1,23 @@
+Special Remark:
+===============
+
+The current version of dom2 works only with the libxml2 dll,
+that is contained in libxml.zip in this directory.
+There is a bug in the current libxml2.dll from Igor.
+Get this libxml.dll file, rename it to libxml2.dll and use
+it until the bug in Igor's dll is fixed.
+
+New in the version from 2001-01-03 in Dom2.pas:
+-----------------------------------------------
+
+You can choose between enums for NodeTypes and integer for NodeTypes.
+Integer-values are used by xmldom.pas from Borland (D6 Enterprise),
+so if you want to write code, that is compatible to xmldom.pas than
+use {$DEFINE NodeTypeInteger}.
+
+
 The files in this directory:
+----------------------------
 
 Dom2.pas
 .
@@ -33,7 +52,6 @@ msxml 3.0 a proprietary limited syntax.
 tests_libxml2.pas
 a list of the dom2-functions, already implemented in libxmldom.pas
 
-Uwe Fechner, 2001-12-23
-
+Uwe Fechner
 
 
