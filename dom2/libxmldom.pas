@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.46 2002-01-16 13:28:52 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.47 2002-01-16 15:36:24 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -162,6 +162,10 @@ type
 	private
 		//ns:
 		function GetGAttribute: xmlAttrPtr;
+	protected //IDomNode
+		function  IDomAttr.get_nodeValue = get_value;
+		procedure IDomAttr.set_nodeValue = set_value;
+	protected //IDomAttr
 	protected
 		{ Property Get/Set }
 		function get_name: DOMString;
@@ -685,7 +689,7 @@ end;
 function TGDOMNode.get_nodeValue: DOMString;
 begin
 	case FGNode.type_ of
-	XML_ATTRIBUTE_NODE,
+//note:	XML_ATTRIBUTE_NODE is handled in TGDOMAttr
 	XML_TEXT_NODE,
 	XML_CDATA_SECTION_NODE,
 	XML_ENTITY_REF_NODE,
@@ -702,7 +706,7 @@ end;
 procedure TGDOMNode.set_nodeValue(const value: DOMString);
 begin
 	case FGNode.type_ of
-	XML_ATTRIBUTE_NODE,
+//note:	XML_ATTRIBUTE_NODE is handled in TGDOMAttr
 	XML_TEXT_NODE,
 	XML_CDATA_SECTION_NODE,
 	XML_ENTITY_REF_NODE,
@@ -1268,12 +1272,32 @@ end;
 
 function TGDOMAttr.get_value: DOMString;
 begin
-	result:= inherited get_nodeValue;
+	Result := UTF8Decode(xmlNodeListGetString(FGNode.doc, FGNode.children, 1));
 end;
 
 procedure TGDOMAttr.set_value(const attributeValue: DOMString);
+var
+	attr: xmlAttrPtr;
+	tmp: xmlNodePtr;
+	v: string;
 begin
-	inherited set_nodeValue(attributeValue);
+	v := UTF8Encode(attributeValue);
+	attr := xmlAttrPtr(FGNode);
+	if attr.children<>nil then begin
+		xmlFreeNodeList(attr.children);
+		attr.children:=nil;
+		attr.last:=nil;
+	end;
+	attr.children := xmlStringGetNodeList(attr.doc, PChar(v));
+	tmp := attr.children;
+	while tmp<>nil do begin
+		tmp.parent := xmlNodePtr(attr);
+		tmp.doc := attr.doc;
+		if tmp.next=nil then begin
+			attr.last := tmp;
+		end;
+		tmp := tmp.next;
+	end;
 end;
 
 constructor TGDOMAttr.Create(AAttribute: xmlAttrPtr);
