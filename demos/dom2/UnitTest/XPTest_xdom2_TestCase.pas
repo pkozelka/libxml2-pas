@@ -3,7 +3,7 @@ unit XPTest_xdom2_TestCase;
 interface
 
 uses
-  SysUtils, Classes, TestFrameWork, libxmldom, xdom2, Dialogs, msxml_impl,
+  SysUtils, Classes, TestFrameWork, libxmldom, idom2, Dialogs, msxml_impl,
   ActiveX,GUITestRunner,StrUtils,jkDomTest,ComObj,IniFiles;
 
 const

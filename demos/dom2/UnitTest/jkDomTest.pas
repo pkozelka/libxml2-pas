@@ -26,7 +26,7 @@ unit jkDomTest;
 interface
 {$DEFINE NodeTypeInteger}
 
-uses xdom2,libxmldom,msxml_impl; // IDOMIMplementation, IDOMDocument
+uses idom2,libxmldom,msxml_impl; // IDOMIMplementation, IDOMDocument
 
 function TestGDom3(name,vendorstr:string;TestSet:integer):double;
 function getDoc(filename,vendorstr: string;TestSet:integer=0): IDOMDocument;

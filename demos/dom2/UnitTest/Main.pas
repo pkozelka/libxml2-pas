@@ -3,7 +3,7 @@ unit Main;
 interface
 
 uses
-  xDom2;
+  idom2;
 
 implementation
 
