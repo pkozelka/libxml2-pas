@@ -36,11 +36,9 @@ function copySourceFilesToDist()
 	cp $HEADERS_DIR/../common/license/COPYING* $DIST
 
 	local pkgVer="$LIBXML_MAJOR_VERSION"_"$LIBXML_MINOR_VERSION"_"$LIBXML_MICRO_VERSION"
-	# update LIBSUFIX and remove resource include directive
-sed -f - $SRC/libxml2_pas.dpk >$DIST/src/libxml2_pas.dpk <<EOF
-s/devel/_$pkgVer/
-s/\$R \*.res//
-EOF
+	# remove resource include directive
+	sed 's/\$R \*.res//' $SRC/libxml2_pas.dpk >$DIST/src/libxml2_pas.dpk
+
 	# prepare JEDI info file
 sed -f - INFO.txt.template > $DIST/INFO.txt <<EOF
 s:@DATE@:`date +'%d %b %Y'`:g
@@ -67,7 +65,7 @@ function convertToLf()
 		tr -d '\015' < $fn > $fn.stripcr
 		mv $fn.stripcr $fn
 	done
-	echo -ne "                                                                       "
+	echo -e "                                                                       "
 }
 
 function singleFileToCrLf()
@@ -86,7 +84,7 @@ function convertToCrLf()
 		singleFileToCrLf $fn >$fn.crlf
 		mv $fn.crlf $fn
 	done
-	echo -ne "                                                                       "
+	echo -e "                                                                       "
 }
 
 function compressDist()
