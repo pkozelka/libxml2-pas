@@ -7,8 +7,7 @@ uses
   ActiveX,GUITestRunner,StrUtils,jkDomTest, ComObj;
 
 const
-  //datapath='L:\@Demos\Open_xdom\Data\';  //set to the directory with test.xml
-  datapath='../../data';
+
   xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
   xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
   xmlstr2 = '<?xml version="1.0" encoding="iso-8859-1"?>'+
@@ -190,7 +189,9 @@ type TSimpleTests = class(TTestCase)
 
 implementation
 
-var impl: IDOMImplementation;
+var
+  impl: IDOMImplementation;
+  datapath: string ='';
 
 procedure TTestDom2Methods.SetUp;
 begin
@@ -528,11 +529,13 @@ var
   TestSet: integer;
   TestsOK: integer;
   i,j: integer;
+  temp:string;
 begin
+  temp:=includetrailingpathdelimiter(datapath);
   TestSet:=0;
   for j:=1 to 50 do begin
     for i:=1 to 100 do begin
-      TestsOK:=TestDocument(datapath+'test.xml',domvendor,TestSet);
+      TestsOK:=TestDocument(temp+'test.xml',domvendor,TestSet);
       //OutLog('Passed OK: '+inttostr(TestsOK));
       Check((TestsOK >= 15),(inttostr(15-TestsOK)+' Tests failed!')); //15
     end;
@@ -545,11 +548,13 @@ var
   TestSet: integer;
   TestsOK: integer;
   i,j: integer;
+  temp: string;
 begin
+  temp:=includetrailingpathdelimiter(datapath);
   TestSet:=0;
   for j:=1 to 50 do begin
     for i:=1 to 100 do begin
-      TestsOK:=TestElement0(datapath+'test.xml',domvendor,TestSet);
+      TestsOK:=TestElement0(temp+'test.xml',domvendor,TestSet);
       //OutLog('Passed OK: '+inttostr(TestsOK));
       Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!'));
     end;
@@ -580,11 +585,13 @@ var
   TestSet: integer;
   TestsOK: integer;
   i,j: integer;
+  temp: string;
 begin
+  temp:=includetrailingpathdelimiter(datapath);
   TestSet:=0;
   for j:=1 to 50 do begin
     for i:=1 to 1 do begin
-      TestsOK:=TestNamedNodemap(datapath+'test.xml',domvendor,TestSet);
+      TestsOK:=TestNamedNodemap(temp+'test.xml',domvendor,TestSet);
       //OutLog('Passed OK: '+inttostr(TestsOK));
       Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!')); //15
     end;
@@ -1615,7 +1622,7 @@ end;
 function TSimpleTests.myIsSameNode(node1, node2: IDOMNode): boolean;
 begin
   try
-//    result:=(node1 as IDomNodeCompare).IsSameNode(node2);
+    result:=(node1 as IDomNodeCompare).IsSameNode(node2);
   except
     if (node1 as IUnKnown) = (node2 as IUnKnown)
       then result:=true
@@ -2050,6 +2057,14 @@ begin
 end;
 
 initialization
+  {$ifdef WIN32}
+    if DirectoryExists('L:\@Demos\Open_xdom\Data')
+      then datapath:='L:\@Demos\Open_xdom\Data'
+      else datapath:='../../data';
+  {$endif}
+  {$ifdef LINUX}
+    datapath:='../../data';
+  {$endif}
   RegisterTest('', TTestDom2Methods.Suite);
   RegisterTest('', TTestMemoryLeaks.Suite);
   RegisterTest('', TTestDomExceptions.Suite);
