@@ -1,3 +1,7 @@
+TEMPORARY NOTE:
+- special build of libxml2.dll is needed to work with this release. 
+You will find it at 
+
 Delphi-Headers for libxml2
 ==========================
 Libxml2 is a low-level library for the work with xml-documents.

@@ -79,6 +79,7 @@ type
   uses for allocating it. Unfortunately it doesn't work...
 }
 procedure msvcrt_free(p:pointer); cdecl; external 'msvcrt.dll' name 'free';
+procedure xmlFreeStr(str: PxmlChar);cdecl;external LIBXML2_SO name 'xmlFreeStr'; overload;
 {$endif}
 
 // functions that reference symbols defined later - by header file:
@@ -107,7 +108,8 @@ implementation
 procedure xmlFree(str: PxmlChar);
 begin
 {$ifdef WIN32}
-//  msvcrt_free(pointer(str)); //todo: this does not work yet
+//  msvcrt_free(pointer(str)); //todo: this does not work
+  xmlFreeStr(str);
 {$else}
   FreeMem(PChar(str)); //hopefully works under Kylix
 {$endif}
