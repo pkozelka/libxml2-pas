@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.26 2002-02-27 20:14:18 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.27 2002-02-28 19:41:09 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -151,6 +151,7 @@ type
   TLDomChildNodeList = class(TLDomObject, IDomNodeList)
   private
     fOwnerNode: TLDomNode; // non-counted reference
+    function GetFirstChildNodePtr: xmlNodePtr; virtual;
   protected //IDomNodeList
     function get_item(index: Integer): IDomNode;
     function get_length: Integer;
@@ -160,6 +161,12 @@ type
     destructor Destroy; override;
   end;
 
+  { TLDomEntRefChildNodes class }
+
+  TLDomEntRefChildNodes = class(TLDomChildNodeList, IDomNodeList)
+  private
+    function GetFirstChildNodePtr: xmlNodePtr; override;
+  end;
   { TLDomCharacterData class }
 
   TLDomCharacterData = class(TLDomNode, IDomCharacterData, IDomNode)
@@ -256,6 +263,7 @@ type
   TLDomEntity = class(TLDomNode, IDomNode, IDomEntity)
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
+    function  get_nodeType: DomNodeType;
   protected //IDomEntity
     function  IDomEntity.get_parentNode = returnNullDomNode;
     function  get_publicId: DomString;
@@ -267,9 +275,12 @@ type
 
   TLDomEntityReference = class(TLDomNode, IDomEntityReference, IDomNode)
   protected //IDomNode
-    function  IDomNode.get_childNodes = returnChildNodes;
+    function  get_childNodes: IDomNodeList;
+    function  get_firstChild: IDomNode;
+    function  get_lastChild: IDomNode;
+    function  get_nodeValue: DomString;
   protected //IDomEntityReference
-    function  IDomEntityReference.get_childNodes = returnChildNodes;
+  protected
   end;
 
   { TLDomNotation class }
@@ -366,6 +377,8 @@ type
   TLDomDocumentType = class(TLDomNode, IDomDocumentType, IDomNode)
   private
     function GetGDocumentType: xmlDtdPtr;
+  protected //IDomNode
+    function  get_nodeType: DomNodeType;
   protected //IDomDocumentType
     function IDomDocumentType.get_name = get_nodeName;
     function get_entities: IDomNamedNodeMap;
@@ -843,7 +856,6 @@ begin
   XML_ATTRIBUTE_NODE,
   XML_TEXT_NODE,
   XML_CDATA_SECTION_NODE,
-  XML_ENTITY_REF_NODE,
   XML_COMMENT_NODE,
   XML_PI_NODE:
     begin
@@ -1086,13 +1098,18 @@ begin
   inherited Destroy;
 end;
 
+function TLDomChildNodeList.GetFirstChildNodePtr: xmlNodePtr;
+begin
+  Result := fOwnerNode.requestNodePtr.children;
+end;
+
 function TLDomChildNodeList.get_item(index: Integer): IDomNode;
 var
   node: xmlNodePtr;
   cnt: integer;
 begin
   DomAssert(index>=0, INDEX_SIZE_ERR);
-  node := fOwnerNode.requestNodePtr.children;
+  node := GetFirstChildNodePtr;
   cnt := 0;
   while (cnt<index) do begin
     if (node=nil) then begin
@@ -1109,11 +1126,19 @@ var
   node: xmlNodePtr;
 begin
   Result := 0;
-  node := fOwnerNode.MyNode.children;
+  node := GetFirstChildNodePtr;
   while (node<>nil) do begin
     Inc(Result);
     node := node.next;
   end;
+end;
+
+{ TLDomEntRefChildNodes }
+
+function TLDomEntRefChildNodes.GetFirstChildNodePtr: xmlNodePtr;
+begin
+  Result := fOwnerNode.requestNodePtr.children;
+  Result := Result.children;
 end;
 
 { TLDomDocument }
@@ -1558,6 +1583,11 @@ end;
 
 { TLDomEntity }
 
+function TLDomEntity.get_nodeType: DomNodeType;
+begin
+  Result := ENTITY_NODE;
+end;
+
 function TLDomEntity.get_notationName: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
@@ -1608,6 +1638,11 @@ end;
 function TLDomDocumentType.GetGDocumentType: xmlDtdPtr;
 begin
   Result := xmlDtdPtr(MyNode);
+end;
+
+function TLDomDocumentType.get_nodeType: DomNodeType;
+begin
+  Result := DOCUMENT_TYPE_NODE;
 end;
 
 { TLDomNotation }
@@ -1996,6 +2031,34 @@ end;
 function TLDomDocumentBuilderFactory.Get_VendorID : DomString;
 begin
   Result := fVendorId;
+end;
+
+{ TLDomEntityReference }
+
+function TLDomEntityReference.get_firstChild: IDomNode;
+begin
+  Result := GetDOMObject(fMyNode.children.children) as IDomNode;
+end;
+
+function TLDomEntityReference.get_lastChild: IDomNode;
+begin
+  Result := GetDOMObject(fMyNode.children.last) as IDomNode;
+end;
+
+function TLDomEntityReference.get_nodeValue: DomString;
+var
+  p: PxmlChar;
+begin
+  p := xmlEntityPtr(fMyNode.children).content;
+  Result := UTF8Decode(p);
+end;
+
+function TLDomEntityReference.get_ChildNodes: IDomNodeList;
+begin
+  if (fChildNodes=nil) then begin
+    TLDomEntRefChildNodes.Create(self); // assigns fChildNodes
+  end;
+  Result := fChildNodes;
 end;
 
 initialization
