@@ -253,21 +253,25 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
       outLog('document.createComment doesn''t work!');
     end;
 
-    if vendorstr<>'LIBXML' then begin
-      //p=3
-      documentfragment := document.createDocumentFragment;
-      test('document.createDocumentFragment',(documentfragment <> nil));
-      documentfragment := nil;
+    //p=3
+    try
+      processinginstruction := document.createProcessingInstruction('qqq','www');
+      test('document.createProcessingInstruction',(processinginstruction <> nil));
+      processinginstruction := nil;
+    except
+      outLog('document.createProcessingInstruction doesn''t work!');
+    end;
 
+    //p=3
+    documentfragment := document.createDocumentFragment;
+    test('document.createDocumentFragment',(documentfragment <> nil));
+    documentfragment := nil;
+
+    if vendorstr<>'LIBXML' then begin
       //p=3
       entityreference := document.createEntityReference('iii');
       test('document.createEntityReference',(entityreference <> nil));
       entityreference := nil;
-
-      //p=3
-      processinginstruction := document.createProcessingInstruction('qqq','www');
-      test('document.createProcessingInstruction',(processinginstruction <> nil));
-      processinginstruction := nil;
     end;
   end;
 
@@ -448,7 +452,7 @@ var
   dom: IDOMImplementation;
   document: IDOMDocument;
   element: IDOMElement;
-  node: IDOMNode;
+  node,node1: IDOMNode;
   nodelist: IDOMNodeList;
   nodeselect: IDOMNodeSelect;
   attlist: IDOMNamedNodeMap;
@@ -569,20 +573,24 @@ begin
   cdata.replaceData(1,3,'bbb');
   test('characterData.replaceData',(cdata.data = 'zbbbzz'));
   cdata := nil;
-  if vendorstr<>'LIBXML' then begin
-    // testing processingInstruction
+ 
+  // testing processingInstruction
 
-    processinginstruction := document.createProcessingInstruction('abc','def');
-    test('processingInstruction.target',(processinginstruction.target = 'abc'));
-    test('processingInstruction.data',(processinginstruction.data = 'def'));
-    processinginstruction := nil;
+  processinginstruction := document.createProcessingInstruction('abc','def');
+  test('processingInstruction.target',(processinginstruction.target = 'abc'));
+  test('processingInstruction.data',(processinginstruction.data = 'def'));
+  //todo:
+  //test pi.setdata
+  processinginstruction := nil;
 
+  try
     // testing text
-
     text := document.createTextNode('blabla');
     text := text.splitText(3);
     test('text.splitText',(text.data = 'bla'));
     text := nil;
+  except
+    OutLog('__text.splitText doesn''t work!');
   end;
 
   // testing namedNodeMap
@@ -590,7 +598,7 @@ begin
   namednodemap := documentElement.attributes;
   if namednodemap<>nil
     then outlog('namedNodeMap.length: '+inttostr(namedNodeMap.length))
-    else outlog('namedNodeMap=NIL');
+    else outlog('__namedNodeMap=NIL');
   documentElement:=nil;
   node := document.createAttribute('age') as IDOMNode;
   node.nodeValue := '13';
@@ -599,6 +607,18 @@ begin
 
   node := namednodemap.getNamedItem('age');
   test('namedNodeMap.getNamedItem/setNamedItem',(node.nodeValue = '13'));
+
+  node1 := document.createAttribute('sex') as IDOMNode;
+  node1.nodeValue:='male';
+  node1.nodeName;
+  node1 := namednodemap.setNamedItem(node1);
+  if node1<> nil
+    then begin
+      test('namedNodeMap.setNamedItemII',(namedNodeMap[1].nodeValue = 'male'));
+      node1 := namednodemap.removeNamedItem('sex');
+    end
+    else outLog('__namedNodeMap.setNamedItemII doesn''t work!');
+
   node := namednodemap.removeNamedItem('age');
   test('namedNodeMap.removeNamedItem',(namednodemap.length = 0));
   node := nil;
@@ -717,7 +737,7 @@ begin
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  testCount:=111;
+  testCount:=112;
   if (TestSet and 1) = 1
     then inc(testCount);
   outLog('Number of tests total:    '+inttostr(TestCount));
