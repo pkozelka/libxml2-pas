@@ -275,10 +275,10 @@ type
       { IDOMPersist methods}
       function  get_xml : DOMString;
       function  asyncLoadState : Integer;
-      function  load(source : OleVariant) : Boolean;
+      function  load(source: DOMString) : Boolean;
       function  loadFromStream(const stream : TStream) : Boolean;
       function  loadxml(const value : DomString) : Boolean;
-      procedure save(destination : OleVariant);
+      procedure save(destination: DOMString);
       procedure saveToStream(const stream : TStream);
       procedure set_OnAsyncLoad(
               const sender : TObject;
@@ -1242,7 +1242,7 @@ begin
   result := fMSDomDocument.readyState;
 end;
 
-function TMSXMLDocument.load(source : OleVariant) : Boolean;
+function TMSXMLDocument.load(source: DomString) : Boolean;
 begin
   result := fMSDomDocument.load(source);
   if not result then
@@ -1288,7 +1288,7 @@ begin
   end;
 end;
 
-procedure TMSXMLDocument.save(destination : OleVariant);
+procedure TMSXMLDocument.save(destination: DomString);
 begin
   fMSDomDocument.save(destination);
 end;
