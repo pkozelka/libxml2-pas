@@ -943,13 +943,14 @@ function TMSXMLDocument.load(source : OleVariant) : Boolean;
 begin
   result := fMSDomDocument.load(source);
   if not result then
-  begin
-    raise EDomException.createFmt(
-            etParseErr,
-            'Reason: %s, Line: %d, LinePos: %d',
-            [fMSDomDocument.parseError.reason,
-            fMSDomDocument.parseError.line,
-            fMSDomDocument.parseError.linePos]);
+	begin
+		raise EDomException.createFmt(
+						etParseErr,
+						'Reason: %s, Url: %s, Line: %d, LinePos: %d',
+						[fMSDomDocument.parseError.reason,
+						fMSDomDocument.parseError.url,
+						fMSDomDocument.parseError.line,
+						fMSDomDocument.parseError.linePos]);
   end;
 end;
 
