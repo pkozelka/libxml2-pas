@@ -42,10 +42,6 @@ type
   PPChar = ^PChar;
   PLibXml2File = pointer; //placeholder for 'FILE *' C-type
 
-{$IFDEF VER130}
-function StrNextChar(p: PChar): PChar;
-{$ENDIF}
-
 {$DEFINE LIBXML_THREAD_ALLOC_ENABLED}
 {$DEFINE LIBXML_THREAD_ENABLED}
 {$DEFINE LIBXML_HTML_ENABLED}
@@ -88,6 +84,12 @@ function StrNextChar(p: PChar): PChar;
 {$I libxml2_schemasInternals.inc}
 {$I libxml2_xmlschemastypes.inc}
 {$I libxml2_xmlschemas.inc}
+
+// functions existing only in some compilers
+
+{$IFNDEF HAS_STRNEXTCHAR_SUPPORT}
+function StrNextChar(p: PChar): PChar;
+{$ENDIF}
 
 // functions that reference symbols defined later - by header file:
 
@@ -181,7 +183,7 @@ end;
 
 function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): Boolean;
 begin
-  Result := ((ns = nil) or (ns.nodeNr = 0) or (ns.nodeTab = nil));
+  Result := ((ns = nil) or (ns^.nodeNr = 0) or (ns^.nodeTab = nil));
 end;
 
 // macros from parserInternals
@@ -239,7 +241,7 @@ begin
 end;
 {$ENDIF}
 
-{$IFDEF VER130}
+{$IFNDEF HAS_STRNEXTCHAR_SUPPORT}
 function StrNextChar(p: PChar): PChar;
 begin
   Result := p + 1;

@@ -1,5 +1,6 @@
 {
-  This file configures various capabilities specific to particular compilers.
+  This file configures capabilities specific to various Pascal compilers.
+  All compiler differences should be expressed here.
   2001-2002 (C) Petr Kozelka <pkozelka@email.cz>
 }
 
@@ -25,4 +26,7 @@
 
 // Do we have C-like enumerations, i.e. with the option to assign direct values to individual constants ?
 {$IFDEF VER140} {$DEFINE HAS_CENUM} {$ENDIF}
+
+// Do we have support for StrNextChar function ?
+{$IFDEF VER140} {$DEFINE HAS_STRNEXTCHAR_SUPPORT} {$ENDIF}
 
