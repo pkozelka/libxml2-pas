@@ -43,6 +43,7 @@ type
     Button8: TButton;
     Button10: TButton;
     Button11: TButton;
+    Button13: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -58,6 +59,7 @@ type
     procedure Button3Click(Sender: TObject);
     procedure Button10Click(Sender: TObject);
     procedure Button11Click(Sender: TObject);
+    procedure Button13Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -72,7 +74,7 @@ var
 implementation
 
 uses
-  jkDomTest,feDomTest,conapp;
+  jkDomTest,feDomTest,conapp,xdom2,libxmldom,msxml_impl;
 var
   stack: pointer;
 
@@ -319,6 +321,13 @@ begin
 //  GetSizeInfo( stack, 'Commited bytes for stack' );
 //  GetSizeInfo( @Sysinit.Datamark, 'Commited bytes for data section' );
   GetHeapInfo;
+end;
+
+procedure TForm1.Button13Click(Sender: TObject);
+begin
+  Memo1.lines.Clear;
+  EnableOutput.Checked:=true;
+  TestDom3(Combobox1.Text,GetVendorStr);
 end;
 
 Initialization

@@ -30,10 +30,13 @@ interface
   //   defined in any specification, what whitespace is and what not
   function TestDom2(name,vendor:string;ignore:boolean):double;
 
+  function TestDom3(name,vendor:string):double;
+
 
 implementation
 
-uses MicroTime, conapp, sysutils, Dialogs, xdom2, libxml2,libxmldom,jkDomTest;
+uses MicroTime, conapp, sysutils, Dialogs, xdom2, libxml2,libxmldom,
+  jkDomTest;
 
 function TestDom1b(name,vendor:string):double;
 var
@@ -151,17 +154,36 @@ begin
   //outLog('elementcount='+inttostr(elementcount));
 end;
 
-function getDoc(filename: string): IDomDocument;
+function getDoc(filename,vendor: string): IDomDocument;
 var dom: IDomImplementation;
     doc: IDomDocument;
     FDomPersist: IDomPersist;
     ok: boolean;
 begin
-  dom := GetDom('GXML');
+  dom := GetDom(vendor);
   doc := dom.createDocument('','',nil);
   FDomPersist := doc as IDomPersist;
   ok := FDomPersist.load(filename);
   if ok then result := doc else result := nil;
+end;
+
+function TestDom3(name,vendor:string):double;
+var
+  doc: IDomDocument;
+  temp: string;
+begin
+  doc:=getDoc('..\data\'+name,vendor);
+  if doc<>nil then
+    begin
+      outLog('Parsed file ok!');
+    end;
+  temp:=(doc as IDOMPersist).xml;
+  // MSXML uses tabs for indentation,
+  // LIBXML uses two spaces
+  temp:=stringReplace(temp,#09,'  ',[rfReplaceAll]);
+  // LIBXML has Unix-Style LF in it's output
+  temp:=adjustLineBreaks(temp);
+  outLog(temp);
 end;
 
 end.

@@ -286,6 +286,15 @@ object Form1: TForm1
         OnClick = Button10Click
       end
     end
+    object Button13: TButton
+      Left = 552
+      Top = 40
+      Width = 89
+      Height = 25
+      Caption = 'ShowDom'
+      TabOrder = 15
+      OnClick = Button13Click
+    end
   end
   object Panel2: TPanel
     Left = 0
