@@ -26,9 +26,6 @@ package libxml2_pas;
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
-requires
-  rtl;
-
 contains
   iconv in 'iconv.pas',
   libxml2 in 'libxml2.pas',
