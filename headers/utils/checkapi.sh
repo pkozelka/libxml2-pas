@@ -151,21 +151,6 @@ for fn in $FILELIST ; do
 	CVSROOT="`cat $LOCALROOT/$origFilePath/CVS/Root`"
 
 	oldHfile="$TMP/$dirPrefix/${origFileName%.h}-${curRev}.h"
-#	if [ ! -s "$oldHfile" ]; then
-	if false; then
-		echo "Retrieving file ${origFileName%.h}-${curRev}.h" >&2
-		pushd $LOCALROOT >/dev/null
-		cmd="cvs -z4 -d$CVSROOT up -r $curRev $origFilePath/$origFileName"
-		echo "$cmd"
-		$cmd
-		cmd="cp $origFilePath/$origFileName $oldHfile"
-		echo "$cmd"
-		$cmd
-		cmd="cvs -z4 -d$CVSROOT up -r $newRev $origFilePath/$origFileName"
-		echo "$cmd"
-		$cmd
-		popd >/dev/null
-	fi
 	if cacheGet "$LOCALROOT/$origFile" "$curRev" "$oldHfile"; then
 		diff -u4 $oldHfile $LOCALROOT/$origFile >$TARGETFILE.$curRev-$newRev.diff
 	else
