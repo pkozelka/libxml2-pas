@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.47 2002-01-16 15:36:24 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.48 2002-01-16 15:43:53 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -635,8 +635,7 @@ begin
 	result:=0; //todo
 end;
 
-function TGDOMImplementation.createDocumentType(const qualifiedName, publicId,
-								systemId: DOMString): IDOMDocumentType;
+function TGDOMImplementation.createDocumentType(const qualifiedName, publicId, systemId: DOMString): IDOMDocumentType;
 var
 	dtd:xmlDtdPtr;
 	uqname, upubid, usysid: string;
@@ -644,16 +643,13 @@ begin
 	uqname := UTF8Encode(qualifiedName);
 	upubid := UTF8Encode(publicId);
 	usysid := UTF8Encode(systemId);
-	dtd:=xmlCreateIntSubSet(nil, PChar(uqname), PChar(upubid), PChar(usysid)); //todo: doc!
-	if dtd<>nil
-	then Result := TGDOMDocumentType.Create(dtd) as IDOMDocumentType
-	else Result := nil;
+	dtd := xmlCreateIntSubSet(nil, PChar(uqname), PChar(upubid), PChar(usysid)); //todo: doc!
+	Result := GetDomObject(dtd) as IDOMDocumentType;
 end;
 
-function TGDOMImplementation.createDocument(const namespaceURI, qualifiedName: DOMString;
-			doctype: IDOMDocumentType): IDOMDocument;
+function TGDOMImplementation.createDocument(const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType): IDOMDocument;
 begin
-	Result := TGDOMDocument.Create(self,namespaceURI, qualifiedName,doctype) as IDOMDocument;
+	Result := TGDOMDocument.Create(self,namespaceURI, qualifiedName, doctype) as IDOMDocument;
 end;
 
 // *************************************************************
@@ -1124,9 +1120,7 @@ begin
 					attr:=xmlSetProp(FGNamedNodeMap,slocalName,value);
 				end;
 		end;
-		if attr<>nil
-			then result:=TGDomAttr.Create(attr) as IDOMNode
-			else result:=nil;
+		Result := GetDomObject(attr) as IDomNode;
 	//todo: RegisterFlyingNode
 	//todo: UnregisterFlyingNode
 end;
@@ -1186,9 +1180,7 @@ begin
 			if ns<> nil
 				then attr:=xmlSetNSProp(FGNamedNodeMap,ns,pchar(slocalName),value)
 				else attr:=xmlSetProp(FGNamedNodeMap,pchar(slocalName),value);
-			if attr<>nil
-				then result:=TGDomAttr.Create(attr) as IDOMAttr
-				else result:=nil;
+			Result := GetDOMObject(attr) as IDOMNode;
 		end;
 	end else result:=nil;
 	//todo: RegisterFlyingNode
@@ -1354,9 +1346,7 @@ var
 	attr: xmlAttrPtr;
 begin
 	attr := xmlHasProp(FGNode, PChar(UTF8Encode(name)));
-	if attr<>nil
-	then result := TGDOMAttr.Create(attr) as IDOMAttr
-	else result := nil;
+	Result := GetDOMObject(attr) as IDOMAttr;
 end;
 
 function TGDOMElement.setAttributeNode(const newAttr: IDOMAttr):IDOMAttr;
@@ -1384,7 +1374,7 @@ begin
 		if oldattr<>nil
 			then begin
 				temp:=oldattr.name;
-				result:=TGDomAttr.Create(oldattr) as IDOMAttr;
+				Result := GetDOMObject(oldattr) as IDOMAttr;
 			end
 			else begin
 				result:=nil;
@@ -1473,7 +1463,7 @@ begin
 	attr := xmlHasNSProp(FGNode,
 		PChar(UTF8Encode(localName)),
 		PChar(UTF8Encode(namespaceURI)));
-	Result:=TGDOMAttr.Create(attr) as IDOMAttr;
+	Result := GetDOMObject(attr) as IDOMAttr;
 end;
 
 function TGDOMElement.setAttributeNodeNS(const newAttr: IDOMAttr): IDOMAttr;
@@ -1510,7 +1500,7 @@ begin
 		if oldattr<>nil
 			then begin
 				temp:=oldattr.name;
-				result:=TGDomAttr.Create(oldattr) as IDOMAttr;
+				Result := GetDOMObject(attr) as IDOMAttr;
 			end
 			else begin
 				result:=nil;
