@@ -697,6 +697,9 @@ begin
 		end;
 	end;
 	xmlXPathFreeObject(rv);
+	if (Result=nil) then begin
+		Result := TNodeArray.Create(nil);
+	end;
 end;
 
 function TXMLDOMNode.selectSingleNode(const queryString: WideString): IXMLDOMNode;
@@ -894,8 +897,10 @@ end;
 
 constructor TNodeArray.Create(aItems: xmlNodeSetPtr);
 begin
-	SetLength(FItems, aItems^.nodeNr);
-	Move(aItems.nodeTab^, Addr(FItems[0])^, aItems^.nodeNr * sizeof (pointer));
+	if (aItems<>nil) then begin
+		SetLength(FItems, aItems^.nodeNr);
+		Move(aItems.nodeTab^, Addr(FItems[0])^, aItems^.nodeNr * sizeof (pointer));
+	end;
 end;
 
 destructor TNodeArray.Destroy;
