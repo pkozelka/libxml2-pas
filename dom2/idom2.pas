@@ -953,16 +953,16 @@ type
     function selectNodes(const nodePath : DomString) : IDomNodeList;
     procedure registerNs(const prefix : DomString; const uri : DomString);
   end;
-	
-	IDOMNodeEx = interface(IDOMNode)
+
+	IDomNodeEx = interface(IDomNode)
     ['{17D937A2-C6EE-448F-8530-221D744AC083}']
 	  { Property Acessors }
     //function get_text: DOMString; safecall;
     //function get_xml: DOMString; safecall;
     //procedure set_text(const Value: DOMString); safecall;
     { Methods }
-    procedure transformNode(const stylesheet: IDOMNode; var output: WideString); overload;
-    procedure transformNode(const stylesheet: IDOMNode; var output: IDOMDocument); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: WideString); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
     { Properties }
     //property text: DOMString read get_text write set_text;
     //property xml: DOMString read get_xml;
