@@ -582,7 +582,7 @@ function IsSameNode(node1,node2: IDomNode):boolean;
 implementation
 {$ifdef WIN32}
 uses
-  windows;
+  windows, qdialogs;
 {$endif}
 
 var
@@ -620,13 +620,13 @@ begin
     else Result := nil;
 end;
 
-function prefix(qualifiedName:string):string;
+function prefix(qualifiedName:wideString):wideString;
 begin
   result := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
 end;
 
-function localName(qualifiedName:string):string;
-var prefix: string;
+function localName(qualifiedName:wideString):wideString;
+var prefix: widestring;
 begin
   prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
   if length(prefix)>0
@@ -804,6 +804,8 @@ end;
 
 // IDomNode
 function TGDOMNode.get_nodeName: DOMString;
+const
+  emptyWString: WideString='';
 begin
   case FGNode.type_ of
     XML_HTML_DOCUMENT_NODE,
@@ -818,11 +820,11 @@ begin
       Result:= '#text';
     XML_TEXT_NODE,
     XML_COMMENT_NODE:
-      Result := '#'+UTF8Decode(FGNode.name);
+      Result := emptyWString+'#'+UTF8Decode(FGNode.name);
   else
     Result := UTF8Decode(FGNode.name);
     if (FGNode.ns<>nil) and (FGNode.ns.prefix<>nil) then begin
-      Result := UTF8Decode(FGNode.ns.prefix)+':'+Result;
+      Result := emptyWString+UTF8Decode(FGNode.ns.prefix)+':'+Result;
     end;
   end;
 end;
@@ -981,7 +983,7 @@ end;
 
 function TGDOMNode.get_localName: DOMString;
 var
-  temp: String;
+  temp: WideString;
 begin
   case FGNode.type_ of
     XML_HTML_DOCUMENT_NODE,
@@ -996,15 +998,14 @@ begin
       Result := '#'+UTF8Decode(FGNode.name);
   else
     begin
-      temp:=FGNode.name;
+      result:=UTF8Decode(FGNode.name);
       // this is neccessary, because according to the dom2
       // specification localName has to be nil for nodes,
       // that don't have a namespace
       if FGNode.ns=nil
-        then temp:='';
+        then result:='';
     end;
   end;
-  result:=temp;
 end;
 
 function TGDOMNode.insertBefore(const newChild, refChild: IDomNode): IDomNode;
@@ -1541,12 +1542,8 @@ begin
 end;
 
 function TGDOMAttr.get_name: DOMString;
-var
-  temp: string;
 begin
-  //temp:=libxmlStringToString(GAttribute.name);
-  temp:=inherited get_nodeName;
-  result:=temp;
+  result:=inherited get_nodeName;
 end;
 
 function TGDOMAttr.get_ownerElement: IDomElement;
@@ -2979,8 +2976,8 @@ constructor TGDOMNameSpace.create(node:xmlNodePtr;
   namespaceURI,qualifiedName: DOMString;OwnerDoc:IDomDocument);
 var
   name1,name3: TGdomString;
-  prefix: string;
-  alocalName: string;
+  prefix: wideString;
+  alocalName: wideString;
 begin
   FOwnerDoc:=OwnerDoc;
   name1:=TGdomString.create(namespaceURI);
@@ -3577,7 +3574,7 @@ end;
 
 initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
-  //InitExportedVar;
+  InitExportedVar;
 finalization
 end.
 
