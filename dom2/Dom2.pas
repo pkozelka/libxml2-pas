@@ -991,7 +991,7 @@ type
     ['{A50A05D4-3E67-44CA-9872-C80CD83A47BD}']
     function selectNode(const nodePath : DomString) : IDomNode;
     function selectNodes(const nodePath : DomString) : IDomNodeList;
-    procedure registerNs(const prefix : DomString; uri : DomString);
+    procedure registerNs(const prefix : DomString; const uri : DomString);
   end;
 
 

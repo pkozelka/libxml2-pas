@@ -230,7 +230,7 @@ type
               const version : DomString) : Boolean;
     function selectNode(const nodePath: WideString): IDOMNode;
     function selectNodes(const nodePath: WideString): IDOMNodeList;
-    procedure registerNS(const prefix : DomString; uri : DomString);
+    procedure registerNS(const prefix : DomString; const uri : DomString);
   end;
 
 
@@ -955,13 +955,13 @@ begin
   result := fMSDomDocument.load(source);
   if not result then
 	begin
-		raise EDomException.createFmt(
-						etParseErr,
-						'Reason: %s, Url: %s, Line: %d, LinePos: %d',
-						[fMSDomDocument.parseError.reason,
-						fMSDomDocument.parseError.url,
-						fMSDomDocument.parseError.line,
-						fMSDomDocument.parseError.linePos]);
+	  raise EDomException.createFmt(
+		        etParseErr,
+            'Reason: %s, Url: %s, Line: %d, LinePos: %d',
+            [fMSDomDocument.parseError.reason,
+            fMSDomDocument.parseError.url,
+            fMSDomDocument.parseError.line,
+            fMSDomDocument.parseError.linePos]);
   end;
 end;
 
@@ -1213,9 +1213,8 @@ end;
 
 function TMSXMLNode.get_LocalName : DomString;
 begin
-  //by FE
-  if fMSDomNode.nodeName=fMSDomNode.baseName
-    then result:='' //see DOM2 specification
+  if fMSDomNode.nodeName = fMSDomNode.baseName
+    then result := ''
     else result := fMSDomNode.baseName;
 end;
 
@@ -1330,7 +1329,7 @@ end;
  *)
 constructor TMSXMLNamedNodeMap.create(msDomNamedNodeMap : IXMLDOMNamedNodeMap);
 begin
-  inherited create; //by FE
+  inherited create;
   fMSDomNamedNodeMap := msDomNamedNodeMap;
 end;
 
@@ -1966,7 +1965,7 @@ begin
     else result := nil;
 end;
 
-procedure TMSXMLNode.registerNS(const prefix : DomString; uri : DomString);
+procedure TMSXMLNode.registerNS(const prefix : DomString; const uri : DomString);
 begin
 
 end;
