@@ -1,5 +1,5 @@
 unit libxml2_experimental;
-//$Id: libxml2_experimental.pas,v 1.4 2002-02-18 20:37:51 pkozelka Exp $
+//$Id: libxml2_experimental.pas,v 1.5 2002-02-25 12:56:12 pkozelka Exp $
 (**
  * Title:        libxml2 experimental unit
  * Description:  Contains experimental code for support or development of libxml2
@@ -40,7 +40,7 @@ begin
   OutputDebugString(msg);
 {$ENDIF}
 {$IFDEF LINUX}
-  Writeln(StrToPas(s));
+  Writeln(StrPas(msg));
 {$ENDIF}
 end;
 
