@@ -1,8 +1,0 @@
-#!/bin/sh
-# Uploads a file to the 'incoming' dir at sourceforge upload ftp server
-#
-# Args:
-#    $1 - the file to be uploaded
-ftp-put.sh upload.log upload.sourceforge.net incoming $1 $1 anonymous libxml2-pas@sourceforge.net
-cat upload.log
-rm -f upload.log
