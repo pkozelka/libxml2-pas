@@ -1,5 +1,5 @@
-//$Id: libxml2_experimental.pas,v 1.2 2002-02-15 11:32:37 pkozelka Exp $
 unit libxml2_experimental;
+//$Id: libxml2_experimental.pas,v 1.3 2002-02-18 20:32:32 pkozelka Exp $
 (**
  * Title:        libxml2 experimental unit
  * Description:  Contains experimental code for support or development of libxml2
@@ -11,42 +11,38 @@ unit libxml2_experimental;
 interface
 
 uses
-{$ifdef WIN32}
+{$IFDEF WIN32}
   windows,
-{$endif}
+{$ENDIF}
   libxml2;
 
-// this one was proposed to Daniel
-function  xmlFormatMessage(buf: PChar; aMsg: PChar): Longint; cdecl;external LIBXML2_SO;
-
 type
-  TMessageHandler = procedure (aMsg: String) of object;
+  TMessageHandler = procedure(aMsg: string) of object;
 
 procedure RegisterErrorHandler(aHandler: TMessageHandler);
 
 implementation
+
+uses
+  SysUtils;
 
 var
   myErrH: TMessageHandler;
 
 // error output redirected to OutputDebugString
 
-procedure myGenericErrorFunc(ctx: pointer; msg: PChar); cdecl;
-var
-  s: String;
+procedure myGenericErrorFunc(ctx: Pointer; msg: PChar); cdecl;
 begin
-  SetLength(s, 10000);
-  s := msg;
-//  SetLength(s, xmlFormatMessage(PChar(s), @msg));
   if Assigned(myErrH) then begin
-    myErrH(s);
+    myErrH(msg);
   end;
-{$ifdef WIN32}
-  OutputDebugString(PChar(s));
-{$endif}
-{$ifdef LINUX}
-  Writeln(s);
-{$endif}
+  Writeln(StrPas(msg));
+{$IFDEF WIN32}
+  OutputDebugString(msg);
+{$ENDIF}
+{$IFDEF LINUX}
+  Writeln(StrToPas(s));
+{$ENDIF}
 end;
 
 procedure RegisterErrorHandler(aHandler: TMessageHandler);
@@ -57,5 +53,6 @@ end;
 initialization
   // redirect error output
   xmlSetGenericErrorFunc(nil, @myGenericErrorFunc);
+
 end.
 
