@@ -29,13 +29,9 @@ interface
 implementation
 
 USES
-
   FastTime;
 
 VAR
-
-  startTime : double;               (* time when this unit started *)
-  time: double;
   Timer: TQmwFastTime;
 
 
