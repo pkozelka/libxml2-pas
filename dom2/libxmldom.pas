@@ -459,7 +459,7 @@ type
   TGDOMNameSpace = class
   private
     NS:xmlNSPtr;
-    localName: TGdomString;
+    localName,FqualifiedName: TGdomString;
   public
     constructor create(node:xmlNodePtr;namespaceURI,qualifiedName: DOMString);
     destructor destroy; override;
@@ -1320,7 +1320,8 @@ function TGDOMAttr.get_name: DOMString;
 var
   temp: string;
 begin
-  temp:=libxmlStringToString(GAttribute.name);
+  //temp:=libxmlStringToString(GAttribute.name);
+  temp:=inherited get_nodeName;
   result:=temp;
 end;
 
@@ -1422,9 +1423,9 @@ end;
 
 function TGDOMElement.setAttributeNode(const newAttr: IDOMAttr):IDOMAttr;
 var
-	attr,xmlnewAttr,oldattr: xmlAttrPtr;
-	temp: string;
-	node: xmlNodePtr;
+  attr,xmlnewAttr,oldattr: xmlAttrPtr;
+  temp: string;
+  node: xmlNodePtr;
 begin
   if newAttr<>nil then begin
     xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));     // Get the libxml2-Attribute
@@ -1455,8 +1456,8 @@ end;
 
 function TGDOMElement.removeAttributeNode(const oldAttr: IDOMAttr):IDOMAttr;
 var
-	attr,xmlnewAttr,oldattr1: xmlAttrPtr;
-	node: xmlNodePtr;
+  attr,xmlnewAttr,oldattr1: xmlAttrPtr;
+  node: xmlNodePtr;
 begin
 	if oldAttr<>nil then begin
 		xmlnewAttr:=xmlAttrPtr(GetGNode(oldAttr));     // Get the libxml2-Attribute
@@ -1511,6 +1512,8 @@ var
 begin
   value1:=TGdomString.create(value);
   ns := TGDOMNamespace.create(xmlNodePtr(GElement),namespaceURI,qualifiedName);
+  node:=xmlNodePtr(GElement);
+  xmlSetNs(node,ns.ns);
   {temp:=}xmlSetNSProp(xmlNodePtr(GElement),ns.NS,ns.localName.CString,value1.CString);
   value1.free;
   ns.Free;
@@ -1519,26 +1522,43 @@ end;
 
 procedure TGDOMElement.removeAttributeNS(const namespaceURI, localName: DOMString);
 var
-  attr: xmlAttrPtr;
+  attr,attr1: xmlAttrPtr;
   name1,name2: TGdomString;
+  ok: integer;
+  ns: TGdomNamespace;
 begin
   name1:=TGdomString.create(localName);
   name2:=TGdomString.create(namespaceURI);
-	attr := xmlHasNSProp(xmlNodePtr(GElement), name1.CString,name2.CString);
+  attr := xmlHasNSProp(xmlNodePtr(GElement), name1.CString,name2.CString);
   name1.free;
   name2.free;
   if attr <> nil
-    then xmlRemoveProp(attr);
+    then begin
+      ok:=xmlRemoveProp(attr);
+      if ok<>0 then checkerror(103);
+      name1:=TGdomString.create(localName);
+      //ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName);
+      //ok:=xmlUnsetNsProp(xmlNodePtr(GElement),ns.ns,name1.CString);
+      //ns.free;
+      name2:=TGdomString.create(namespaceURI);
+
+      attr1 := xmlHasNSProp(xmlNodePtr(GElement), name1.CString,name2.CString);
+      name1.free;
+      name2.free;
+    end;
 end;
 
 function TGDOMElement.getAttributeNodeNS(const namespaceURI, localName: DOMString): IDOMAttr;
 var
   temp: xmlAttrPtr;
   name1,name2: TGdomString;
+  tstring:string;
 begin
   name1:=TGdomString.create(namespaceURI);
   name2:=TGdomString.create(localName);
   temp:=xmlHasNSProp(xmlNodePtr(GElement), name2.CString,name1.CString);
+  tstring:=temp.ns.href;
+  tstring:=temp.ns.prefix;
   name1.Free;
   name2.free;
   if temp<>nil
@@ -1548,37 +1568,43 @@ end;
 
 function TGDOMElement.setAttributeNodeNS(const newAttr: IDOMAttr): IDOMAttr;
 var
-  attr,xmlnewAttr: xmlAttrPtr;
-  value:pchar;
-  temp,slocalName: string;
-  ns:xmlNSPtr;
-  namespace:pchar;
+  attr,xmlnewAttr,oldattr: xmlAttrPtr;
+  temp: string;
+  node: xmlNodePtr;
+  namespace: pchar;
+  slocalname: string;
 begin
   if newAttr<>nil then begin
-    xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));              // Get the libxml2-Attribute
-    (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
-    ns:=xmlnewAttr.ns;
-    if ns<>nil
-      then namespace:=ns.href
-      else namespace:='';
+    xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));    // Get the libxml2-Attribute
+    node:=xmlNodePtr(GElement);
+    xmlnewAttr.parent:=node;
+    if xmlnewAttr.ns<>nil
+      then begin
+        namespace:=xmlnewAttr.ns.href;
+        xmlSetNs(node,xmlnewAttr.ns);
+      end else namespace:='';
     slocalName:=localName(xmlNewattr.name);
-    attr:=xmlHasNSProp(xmlNodePtr(GElement),pchar(slocalName),namespace); // Check if the Element has
-                                                                        // already an attribute with this name
-    if attr=nil then begin
-      temp:=newAttr.value;
-      if xmlnewAttr.children<>nil
-        //todo: test the following case with a non-empty newAttr.value
-        //newAttr.value must be the same as xmlnewAttr.children.content
-        then value:=xmlnewAttr.children.content             // not tested
-        else value:='';
-      if ns<> nil
-        then attr:=xmlSetNSProp(xmlNodePtr(GElement),ns,pchar(slocalName),value)
-        else attr:=xmlSetProp(xmlNodePtr(GElement),pchar(slocalName),value);
-      if attr<>nil
-        then result:=TGDomAttr.Create(attr,FOwnerDocument) as IDOMAttr
-        else result:=nil;
-    end;
-  end else result:=nil;
+    oldattr:=xmlHasNSProp(node,pchar(slocalName),namespace); // already an attribute with this name?
+    attr:=node.properties;                                   // if not, then oldattr=nil
+    if attr=oldattr
+      then node.properties:=xmlNewAttr
+      else begin
+         while attr.next <> oldattr do begin
+           attr:=attr.next
+         end;
+         attr.next:=xmlNewAttr;
+      end;
+    (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+    if oldattr<>nil
+      then begin
+        temp:=oldattr.name;
+        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDOMAttr;
+        (FOwnerDocument as IDOMInternal).appendAttr(oldattr);
+      end
+      else begin
+        result:=nil;
+      end;
+  end;
 end;
 
 function TGDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
@@ -1590,7 +1616,7 @@ end;
 
 function TGDOMElement.hasAttribute(const name: DOMString): WordBool;
 var
-	name1: TGdomString;
+  name1: TGdomString;
 begin
   name1:=TGdomString.create(name);
   if xmlGetProp(xmlNodePtr(GElement),name1.CString) <> nil
@@ -1603,9 +1629,16 @@ end;
 function TGDOMElement.hasAttributeNS(const namespaceURI, localName: DOMString): WordBool;
 var
   name1,name2: TGdomString;
+  temp: string;
+  node:xmlNodePtr;
 begin
   name2:=TGdomString.create(namespaceURI);
   name1:=TGdomString.create(localName);
+  node:=xmlNodePtr(GElement);
+  if node.ns<>nil then begin
+    temp:=node.ns.href;
+    temp:=node.ns.prefix;
+  end;
   if (xmlGetNSProp(xmlNodePtr(GElement),name1.CString,
     name2.CString)) <> nil
     then result:=true
@@ -1671,8 +1704,14 @@ begin
     for i:=0 to FAttrList.Count-1 do begin
       AAttr:=FAttrList[i];
       if AAttr<>nil then
-        if (AAttr.parent=nil) and (AAttr.ns=nil)
-          then xmlFreeProp(AAttr);
+        if (AAttr.parent=nil) then
+          if (AAttr.ns=nil)
+            then xmlFreeProp(AAttr)
+            else begin
+              AAttr.ns:=nil;
+              //xmlFreeProp(AAttr);
+            end;
+
     end;
     for i:=0 to FNodeList.Count-1 do begin
       ANode:=FNodeList[i];
@@ -1806,7 +1845,7 @@ var
   AAttr: xmlAttrPtr;
 begin
   name1:=TGdomString.create(name);
-  AAttr:=xmlNewDocProp(FPGDomeDoc,name1.CString,pchar(''));
+  AAttr:=xmlNewProp(nil,name1.CString,pchar(''));
   name1.free;
   if AAttr<>nil
     then begin
@@ -1928,21 +1967,18 @@ end;
 function TGDOMDocument.createAttributeNS(const namespaceURI,
   qualifiedName: DOMString): IDOMAttr;
 var
-  name1,name2,name3: TGdomString;
   AAttr: xmlAttrPtr;
-  ns: xmlNsPtr;
+  ns: TGDOMNameSpace;
+  temp:string;
 begin
-  name1:=TGdomString.create(namespaceURI);
-	name2:=TGdomString.create((qualifiedName));
-  name3:=TGdomString.create(prefix(qualifiedName));
-  ns := xmlNewNs(nil, name1.CString, name3.CString);
-  AAttr:=xmlNewNsProp(nil,ns,name2.CString,nil);
-  name1.free;
-  name2.free;
-  name3.free;
+  ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName);
+  AAttr:=xmlNewNsProp(nil,ns.ns,ns.localName.CString,nil);
+  ns.free;
   if AAttr<>nil
-    then result:=TGDOMAttr.Create(AAttr,self)
-    else result:=nil;
+    then begin
+      FAttrList.Add(AAttr);
+      result:=TGDOMAttr.Create(AAttr,self)
+    end else result:=nil;
 end;
 
 function TGDOMDocument.getElementsByTagNameNS(const namespaceURI,
@@ -2438,6 +2474,7 @@ var
 begin
   name1:=TGdomString.create(namespaceURI);
   prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
+  FqualifiedName:=TGdomString.create(qualifiedName);
   localName:=TGdomString.create(Copy(qualifiedName,Pos(':',qualifiedName)+1,
     length(qualifiedName)-length(prefix)-1));
   name3:=TGdomString.create(prefix);
@@ -2450,6 +2487,7 @@ destructor TGDOMNameSpace.destroy;
 begin
   //todo: xmlFreeNs(ns);
   localName.free;
+  FqualifiedName.Free;
   inherited destroy;
 end;
 
