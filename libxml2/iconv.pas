@@ -49,9 +49,9 @@ extern LIBICONV_DLL_EXPORTED int _libiconv_version;       /* Likewise */
 
 type
 	{ Define iconv_t ourselves.  }
-	iconv_t = pointer;
+	iconv_t = Pointer;
 	{ Get size_t declaration.  }
-	size_t = longint;
+	size_t = Cardinal;
 	{ Get errno declaration and values.  }
 {todo: #include <errno.h>}
 	{ Some systems, like SunOS 4, don't have EILSEQ. On these systems, define
@@ -63,12 +63,12 @@ const
 }
 { Allocates descriptor for code conversion from encoding `fromcode' to
 	encoding `tocode'.  }
-{$ifndef LIBICONV_PLUG}
+{$IFNDEF LIBICONV_PLUG}
 {todo
 const
 	iconv_open = libiconv_open;
 }
-{$endif}
+{$ENDIF}
 (*todo
 extern LIBICONV_DLL_EXPORTED iconv_t iconv_open (const char* tocode, const char* fromcode);
 extern LIBICONV_DLL_EXPORTED iconv_t iconv_open (const char* tocode, const char* fromcode);
@@ -78,13 +78,13 @@ extern LIBICONV_DLL_EXPORTED iconv_t iconv_open (const char* tocode, const char*
 	 ` outbuf'.
 	 Decrements ` inbytesleft' and increments ` inbuf' by the same amount.
 	 Decrements ` outbytesleft' and increments ` outbuf' by the same amount.  }
-{$ifndef LIBICONV_PLUG}
+{$IFNDEF LIBICONV_PLUG}
 
 {todo
 const
 	iconv = libiconv;
 }
-{$endif}
+{$ENDIF}
 (*todo
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
@@ -93,16 +93,16 @@ extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
 *)
 { Frees resources allocated for conversion descriptor `cd'.  }
-{$ifndef LIBICONV_PLUG}
+{$IFNDEF LIBICONV_PLUG}
 {todo
 const
 	iconv_close = libiconv_close;
 }
-{$endif}
+{$ENDIF}
 (*todo
 extern LIBICONV_DLL_EXPORTED int iconv_close (iconv_t cd);
 *)
-{$ifndef LIBICONV_PLUG}
+{$IFNDEF LIBICONV_PLUG}
 { Nonstandard extensions.  }
 { Control of attributes.  }
 {todo
@@ -121,8 +121,9 @@ const
 	ICONV_GET_TRANSLITERATE = 1;
 	{ const int  argument  }
 	ICONV_SET_TRANSLITERATE = 2;
-{$endif}
+{$ENDIF}
 
 implementation
 
 end.
+

@@ -35,7 +35,7 @@ const
 
 type
   DWORD = integer;
-  PLongInt = ^LongInt;
+  PLongInt = ^Longint;
   PByte = ^byte;
   PPChar = ^PChar;
 
@@ -84,9 +84,9 @@ type
 // functions that reference symbols defined later - by header file:
 
 // tree.h
-function  xmlSaveFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlSaveFormatFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar; format:longint):longint;cdecl;external LIBXML2_SO;
-procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePtr; level:longint; format:longint; encoding:Pchar);cdecl;external LIBXML2_SO;
+function  xmlSaveFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar):Longint;cdecl;external LIBXML2_SO;
+function  xmlSaveFormatFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar; format:Longint):Longint;cdecl;external LIBXML2_SO;
+procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePtr; level:Longint; format:Longint; encoding:Pchar);cdecl;external LIBXML2_SO;
 
 // xmlIO.h
 function  xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
@@ -115,7 +115,7 @@ end;
 
 // macros from xpath.h
 
-function xmlXPathNodeSetGetLength(ns : xmlNodeSetPtr) : integer;
+function xmlXPathNodeSetGetLength(ns : xmlNodeSetPtr) : Integer;
 begin
   if ns=nil then begin
     Result := 0;
@@ -124,7 +124,7 @@ begin
   end;
 end;
 
-function xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: integer): xmlNodePtr;
+function xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: Integer): xmlNodePtr;
 var
   p: PxmlNodePtr;
 begin
@@ -137,7 +137,7 @@ begin
   Result := p^;
 end;
 
-function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): boolean;
+function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): Boolean;
 begin
   Result := ((ns = nil) or (ns.nodeNr = 0) or (ns.nodeTab = nil));
 end;
@@ -167,17 +167,17 @@ begin
 end;
 
 // Delphi memory handling
-procedure DelphiFreeFunc(ptr: pointer); cdecl;
+procedure DelphiFreeFunc(ptr: Pointer); cdecl;
 begin
   FreeMem(ptr);
 end;
 
-function  DelphiMallocFunc(size:size_t):pointer; cdecl;
+function  DelphiMallocFunc(size:size_t):Pointer; cdecl;
 begin
   Result := AllocMem(size);
 end;
 
-function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer; cdecl;
+function  DelphiReallocFunc(ptr:Pointer; size:size_t):Pointer; cdecl;
 begin
   Result := ReallocMemory(ptr, size);
 end;
