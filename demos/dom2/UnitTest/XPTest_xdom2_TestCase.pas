@@ -40,6 +40,8 @@ type TTestDOM2Methods = class(TTestCase)
     procedure CreateAttributeNS;
     procedure TestDocCount;
     procedure TestElementByID;
+    procedure LoadFiles;
+    procedure LoadFilesII;
     procedure append_100_attributes_with_different_namespaces;
   end;
 
@@ -152,9 +154,11 @@ type TSimpleTests = class(TTestCase)
     procedure ownerElement;
     procedure selectNodes;
     procedure selectNodes2;
+    procedure selectNodes3;
     procedure namedNodeMap;
     procedure namedNodeMapNS;
     procedure persist;
+    procedure documentFragment;
     property fqname: string read getFqname;
   end;
 
@@ -647,16 +651,19 @@ begin
   check(attr.value = '', 'wrong value');
   check(attr.ownerDocument = doc, 'wrong ownerDocument');
   try
-    attr := doc.createAttribute('!@#"');
-    check(False, 'no exception raised');
+    attr := doc.createAttribute('!@"#');
+    check(False, 'exception not raised');
   except
     on E: Exception do begin
+      if E is ETestFailure then check(False, 'exception not raised');
       if domvendor = 'LIBXML' then begin
         if E is EDomException then begin
           check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
         end;
       end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
         check(E is EOleException, 'wrong exception raised');
+      end else begin
+        raise EUnknownDomVendor.Create('unknown domvendor '+domvendor);
       end;
     end;
   end;
@@ -731,12 +738,15 @@ begin
     check(False, 'no exception raised');
   except
     on E: Exception do begin
+      if E is ETestFailure then check(False, 'exception not raised');
       if domvendor = 'LIBXML' then begin
         if E is EDomException then begin
           check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
         end;
       end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
         check(E is EOleException, 'wrong exception raised');
+      end else begin
+        raise EUnknownDomVendor.Create('unknown domvendor '+domvendor);
       end;
     end;
   end;
@@ -776,12 +786,15 @@ begin
     check(False, 'no exception raised');
   except
     on E: Exception do begin
+      if E is ETestFailure then check(False, 'exception not raised');
       if domvendor = 'LIBXML' then begin
         if E is EDomException then begin
           check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
         end;
       end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
         check(E is EOleException, 'wrong exception raised');
+      end else begin
+        raise EUnknownDomVendor.Create('unknown domvendor '+domvendor);
       end;
     end;
   end;
@@ -809,7 +822,7 @@ begin
   (doc as IDOMPersist).loadxml(xmlstr2);
   check(doc.docType <> nil, 'is nil');
   check(doc.docType.entities.length = 1, 'wrong entities length');
-  ent := doc.docType.entities[0] as IDOMEntity;
+  //ent := doc.docType.entities[0] as IDOMEntity;
   // to be continued ...
   {
   i := doc.docType.notations.length;
@@ -835,6 +848,26 @@ begin
   check(elem.nodeType = ELEMENT_NODE, 'wrong nodeType');
   check(elem.parentNode.nodeName = '#document', 'wrong parentNode');
   check(elem.ownerDocument = doc, 'wrong ownerDocument');
+end;
+
+procedure TSimpleTests.documentFragment;
+const
+  n = 10;
+var
+  i: integer;
+begin
+  check(doc.documentElement.childNodes.length = 0, 'wrong childNodes.length');
+  docfrag := doc.createDocumentFragment;
+  for i := 0 to n-1 do begin
+    elem := doc.createElement(name);
+    elem.setAttribute(name,data+IntToStr(i));
+    docfrag.appendChild(elem);
+  end;
+  check(docfrag.childNodes.length = n, 'wrong childNodes.length');
+  doc.documentElement.appendChild(docfrag);
+  check(doc.documentElement.childNodes.length <> 0, 'childNodes.length = 0');
+  check(doc.documentElement.childNodes[0].nodeName = name, 'wrong nodeName - expected: "'+name+'" found: "'+doc.documentElement.childNodes[0].nodeName+'"');
+  check(doc.documentElement.childNodes.length = n, 'wrong childNodes.length');
 end;
 
 procedure TSimpleTests.domImplementation;
@@ -1367,6 +1400,28 @@ begin
   end;
 end;
 
+procedure TSimpleTests.selectNodes3;
+begin
+  select := doc.documentElement as IDOMNodeSelect;
+  try
+    nodelist := select.selectNodes('"');
+    check(False, 'exception not raised');
+  except
+    on E: Exception do begin
+      if E is ETestFailure then check(False, 'exception not raised');
+      if domvendor = 'LIBXML' then begin
+        if E is EDomException then begin
+          check((E as EDomException).code = SYNTAX_ERR, 'wrong exception raised');
+        end;
+      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+        check(E is EOleException, 'wrong exception raised');
+      end else begin
+        raise EUnknownDomVendor.Create('unknown domvendor '+domvendor);
+      end;
+    end;
+  end;
+end;
+
 procedure TSimpleTests.SetUp;
 begin
   inherited;
@@ -1399,6 +1454,67 @@ begin
   inherited;
 end;
 
+procedure TTestDOM2Methods.LoadFiles;
+var
+	builder: IDomDocumentBuilder;
+	mydoc: IDomDocument;
+	fd: string; // file directory
+	fn: string; // file name
+	sr: TSearchRec;
+	rv: integer; // returned value
+	cnt: integer; // tested file counter
+begin
+	fd := datapath;
+	try
+		cnt := 0;
+		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
+		while (rv=0) do begin
+			Inc(cnt);
+			builder := getDocumentBuilderFactory(DomVendor).newDocumentBuilder;
+			fn := fd + '/' + sr.Name;
+			mydoc := builder.load(fn);
+			check(mydoc<>nil, fn+': document not loaded');
+			check(mydoc.documentElement<>nil, fn+': documentElement is nil');
+			rv := FindNext(sr);
+		end;
+		if (cnt=0) then begin
+			check(false, 'No XML file available for testing in directory '+fd);
+		end;
+	finally
+		FindClose(sr);
+	end;
+end;
+
+procedure TTestDOM2Methods.LoadFilesII;
+var
+	mydoc: IDomDocument;
+	fd: string; // file directory
+	fn: string; // file name
+	sr: TSearchRec;
+	rv: integer; // returned value
+	cnt: integer; // tested file counter
+begin
+  impl := GetDom(domvendor);
+  mydoc := impl.createDocument('','',nil);
+	fd := datapath;
+	try
+		cnt := 0;
+		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
+		while (rv=0) do begin
+			Inc(cnt);
+			fn := fd + '/' + sr.Name;
+      (mydoc as IDOMPersist).load(fn);
+			check(mydoc<>nil, fn+': document not loaded');
+			check(mydoc.documentElement<>nil, fn+': documentElement is nil');
+			rv := FindNext(sr);
+		end;
+		if (cnt=0) then begin
+			check(false, 'No XML file available for testing in directory '+fd);
+		end;
+	finally
+		FindClose(sr);
+	end;
+end;
 
 initialization
   RegisterTest('', TTestDom2Methods.Suite);
@@ -1407,5 +1523,6 @@ initialization
   RegisterTest('', TSimpleTests.Suite);
   CoInitialize(nil);
 end.
+
 
 
