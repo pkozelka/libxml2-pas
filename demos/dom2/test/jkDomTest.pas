@@ -93,7 +93,7 @@ begin
   if (TestSet and 1) = 0
     then doc:=GetEmptyDoc(vendorstr)
     else doc:=GetEmptyDoc1(vendorstr);
-  //(doc as IDOMParseOptions).validate := true; // we want to use a dtd
+  (doc as IDOMParseOptions).validate := true; // we want to use a dtd
   (doc as IDOMParseOptions).resolveExternals := true;
   (doc as IDOMParseOptions).preserveWhiteSpace := false;
   FDomPersist := doc as IDomPersist;
@@ -532,8 +532,8 @@ begin
   test('documentType.name',(documenttype.name = 'test'));
   namednodemap := documenttype.entities;
   test('documentType.entities',(namednodemap <> nil));
-  if vendorstr<>'LIBXML' then begin
-    test('entity.length',(namednodemap.length = 2));
+  test('entity.length',(namednodemap.length = 2));
+  if vendorstr<>SLIBXML then begin
     test('entity.notationName',((namednodemap[0] as IDOMEntity).notationName = 'type2'));
     temp:=((namednodemap[0] as IDOMEntity).systemId);
     test('entity.systemId', temp = 'file.type2');
@@ -548,7 +548,6 @@ begin
     documenttype:=nil;
   end
   else begin
-    OutLog('___entity.length not tested!');
     OutLog('___entity.notationName not tested!');
     OutLog('___entity.systemID not tested!');
     OutLog('___entity.publicID not tested!');
@@ -724,6 +723,7 @@ var
   node:     IDOMNode;
   attr:     IDOMAttr;
   dom2:  boolean;
+  count: integer;
 begin
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   document := getDoc(filename,vendorstr);
@@ -772,8 +772,11 @@ begin
   element := document.documentElement.firstChild as IDOMElement;
   test('element.hasAttribute',element.hasAttribute('name')) ;
   // bis hier ok
-  element.removeAttribute('name');
-  test('element.removeAttribute',(not element.hasAttribute('name'))) ;
+  count:=element.attributes.length;
+  element.removeAttribute('test');
+  count:=element.attributes.length;
+  element.attributes[0].nodeName;
+  test('element.removeAttribute',(not element.hasAttribute('test'))) ;
   element := nil;
   if dom2 then begin
     attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');

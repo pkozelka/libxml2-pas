@@ -54,6 +54,9 @@ begin
   doc:=GetEmptyDoc(vendor);
 
   FDomPersist:=doc as IDomPersist;
+  (doc as IDomParseOptions).resolveExternals:=true;
+  (doc as IDomParseOptions).preserveWhiteSpace:=false;
+  (doc as IDomParseOptions).validate:=false;
   ok:=FDomPersist.load(filename);
   if ok then begin
     outLog('Parsed file ok!');
@@ -116,7 +119,7 @@ var node: IDomNode;
     i: integer;
 begin
   result:=0;
-  filename:='..\data\'+name;
+  filename:=datapath+'/'+name;
   StartTimer;
   dom:=getDom(vendor);
   doc:=dom.createDocument('','',nil);
@@ -180,6 +183,8 @@ begin
     begin
       outLog('Parsed file ok!');
     end;
+  if vendor='LIBXML_4CT'
+    then (doc as IDomOutputOptions).prettyPrint:=false;
   temp:=(doc as IDOMPersist).xml;
   // MSXML uses tabs for indentation,
   // LIBXML uses two spaces
