@@ -158,7 +158,6 @@ end;
 
 procedure MOVETO_ENDTAG(var p: PxmlChar);
 begin
-  NextCharIndex()
   while ((p^<>#0) and (p^<>'>')) do p := StrNextChar(p);
 end;
 
