@@ -5,11 +5,11 @@ libxml2-pas 2.4.28:
 -------------------
 [unchanged]
 
-libxslt-pas 1.0.20:
+libxslt-pas 1.0.23:
 -------------------
 - translated new file: security.h
 
-libexslt-pas 0.7.11:
+libexslt-pas 0.7.14:
 -------------------
 [unchanged]
 

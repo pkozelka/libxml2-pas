@@ -20,21 +20,21 @@ const
    *
    * the version string like "1.2.3"
    *)
-  LIBEXSLT_DOTTED_VERSION = '0.7.11';
+  LIBEXSLT_DOTTED_VERSION = '0.7.14';
 
   (**
    * LIBEXSLT_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBEXSLT_VERSION = 00711;
+  LIBEXSLT_VERSION = 00714;
 
   (**
    * LIBEXSLT_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-  LIBEXSLT_VERSION_STRING = '00711';
+  LIBEXSLT_VERSION_STRING = '00714';
 
 (**
  * ATTRIBUTE_UNUSED:
