@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.23] encoding.h
+// CVS-SIGN: [1.24] encoding.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -40,7 +40,7 @@ const
 		declaration are looked at and a converter is looked for at that
 		point. If not found the parser stops here as asked by the XML REC
 		Converter can be registered by the user using xmlRegisterCharEncodingHandler
-		but the currentl form doesn't allow stateful transcoding (a serious
+		but the current form doesn't allow stateful transcoding (a serious
 		problem agreed !). If iconv has been found it will be used
 		automatically and allow stateful transcoding, the simplest is then
 		to be sure to enable icon and to provide iconv libs for the encoding
@@ -74,9 +74,9 @@ const
 type
 	{
 		xmlCharEncodingInputFunc:
-		@aOut:  a pointer ot an array of bytes to store the UTF-8 result
+		@aOut:  a pointer to an array of bytes to store the UTF-8 result
 		@outlen:  the length of @out
-		@aIn:  a pointer ot an array of chars in the original encoding
+		@aIn:  a pointer to an array of chars in the original encoding
 		@inlen:  the length of @in
 
 		Take a block of chars in the original encoding and try to convert
@@ -92,9 +92,9 @@ type
 
 	{
 		xmlCharEncodingOutputFunc:
-		@aOut:  a pointer ot an array of bytes to store the result
+		@aOut:  a pointer to an array of bytes to store the result
 		@outlen:  the length of @out
-		@aIn:  a pointer ot an array of UTF-8 chars
+		@aIn:  a pointer to an array of UTF-8 chars
 		@inlen:  the length of @in
 
 		Take a block of UTF-8 chars in and try to convert it to an other
@@ -106,7 +106,7 @@ type
 			 if the transcoding failed.
 		The value of @inlen after return is the number of octets consumed
 			 as the return value is positive, else unpredictiable.
-		The value of @outlen after return is the number of ocetes consumed.
+		The value of @outlen after return is the number of octets consumed.
 	}
 	xmlCharEncodingOutputFunc = function (aOut: PByte; outlen: integer; aIn: PByte; inlen: integer): integer; cdecl;
 

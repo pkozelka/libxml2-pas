@@ -419,7 +419,7 @@ function  xmlXPathParseNCName(ctxt:xmlXPathParserContextPtr):PxmlChar;cdecl;exte
 	Debug
 }
 {$ifdef LIBXML_DEBUG_ENABLED}
-procedure xmlXPathDebugDumpObject(output:PFILE; cur:xmlXPathObjectPtr; depth:longint);cdecl;external LIBXML2_SO;
+//[pk] see the same declaration above: procedure xmlXPathDebugDumpObject(var output:TextFile; cur:xmlXPathObjectPtr; depth:longint);cdecl;external LIBXML2_SO;
 {$endif}
 
 {

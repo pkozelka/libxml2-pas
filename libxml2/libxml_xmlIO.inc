@@ -92,7 +92,7 @@ function  xmlRegisterOutputCallbacks(matchFunc:xmlOutputMatchCallback; openFunc:
 	This function only exists if HTTP support built into the library
 }
 {$ifdef LIBXML_HTTP_ENABLED}
-function  xmlIOHTTPOpenW(const char * post_uri, int   compression ): pointer; cdecl;external LIBXML2_SO;
+function  xmlIOHTTPOpenW(post_uri: PChar; compression: longint): pointer; cdecl;external LIBXML2_SO;
 procedure xmlRegisterHTTPPostCallbacks; cdecl;external LIBXML2_SO;
 {$endif} // LIBXML_HTTP_ENABLED
 

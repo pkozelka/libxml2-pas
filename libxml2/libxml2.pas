@@ -42,7 +42,7 @@ type
 {$define LIBXML_DOCB_ENABLED}
 
 {TODO: $I libxml_xmlversion.inc}
-{TODO: $I libxml_xmlwin32version.inc}
+{$I libxml_xmlwin32version.inc}
 
 {$I libxml_xmlmemory.inc}
 {$I libxml_tree.inc}
