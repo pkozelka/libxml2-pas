@@ -9,18 +9,15 @@ Contents:
 	VERSION COMPLIANCE
 	WHAT YOU FIND IN THIS PACKAGE
 	USAGE
-	H2PAS options
+	GENERATING THE PASCAL BINDINGS
 	LINKS
 	HOW TO HELP
 
-CONDITIONAL DEFINES
--------------------
-USE_PASCAL_MM
-	activates the compiler's native memory manager, instead of making use of the MM already active in libxml2.
-	Use it only if you encounter MM-related problems. In that case, please report the circumstances to our mailing list.
 
 AUTHORS
 -------
+Eric Zurcher <Eric.Zurcher@csiro.au>
+        - interface generation from API description via XSLT stylesheet 
 Petr Kozelka <pkozelka@email.cz>
 	-  original header translations
 
@@ -30,24 +27,25 @@ Uwe Fechner <ufechner@4commerce.de>
 	- testing, demo application(s), initiated the libxslt translation
 Martijn Brinkers <martijn_brinkers@yahoo.co.uk>
 Mikhail Soukhanov <m.soukhanov@geosys.ru>
-Eric Zurchner <Eric.Zurcher@csiro.au>
 
 VERSION COMPLIANCE
 ------------------
-libxml2: look into file 'libxml_xmlwin32version.inc' for value of constant LIBXML_DOTTED_VERSION.
-libxslt: look into file 'libxml_xsltconfig.inc' for value of constant LIBXSLT_DOTTED_VERSION
-libexslt: look into file 'libxml_exsltconfig.inc' for value of constant LIBEXSLT_DOTTED_VERSION
+libxml2: 2.6.17
+libxslt: 1.1.12
+libexslt: 0.8.10
 
 WHAT YOU FIND IN THIS PACKAGE
 -----------------------------
-src/			- pascal translations of the libxml2 headers
-demos/libxml2/		- demo applications
-demos/libxml2/demo1/	- demo application for xpath testing (by Uwe Fechner)
+libxml2.pas, libxslt.pas, libexslt.pas 	- pascal bindings generated from API descriptions
+style/DelphiAPI.xsl			- XSLT transformation used to generate the Pascal code
+src/					- older pascal translations generated from the libxml2 headers
+demos/libxml2-test/			- demo applications
+demos/demo1/				- demo application for xpath testing (by Uwe Fechner)
+demos/simplexslt/			- demo application for XSLT testing
 
 
 USAGE
 -----
-Note that you should *NEVER* need to include any of the *.inc files in the translation directory.
 To use functions implemented in libxml2, you just put "libxml2" into your _uses_ list:
 
 program MyPrg;
@@ -70,12 +68,63 @@ On Linux system, you need the corresponding ".so" shared object files.
 KNOWN PROBLEMS
 --------------
 - extending the xslt-processor with own functions doesn't work yet
-- no demo-program yet for xslt
+- only a rather small part of the API has been tested
 
-H2PAS options
--------------
-The utility h2pas was used with the following options:
-h2pas -d -e -c -i <filename>.h -o libxml_<filename>.inc
+GENERATING THE PASCAL BINDINGS
+------------------------------
+DelphiAPI.xsl is an XSLT stylesheet for transforming the interface to libxml2, 
+as described in libxml2-api.xml, into Delphi bindings. The same stylesheet may
+also be applied to the libxslt and libexslt descriptions to generate Delphi
+bindings for those libraries.
+
+Usage:
+	xsltproc [--stringparam unit unit-name] DelphiAPI.xsl source-file
+
+Examples:
+	xsltproc --output libxml2.pas DelphiAPI.xsl libxml2-api.xml 
+
+	xsltproc --output libxslt.pas --stringparam unit libxslt DelphiAPI.xsl libxslt-api.xml
+
+
+The resulting Pascal code may not be perfect - a small amount of manual editing
+will typically be required to get the code to compile correctly. For example,
+a name conflicts may need to be resolved as a consequence of Delphi's lack of
+case-sensitivity (e.g. the xmlXPathError enumeration vs. the xmlXPatherror 
+procedure). A few delarations may need to be reordered, as when one structure
+(e.g., xmlGlobalState) includes other structures within it. 
+
+The transform operates only upon the contents of the <symbols> element of the 
+interface description.
+
+No attempt is made to declare or convert the macros defined in the interface,
+nor are conditional macros considered when generating the bindings.
+
+Enumerations, typedefs, structs, and functypes are converted to their Delphi 
+equivalents, and imported functions are fully declared.
+
+Imported "variables" are a bit more problematic, for two reasons: (1) Delphi
+does not provide direct support for the concept of an imported variable, and 
+(2) some of these (at least in thread-aware versions of libxml2) are actually
+implemented in part as C macros. In many of these cases (for example,
+"xmlParserVersion") the "variable" is actually implemented as a function
+with a double underscore prepended to the name, which returns a pointer the 
+desired value. I attempt to import these functions (though there is
+no reliable way of knowing which variables are so implemented); to use
+them in a Delphi application, one can use "__xmlParserVersion()^" rather
+than "xmlParserVersion". In some other cases (notably xmlMalloc, xmlFree,
+and friends), the exported variable is a pointer to a function. These
+are handled by proxy functions which are implemented by using GetProcAddress 
+during module initialization to obtain the address of the pointer to the 
+function.
+
+I have not yet been able to work out a way to handle function types 
+definitions that define a function type having a variable number of
+parameters. This includes errorSAXFunc, fatalErrorSAXFunc, warningSAXFunc,
+xmlGenericErrorFunc, xmlRelaxNGValidityErrorFunc, 
+xmlRelaxNGValidityWarningFunc, xmlSchemaValidityErrorFunc,
+xmlSchemaValidityWarningFunc, xmlValidityErrorFunc, and 
+xmlValidityWarningFunc. Any ideas for correct handling of these function
+types would be welcome.
 
 
 LINKS

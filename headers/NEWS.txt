@@ -1,6 +1,23 @@
 ********************************************************************
 *************************  LATEST CHANGES  *************************
 ********************************************************************
+libxml2-pas 2.6.17:
+--------------------
+libxslt-pas 1.1.12:
+-------------------
+libexslt-pas 0.8.10:
+-------------------
+- this release uses a totally different approach to generate the
+  units - they are now created from the XML descriptions of the
+  API, rather than from the C headers (Eric Zurcher)
+
+iconv 0.9:
+----------
+- translation upgraded to iconv version 1.9.1
+
+********************************************************************
+*************************  OLDER  CHANGES  *************************
+********************************************************************
 libxml2-pas 2.5.2:
 -------------------
 - translated new file: xmlreader.h
@@ -13,14 +30,10 @@ libxslt-pas 1.0.24:
 libexslt-pas 0.7.15:
 -------------------
 [unchanged]
-
 iconv 0.8:
 ----------
 - iconv translation completed by Mikhail Soukhanov
 
-********************************************************************
-*************************  OLDER  CHANGES  *************************
-********************************************************************
 - Delphi 5 compatibility completed
 
 libxml2-pas 2.4.24:
