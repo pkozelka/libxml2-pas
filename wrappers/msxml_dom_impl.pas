@@ -164,6 +164,8 @@ type
 		function  IXMLDOMAttribute.Get_name = Get_nodeName;
 		function  IXMLDOMAttribute.Get_value = Get_nodeValue;
 		procedure IXMLDOMAttribute.Set_value = Set_nodeValue;
+	protected //DOM2
+		//todo: function Get_ownerElement: IXMLDOMElement;
 	end;
 
 	TXMLDOMEntityReference = class(TXMLDOMNode)
@@ -352,7 +354,7 @@ begin
 {$endif}
 		end;
 	end else begin
-		Result := IUnknown(p.node._private);
+		Result := TXMLDOMNode(p.node._private) as IUnknown;
 	end;
 end;
 
@@ -623,7 +625,7 @@ begin
 	if (rv=nil) then exit;
 	if (rv.type_ = XPATH_NODESET) then begin
 		if (rv.nodesetval.nodeNr > 0) then begin
-			node := rv.nodesetval.nodeTab^[0];
+			node := rv.nodesetval.nodeTab^;
 			Result := GetDOMObject(node) as IXMLDOMNode;
 		end;
 	end;

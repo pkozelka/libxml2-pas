@@ -98,8 +98,7 @@ type
 	xmlDtdPtr = ^xmlDtd;
 	xmlNodePtr = ^xmlNode;
 
-	xmlNodePtrArray = array of xmlNodePtr;
-	PxmlNodePtr = ^xmlNodePtrArray;
+	PxmlNodePtr = ^xmlNodePtr;
 
 	{
 		xmlChar:

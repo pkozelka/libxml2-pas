@@ -17,11 +17,15 @@ begin
 end;
 
 function xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: integer): xmlNodePtr;
+var
+	p: PxmlNodePtr;
 begin
 	Result := nil;
 	if ns=nil then exit;
 	if index<0 then exit;
 	if index>=ns^.nodeNr then exit;
-	Result := ns^.nodeTab^[index];
+	p := ns^.nodeTab;
+	Inc(p, index);
+	Result := p^;
 end;
 
