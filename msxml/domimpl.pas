@@ -116,11 +116,28 @@ type
 		procedure normalize; safecall;
 	end;
 
-	TXMLDOMComment = class(TXMLDOMNode)
+	TXMLDOMCharacterData = class(TXMLDOMNode,
+		IXMLDOMCharacterData, IXMLDOMNode)
+	protected //IXMLDOMCharacterData
+		function  Get_data: WideString; safecall;
+		procedure Set_data(const data: WideString); safecall;
+		function  Get_length: Integer; safecall;
+		function  substringData(offset: Integer; count: Integer): WideString; safecall;
+		procedure appendData(const data: WideString); safecall;
+		procedure insertData(offset: Integer; const data: WideString); safecall;
+		procedure deleteData(offset: Integer; count: Integer); safecall;
+		procedure replaceData(offset: Integer; count: Integer; const data: WideString); safecall;
+	end;
+
+	TXMLDOMComment = class(TXMLDOMCharacterData)
 		//todo
 	end;
 
-	TXMLDOMText = class(TXMLDOMNode)
+	TXMLDOMText = class(TXMLDOMCharacterData)
+		//todo
+	end;
+
+	TXMLDOMCDataSection = class(TXMLDOMText)
 		//todo
 	end;
 
@@ -234,7 +251,7 @@ type
 		destructor Destroy; override;
 	end;
 
-function GetDOMObject(const aNode: xmlNodePtr): IUnknown;
+function GetDOMObject(const aNode: pointer): IUnknown;
 
 implementation
 
@@ -259,35 +276,37 @@ begin
 	Result := (aDOMNode as ILibXml2Node).NodePtr;
 end;
 
-function GetDOMObject(const aNode: xmlNodePtr): IUnknown;
+function GetDOMObject(const aNode: pointer): IUnknown;
+var
+	p: TUniNode absolute aNode;
 begin
 	if (aNode = nil) then begin
 		Result := nil;
-	end else if (nil = aNode._private) then begin
-		case aNode.type_ of
+	end else if (nil = p.node._private) then begin
+		case p.node.type_ of
 		XML_ATTRIBUTE_NODE:
-			Result := TXMLDOMAttribute.Create(aNode);
+			Result := TXMLDOMAttribute.Create(p.node);
 		XML_ELEMENT_NODE:
-			Result := TXMLDOMElement.Create(aNode);
+			Result := TXMLDOMElement.Create(p.node);
 		XML_TEXT_NODE:
-			Result := TXMLDOMText.Create(aNode);
+			Result := TXMLDOMText.Create(p.node);
 		XML_CDATA_SECTION_NODE:
-			Result := TXMLDOMElement.Create(aNode);
+			Result := TXMLDOMElement.Create(p.node);
 		XML_ENTITY_REF_NODE:
-			Result := TXMLDOMEntityReference.Create(aNode);
+			Result := TXMLDOMEntityReference.Create(p.node);
 		XML_ENTITY_NODE:
-			Result := TXMLDOMEntity.Create(aNode);
+			Result := TXMLDOMEntity.Create(p.node);
 		XML_PI_NODE:
-			Result := TXMLDOMProcessingInstruction.Create(aNode);
+			Result := TXMLDOMProcessingInstruction.Create(p.node);
 		XML_COMMENT_NODE:
-			Result := TXMLDOMComment.Create(aNode);
+			Result := TXMLDOMComment.Create(p.node);
 		XML_DOCUMENT_NODE:
-			Result := TXMLDOMDocument.Create(aNode);
+			Result := TXMLDOMDocument.Create(p.node);
 		XML_DOCUMENT_TYPE_NODE:
-			Result := TXMLDOMDocumentType.Create(aNode);
+			Result := TXMLDOMDocumentType.Create(p.node);
 //		XML_DOCUMENT_FRAG_NODE:
 		XML_NOTATION_NODE:
-			Result := TXMLDOMNotation.Create(aNode);
+			Result := TXMLDOMNotation.Create(p.node);
 //		XML_HTML_DOCUMENT_NODE:
 //		XML_DTD_NODE:
 //		XML_ELEMENT_DECL:
@@ -301,7 +320,7 @@ begin
 {$endif}
 		end;
 	end else begin
-		Result := IUnknown(aNode._private);
+		Result := IUnknown(p.node._private);
 	end;
 end;
 
@@ -686,7 +705,7 @@ end;
 
 function TAttrNodeMap.removeNamedItem(const name: WideString): IXMLDOMNode;
 begin
-	fparent.removeAttribute(name);
+	FParent.removeAttribute(name);
 end;
 
 function TAttrNodeMap.removeQualifiedItem(const baseName, namespaceURI: WideString): IXMLDOMNode;
@@ -807,8 +826,13 @@ begin
 end;
 
 function TXMLDOMDocument.createAttribute(const name: WideString): IXMLDOMAttribute;
+var
+	s: string;
+	node: xmlAttrPtr;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	s := name;
+	node := xmlNewDocProp(FNode.doc, PChar(s), nil);
+	Result := GetDOMObject(node) as IXMLDOMAttribute;
 end;
 
 function TXMLDOMDocument.createCDATASection(const data: WideString): IXMLDOMCDATASection;
@@ -832,8 +856,11 @@ begin
 end;
 
 function TXMLDOMDocument.createDocumentFragment: IXMLDOMDocumentFragment;
+var
+	node: xmlNodePtr;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	node := xmlNewDocFragment(FNode.doc);
+	Result := GetDOMObject(node) as IXMLDOMDocumentFragment;
 end;
 
 function TXMLDOMDocument.createElement(const tagName: WideString): IXMLDOMElement;
@@ -858,6 +885,7 @@ end;
 
 function TXMLDOMDocument.createNode(type_: OleVariant; const name, namespaceURI: WideString): IXMLDOMNode;
 begin
+	//todo
 end;
 
 function TXMLDOMDocument.createProcessingInstruction(const target, data: WideString): IXMLDOMProcessingInstruction;
@@ -878,7 +906,7 @@ var
 begin
 	d := data;
 	node := xmlNewDocText(FNode.doc, PChar(d));
-	GetDOMObject(node, Result);
+	Result := GetDOMObject(node) as IXMLDOMText;
 end;
 
 function TXMLDOMDocument.Get_async: WordBool;
@@ -896,7 +924,7 @@ var
 	node: xmlNodePtr;
 begin
 	node := xmlDocGetRootElement(FNode.doc);
-	GetDOMObject(node,Result);
+	Result := GetDOMObject(node) as IXMLDOMElement;
 end;
 
 function TXMLDOMDocument.Get_implementation_: IXMLDOMImplementation;
@@ -926,7 +954,7 @@ end;
 
 function TXMLDOMDocument.Get_url: WideString;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	Result := ''; //todo
 end;
 
 function TXMLDOMDocument.Get_validateOnParse: WordBool;
@@ -997,6 +1025,50 @@ end;
 procedure TXMLDOMDocument.Set_validateOnParse(isValidating: WordBool);
 begin
 	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+{ TXMLDOMCharacterData }
+
+procedure TXMLDOMCharacterData.appendData(const data: WideString);
+var
+	s: string;
+begin
+	xmlNodeAddContent(FNode.node, PChar(s));
+end;
+
+procedure TXMLDOMCharacterData.deleteData(offset, count: Integer);
+begin
+	ENotImpl('TXMLDOMCharacterData.xxx');
+end;
+
+function TXMLDOMCharacterData.Get_data: WideString;
+begin
+	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
+end;
+
+function TXMLDOMCharacterData.Get_length: Integer;
+begin
+	Result := Length(Get_data);
+end;
+
+procedure TXMLDOMCharacterData.insertData(offset: Integer; const data: WideString);
+begin
+	ENotImpl('TXMLDOMCharacterData.xxx');
+end;
+
+procedure TXMLDOMCharacterData.replaceData(offset, count: Integer; const data: WideString);
+begin
+	ENotImpl('TXMLDOMCharacterData.xxx');
+end;
+
+procedure TXMLDOMCharacterData.Set_data(const data: WideString);
+begin
+	Set_nodeValue(data);
+end;
+
+function TXMLDOMCharacterData.substringData(offset, count: Integer): WideString;
+begin
+	Result := Copy(Get_data, offset, count);
 end;
 
 end.
