@@ -38,6 +38,7 @@ type
 
 {TODO: $I libxml_xmlversion.inc}
 {TODO: $I libxml_xmlwin32version.inc}
+{TODO: $I libxml_globals.inc}
 
 {$I libxml_xmlmemory.inc}
 {$I libxml_tree.inc}
@@ -47,6 +48,7 @@ type
 {$I libxml_entities.inc}
 {$I libxml_list.inc}
 {$I libxml_valid.inc}
+{TODO: $I libxml_parserInternals.inc}
 {$I libxml_parser.inc}
 {$I libxml_SAX.inc}
 
@@ -65,6 +67,7 @@ type
 {$I libxml_HTMLtree.inc}
 {$I libxml_DOCBparser.inc}
 {$I libxml_catalog.inc}
+{TODO: $I libxml_threads.inc}
 
 // this will later be in libxml_xpathInternals.inc
 function  xmlXPathRegisterNs(ctxt:xmlXPathContextPtr;prefix,ns_uri:PxmlChar):longint;cdecl;external LIBXML2_SO;
