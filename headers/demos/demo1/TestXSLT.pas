@@ -96,7 +96,7 @@ begin
   if node=nil then exit;
   temp:=node.name;
   outLog('name of root element: '+temp);
-  temp:=inttostr(node.type_);
+  temp:=inttostr(Ord(node.type_));
   outLog('type of root element: '+temp);
   //xmlFreeNode(node);
   xmlFreeDoc(doc);
