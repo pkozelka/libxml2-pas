@@ -153,9 +153,6 @@ object Form1: TForm1
     Height = 32
     Align = alTop
     TabOrder = 2
-    DesignSize = (
-      592
-      32)
     object EnableOutput: TCheckBox
       Left = 8
       Top = 8

@@ -160,6 +160,7 @@ procedure TestGDom3b(name,vendorstr:string);
     text: IDOMText;
     attr: IDOMAttr;
     node: IDOMNode;
+    temp: string;
   begin
     test('document',(document <> nil));
     if document=nil then exit;
@@ -201,12 +202,14 @@ procedure TestGDom3b(name,vendorstr:string);
     //p=2
     nodelist := document.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
     if nodelist<>nil
-      then test('document.getElementsByTagNameNS (length)',(nodelist.length = 1));
+      then test('document.getElementsByTagNameNS (length)',(nodelist.length = 1))
+      else outLog('__document.getElementsByTagNameNS (length) doesn''t work!');
     nodelist := nil;
     //p=2
     nodelist := document.documentElement.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
     if nodelist <> nil
-      then test('element.getElementsByTagNameNS (length)',(nodelist.length = 1));
+      then test('element.getElementsByTagNameNS (length)',(nodelist.length = 1))
+      else outLog('__element.getElementsByTagNameNS (length) doesn''t work');
     nodelist := nil;
 
     //p=2
@@ -214,6 +217,8 @@ procedure TestGDom3b(name,vendorstr:string);
     if nodelist <> nil then begin
       test('document.getElementsByTagName',(nodelist <> nil));
       test('document.getElementsByTagName (length)',(nodelist.length = 1)) ;
+    end else begin
+      outLog('__document.getElementsByTagName doesn''t work!');
     end;
     nodelist := nil;
 
@@ -221,17 +226,22 @@ procedure TestGDom3b(name,vendorstr:string);
     dom := document.domImplementation;
     test('document.domImplementation',(dom <> nil)) ;
     dom := nil;
-    if vendorstr<>'LIBXML' then begin
-      //p=2
-      cdata := document.createCDATASection('zzz');
-      test('document.createCDATASection',(cdata <> nil));
-      cdata := nil;
 
-      //p=2
+    //p=2
+    cdata := document.createCDATASection('zzz');
+    test('document.createCDATASection',(cdata <> nil));
+    cdata := nil;
+
+    //p=2
+    try
       comment := document.createComment('xxx');
       test('document.createComment',(comment <> nil));
       comment := nil;
+    except
+      outLog('document.createComment doesn''t work!');
+    end;
 
+    if vendorstr<>'LIBXML' then begin
       //p=3
       documentfragment := document.createDocumentFragment;
       test('document.createDocumentFragment',(documentfragment <> nil));
@@ -251,13 +261,14 @@ procedure TestGDom3b(name,vendorstr:string);
 
   procedure TestNode1(filename,vendorstr:string);
   var
-    node,node1,docelement: IDOMNode;
+    node,node1,docelement,childnode: IDOMNode;
     nodelist: IDOMNodeList;
     nodeselect: IDOMNodeSelect;
     attlist: IDOMNamedNodeMap;
     namednodemap: IDOMNamedNodeMap;
     i: integer;
     document: IDOMDocument;
+    temp: string;
   begin
     document:=nil;
     document := getDoc(filename,vendorstr);
@@ -357,47 +368,48 @@ procedure TestGDom3b(name,vendorstr:string);
     test('node.remove & append',(node.nodeName = 'sometag')) ;
     node := nil;
 
-    if vendorstr<>'LIBXML' then begin
-
-      node := document.documentElement.lastChild.cloneNode(True);
-
+    try
       //p=2
+      node := document.documentElement.lastChild.cloneNode(True);
       node := document.documentElement.replaceChild(node,document.documentElement.firstChild);
       test('node.replaceChild',(node <> nil)) ;
       test('node.clone & replace',(node.nodeName = 'sometag')) ;
       node := nil;
+    except
+      outLog('__node.replaceChild doesn''t work!');
+      outLog('__node.clone & replace doesn''t work!');
+    end;
 
-      //if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
-        test('node.isSupported "Core"',(document.documentElement.isSupported('Core','2.0'))) ;
-        test('node.isSupported "XML"',(document.documentElement.isSupported('XML','2.0'))) ;
-      //end else begin
-      //  outLog('node.isSupported doesn''t work with MSXML.')
-      //end;
+    test('node.isSupported "Core"',(document.documentElement.isSupported('Core','2.0'))) ;
+    test('node.isSupported "XML"',(document.documentElement.isSupported('XML','2.0'))) ;
 
+    try
       //p=2
-      outLog('node.normalize => disabled');
       // testing normalize
-      {
+    temp:='';
+    node:=document.documentElement as IDOMNode;
       for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
+        if node.firstChild.childNodes[i].nodeType = ntTEXTNODE then begin
           childnode := node.firstChild.childNodes[i].cloneNode(True);
           Break;
         end;
       end;
       node.firstChild.appendChild(childnode);
-      node.firstChild.appendChild(childnode);
+      //node.firstChild.appendChild(childnode);
       for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
-          outLog('text before normalize: '+node.firstChild.childNodes[i].nodeValue);
+        if node.firstChild.childNodes[i].nodeType = ntTEXTNODE then begin
+          temp:=temp+node.firstChild.childNodes[i].nodeValue;
         end;
       end;
       node.firstChild.normalize;
       for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
-          outLog('text after normalize: '+node.firstChild.childNodes[i].nodeValue);
+        if node.firstChild.childNodes[i].nodeType = ntTEXTNODE then begin
+          test('node.normalize',node.firstChild.childNodes[i].nodeValue=temp);
+          //outLog('text after normalize: '+node.firstChild.childNodes[i].nodeValue);
         end;
       end;
-      }
+    except
+      outLog('__node.normalize doesn''t work!');
     end;
   end;
 
@@ -695,7 +707,7 @@ begin
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  outLog('Number of tests total:     110');
+  outLog('Number of tests total:     111');
   //outLog('doccount='+inttostr(doccount));
   //outLog('nodecount='+inttostr(nodecount));
   //outLog('elementcount='+inttostr(elementcount));

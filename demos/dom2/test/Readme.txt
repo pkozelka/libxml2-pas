@@ -8,7 +8,7 @@ libxml2
 And to run, you need the examples from:
 demos/data
 
-So far tested with Delphi 6 only.
+Tested with Delphi 5 and with Delphi 6.
 
 It's a graphical program that performs the follwing
 test:
@@ -20,11 +20,7 @@ You can switch between msxml-dom and libxml2 at runtime.
 
 Hints for compiling:
 - add the dom2 and the libxml2 folders to your library path
-- you have to edit the following lines in dom2demo.dpr with
-  a texteditor, to match your installation path:
-  > libxmldom in 'L:\dom2\libxmldom.pas',
-  > Dom2 in 'L:\dom2\Dom2.pas',
-  > msxml_impl in 'L:\dom2\msxml_impl.pas';
+- edit the paths in project-options to fit your enviroment
 
 Uwe Fechner (ufechner@csi.com)
 
