@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.12 2002-02-11 20:51:08 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.13 2002-02-11 20:58:17 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -299,24 +299,28 @@ type
 
 //overridable implementations
 var
-  GlbNodeClasses: array[XML_ELEMENT_NODE..XML_ENTITY_DECL] of TLDOMNodeClass = (
-    nil, //TGDOMElement,
-    TLDOMAttr,
-    TLDOMText,
-    TLDOMCDataSection,
-    TLDOMEntityReference,
-    TLDOMEntity,
-    TLDOMProcessingInstruction,
-    TLDOMComment,
-    nil, //TGDOMDocument,
-    TLDOMDocumentType,
-    TLDOMDocumentFragment,
-    TLDOMNotation,
-    nil, //TGDOMDocument,
-    TLDOMDocumentType,
-    nil,
-    nil,
-    TLDOMEntity
+  GlbNodeClasses: array[XML_ELEMENT_NODE..XML_DOCB_DOCUMENT_NODE] of TLDOMNodeClass = (
+    nil, //TGDOMElement, //XML_ELEMENT_NODE
+    TLDOMAttr, //XML_ATTRIBUTE_NODE
+    TLDOMText, //XML_TEXT_NODE
+    TLDOMCDataSection, //XML_CDATA_SECTION_NODE
+    TLDOMEntityReference, //XML_ENTITY_REF_NODE
+    TLDOMEntity, //XML_ENTITY_NODE
+    TLDOMProcessingInstruction, //XML_PI_NODE
+    TLDOMComment, //XML_COMMENT_NODE
+    nil, //TGDOMDocument, //XML_DOCUMENT_NODE
+    TLDOMDocumentType, //XML_DOCUMENT_TYPE_NODE
+    TLDOMDocumentFragment, //XML_DOCUMENT_FRAG_NODE
+    TLDOMNotation, //XML_NOTATION_NODE
+    nil, //TGDOMDocument, //XML_HTML_DOCUMENT_NODE
+    TLDOMDocumentType, //XML_DTD_NODE
+    nil, //XML_ELEMENT_DECL
+    nil, //XML_ATTRIBUTE_DECL
+    TLDOMEntity, //XML_ENTITY_DECL
+    nil, //XML_NAMESPACE_DECL,
+    nil, //XML_XINCLUDE_START,
+    nil, //XML_XINCLUDE_END,
+    nil  //XML_DOCB_DOCUMENT_NODE
   );
 
 
