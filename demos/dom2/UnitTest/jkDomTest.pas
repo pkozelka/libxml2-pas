@@ -111,7 +111,6 @@ var
   dom2: boolean;
 begin
   TestsOK:=0;
-  result:=0;
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   document := getDoc(filename,vendorstr);
   documentElement:= document.documentElement;
@@ -304,7 +303,6 @@ var
   nodelist: IDOMNodeList;
   dom2: boolean;
 begin
-  result:=0;
   TestsOK:=0;
   document := getDoc(filename,vendorstr,TestSet);
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
