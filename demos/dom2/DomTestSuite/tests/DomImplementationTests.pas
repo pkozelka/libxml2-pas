@@ -1,5 +1,12 @@
 unit DomImplementationTests;
 
+(*
+ * Test cases for IDomImplementation.
+ *
+ * NOTE: writing tests and compliance tests without a fully non-compliant DOM
+ * could easily result in incorrect test code.
+*)
+
 interface
 
 uses
