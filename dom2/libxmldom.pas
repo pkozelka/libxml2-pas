@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.101 2002-01-30 21:50:20 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.102 2002-01-30 22:06:02 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -408,10 +408,10 @@ type
     procedure set_validate(aValue: Boolean);
   protected //IDomPersist
     function  asyncLoadState: Integer;
-    function  load(source: DomString): Boolean;
+    function  load(aUrl: DomString): Boolean;
     function  loadFromStream(const stream: TStream): Boolean;
     function  loadxml(const Value: DomString): Boolean;
-    procedure save(destination: DomString);
+    procedure save(aUrl: DomString);
     procedure saveToStream(const stream: TStream);
     procedure set_OnAsyncLoad(const Sender: TObject; EventHandler: TAsyncEventHandler);
   protected //IDomOutput
@@ -2011,16 +2011,16 @@ end;
 (**
  * Load dom from file
  *)
-function TGDOMDocument.load(source: DomString): Boolean;
+function TGDOMDocument.load(aUrl: DomString): Boolean;
 var
   fn: String;
   ctxt: xmlParserCtxtPtr;
 begin
   Result := false;
 {$ifdef WIN32}
-  fn := StringReplace(UTF8Encode(source), '\', '\\', [rfReplaceAll]);
+  fn := StringReplace(UTF8Encode(aUrl), '\', '\\', [rfReplaceAll]);
 {$else}
-  fn := source;
+  fn := UTF8Encode(aUrl);
 {$endif}
   xmlInitParser();
   ctxt := xmlCreateFileParserCtxt(PChar(fn));
@@ -2065,16 +2065,12 @@ begin
   end;
 end;
 
-procedure TGDOMDocument.save(destination: DomString);
+procedure TGDOMDocument.save(aUrl: DomString);
 var
-  temp:String;
-  encoding:pchar;
-  bytes: integer;
+  sz: integer;
 begin
-  temp:=destination;
-  encoding:=GDoc.encoding;
-  bytes:=xmlSaveFileEnc(pchar(temp),GDoc,encoding);
-  if bytes<0 then DomAssert(false, 22); //write error
+  sz := xmlSaveFileEnc(PChar(UTF8Encode(aUrl)), GDoc, GDoc.encoding);
+  DomAssert(sz>0, 22); //DIRTY // write error
 end;
 
 procedure TGDOMDocument.saveToStream(const stream: TStream);
