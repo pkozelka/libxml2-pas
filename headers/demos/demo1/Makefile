@@ -1,17 +1,24 @@
-PROJECT=Demo1
 DCC=dcc
-EXECUTABLE=$(PROJECT)
-DCCOPTS=-Q -U../../../libxml2
+DCCOPTS=-Q -U../../src
 
 all: test
 
-../../../libxml2.dcu: ../../../libxml2/*.pas ../../../libxml2/*.inc
-	$(DCC) $(DCCOPTS) ../../../libxml2/libxml2.pas
+./Demo1: Demo1.dpr
+	$(DCC) $(DCCOPTS) Demo1.dpr
 
-./$(EXECUTABLE): $(PROJECT).dpr ../../../libxml2.dcu
-	$(DCC) $(DCCOPTS) $(PROJECT).dpr
+./transform: transform.dpr
+	$(DCC) $(DCCOPTS) transform.dpr
+
 clean:
-	rm -f *.dcu
+	rm -f *.dcu 17-3.html
 
-test: ./$(EXECUTABLE)
-	./$(EXECUTABLE) calServer.xml
+distclean: clean
+	rm -f *.exe
+
+testDemo1: ./Demo1 ./transform
+	./Demo1 calServer.xml '//*'
+
+testtransform: ./transform
+	./transform.exe 17-1.xml 17-2.xsl 17-3.html
+
+test: testDemo1 testtransform
