@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.81 2002-01-27 11:04:35 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.82 2002-01-27 21:59:42 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -453,6 +453,7 @@ resourcestring
 
 const
   DEFAULT_IMPL_FREE_THREADED = false;
+var
   GDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
 
 function ErrorString(err:integer):String;
@@ -764,6 +765,7 @@ begin
   Result := GDOMImplementation[aFreeThreading];
   if (Result = nil) then begin
     Result := TGDOMImplementation.Create; // currently, the same imlementation for both cases
+    GDOMImplementation[aFreeThreading] := Result;
   end;
 end;
 
@@ -1011,9 +1013,7 @@ begin
     // this is neccessary, because according to the dom2
     // specification localName has to be nil for nodes,
     // that don't have a namespace
-    if (FGNode.ns<>nil) then begin
-      Result := UTF8Decode(FGNode.name);
-    end;
+    Result := UTF8Decode(FGNode.name);
   else
     Result := '';
   end;
@@ -1637,7 +1637,7 @@ end;
 function TGDOMDocument.get_domImplementation: IDomImplementation;
 begin
   if FGDOMImpl=nil then begin
-    FGDOMImpl := GDOMImplementation[DEFAULT_IMPL_FREE_THREADED];
+    FGDOMImpl := TGDOMImplementation.getInstance(DEFAULT_IMPL_FREE_THREADED);
   end;
   Result := FGDOMImpl;
 end;
@@ -2254,11 +2254,7 @@ initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
 finalization
   // release on-demand created instances
-  if GDOMImplementation[false]<>nil then begin
-    GDOMImplementation[false]._Release;
-  end;
-  if GDOMImplementation[true]<>nil then begin
-    GDOMImplementation[true]._Release;
-  end;
+  GDOMImplementation[false] := nil;
+  GDOMImplementation[true] := nil;
 end.
 
