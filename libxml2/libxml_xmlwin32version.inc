@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.25] xmlwin32version.h
+// CVS-SIGN: [1.26] xmlwin32version.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,21 +30,21 @@ const
  *
  * the version string like "1.2.3"
  *)
-   LIBXML_DOTTED_VERSION = '2.4.14';
+   LIBXML_DOTTED_VERSION = '2.4.15';
 
 (**
  * LIBXML_VERSION:
  *
  * the version number: 1.2.3 value is 1002003
  *)
-  LIBXML_VERSION = 20414;
+  LIBXML_VERSION = 20415;
 
 (**
  * LIBXML_VERSION_STRING:
  *
  * the version number string, 1.2.3 value is "1002003"
  *)
-   LIBXML_VERSION_STRING = '20414';
+   LIBXML_VERSION_STRING = '20415';
 
 (**
  * LIBXML_TEST_VERSION:

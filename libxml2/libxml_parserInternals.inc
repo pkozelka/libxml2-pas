@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.44] parserInternals.h
+// CVS-SIGN: [1.45] parserInternals.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -192,7 +192,6 @@ function  xmlNewParserCtxt:xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 function  xmlCreateEntityParserCtxt(URL:PxmlChar; ID:PxmlChar; base:PxmlChar):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 function  xmlSwitchEncoding(ctxt:xmlParserCtxtPtr; enc:xmlCharEncoding):longint;cdecl;external LIBXML2_SO;
 function  xmlSwitchToEncoding(ctxt:xmlParserCtxtPtr; handler:xmlCharEncodingHandlerPtr):longint;cdecl;external LIBXML2_SO;
-//[pk] see "parser": procedure xmlFreeParserCtxt(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
 
 (**
  * Entities

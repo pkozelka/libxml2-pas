@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.32] entities.h
+// CVS-SIGN: [1.33] entities.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -31,7 +31,7 @@ type
    * An unit of storage for an entity, contains the string, the value
    * and the linking data needed for the linking in the hash table.
    *)
-  xmlEntityPtr = ^xmlEntity;
+  xmlEntityPtr = ^xmlEntity; //[pk] cannot be moved to tree.inc
   xmlEntity = record
     _private : pointer;             { application data  }
     type_ : xmlElementType;         { XML_ENTITY_DECL, must be second !  }

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.100] tree.h
+// CVS-SIGN: [1.102] tree.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -32,6 +32,12 @@ xmlParserInput
 xmlParserInputPtr
 xmlParserCtxt
 xmlParserCtxtPtr
+xmlSAXLocatorPtr
+xmlSAXHandlerPtr
+}
+
+{[pk] following declarations are in entities.inc:
+xmlEntityPtr
 }
 
 const
@@ -451,15 +457,17 @@ type
     charset : longint;              { encoding of the in-memory content - actually an xmlCharEncoding  }
   end;
 
-  (**
-   * Variables.
-   *)
-(* TODO: translate somehow
+(**
+ * Variables.
+ *)
+(*TODO: translate somehow
+{$if False}
 LIBXML_DLL_IMPORT extern int oldXMLWDcompatibility;/* maintain compatibility with old WD */
 LIBXML_DLL_IMPORT extern int xmlIndentTreeOutput;  /* try to indent the tree dumps */
 LIBXML_DLL_IMPORT extern xmlBufferAllocationScheme xmlBufferAllocScheme; /* alloc scheme to use */
 LIBXML_DLL_IMPORT extern int xmlSaveNoEmptyTags; /* save empty tags as <empty></empty> */
 LIBXML_DLL_IMPORT extern int xmlDefaultBufferSize; /* default buffer size */
+{$ifend}
 *)
 
 (*

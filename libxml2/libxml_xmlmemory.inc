@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.23] xmlmemory.h
+// CVS-SIGN: [1.26] xmlmemory.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -87,10 +87,8 @@ type
   xmlStrdupFunc = function (str:PChar):PChar; cdecl;
   PxmlStrdupFunc = ^xmlStrdupFunc;
 
-  (*
-   * The 4 interfaces used for all memory handling within libxml
-   *)
-(* TODO somehow
+(*
+ * The 4 interfaces used for all memory handling within libxml
 LIBXML_DLL_IMPORT extern xmlFreeFunc xmlFree;
 LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMalloc;
 LIBXML_DLL_IMPORT extern xmlReallocFunc xmlRealloc;

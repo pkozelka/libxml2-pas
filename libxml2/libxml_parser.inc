@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.73] parser.h
+// CVS-SIGN: [1.75] parser.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -571,20 +571,32 @@ type
  * version infos.
  *)
 (* TODO somehow
+{$if false}
 LIBXML_DLL_IMPORT extern const char *xmlParserVersion;
+{$ifend}
 LIBXML_DLL_IMPORT extern xmlSAXLocator xmlDefaultSAXLocator;
 LIBXML_DLL_IMPORT extern xmlSAXHandler xmlDefaultSAXHandler;
 LIBXML_DLL_IMPORT extern xmlSAXHandler htmlDefaultSAXHandler;
 LIBXML_DLL_IMPORT extern xmlSAXHandler docbDefaultSAXHandler;
 *)
+
+(*
+ * entity substitution default behavior.
+ *)
+
+{$ifdef VMS}
 (**
  * xmlSubstituteEntitiesDefaultValue:
  *
  * global variable controlling the entity substitution default behavior
  *)
+//TODO: LIBXML_DLL_IMPORT extern int xmlSubstituteEntitiesDefaultVal;
+{$endif}
 (*
-LIBXML_DLL_IMPORT extern int xmlSubstituteEntitiesDefaultValue;
-LIBXML_DLL_IMPORT extern int xmlGetWarningsDefaultValue;
+{$if false}
+//TODO: LIBXML_DLL_IMPORT extern int xmlSubstituteEntitiesDefaultValue;
+//TODO: LIBXML_DLL_IMPORT extern int xmlGetWarningsDefaultValue;
+{$ifend}
 *)
 
 (*
@@ -657,14 +669,6 @@ function  xmlIOParseDTD(sax:xmlSAXHandlerPtr; input:xmlParserInputBufferPtr; enc
 function  xmlParseBalancedChunkMemory(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_data:pointer; depth:longint; aString:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
 function  xmlParseExternalEntity(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_data:pointer; depth:longint; URL:PxmlChar; ID:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
 function  xmlParseCtxtExternalEntity(ctx:xmlParserCtxtPtr; URL:PxmlChar; ID:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
-
-(*
- * SAX initialization routines
- *)
-(* these are in libxml_SAX.inc
-procedure xmlDefaultSAXHandlerInit;cdecl;external LIBXML2_SO;
-procedure htmlDefaultSAXHandlerInit;cdecl;external LIBXML2_SO;
-*)
 
 (*
  * Parser contexts handling.
