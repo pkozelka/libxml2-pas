@@ -39,7 +39,10 @@ directory listed in the PATH environment variable:
 iconv.dll
 libxml2.dll
 
-
+H2PAS options
+-------------
+The utility h2pas was used with the following options:
+h2pas -d -e -c -i <filename>.h -o libxml_<filename>.inc
 
 LINKS
 -----
