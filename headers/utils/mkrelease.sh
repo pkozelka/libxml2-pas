@@ -155,7 +155,7 @@ function singleFileToCrLf()
 function convertToCrLf()
 {
 	for fn in $*; do
-		echo -ne "convertToLf: $fn                                \015"
+		echo -ne "convertToCrLf: $fn                                \015"
 		singleFileToCrLf $fn >$fn.crlf
 		mv $fn.crlf $fn
 	done
