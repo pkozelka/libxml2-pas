@@ -1,7 +1,16 @@
 #!/bin/sh
 
+#
+# Usage:
+# checkapi.sh <LOCAL_ROOT> [<files>]
+#
+
+# TODO:
+#   - check that LIBXML2_PAS variable is correctly set
+#
+#
+
 TRANSLATED_FILES="`find libxml2 libxslt -name '*.inc'`"
-CVSROOT=':pserver:anonymous@anoncvs.gnome.org:/cvs/gnome'
 LOCALROOT=/home/pk/cvs/gnome.org
 TMP=CHECKAPI.TMP
 
@@ -46,8 +55,20 @@ for fn in $TRANSLATED_FILES ; do
 	cp $LOCALROOT/$ORIGFILE $TARGETFILE
 
 	# translate it into pascal and apply known conversions
-	#todo
-	>$TARGETFILE.pas
+	if [ -x "h2pas" ]; then
+
+		# translate
+		h2pas -d -e -c -i $TARGETFILE -o $TARGETFILE.1.pas
+
+		# apply known replacements
+		sed -f $LIBXML2_PAS/utils/afterconv.sed $TARGETFILE.1.pas >$TARGETFILE.2.pas
+
+		# compare original translation and the one with replacements
+		diff $TARGETFILE.h2pas.pas $TARGETFILE.sed.pas >$TARGETFILE.pas.diff12
+	fi
+
+	# find the CVSROOT for this file - it is stored with the CVS local copy
+	CVSROOT="`cat $LOCALROOT/$ORIGFILEPATH/CVS/Root`"
 
 	# get diff
 	cmd="cvs -z4 -d$CVSROOT rdiff -r $REV -r $NEWREV $ORIGFILE"
@@ -56,8 +77,11 @@ for fn in $TRANSLATED_FILES ; do
 	$cmd >$TARGETFILE.diff
 
 	# get log entries
+	origpwd=`pwd`
+	cd $LOCALROOT
 	cmd="cvs -z4 -d$CVSROOT log -N -r$REV:$NEWREV $ORIGFILE"
 	echo "    Extracting log file ($TARGETFILE.log):"
 	echo "    $cmd"
-	$cmd >$TARGETFILE.log
+	$cmd >$origpwd/$TARGETFILE.log
+	cd $origpwd
 done
