@@ -8,6 +8,7 @@ unit libxml2;
 	See also:
 		http://www.xmlsoft.org  - the libxml2 homepage
 		http://kozelka.hyperlink.cz  - my homepage
+		test
 }
 
 interface
