@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.53 2002-01-16 19:54:45 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.54 2002-01-16 20:25:41 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -368,10 +368,10 @@ type
 		procedure SetGDoc(aNewDoc: xmlDocPtr);
 
 		property  GDoc: xmlDocPtr read GetGDoc write SetGDoc;
+	protected
+		property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl;
 	public
-		constructor Create(GDOMImpl:IDOMImplementation; const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType); overload;
 		constructor Create(GDOMImpl:IDOMImplementation); overload;
-		constructor Create(GDOMImpl:IDOMImplementation; aUrl: DomString); overload;
 		destructor Destroy; override;
 	end;
 
@@ -425,6 +425,7 @@ resourcestring
 	SGDOMNotInstalled = 'GDOME2 is not installed';
 
 const
+	DEFAULT_IMPL_FREE_THREADED = false;
 	GDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
 
 function GetDOMObject(aNode: pointer): IUnknown;
@@ -674,7 +675,12 @@ end;
 
 function TGDOMImplementation.createDocument(const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType): IDOMDocument;
 begin
-	Result := TGDOMDocument.Create(self,namespaceURI, qualifiedName, doctype) as IDOMDocument;
+	DomAssert(doctype=nil, NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
+	Result := TGDOMDocument.Create(nil);
+	// prepare documentElement if necessary
+	if (qualifiedName<>'') then begin
+		Result.appendChild(Result.createElementNS(namespaceURI, qualifiedName));
+	end;
 end;
 
 { TGDomeNode }
@@ -1582,55 +1588,13 @@ begin
 	inherited destroy;
 end;
 
-
-//************************************************************************
-// functions of TGDOMDocument
-//************************************************************************
-
-constructor TGDOMDocument.create(GDOMImpl:IDOMImplementation; const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType);
-begin
-//	DomAssert(doctype<>nil, NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
-	//Create doc-node as pascal object
-	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
-	FGDOMImpl:=GDOMImpl;
-	FFlyingNodes := TList.Create;
-	Inc(doccount);
-	// prepare documentElement
-	if (qualifiedName<>'') then begin
-		appendChild(createElementNS(namespaceURI, qualifiedName));
-	end;
-	_AddRef; //todo: replace with better solution
-end;
+{ TGDOMDocument }
 
 constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
 begin
 	//Create root-node as pascal object
-	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
-	FGDOMImpl := GDOMImpl;
+	inherited Create(nil);
 	FFlyingNodes := TList.Create;
-	Inc(doccount);
-	_AddRef; //todo: replace with better solution
-end;
-
-constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
-var
-	fn: string;
-	doc: xmlDocPtr;
-begin
-	//Get root-node
-	{$ifdef WIN32}
-		fn := UTF8Encode(StringReplace(aUrl, '\', '\\', [rfReplaceAll]));
-	{$else}
-		fn := aUrl;
-	{$endif}
-	doc := xmlParseFile(PChar(fn));
-	if (doc=nil) then begin
-		DomAssert(false, 102);
-	end;
-
-	inherited Create(xmlNodePtr(doc));
-	FFlyingNodes := TList.Create;
-	FGdomimpl:=GDOMImpl;
 	Inc(doccount);
 	_AddRef; //todo: replace with better solution
 end;
@@ -1658,7 +1622,10 @@ end;
 
 function TGDOMDocument.get_domImplementation: IDOMImplementation;
 begin
-	result:=FGDOMImpl;
+	if FGDOMImpl=nil then begin
+		FGDOMImpl := GDOMImplementation[DEFAULT_IMPL_FREE_THREADED];
+	end;
+	Result := FGDOMImpl;
 end;
 
 function TGDOMDocument.get_documentElement: IDOMElement;
@@ -1932,15 +1899,20 @@ begin
 	result:=0;
 end;
 
+(**
+ * Load dom from file
+ *)
 function TGDOMDocument.load(source: OleVariant): Boolean;
-// Load dom from file
 var
-	filename: string;
+	fn: string;
 	newdoc: xmlDocPtr;
 begin
-//  filename:=StringReplace(source, '\', '/', [rfReplaceAll]);
-	filename:=source;
-	newdoc := xmlParseFile(pchar(filename));
+{$ifdef WIN32}
+	fn := StringReplace(UTF8Encode(source), '\', '\\', [rfReplaceAll]);
+{$else}
+	fn := source;
+{$endif}
+	newdoc := xmlParseFile(pchar(fn));
 	Result := newdoc<>nil;
 	if Result then begin
 		GDoc := newdoc;
@@ -2294,7 +2266,8 @@ end;
 
 function TGDOMDocumentBuilder.load(const url: DomString): IDomDocument;
 begin
-	result:=TGDOMDocument.Create(Get_DomImplementation, url);
+	Result := TGDOMDocument.Create(Get_DomImplementation);
+	(Result as IDomPersist).load(url);
 end;
 
 function TGDOMDocumentBuilder.newDocument: IDomDocument;
@@ -2305,7 +2278,7 @@ end;
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
 begin
 	result:=TGDOMDocument.Create(Get_DomImplementation);
-	(result as IDOMPersist).loadxml(xml);
+	(Result as IDomPersist).loadxml(xml);
 end;
 
 procedure TGDOMNode.RegisterNS(const prefix, URI: DomString);
