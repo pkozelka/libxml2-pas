@@ -1,12 +1,12 @@
 all:
 	echo "Compilation currently not supported by Makefile."
 dist:
-	sh utils/mkrelease.sh dist
+	bash utils/mkrelease.sh dist
 upload:
-	sh utils/mkrelease.sh upload
+	bash utils/mkrelease.sh upload
 
 bin:
-	sh utils/mkrelease.sh bin
+	bash utils/mkrelease.sh bin
 	
 checkapi:
-	sh utils/checkapi.sh $(GNOMECVSROOT) src/*.inc
+	bash utils/checkapi.sh $(GNOMECVSROOT) src/*.inc
