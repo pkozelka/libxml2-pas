@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE test SYSTEM "test.dtd">
+<test eva:name1="" xmlns:eva="http://xmlns.4commerce.de/eva" eva:test="huhu"><sometag test="hallo welt" eva:sulze="wabbelig">abc</sometag><anothertag name="2nd child of DocumentElement"/><lasttag/></test>

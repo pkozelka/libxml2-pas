@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<events>
+  <event ID="60061" class="event" owner="-1" chdate="2001-08-24 03:24:54 PM" crdate="2001-08-24 03:24:54 PM" selected="F">
+    <subclass>
+      NULL
+    </subclass>
+    <keywords>
+      Hitzefrei
+    </keywords>
+    <fromdate>
+      <date>
+        2001-12-13
+      </date>
+      <time>
+        09:00:00 AM
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        2001-12-13
+      </date>
+      <time>
+        11:00:00 AM
+      </time>
+    </todate>
+    <remark>
+      test jk 1
+    </remark>
+    <categories id="1">
+      <NAME>
+        
+      </NAME>
+    </categories>
+    <deltaalert>
+      
+    </deltaalert>
+    <absalert>
+      <date>
+        
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </absalert>
+    <calendarid>
+      
+    </calendarid>
+    <invitationmailid>
+      
+    </invitationmailid>
+  </event>
+  <event ID="60062" class="event" owner="-1" chdate="0001-01-01" crdate="2001-08-24 03:26:43 PM" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      Meeting
+    </keywords>
+    <fromdate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        10:00:00 AM
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        11:30:00 AM
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+    <categories id="">
+      <NAME>
+        
+      </NAME>
+    </categories>
+    <deltaalert>
+      
+    </deltaalert>
+    <absalert>
+      <date>
+        
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </absalert>
+    <calendarid>
+      
+    </calendarid>
+  </event>
+  <event ID="60063" class="event" owner="-1" chdate="0001-01-01" crdate="2001-08-24 03:42:11 PM" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      Geburtstag
+    </keywords>
+    <fromdate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        11:59:00 PM
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+    <categories id="">
+      <NAME>
+        
+      </NAME>
+    </categories>
+    <deltaalert>
+      
+    </deltaalert>
+    <absalert>
+      <date>
+        
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </absalert>
+  </event>
+  <event ID="60064" class="event" owner="100" chdate="0001-01-01" crdate="0001-01-01" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      Geburtstag
+    </keywords>
+    <fromdate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        11:59:00 PM
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+    <categories id="">
+      <NAME>
+        
+      </NAME>
+    </categories>
+    <deltaalert>
+      
+    </deltaalert>
+  </event>
+  <event ID="60065" class="event" owner="-1" chdate="0001-01-01" crdate="0001-01-01" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      
+    </keywords>
+    <fromdate>
+      <date>
+        
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+    <categories id="">
+      <NAME>
+        
+      </NAME>
+    </categories>
+  </event>
+  <event ID="60066" class="event" owner="100" chdate="0001-01-01" crdate="0001-01-01" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      Geburtstag
+    </keywords>
+    <fromdate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        11:59:00 PM
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+    <categories id="">
+      <NAME>
+        
+      </NAME>
+    </categories>
+  </event>
+  <event ID="60067" class="event" owner="100" chdate="0001-01-01" crdate="0001-01-01" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      Geburtstag
+    </keywords>
+    <fromdate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        2001-12-12
+      </date>
+      <time>
+        11:59:00 PM
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+  </event>
+  <event ID="60068" class="event" owner="22" chdate="0001-01-01" crdate="0001-01-01" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      Geburtstag
+    </keywords>
+    <fromdate>
+      <date>
+        2001-01-01
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+  </event>
+  <event ID="60069" class="event" owner="55" chdate="0001-01-01" crdate="0001-01-01" selected="F">
+    <subclass>
+      
+    </subclass>
+    <keywords>
+      Geburtstag
+    </keywords>
+    <fromdate>
+      <date>
+        2001-01-01
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </fromdate>
+    <todate>
+      <date>
+        
+      </date>
+      <time>
+        00:00:00
+      </time>
+    </todate>
+    <remark>
+      
+    </remark>
+  </event>
+</events>
