@@ -1972,9 +1972,9 @@ begin
 end;
 
 initialization
+  CoInitialize(nil);
   {register non-threading aware factory}
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(false));
   {register Free-threading factory}
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(true));
-
 end.
