@@ -521,9 +521,11 @@ begin
 end;
 
 procedure TTestPersist.loadXmlUml;
+var teststr: widestring;
 begin
   // test how loadxml behaves with 'umlauts'
-  (doc as IDOMPersist).loadxml(xmldecl+'<root><text>äöüß</text><text>ÄÖÜ</text></root>');
+  teststr := xmldecl+'<root><text>äöüß</text><text>ÄÖÜ</text></root>';
+  (doc as IDOMPersist).loadxml(teststr);
   check(doc.documentElement.hasChildNodes, 'has no childNodes');
   check(doc.documentElement.childNodes.length = 2, 'wrong length');
   check(doc.documentElement.firstChild.firstChild.nodeType = TEXT_NODE, 'wrong nodeType');
@@ -531,7 +533,7 @@ begin
   //showMessage(doc.documentElement.firstChild.firstChild.nodeValue);
   check(doc.documentElement.firstChild.firstChild.nodeValue = 'äöüß', 'wrong nodeValue');
   check(doc.documentElement.lastChild.firstChild.nodeValue = 'ÄÖÜ', 'wrong nodeValue');
-  //showMessage((doc as IDomPersist).xml);
+  check(WideSameStr(unify((doc as IDomPersist).xml),unify(teststr)), 'xml output is different from parsed text');
 end;
 
 procedure TTestPersist.loadXmlUnicode;
@@ -553,13 +555,11 @@ begin
   //showMessage(doc.documentElement.firstChild.firstChild.nodeValue);
   check(doc.documentElement.firstChild.firstChild.nodeValue = teststr, 'wrong nodeValue');
   check(doc.documentElement.lastChild.firstChild.nodeValue = 'ÄÖÜ', 'wrong nodeValue');
-  //showMessage((doc as IDomPersist).xml);
+  check(WideSameStr(unify((doc as IDomPersist).xml),unify(parsestr)), 'xml output is different from parsed text');
 end;
 
 initialization
   datapath := getDataPath;
   CoInitialize(nil);
 
-finalization
-  CoUnInitialize;
 end.

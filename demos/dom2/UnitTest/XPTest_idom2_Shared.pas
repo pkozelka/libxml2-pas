@@ -13,6 +13,7 @@ uses
 
 const
   CRLF    = #13#10;
+  xmlns   = 'http://www.w3.org/2000/xmlns/';
   xmldecl = '<?xml version="1.0" encoding="iso-8859-1"?>';
   xmlstr  = xmldecl + '<test />';
   xmlstr1 = xmldecl + '<test xmlns=''http://ns.4ct.de''/>';
@@ -25,7 +26,13 @@ const
             '<!ENTITY FOO2 SYSTEM "file.type2" NDATA type2>' + ']>' +
             '<root />';
   xmlstr3 = xmldecl +
-            '<xObject id="xcl.customers.list" executor="sql" xmlns:xob="http://xmlns.4commerce.de/xob" auth="xcl.customers.list" connection="ib.kis">' +
+            '<xObject'+
+            ' id="xcl.customers.list"'+
+            ' executor="sql"'+
+            ' xmlns:xob="http://xmlns.4commerce.de/xob"'+
+            ' auth="xcl.customers.list"'+
+            ' connection="ib.kis"'+
+            '>' +
             '  <result />' +
             '</xObject>';
   xslstr  = xmldecl +
@@ -106,7 +113,7 @@ type
 function getDataPath: string;
 function domvendor: string;
 function myIsSameNode(node1, node2: IDomNode): boolean;
-function Unify(xml: string; removeEncoding: boolean = True): string;
+function Unify(xml: widestring; removeEncoding: boolean = True): widestring;
 function GetHeader(xml: string): string;
 function StrCompare(str1, str2: WideString): integer;
 function getUnicodeStr(mode: integer = 0): WideString;
@@ -157,7 +164,7 @@ begin
   Result := domSetup.getCurrentDomSetup.getVendorID;
 end;
 
-function Unify(xml: string; removeEncoding: boolean = True): string;
+function Unify(xml: widestring; removeEncoding: boolean = True): widestring;
   // this procedure unifies the result of the method xml of IDomPersist
 var
   len : integer;
@@ -205,8 +212,11 @@ end;
 
 function myIsSameNode(node1, node2: IDomNode): boolean;
   // compare if two nodes are the same (not equal)
+var
+  domcompare: IDomNodeCompare;
 begin
-  if (domvendor = 'LIBXML_4CT')
+  node1.QueryInterface(IDomNodeCompare,domcompare);
+  if (domcompare <> nil)
     then Result := (node1 as IDomNodeCompare).IsSameNode(node2)
     else Result := ((node1 as IUnknown) = (node2 as IUnknown));
 end;

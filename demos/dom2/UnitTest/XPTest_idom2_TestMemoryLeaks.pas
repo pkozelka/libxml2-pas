@@ -123,14 +123,14 @@ var
   dom2: boolean;
 begin
   TestsOK := 0;
-  if (testset and 512) = 512 then dom2 := True 
-  else dom2 := False;
+  dom2 := True;
   document := getDoc(filename, vendorstr);
   documentElement := document.documentElement;
   namednodemap := documentElement.attributes;
-  if namednodemap <> nil then outlog('namedNodeMap.length: ' +
-      IntToStr(namedNodeMap.length))
-  else outlog('__namedNodeMap=NIL');
+  if namednodemap <> nil then begin
+    outlog('namedNodeMap.length: '+IntToStr(namedNodeMap.length));
+    Inc(TestsOK);
+  end else outlog('__namedNodeMap=NIL');
   documentElement := nil;
   node := document.createAttribute('age') as IDomNode;
   node.nodeValue := '13';
@@ -143,7 +143,7 @@ begin
   node1 := document.createAttribute('sex') as IDomNode;
   node1.nodeValue := 'male';
   node1.nodeName;
-  node1 := namednodemap.setNamedItem(node1);
+  namednodemap.setNamedItem(node1);
   if node1 <> nil then begin
     test('namedNodeMap.setNamedItemII', (namedNodeMap[1].nodeValue = 'male'));
     node1 := namednodemap.removeNamedItem('sex');
@@ -158,7 +158,7 @@ begin
       node := document.createAttributeNS('http://xmlns.4commerce.de/eva',
         'eva:age') as IDomNode;
       node.nodeValue := '13';
-      node := namednodemap.setNamedItemNS(node);
+      namednodemap.setNamedItemNS(node);
       node := nil;
       node := namednodemap.getNamedItemNS('http://xmlns.4commerce.de/eva', 'age');
       test('namedNodeMap.getNamedItemNS/setNamedItemNS', (node.nodeValue = '13'));
@@ -566,8 +566,7 @@ procedure TestGDom3b(Name, vendorstr: string; TestSet: integer);
     processinginstruction := document.createProcessingInstruction('abc', 'def');
     test('processingInstruction.target', (processinginstruction.target = 'abc'));
     test('processingInstruction.data', (processinginstruction.Data = 'def'));
-    //todo:
-    //test pi.setdata
+    //todo: test pi.setdata
     processinginstruction := nil;
 
     // testing text
@@ -1078,7 +1077,7 @@ begin
   for j := 1 to 10 do begin
     for i := 1 to 100 do begin
       TestsOK := TestNamedNodemap(temp + 'test.xml', domvendor, TestSet);
-      Check((TestsOK >= 1), (IntToStr(1 - TestsOK) + ' Tests failed!')); //15
+      Check((TestsOK >= 6), (IntToStr(6 - TestsOK) + ' Tests failed!')); //15
     end;
   end;
 end;
