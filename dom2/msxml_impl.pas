@@ -8,6 +8,8 @@ unit msxml_impl;
  *   MSXML2_RENTAL_MODEL and MSXML2_FREETHREADING_MODEL (see MS documentation)
  *
  * Author: Martijn Brinkers
+ *
+ * some changes by: Uwe Fechner
 *)
 
 interface
@@ -147,7 +149,7 @@ type
   end;
 
 
-  TMSXMLNode = class(TInterfacedObject, IDomNode, IMSXMLExtDomNode)
+  TMSXMLNode = class(TInterfacedObject, IDomNode, IDomNodeSelect, IMSXMLExtDomNode)
     private
       fMSDomNode : IXMLDOMNode;
 
@@ -188,6 +190,9 @@ type
       function  isSupported(
               const feature : DomString;
               const version : DomString) : Boolean;
+    function selectNode(const nodePath: WideString): IDOMNode;
+    function selectNodes(const nodePath: WideString): IDOMNodeList;
+
   end;
 
 
@@ -790,9 +795,11 @@ function TMSXMLDocument.createElementNS(
         const qualifiedName : DomString) : IDomElement;
 var
   msElement : IXMLDOMElement;
+  node: IXMLDOMNode;
 begin
-  (* namespace not supported *)
-  msElement := fMSDomDocument.createElement(qualifiedName);
+  //Changes by FE
+  node := fMSDomDocument.createNode(NODE_ELEMENT, qualifiedName, namespaceURI);
+  msElement:=node as IXMLDOMElement;
   if msElement = nil then
     result := nil
   else
@@ -1107,8 +1114,10 @@ end;
 
 function TMSXMLNode.get_LocalName : DomString;
 begin
-  (* GetLocalName is not supported *)
-  raise EDomException.create(etNotSupportedErr, 'GetLocalName is not supported');
+  //by FE
+  if fMSDomNode.nodeName=fMSDomNode.baseName
+    then result:='' //see DOM2 specification
+    else result := fMSDomNode.baseName;
 end;
 
 function TMSXMLNode.insertBefore(
@@ -1837,6 +1846,21 @@ begin
   result := fMSNotation.systemId;
 end;
 
+
+function TMSXMLNode.selectNode(const nodePath: WideString): IDOMNode;
+var
+  Node: IXMLDOMNode;
+begin
+  Node := fMSDomNode.selectSingleNode(nodePath);
+  if Assigned(Node) then
+    Result := createXMLNode(Node) else
+    Result := nil;
+end;
+
+function TMSXMLNode.selectNodes(const nodePath: WideString): IDOMNodeList;
+begin
+
+end;
 
 initialization
   {register non-threading aware factory}
