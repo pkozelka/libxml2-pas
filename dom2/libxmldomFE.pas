@@ -521,6 +521,7 @@ uses Dialogs;
 
 function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
 function removeAttr(element:xmlNodePtr;attr: xmlAttrPtr):xmlAttrPtr; forward;
+function xmlRemoveChild(element:xmlNodePtr;node: xmlNodePtr):xmlNodePtr; forward;
 function IsXmlName(const S: wideString): boolean; forward;
 function IsXmlChars(const S: wideString): boolean; forward;
 function appendNamespace(element:xmlNodePtr;ns: xmlNsPtr): boolean; forward;
@@ -972,27 +973,28 @@ begin
 end;
 
 function TGDOMNode.replaceChild(const newChild, oldChild: IDOMNode): IDOMNode;
-var
-  old, cur, node: xmlNodePtr;
+
 begin
-  //todo: raise exception otherwise
-  if (oldChild<>nil) and (newChild<>nil)
-    then begin
-      old := GetGNode(oldChild);
-      cur := GetGNode(newChild);
-      node:=xmlReplaceNode(old, cur);
-      old.parent:=nil;
-      (FOwnerDocument as IDOMInternal).appendNode(old);
-      result:=oldChild;
-    end
-    else result:=nil;
+  result:=self.removeChild(oldchild);
+  if result=nil
+    then checkError(NOT_FOUND_ERR);
+  self.appendChild(newChild);
 end;
 
 function TGDOMNode.removeChild(const childNode: IDOMNode): IDOMNode;
+var
+  node: xmlNodePtr;
 begin
   if childNode<>nil
     then begin
-      xmlUnlinkNode(GetGNode(childNode));
+      node:=GetGNode(childNode);
+      if node.parent<>FGNode
+        then checkError(NOT_FOUND_ERR);
+      node:=xmlRemoveChild(FGNode,node);
+      if node=nil
+        then checkError(NOT_FOUND_ERR);
+      node.parent:=nil;
+      (FOwnerDocument as IDOMInternal).appendNode(node);
     end;
   result:=childNode;
 end;
@@ -1048,7 +1050,11 @@ begin
     then CheckError(NO_MODIFICATION_ALLOWED_ERR);
   // if the new child is already in the tree, it is first removed
   if node.parent<>nil
-    then xmlUnlinkNode(node);
+    //then xmlUnlinkNode(node);
+    then node:=xmlRemoveChild(node.parent,node)
+    //if it wasn't already in the tree, then remove it from the list of
+    //nodes, that have to be freed
+    else (FOwnerDocument as IDOMInternal).removeNode((node));
   // if the new child is a document_fragment, then the entire contents of the document fragment are
   // moved into the child list of this node
   if node.type_=XML_DOCUMENT_FRAG_NODE
@@ -1095,6 +1101,7 @@ begin
   node:=xmlCopyNode(FGNode,recursive);
   if node<>nil
     then begin
+      node.doc:=FGNode.doc;
       if node.parent=nil
         then (FOwnerDocument as IDOMInternal).appendNode(node);
       result:=MakeNode(node,FOwnerDocument) as IDOMNode
@@ -1385,7 +1392,8 @@ begin
     if xmlnewAttr.ns<>nil
       then begin
         namespace:=xmlnewAttr.ns.href;
-        appendNamespace(node,xmlnewAttr.ns);
+        ns:=xmlCopyNamespace(xmlnewAttr.ns);
+        appendNamespace(node,ns);
       end else namespace:='';
     slocalName:=localName(xmlNewattr.name);
     oldattr:=xmlHasNSProp(node,pchar(slocalName),namespace); // already an attribute with this name?
@@ -1428,10 +1436,6 @@ begin
     if attr = nil
         then checkError(NOT_FOUND_ERR);
     attr:=removeAttr(FGNamedNodeMap,attr);
-    //the following line is a workaround
-    //todo:
-    //remove ns from element in the removeAttr function
-    attr.ns:=nil;
     (FOwnerDocument as IDOMInternal).appendAttr(attr);
 	end;
   if attr<>nil
@@ -1857,10 +1861,6 @@ begin
     if tmp=attr
       then begin
         result:=attr;
-        result.parent:=nil;
-        result.next:=nil;
-        //result.last:=result;
-        result.doc:=nil;
         if tmp.next <> nil
           then if last <> nil
             then last.next:=tmp.next
@@ -1868,12 +1868,46 @@ begin
           else if last <> nil
             then last.next:=nil
             else element.properties:=nil;
+        result.parent:=nil;
+        result.next:=nil;
+        result.doc:=nil;
         break;
       end;
     last:=tmp;
     tmp:=tmp.next;
   end;
 end;
+
+function xmlRemoveChild(element:xmlNodePtr;node: xmlNodePtr):xmlNodePtr;
+//removes a child from an element and returns the removed child
+var
+  tmp,last:xmlNodePtr;
+begin
+  result:=nil;
+  last:=nil;
+  //if element.type_<> Element_Node then exit;
+  if element.children = nil then exit;
+  tmp:=element.children;
+  while tmp <> nil do begin
+    if tmp=node
+      then begin
+        result:=node;
+        if tmp.next <> nil
+          then if last <> nil
+            then last.next:=tmp.next
+            else element.children:=tmp.next
+          else if last <> nil
+            then last.next:=nil
+            else element.children:=nil;
+        result.parent:=nil;
+        result.next:=nil;
+        break;
+      end;
+    last:=tmp;
+    tmp:=tmp.next;
+  end;
+end;
+
 
 function TGDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
 begin
