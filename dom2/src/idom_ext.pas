@@ -1,5 +1,5 @@
-unit idom_experimental;
-//$Id: idom_experimental.pas,v 1.3 2002-02-11 01:27:24 pkozelka Exp $
+unit idom_ext;
+//$Id: idom_ext.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
 (*
  * Experimental extensions to the DOM Level 2 specification.
  *
@@ -95,7 +95,7 @@ type
 
   (*
    * non standard DOM extension.
-  *)
+   *)
   IDomNodeSelect = interface
     ['{A50A05D4-3E67-44CA-9872-C80CD83A47BD}']
     function selectNode(const nodePath : DomString) : IDomNode;
@@ -105,16 +105,24 @@ type
 
   IDomNodeEx = interface(IDomNode)
     ['{17D937A2-C6EE-448F-8530-221D744AC083}']
-    { Property Acessors }
-    //function get_text: DOMString; safecall;
-    //function get_xml: DOMString; safecall;
-    //procedure set_text(const Value: DOMString); safecall;
-    { Methods }
     procedure transformNode(const stylesheet: IDomNode; var output: WideString); overload;
     procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
-    { Properties }
-    //property text: DOMString read get_text write set_text;
-    //property xml: DOMString read get_xml;
+  end;
+
+  { IDomNodeExt }
+
+	// this interface is similar to the interface IDomNodeEx from Borland,
+  // but not the same, therefore a slightly different name is used
+	// it provides methods for xslt transformation (transformNode)
+	// for accessing the text-value of an element (similar to textcontent in dom3)
+	// and for obtaining the string-value of a node (property xml)
+
+	IDomNodeExt = interface(IDomNodeEx)
+    ['{1B41AE3F-6365-41FC-AFDD-26BC143F9C0F}']
+    { Property Acessors }
+    function get_text: DomString;
+    function get_xml: DomString;
+    procedure set_text(const Value: DomString);
   end;
 
 implementation

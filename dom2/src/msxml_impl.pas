@@ -51,18 +51,18 @@ uses
   windows,
   ComObj,
   idom2,
-  idom_experimental,
-  idom2_ext;
+  idom_ext;
 
-  const MSXML2Rental = 'MSXML2_RENTAL_MODEL';
-  const MSXML2Free = 'MSXML2_FREETHREADING_MODEL';
+const
+  MSXML2Rental = 'MSXML2_RENTAL_MODEL';
+  MSXML2Free = 'MSXML2_FREETHREADING_MODEL';
 
 type
 
-   (*
+  (*
    * Extensions to IDomNode interface.
    *
-  *)
+   *)
   IMSXMLExtDomNode = interface
     ['{692595BF-F4AA-454B-A000-DF858113286B}']
     (* Used to get the MS interface from IDomNode interface *)
@@ -72,7 +72,7 @@ type
   (*
    * Extensions to IDomAttr interface.
    *
-  *)
+   *)
   IMSXMLExtDomAttr = interface
     ['{72A3E81C-8F5E-43B5-93DB-F229949FD07F}']
     (* Used to get the MS interface from IDomAttr interface *)
@@ -2301,7 +2301,7 @@ end;
 
 (*
  * TMSXMLNotation
-*)
+ *)
 constructor TMSXMLNotation.create(msNotation : IXMLDOMNotation);
 begin
   inherited create(msNotation);

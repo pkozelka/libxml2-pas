@@ -1,7 +1,7 @@
-unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.34 2002-08-05 00:37:29 pkozelka Exp $
+unit libxml_core;
+//$Id: libxml_core.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
 (*
- * libxml-based implementation of DOM level 2.
+ * libxml-based core implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
  *
  * Licensing: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -18,8 +18,13 @@ interface
 uses
   Classes,
   SysUtils,
-  libxml_impl_utils,
+  domimpl_utils,
   idom2,
+{$IFDEF VER130}
+  Unicode,
+  ComObj,
+  Windows,
+{$ENDIF}
   libxml2;
 
 type
@@ -615,12 +620,12 @@ end;
 
 function TLDomNodeExtension._AddRef: Integer;
 begin
-  Result := IInterface(fLDomNode)._AddRef;
+  Result := IUnknown(fLDomNode)._AddRef;
 end;
 
 function TLDomNodeExtension._Release: Integer;
 begin
-  Result := IInterface(fLDomNode)._Release;
+  Result := IUnknown(fLDomNode)._Release;
 end;
 
 constructor TLDomNodeExtension.Create(const aLDomNode: TLDomNode);

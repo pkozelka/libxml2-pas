@@ -1,5 +1,5 @@
-unit libxml_impl_utils;
-//$Id: libxml_impl_utils.pas,v 1.3 2002-08-05 01:31:27 pkozelka Exp $
+unit domimpl_utils;
+//$Id: domimpl_utils.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *

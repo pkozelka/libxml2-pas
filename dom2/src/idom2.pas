@@ -1,5 +1,5 @@
 unit idom2;
-//$Id: idom2.pas,v 1.12 2002-02-16 10:57:03 ufechner Exp $
+//$Id: idom2.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
 (*
  * Interface specifications for Dom level 2.
  *

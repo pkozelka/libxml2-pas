@@ -1,5 +1,5 @@
-unit libxmldom;
-//$Id: libxmldom.pas,v 1.107 2002-04-16 21:31:58 pkozelka Exp $
+unit libxml_impl;
+//$Id: libxml_impl.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -33,11 +33,11 @@ uses
 {$endif}
   classes,
   idom2,
-  idom_experimental,
+  idom_ext,
   libxml2,
   libxslt,
-  libxml_impl,
-  libxml_impl_utils,
+  libxml_core,
+  domimpl_utils,
   sysutils;
 
 const
