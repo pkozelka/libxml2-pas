@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.4 2002-02-11 19:22:40 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.5 2002-02-11 19:46:09 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -99,7 +99,7 @@ type
 
   { TLDOMDocument class }
 
-  TLDOMDocument = class(TLDOMNode, IDomNode)
+  TLDOMDocument = class(TLDOMNode, IDomDocument, IDomNode)
   protected //tmp
     FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
   private
@@ -119,7 +119,31 @@ type
     function  IDomNode.get_prefix = returnEmptyString;
     function  IDomNode.get_localName = returnEmptyString;
   protected //IDomDocument
+    function  IDomDocument.get_nodeValue = returnEmptyString;
+    function  IDomDocument.get_childNodes = returnChildNodes;
+    function  IDomDocument.get_parentNode = returnNullDomNode;
+    function  IDomDocument.get_previousSibling = returnNullDomNode;
+    function  IDomDocument.get_nextSibling = returnNullDomNode;
+    function  IDomDocument.get_namespaceURI = returnEmptyString;
+    function  IDomDocument.get_prefix = returnEmptyString;
+    function  IDomDocument.get_localName = returnEmptyString;
+    function  get_doctype: IDomDocumentType;
     function  get_domImplementation: IDomImplementation;
+    function  get_documentElement: IDomElement;
+    function  createElement(const tagName: DomString): IDomElement;
+    function  createDocumentFragment: IDomDocumentFragment;
+    function  createTextNode(const data: DomString): IDomText;
+    function  createComment(const data: DomString): IDomComment;
+    function  createCDATASection(const data: DomString): IDomCDataSection;
+    function  createProcessingInstruction(const target, data: DomString): IDomProcessingInstruction;
+    function  createAttribute(const name: DomString): IDomAttr;
+    function  createEntityReference(const name: DomString): IDomEntityReference;
+    function  importNode(importedNode: IDomNode; deep: Boolean): IDomNode;
+    function  createElementNS(const namespaceURI, qualifiedName: DomString): IDomElement;
+    function  createAttributeNS(const namespaceURI, qualifiedName: DomString): IDomAttr;
+    function  getElementById(const elementId: DomString): IDomElement;
+    function  getElementsByTagName(const name: DomString): IDomNodeList;
+    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
   protected //
     constructor Create(aLibXml2Node: pointer); override;
     (**
@@ -742,6 +766,130 @@ begin
   Inc(GlbDocCount);
 end;
 
+function TLDOMDocument.createAttribute(const name: DomString): IDomAttr;
+var
+  attr: xmlAttrPtr;
+  uprefix, ulocal: String;
+begin
+  SplitQName(UTF8Encode(name), uprefix, ulocal);
+  checkName(uprefix, ulocal);
+  attr := xmlNewDocProp(requestDocPtr, PChar(ulocal), nil);
+  Result := GetDOMObject(attr) as IDomAttr;
+end;
+
+function TLDOMDocument.createAttributeNS(const namespaceURI, qualifiedName: DomString): IDomAttr;
+var
+  attr: xmlAttrPtr;
+  ns: xmlNsPtr;
+  uprefix, ulocal, uuri: String;
+begin
+  SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
+  uuri := UTF8Encode(namespaceURI);
+  checkNsName(uprefix, ulocal, uuri);
+  if (uuri<>'') then begin
+    // one more special check for attributes
+    if (uprefix='') and (ulocal='xmlns') then begin
+      DomAssert(uuri=XMLNS_NAMESPACE_URI, NAMESPACE_ERR, 'Invalid namespaceURI for attribute "xmlns": "'+uuri+'"');
+    end;
+    //
+    ns := xmlNewNs(nil, PChar(uuri), PChar(uprefix));
+    attr := xmlNewNsProp(nil, ns, PChar(ulocal), nil);
+    attr.doc := requestDocPtr;
+  end else begin
+    attr := xmlNewDocProp(requestDocPtr, PChar(ulocal), nil);
+  end;
+  Result := GetDOMObject(attr) as IDomAttr;
+end;
+
+function TLDOMDocument.createCDATASection(const data: DomString): IDomCDataSection;
+var
+  node: xmlNodePtr;
+  udata: String;
+begin
+  udata := UTF8Encode(data);
+  DomAssert(Pos(']]>', udata)=0, INVALID_CHARACTER_ERR, 'cdata section cannot contain "]]>"');
+  node := xmlNewCDataBlock(requestDocPtr, PChar(udata), length(udata));
+  Result := GetDOMObject(node) as IDomCDataSection;
+end;
+
+function TLDOMDocument.createComment(const data: DomString): IDomComment;
+var
+  node: xmlNodePtr;
+  udata: String;
+begin
+  udata := UTF8Encode(data);
+  DomAssert(Pos('--', udata)=0, INVALID_CHARACTER_ERR, 'comment cannot contain "--"');
+  node := xmlNewDocComment(requestDocPtr, PChar(UTF8Encode(data)));
+  Result := GetDOMObject(node) as IDomComment;
+end;
+
+function TLDOMDocument.createDocumentFragment: IDomDocumentFragment;
+var
+  node: xmlNodePtr;
+begin
+  node := xmlNewDocFragment(requestDocPtr);
+  Result := GetDOMObject(node) as IDomDocumentFragment;
+end;
+
+function TLDOMDocument.createElement(const tagName: DomString): IDomElement;
+var
+  node: xmlNodePtr;
+  uprefix, ulocal: String;
+begin
+  SplitQName(UTF8Encode(tagName), uprefix, ulocal);
+  checkName(uprefix, ulocal);
+  node := xmlNewDocNode(requestDocPtr, nil, PChar(ulocal),nil);
+  Result := GetDOMObject(node) as IDomElement;
+end;
+
+function TLDOMDocument.createElementNS(const namespaceURI, qualifiedName: DomString): IDomElement;
+var
+  node: xmlNodePtr;
+  ns: xmlNsPtr;
+  uprefix, ulocal, uuri: String;
+begin
+  SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
+  uuri := UTF8Encode(namespaceURI);
+  checkNsName(uprefix, ulocal, uuri);
+  node := xmlNewDocNode(requestDocPtr, nil, PChar(ulocal), nil);
+  if (uuri<>'') then begin
+    ns := xmlNewNs(node, PChar(uuri), PChar(uprefix));
+    xmlSetNs(node, ns);
+  end;
+  Result := GetDOMObject(node) as IDomElement;
+end;
+
+function TLDOMDocument.createEntityReference(const name: DomString): IDomEntityReference;
+var
+  node: xmlNodePtr;
+  uname: String;
+begin
+  uname := UTF8Encode(name);
+  checkName('', uname);
+  node := xmlNewReference(requestDocPtr, PChar(uname));
+  Result := GetDOMObject(node) as IDomEntityReference;
+end;
+
+function TLDOMDocument.createProcessingInstruction(const target, data: DomString): IDomProcessingInstruction;
+var
+  pi: xmlNodePtr;
+  utarget: String;
+begin
+  utarget := UTF8Encode(target);
+  checkName('', utarget);
+  pi := xmlNewPI(PChar(utarget), PChar(UTF8Encode(data)));
+  pi.doc := requestDocPtr;
+  Result := GetDOMObject(pi) as IDomProcessingInstruction;
+end;
+
+function TLDOMDocument.createTextNode(const data: DomString): IDomText;
+var
+  node: xmlNodePtr;
+begin
+  node := xmlNewDocText(requestDocPtr, PChar(UTF8Encode(data)));
+  Result := GetDOMObject(node) as IDomText;
+end;
+
 destructor TLDOMDocument.Destroy;
 begin
   GDoc := nil;
@@ -750,6 +898,28 @@ begin
   FFlyingNodes.Free;
   FFlyingNodes := nil;
   inherited Destroy;
+end;
+
+function TLDOMDocument.getElementById(const elementId: DomString): IDomElement;
+var
+  attr: xmlAttrPtr;
+begin
+  attr := xmlGetID(requestDocPtr, PChar(UTF8Encode(elementId)));
+  if (attr<>nil) then begin
+    Result := GetDOMObject(attr.parent) as IDomElement;
+  end else begin
+    Result := nil;
+  end;
+end;
+
+function TLDOMDocument.getElementsByTagName(const name: DomString): IDomNodeList;
+begin
+  //TODO!
+end;
+
+function TLDOMDocument.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
+begin
+  //TODO!
 end;
 
 function TLDOMDocument.GetFlyingNodes: TList;
@@ -763,6 +933,22 @@ end;
 function TLDOMDocument.GetGDoc: xmlDocPtr;
 begin
   Result := xmlDocPtr(FGNode);
+end;
+
+function TLDOMDocument.get_doctype: IDomDocumentType;
+var
+  dtd: xmlDtdPtr;
+begin
+  Result := nil;
+  if GDoc=nil then exit;
+  dtd := GDoc.intSubset;
+  if dtd = nil then exit;
+  Result := GetDomObject(dtd) as IDomDocumentType;
+end;
+
+function TLDOMDocument.get_documentElement: IDomElement;
+begin
+  Result := GetDOMObject(xmlDocGetRootElement(GDoc)) as IDomElement;
 end;
 
 function TLDOMDocument.get_domImplementation: IDomImplementation;
@@ -786,6 +972,30 @@ end;
 function TLDOMDocument.get_ownerDocument: IDomDocument;
 begin
   Result := nil; // required by DOM spec.
+end;
+
+function TLDOMDocument.importNode(importedNode: IDomNode; deep: Boolean): IDomNode;
+var
+  recurse: integer;
+  node: xmlNodePtr;
+begin
+  Result:=nil;
+  if importedNode=nil then exit;
+  case integer(importedNode.nodeType) of
+    DOCUMENT_NODE,
+    DOCUMENT_TYPE_NODE,
+    NOTATION_NODE,
+    ENTITY_NODE:
+      DomAssert(false, NOT_SUPPORTED_ERR);
+    ATTRIBUTE_NODE:
+      DomAssert(false, NOT_SUPPORTED_ERR); //ToDo: implement this case
+  else
+    if deep
+    then recurse:=1
+    else recurse:=0;
+    node:=xmlDocCopyNode(GetGNode(importedNode), requestDocPtr, recurse);
+    Result := GetDOMObject(node) as IDomNode;
+  end;
 end;
 
 function TLDOMDocument.requestDocPtr: xmlDocPtr;
