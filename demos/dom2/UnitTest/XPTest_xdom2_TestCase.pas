@@ -202,6 +202,8 @@ type TSimpleTests = class(TTestCase)
     procedure valid;
     procedure valid1;
     procedure valid2;
+    procedure valid3;
+    procedure valid4;
     property fqname: string read getFqname;
   end;
 
@@ -1820,7 +1822,6 @@ begin
   end;
 end;
 
-
 procedure TSimpleTests.previousSibling;
 const
   n = 10;
@@ -1969,8 +1970,7 @@ begin
           '<root />';
 
   (doc as IDOMParseOptions).validate := True;
-  (doc as IDOMPersist).loadxml(data);
-  check(doc <> nil, 'is nil');
+  check((doc as IDOMPersist).loadxml(data), 'result of load is false');
   tmp := (doc as IDOMPersist).xml;
   // adjust contents of the text
   if domvendor = 'LIBXML' then begin
@@ -1988,9 +1988,6 @@ begin
 end;
 
 procedure TSimpleTests.valid1;
-var
-  tmp: string;
-  ok: boolean;
 begin
   data := '<?xml version="1.0" encoding="iso-8859-1"?>'+
           '<!DOCTYPE root ['+
@@ -2001,8 +1998,7 @@ begin
           '<egon />';
 
   (doc as IDOMParseOptions).validate := True;
-  ok:=(doc as IDOMPersist).loadxml(data);
-  check(ok=false, 'result of load is not false');
+  check(not (doc as IDOMPersist).loadxml(data), 'result of load is NOT false');
 end;
 
 procedure TSimpleTests.valid2;
@@ -2017,8 +2013,7 @@ begin
           '<egon />';
 
   (doc as IDOMParseOptions).validate := False;
-  (doc as IDOMPersist).loadxml(data);
-  check(doc <> nil, 'is nil');
+  check((doc as IDOMPersist).loadxml(data), 'result of load is false');
   tmp := (doc as IDOMPersist).xml;
   // adjust contents of the textfile
   if domvendor = 'LIBXML' then begin
@@ -2033,6 +2028,65 @@ begin
     fail('unknown dom vendor '+domvendor);
   end;
   check(tmp = data, 'wrong content');
+end;
+
+procedure TSimpleTests.valid3;
+var
+  tmp: string;
+  sl: TStrings;
+begin
+  sl := TStringList.Create;
+  sl.Text := '<?xml version="1.0" encoding="iso-8859-1"?>'+
+             '<!DOCTYPE root ['+
+             '<!ELEMENT root (test*)>'+
+             '<!ELEMENT test (#PCDATA)>'+
+             '<!ATTLIST test name CDATA #IMPLIED>'+
+             ']>'+
+             '<root />';
+  sl.SaveToFile('temp.xml');
+  sl.Free;
+  (doc as IDOMParseOptions).validate := True;
+  try
+    check((doc as IDOMPersist).load('temp.xml'), 'result of load is false');
+    tmp := (doc as IDOMPersist).xml;
+    // adjust contents of the text
+    if domvendor = 'LIBXML' then begin
+      // libxml xml-method adds LF
+      data := AdjustLineBreaks(tmp,tlbsLF);
+    end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+      // ms save-method saves the encoding-attribute
+      // but ms xml-method hides it
+      // ms xml-method adds CRLF
+      data := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
+    end else begin
+      fail('unknown dom vendor '+domvendor);
+    end;
+    check(tmp = data, 'wrong content');
+  finally
+    if FileExists('temp.xml') then DeleteFile('temp.xml');
+  end;
+end;
+
+procedure TSimpleTests.valid4;
+var
+  sl: TStrings;
+begin
+  sl := TStringList.Create;
+  sl.Text := '<?xml version="1.0" encoding="iso-8859-1"?>'+
+             '<!DOCTYPE root ['+
+             '<!ELEMENT root (test*)>'+
+             '<!ELEMENT test (#PCDATA)>'+
+             '<!ATTLIST test name CDATA #IMPLIED>'+
+             ']>'+
+             '<egon />';
+  sl.SaveToFile('temp.xml');
+  sl.Free;
+  (doc as IDOMParseOptions).validate := True;
+  try
+    check(not (doc as IDOMPersist).load('temp.xml'), 'result of load is true');
+  finally
+    if FileExists('temp.xml') then DeleteFile('temp.xml');
+  end;
 end;
 
 procedure TSimpleTests.SetUp;
