@@ -351,6 +351,7 @@ type
 
     {managing the list of nodes and attributes, that must be freed manually}
 
+    procedure removeNode(node: xmlNodePtr);
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
@@ -410,6 +411,7 @@ type
     procedure set_OnAsyncLoad(const Sender: TObject;
       EventHandler: TAsyncEventHandler);
     // IDOMInternal
+    procedure removeNode(node: xmlNodePtr);
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
@@ -492,6 +494,8 @@ function IsReadOnlyNode(node:xmlNodePtr): boolean;
 
 function ErrorString(err:integer):string;
 
+function IsSameNode(node1,node2: IDOMNode):boolean;
+
 implementation
 
 uses Dialogs;
@@ -546,6 +550,23 @@ function libxmlStringToString(libstring:pchar):String;
       end
       else result:='';
   end;
+
+function IsSameNode(node1,node2: IDOMNode):boolean;
+var
+  xnode1,xnode2: xmlNodePtr;
+begin
+  result:=true;
+  if (node1=nil) and (node2=nil)
+    then exit;
+  result:=false;
+  if (node1=nil) or (node2=nil)
+    then exit;
+  xnode1:=GetGNode(node1);
+  xnode2:=GetGNode(node2);
+  if xnode1=xnode2
+    then result:=true
+    else result:=false;
+end;
 
 (*
 function TGDOMImplementationFactory.DOMImplementation: IDOMImplementation;
@@ -975,7 +996,7 @@ const
                         Document_Fragment_Node,
                         Notation_Node];
 var
-  node: xmlNodePtr;
+  tmp,node: xmlNodePtr;
 begin
   node:=GetGNode(newChild);
   if node=nil then CheckError(Not_Supported_Err);
@@ -999,14 +1020,33 @@ begin
     end;}
   if IsReadOnlyNode(node.parent)
     then CheckError(NO_MODIFICATION_ALLOWED_ERR);
+  // if the new child is already in the tree, it is first removed
   if node.parent<>nil
     then xmlUnlinkNode(node);
+    //then node.parent:=nil;
+  if FGNode.children<>nil
+   then if FGNode.children.last<>nil
+    then if FGNode.children.last.type_ = XML_TEXT_NODE
+      then if (node.type_=XML_TEXT_NODE)then begin
+       (FOwnerDocument as IDOMInternal).removeNode((node));
+      end else begin
+      //(FOwnerDocument as IDOMInternal).removeNode(node);
+      end;
+//node.parent:=FGNode;
+  //node:=xmlAddChild(FGNode,node);
 //  if node.type_=XML_ATTRIBUTE_NODE then begin
-//    (FOwnerDocument as IDOMInternal).removeAttr(xmlAttrPtr(node));
+//  end else begin
 //  end;
+  {tmp:=FGNode.last;
+  FGNode.last.next:=node;
+  FGNode.last:=node;
+  node.next:=nil;
+  node.parent:=FGNode;}
   node:=xmlAddChild(FGNode,node);
+  FGNode.children.last:=node;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    //then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=newChild
     else result:=nil;
 end;
 
@@ -1040,6 +1080,7 @@ procedure TGDOMNode.normalize;
 var
 	node,next,new_next: xmlNodePtr;
   nodeType: integer;
+  temp:string;
 begin
   node:=FGNode.children;
   next:=nil;
@@ -1049,16 +1090,19 @@ begin
       next:=node.next;
       while next<>nil do begin
         if next.type_<>TEXT_NODE then break;
-        xmlTextConcat(node,next.content,length(next.content));
+        temp:=next.content;
+        xmlTextConcat(node,pchar(temp),length(temp));
         new_next:=next.next;
+        next.parent:=nil;
+        //(FOwnerDocument as IDOMInternal).appendNode(next);
         xmlUnlinkNode(next);
         xmlFreeNode(next); //carefull!!
         next:=new_next;
       end;
     end else if nodeType=ELEMENT_NODE then begin
-      //todo
+
     end;
-    node:=next;
+    node:=node.next;
   end;
 end;
 
@@ -1392,9 +1436,7 @@ end;
 
 function TGDOMAttr.get_ownerElement: IDOMElement;
 begin
-  checkError(NOT_SUPPORTED_ERR);
-  //DOMVendorNotSupported('get_ownerElement', SGXML); { Do not localize }
-  Result := nil;
+  result:=((self as IDOMNode).parentNode) as IDOMElement;
 end;
 
 function TGDOMAttr.get_specified: WordBool;
@@ -1563,6 +1605,7 @@ begin
     xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));     // Get the libxml2-Attribute
     xmlnewAttr.last:=nil;
     node:=xmlNodePtr(GElement);
+    xmlnewAttr.parent:=node;
     oldAttr:=setAttr(node,xmlNewAttr);
     (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
     if oldattr<>nil
@@ -2064,15 +2107,10 @@ end;
 
 function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList;
 var
-  tmp,tmp1:IDOMNodeList;
-  node:IDOMNode;
+  tmp:IDOMNodeList;
 begin
-  //tmp:=(self as IDOMNodeSelect).selectNodes(tagName);
-  //if tmp<>nil then node:=tmp[0];
-  tmp1:=(self.get_documentElement as IDOMNodeSelect).selectNodes('//'+tagName);
-  //if node<>nil
-    //then (tmp1 as IDOMNodeListExt).AddNode(GetGNode(node));
-  result:=tmp1;
+  tmp:=(self.get_documentElement as IDOMNodeSelect).selectNodes('//'+tagName);
+  result:=tmp;
 end;
 
 function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
@@ -2209,8 +2247,7 @@ function TGDOMDocument.getElementsByTagNameNS(const namespaceURI,
   localName: DOMString): IDOMNodeList;
 var
   docElement:IDOMElement;
-  tmp,tmp1:IDOMNodeList;
-  node:IDOMNode;
+  tmp1:IDOMNodeList;
 begin
   if (namespaceURI='*')
     then if (localname<>'*')
@@ -2542,13 +2579,14 @@ end;
 
 function TGDOMCharacterData.substringData(offset,
   count: Integer): DOMString;
-//var
-//  temp:PGdomeDomString;
+var
+  s: WideString;
 begin
-  checkError(NOT_SUPPORTED_ERR);
-  {temp:=gdome_cd_substringData(GCharacterData,offset,count,@exc);
-  CheckError(exc);
-  result:=GdomeDOMStringToString(temp);}
+  if (offset < 0) or (offset > length(s)) or (count < 0)
+    then checkError(INDEX_SIZE_ERR);
+  s := Get_data;
+  s := copy(s,offset,count);
+  result:= s
 end;
 
 constructor TGDOMCharacterData.Create(ACharacterData: xmlNodePtr;
@@ -2566,12 +2604,25 @@ end;
 
 function TGDOMText.splitText(offset: Integer): IDOMText;
 var
-  s: WideString;
+  s,s1: WideString;
+  tmp: IDOMText;
+  node: IDOMNode;
 begin
   s := Get_data;
-  s:= Copy(s, 1, offset);
-  Set_data(s);
-  result:= self;
+  if (offset < 0) or (offset > length(s))
+    then checkError(INDEX_SIZE_ERR);
+  s1:= Copy(s, 1, offset);
+  Set_data(s1);
+  s1:= Copy(s, 1+offset, length(s));
+  tmp:=self.FOwnerDocument.createTextNode(s1);
+  if self.get_parentNode<>nil
+    then begin
+      node:=self.get_parentNode;
+      if self.get_nextSibling=nil
+        then node.appendChild(tmp)
+        else node.insertBefore(tmp,self.get_nextSibling);
+    end;
+  result:=tmp;
 end;
 
 { TMSDOMEntity }
@@ -3066,6 +3117,12 @@ begin
   for i:= 2 to length(S) do
     if not IsXmlNameChar((PWideChar(S)+i-1)^)
       then begin Result:= false; exit; end;
+end;
+
+procedure TGDOMDocument.removeNode(node: xmlNodePtr);
+begin
+  if node<>nil
+    then FNodeList.Remove(node);
 end;
 
 initialization
