@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.36 2002-01-15 09:19:04 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.37 2002-01-15 09:50:58 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -453,7 +453,7 @@ end;
 function GetGNode(const aNode: IDOMNode): xmlNodePtr;
 begin
 	if not Assigned(aNode) then begin
-		raise EDOMException.Create(SNodeExpected);
+		raise EDOMException.Create(INVALID_ACCESS_ERR, SNodeExpected);
 	end;
 	Result := (aNode as ILibXml2Node).LibXml2NodePtr;
 end;
@@ -487,10 +487,17 @@ begin
 	end;
 end;
 
-procedure CheckError(err:integer);
+(**
+ * Checks if the condition is true, and raises specified exception if not.
+ *)
+procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: widestring='');
 begin
-	if err <>0
-		then raise EDOMException.Create(ErrorString(err));
+	if aErrorCode=0 then exit;
+	if aCondition then exit;
+	if aMsg='' then begin
+		aMsg := ErrorString(aErrorCode);
+	end;
+	raise EDOMException.Create(aMsg);
 end;
 
 function IsReadOnlyNode(node:xmlNodePtr): boolean;
@@ -839,22 +846,18 @@ var
 	node: xmlNodePtr;
 begin
 	node:=GetGNode(newChild);
-	if node=nil then CheckError(NOT_SUPPORTED_ERR);
-	if self.IsReadOnly
-		then CheckError(NO_MODIFICATION_ALLOWED_ERR);
-	if not (newChild.NodeType in FAllowedChildTypes)
-		then CheckError(HIERARCHY_REQUEST_ERR);
-	if FGNode.type_=Document_Node then
-		if (newChild.nodeType = Element_Node) and (xmlDocGetRootElement(xmlDocPtr(FGNode))<>nil)
-			then CheckError(HIERARCHY_REQUEST_ERR);
-	if node.doc<>FGNode.doc
-		then CheckError(WRONG_DOCUMENT_ERR);
-	if self.isAncestorOrSelf(GetGNode(newChild))
-		then CheckError(HIERARCHY_REQUEST_ERR);
-	if IsReadOnlyNode(node.parent)
-		then CheckError(NO_MODIFICATION_ALLOWED_ERR);
-	if node.parent<>nil
-		then xmlUnlinkNode(node);
+	DomAssert(node<>nil, NOT_SUPPORTED_ERR);
+	DomAssert(not IsReadOnly, NO_MODIFICATION_ALLOWED_ERR);
+	DomAssert(not (newChild.NodeType in FAllowedChildTypes), HIERARCHY_REQUEST_ERR);
+	if (FGNode.type_=XML_DOCUMENT_NODE) and (newChild.nodeType = XML_ELEMENT_NODE) then begin
+		DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR);
+	end;
+	DomAssert(node.doc=FGNode.doc, WRONG_DOCUMENT_ERR);
+	DomAssert(not IsAncestorOrSelf(GetGNode(newChild)), HIERARCHY_REQUEST_ERR);
+	DomAssert(not IsReadOnlyNode(node.parent), NO_MODIFICATION_ALLOWED_ERR);
+	if node.parent<>nil then begin
+		xmlUnlinkNode(node);
+	end;
 //  /* If the newChild is already in the tree, it is first removed. */
 //	if (gdome_xmlGetParent(new_priv->n) != NULL)
 //		gdome_xmlUnlinkChild(gdome_xmlGetParent(new_priv->n), new_priv->n);
@@ -862,7 +865,7 @@ begin
 	if node.type_=XML_ATTRIBUTE_NODE then begin
 		(get_OwnerDocument as IDOMInternal).removeAttr(xmlAttrPtr(node));
 	end;
-	node:=xmlAddChild(FGNode,node);
+	node := xmlAddChild(FGNode,node);
 	Result:=MakeNode(node) as IDOMNode;
 end;
 
@@ -980,20 +983,18 @@ var
 	i: integer;
 begin
 	i:=index;
-	node:=nil;
 	if FParent<>nil then begin
 		node:=FParent.children;
 		while (i>0) and (node.next<>nil) do begin
 			dec(i);
-			node:=node.next
+			node:=node.next;
 		end;
-		if i>0 then checkError(INDEX_SIZE_ERR);
+		DomAssert(i>0, INDEX_SIZE_ERR);
 	end else begin
-			if FXPathObject<>nil
-				then node:=xmlXPathNodeSetItem(FXPathObject.nodesetval,i)
-				else checkError(101);
+		DomAssert(FXPathObject<>nil, 101);
+		node := xmlXPathNodeSetItem(FXPathObject.nodesetval,i)
 	end;
-	Result:=MakeNode(node) as IDOMNode
+	Result:=MakeNode(node) as IDOMNode;
 end;
 
 function TGDOMNodeList.get_length: Integer;
@@ -1224,7 +1225,7 @@ end;
 
 function TGDOMAttr.get_ownerElement: IDOMElement;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	//DOMVendorNotSupported('get_ownerElement', SGXML); { Do not localize }
 	Result := nil;
 end;
@@ -1403,7 +1404,7 @@ begin
 	attr := xmlHasNSProp(FGNode, PChar(uns), PChar(ulocal));
 	if (attr <> nil) then begin
 		ok:=xmlRemoveProp(attr);
-		if ok<>0 then checkerror(103);
+		DomAssert(ok=0, 103); //???
 	end;
 end;
 
@@ -1584,7 +1585,7 @@ end;
 
 procedure TGDOMDocument.set_documentElement(const IDOMElement: IDOMElement);
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
 function TGDOMDocument.createElement(const tagName: DOMString): IDomElement;
@@ -1688,8 +1689,10 @@ begin
 	result:=nil;
 	if importedNode=nil then exit;
 	case integer(importedNode.nodeType) of
-		DOCUMENT_NODE,DOCUMENT_TYPE_NODE,NOTATION_NODE,ENTITY_NODE: CheckError(21);
-		ATTRIBUTE_NODE: CheckError(21); //ToDo: implement this case
+		DOCUMENT_NODE,DOCUMENT_TYPE_NODE,NOTATION_NODE,ENTITY_NODE:
+			DomAssert(false, 21);
+		ATTRIBUTE_NODE:
+			DomAssert(false, 21); //ToDo: implement this case
 	else
 		if deep
 		then recurse:=1
@@ -1786,10 +1789,10 @@ function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
 	//AElement: xmlElementPtr;
 	//name1: string;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	{name1:=TGdomString.create(elementID);
 	AElement:=gdome_doc_getElementById(FPGdomeDoc,name1.GetPString, @exc);
-	CheckError(exc);
+	DomAssert(false, exc);
 	name1.Free;
 	if AElement <> nil
 		then result:=TGDOMElement.Create(AElement,self)
@@ -1876,7 +1879,7 @@ end;
 
 function TGDOMDocument.loadFromStream(const stream: TStream): Boolean;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	result:=false;
 end;
 
@@ -1909,18 +1912,18 @@ begin
 	temp:=destination;
 	encoding:=GDoc.encoding;
 	bytes:=xmlSaveFileEnc(pchar(temp),GDoc,encoding);
-	if bytes<0 then CheckError(22); //write error
+	if bytes<0 then DomAssert(false, 22); //write error
 end;
 
 procedure TGDOMDocument.saveToStream(const stream: TStream);
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
 procedure TGDOMDocument.set_OnAsyncLoad(const Sender: TObject;
 	EventHandler: TAsyncEventHandler);
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
 { TGDOMCharacterData }
@@ -1973,9 +1976,9 @@ function TGDOMCharacterData.substringData(offset,
 //var
 //  temp:PGdomeDomString;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	{temp:=gdome_cd_substringData(GCharacterData,offset,count,@exc);
-	CheckError(exc);
+	DomAssert(false, exc);
 	result:=GdomeDOMStringToString(temp);}
 end;
 
@@ -2005,21 +2008,21 @@ end;
 
 function TGDOMEntity.get_notationName: DOMString;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	//result:=GdomeDOMStringToString(gdome_ent_notationName(GEntity,@exc));
-	//CheckError(exc);
+	//DomAssert(exc);
 end;
 
 function TGDOMEntity.get_publicId: DOMString;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	//result:=GdomeDOMStringToString(gdome_ent_publicID(GEntity,@exc));
-	//CheckError(exc);
+	//DomAssert(exc);
 end;
 
 function TGDOMEntity.get_systemId: DOMString;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	//result:=GdomeDOMStringToString(gdome_ent_systemID(GEntity,@exc));
 end;
 
@@ -2051,9 +2054,9 @@ function TGDOMDocumentType.get_entities: IDOMNamedNodeMap;
 //var entities: PGdomeNamedNodeMap;
 //    exc: GdomeException;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	{entities:=gdome_dt_entities(GDocumentType,@exc);
-	CheckError(exc);
+	DomAssert(exc);
 	if entities<>nil
 		then result:=TGDOMNamedNodeMap.Create(entities,FOwnerDocument) as IDOMNamedNodeMap
 		else result:=nil;}
@@ -2079,12 +2082,12 @@ function TGDOMDocumentType.get_notations: IDOMNamedNodeMap;
 //  notations: PGdomeNamedNodeMap;
 //  exc: GdomeException;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	//Implementing this method requires to implement a new
 	//type of NodeList
 	//GetGDocumentType.notations;
 	{notations:=gdome_dt_notations(GDocumentType,@exc);
-	CheckError(exc);
+	DomAssert(exc);
 	if notations<>nil
 		then result:=TGDOMNamedNodeMap.Create(notations,FOwnerDocument) as IDOMNamedNodeMap
 		else result:=nil;}
@@ -2123,9 +2126,9 @@ function TGDOMNotation.get_publicId: DOMString;
 //var
 //  temp: String;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	//temp:=GdomeDOMStringToString(gdome_not_publicId(GNotation, @exc));
-	//CheckError(exc);
+	//DomAssert(exc);
 	//result:=temp;
 end;
 
@@ -2133,9 +2136,9 @@ function TGDOMNotation.get_systemId: DOMString;
 //var
 //  temp: String;
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 	//temp:=GdomeDOMStringToString(gdome_not_systemId(GNotation, @exc));
-	//CheckError(exc);
+	//DomAssert(exc);
 	//result:=temp;
 end;
 
@@ -2167,7 +2170,7 @@ var
 begin
 	temp:=UTF8Encode(nodePath);
 	doc:=FGNode.doc;
-	if doc=nil then CheckError(100);
+	if doc=nil then DomAssert(false, 100);
 	ctxt:=xmlXPathNewContext(doc);
 	ctxt.node:=FGNode;
 //???	{ok:=}xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
@@ -2214,7 +2217,7 @@ end;
 
 procedure TGDOMNode.set_Prefix(const prefix: DomString);
 begin
-	checkError(NOT_SUPPORTED_ERR);
+	DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
 function TGDOMDocumentBuilder.load(const url: DomString): IDomDocument;
@@ -2281,7 +2284,7 @@ begin
 	{$endif}
 	doc := xmlParseFile(PChar(fn));
 	if (doc=nil) then begin
-		checkError(102);
+		DomAssert(false, 102);
 	end;
 
 	inherited create(xmlNodePtr(doc));
