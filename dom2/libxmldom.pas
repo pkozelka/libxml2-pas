@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.102 2002-01-30 22:06:02 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.103 2002-01-31 21:18:33 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -222,7 +222,7 @@ type
     function  IDomNode.get_childNodes = returnChildNodes;
     function  get_attributes: IDomNamedNodeMap;
   protected //IDomElement
-    function  IDomElement.get_tagName = get_localName;
+    function  IDomElement.get_tagName = get_nodeName;
     function  IDomElement.get_childNodes = returnChildNodes;
     function  getAttribute(const name: DomString): DomString;
     procedure setAttribute(const name, value: DomString);
@@ -539,7 +539,7 @@ begin
   if (aLocation<>'') then begin
     aMsg := 'in class '+aLocation+': '+aMsg;
   end;
-  raise EDOMException.Create(aErrorCode, aMsg);
+  raise EDomException.Create(aErrorCode, aMsg);
 end;
 
 function GetDomObject(aNode: pointer): IUnknown;
@@ -700,15 +700,32 @@ begin
   elem.nsDef := attr.ns; //DIRTY
 end;
 
+function isNameChar(c: Longint): boolean;
+begin
+  Result := true;
+  if xmlIsDigit(c) then exit;
+  if xmlIsBaseChar(c) then exit;
+  case c of
+    Ord('.'),
+    Ord('-'),
+    Ord('_'),
+    Ord(':'): exit;
+  end;
+  if xmlIsIdeographic(c) then exit;
+  if xmlIsCombining(c) then exit;
+  if xmlIsExtender(c) then exit;
+  Result := false;
+end;
+
 function isNCName(aStr: DomString): boolean;
 var
   i: integer;
 begin
   Result := false;
   if (Length(aStr)=0) then exit;
-  if (not xmlIsLetter(Ord(aStr[1]))) then exit;
-  for i:=2 to Length(aStr) do begin
-    if not xmlIsBaseChar(Ord(aStr[i])) then exit;
+  if xmlIsDigit(Ord(aStr[1])) then exit;
+  for i:=1 to Length(aStr) do begin
+    if not isNameChar(Ord(aStr[i])) then exit;
   end;
   Result := true;
 end;
@@ -877,6 +894,8 @@ begin
   // prepare documentElement if necessary
   if (qualifiedName<>'') then begin
     Result.appendChild(Result.createElementNS(namespaceURI, qualifiedName));
+  end else begin
+    DomAssert(namespaceURI='', NAMESPACE_ERR, 'cannot create documentElement in namespace "'+namespaceURI+'", because qualifiedName was not specified.');
   end;
 end;
 
@@ -1455,7 +1474,7 @@ begin
     xmlXPathFreeObject(FXPathObj);
   end;
   FXPathObj := xmlXPathEvalExpression(PChar(FQuery), FXPathCtxt);
-  DomAssert(FXPathObj<>nil, INVALID_ACCESS_ERR, 'XPath object does not exist');
+  DomAssert(FXPathObj<>nil, SYNTAX_ERR, 'XPath object does not exist');
   if (FXPathObj.type_ <> XPATH_NODESET) then begin
     DomAssert(false, INVALID_ACCESS_ERR, 'XPath object is not a nodeset');
     xmlXPathFreeObject(FXPathObj);
@@ -1564,35 +1583,9 @@ end;
 function TGDOMAttr.get_specified: Boolean;
 begin
   //todo: implement it correctly
-  Result:=true;
+  Result := true;
+  DomAssert(false, NOT_SUPPORTED_ERR);
 end;
-
-{
-procedure TGDOMAttr.set_nodeValue(const value: DomString);
-var
-  attr: xmlAttrPtr;
-  tmp: xmlNodePtr;
-  v: String;
-begin
-  v := UTF8Encode(value);
-  attr := xmlAttrPtr(FGNode);
-  if attr.children<>nil then begin
-    xmlFreeNodeList(attr.children);
-    attr.children:=nil;
-    attr.last:=nil;
-  end;
-  attr.children := xmlStringGetNodeList(attr.doc, PChar(v));
-  tmp := attr.children;
-  while tmp<>nil do begin
-    tmp.parent := xmlNodePtr(attr);
-    tmp.doc := attr.doc;
-    if tmp.next=nil then begin
-      attr.last := tmp;
-    end;
-    tmp := tmp.next;
-  end;
-end;
-}
 
 { TGDOMElement }
 
@@ -1693,7 +1686,7 @@ end;
 function TGDOMElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
 begin
   if newAttr<>nil then begin
-    xmlSetPropNode(FGNode, xmlAttrPtr(GetGNode(newAttr)));
+    Result := GetDomObject(xmlSetPropNode(FGNode, xmlAttrPtr(GetGNode(newAttr)))) as IDomAttr;
   end else begin
     Result := nil;
   end;
@@ -1793,26 +1786,33 @@ end;
 function TGDOMDocument.createComment(const data: DomString): IDomComment;
 var
   node: xmlNodePtr;
+  udata: String;
 begin
+  udata := UTF8Encode(data);
+  DomAssert(Pos('--', udata)=0, INVALID_CHARACTER_ERR, 'comment cannot contain "--"');
   node := xmlNewDocComment(requestDocPtr, PChar(UTF8Encode(data)));
   Result := GetDOMObject(node) as IDomComment;
 end;
 
 function TGDOMDocument.createCDATASection(const data: DomString): IDomCDataSection;
 var
-  s: String;
   node: xmlNodePtr;
+  udata: String;
 begin
-  s := UTF8Encode(data);
-  node := xmlNewCDataBlock(requestDocPtr, PChar(s), length(s));
+  udata := UTF8Encode(data);
+  DomAssert(Pos(']]>', udata)=0, INVALID_CHARACTER_ERR, 'cdata section cannot contain "]]>"');
+  node := xmlNewCDataBlock(requestDocPtr, PChar(udata), length(udata));
   Result := GetDOMObject(node) as IDomCDataSection;
 end;
 
 function TGDOMDocument.createProcessingInstruction(const target, data: DomString): IDomProcessingInstruction;
 var
   pi: xmlNodePtr;
+  utarget: String;
 begin
-  pi := xmlNewPI(PChar(UTF8Encode(target)), PChar(UTF8Encode(data)));
+  utarget := UTF8Encode(target);
+  checkName('', utarget);
+  pi := xmlNewPI(PChar(utarget), PChar(UTF8Encode(data)));
   pi.doc := requestDocPtr;
   Result := GetDOMObject(pi) as IDomProcessingInstruction;
 end;
@@ -1831,8 +1831,11 @@ end;
 function TGDOMDocument.createEntityReference(const name: DomString): IDomEntityReference;
 var
   node: xmlNodePtr;
+  uname: String;
 begin
-  node := xmlNewReference(requestDocPtr, PChar(UTF8Encode(name)));
+  uname := UTF8Encode(name);
+  checkName('', uname);
+  node := xmlNewReference(requestDocPtr, PChar(uname));
   Result := GetDOMObject(node) as IDomEntityReference;
 end;
 
@@ -1879,41 +1882,6 @@ begin
     Result := GetDOMObject(node) as IDomNode;
   end;
 end;
-(* the c-code to translate (from gdome)
-
-GdomeNode *
-gdome_xml_doc_importNode (GdomeDocument *self, GdomeNode *importedNode, GdomeBoolean deep, GdomeException *exc) {
-  Gdome_xml_Document *priv = (Gdome_xml_Document * )self;
-  Gdome_xml_Node *priv_node = (Gdome_xml_Node * )importedNode;
-  xmlNode *ret = NULL;
-
-  g_return_val_if_fail (priv != NULL, NULL);
-  g_return_val_if_fail (GDOME_XML_IS_DOC (priv), NULL);
-  g_return_val_if_fail (importedNode != NULL, NULL);
-  g_return_val_if_fail (exc != NULL, NULL);
-
-  switch (gdome_xml_n_nodeType (importedNode, exc)) {
-  case XML_ATTRIBUTE_NODE:
-    g_assert (gdome_xmlGetOwner ((xmlNode * )priv->n) == priv->n);
-    ret = (xmlNode * )xmlCopyProp ((xmlNode * )priv->n, (xmlAttr * )priv_node->n);
-    gdome_xmlSetParent (ret, NULL);
-    break;
-  case XML_DOCUMENT_FRAG_NODE:
-  case XML_ELEMENT_NODE:
-  case XML_ENTITY_REF_NODE:
-  case XML_PI_NODE:
-  case XML_TEXT_NODE:
-  case XML_CDATA_SECTION_NODE:
-  case XML_COMMENT_NODE:
-    ret = xmlDocCopyNode (priv_node->n, priv->n, deep);
-    break;
-  default:
-    *exc = GDOME_NOT_SUPPORTED_ERR;
-  }
-
-  return gdome_xml_n_mkref (ret);
-}
-*)
 
 function TGDOMDocument.createElementNS(const namespaceURI, qualifiedName: DomString): IDomElement;
 var
@@ -1942,6 +1910,11 @@ begin
   uuri := UTF8Encode(namespaceURI);
   checkNsName(uprefix, ulocal, uuri);
   if (uuri<>'') then begin
+    // one more special check for attributes
+    if (uprefix='') and (ulocal='xmlns') then begin
+      DomAssert(uuri=XMLNS_NAMESPACE_URI, NAMESPACE_ERR, 'Invalid namespaceURI for attribute "xmlns": "'+uuri+'"');
+    end;
+    //
     ns := xmlNewNs(nil, PChar(uuri), PChar(uprefix));
     attr := xmlNewNsProp(nil, ns, PChar(ulocal), nil);
     attr.doc := requestDocPtr;
@@ -2271,15 +2244,11 @@ end;
 function TGDOMEntity.get_notationName: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //Result:=GdomeDOMStringToString(gdome_ent_notationName(GEntity,@exc));
-  //DomAssert(exc);
 end;
 
 function TGDOMEntity.get_publicId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //Result:=GdomeDOMStringToString(gdome_ent_publicID(GEntity,@exc));
-  //DomAssert(exc);
 end;
 
 function TGDOMEntity.get_systemId: DomString;
@@ -2291,15 +2260,8 @@ end;
 { TGDOMDocumentType }
 
 function TGDOMDocumentType.get_entities: IDomNamedNodeMap;
-//var entities: PGdomeNamedNodeMap;
-//    exc: GdomeException;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  {entities:=gdome_dt_entities(GDocumentType,@exc);
-  DomAssert(exc);
-  if entities<>nil
-    then Result:=TGDOMxxx.Create(entities,FOwnerDocument) as IDomNamedNodeMap
-    else Result:=nil;}
 end;
 
 function TGDOMDocumentType.get_internalSubset: DomString;
@@ -2318,19 +2280,8 @@ begin
 end;
 
 function TGDOMDocumentType.get_notations: IDomNamedNodeMap;
-//var
-//  notations: PGdomeNamedNodeMap;
-//  exc: GdomeException;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //Implementing this method requires to implement a new
-  //type of NodeList
-  //GetGDocumentType.notations;
-  {notations:=gdome_dt_notations(GDocumentType,@exc);
-  DomAssert(exc);
-  if notations<>nil
-    then Result:=TGDOMxxxx.Create(notations,FOwnerDocument) as IDomNamedNodeMap
-    else Result:=nil;}
 end;
 
 function TGDOMDocumentType.get_publicId: DomString;
@@ -2351,23 +2302,13 @@ end;
 { TGDOMNotation }
 
 function TGDOMNotation.get_publicId: DomString;
-//var
-//  temp: String;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //temp:=GdomeDOMStringToString(gdome_not_publicId(GNotation, @exc));
-  //DomAssert(exc);
-  //Result:=temp;
 end;
 
 function TGDOMNotation.get_systemId: DomString;
-//var
-//  temp: String;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //temp:=GdomeDOMStringToString(gdome_not_systemId(GNotation, @exc));
-  //DomAssert(exc);
-  //Result:=temp;
 end;
 
 initialization
