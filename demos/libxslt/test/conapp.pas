@@ -4,7 +4,7 @@ which are in the application object if you have a gui-application}
 
 interface
 
-uses classes;
+uses Classes;
 
 procedure outLog(text:string='');
 procedure outSQLLog(text:string='');

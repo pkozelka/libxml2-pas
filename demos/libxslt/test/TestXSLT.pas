@@ -27,7 +27,7 @@ procedure test2(xmlfile,xslfile,outputfile: string);
 implementation
 
 uses
-  libxml2,libxslt,MicroTime,conApp,SysUtils,windows;
+  libxml2,libxslt{,MicroTime},conApp,SysUtils{,windows};
 
 procedure test2(xmlfile,xslfile,outputfile: string);
 var
@@ -40,25 +40,25 @@ var
   temp: string;
   compression:longint;
 begin
-  StartTimer;
+  //StartTimer;
   xmlSubstituteEntitiesDefault(1);
   params:=nil;
   cur:=xsltParseStylesheetFile(pchar(xslfile));
   if cur<>nil then begin
     outLog('Parsed Stylesheet ok!');
-    outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
+    //outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
   end
   else exit;
   doc:=xmlParseFile(pchar(xmlfile));
   if doc<>nil then begin
     outLog('Parsed File ok!');
-    outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
+    //outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
   end
   else exit;
   res:=xsltApplyStylesheet(cur,doc,params);
   if res<>nil then begin
     outLog('Applied Stylesheet ok!');
-    outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
+   // outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
   end
   else exit;
   node:=xmlDocGetRootElement(res);
@@ -71,7 +71,7 @@ begin
   ok:=xsltSaveResultToFileName(pchar(outputfile), res, cur,compression);
   if ok<>-1 then begin
     outLog('Saved result ok!');
-    outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
+    //outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
   end
   else exit;
 end;
@@ -86,11 +86,11 @@ var doc: xmlDocPtr;
     node: xmlNodePtr;
 begin
   //filename:='..\data\'+filename;
-  StartTimer;
+  //StartTimer;
   doc:=xmlParseFile(pchar(filename));
   if doc<>nil then begin
     outLog('Parsed file ok!');
-    outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
+    //outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
   end
   else exit;
   node:=xmlDocGetRootElement(doc);
