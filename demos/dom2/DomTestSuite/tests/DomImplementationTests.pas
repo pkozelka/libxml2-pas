@@ -28,15 +28,16 @@ type
       procedure hasFeatureCoreTest2;
       procedure hasFeatureCoreTest3;
 
+      procedure createDocMalFormedXMLNSTest; //*
+      procedure createDocNullXMLNSTest;      //*
+
       procedure createEmptyDocumentTest;
       procedure createDocumentNoDocTypeTest;
-      procedure createDocumentMalformedNameTest;
-      procedure createDocumentNulNSTest;
-      procedure createDocumentDifferentDocTest;
+      procedure createDocXMLNSDifferentDocTest; //*
 
       procedure createDocumentTypeTest;
-      procedure createDocumentTypeMalformedNameTest;
-      procedure createDocumentTypeIllegalCharsTest;
+      procedure createDocTypeMalFormedXMLNSTest; //**
+      procedure ceateDocTypeXMLNSIllegalCharTest; //*
   end;
 
   function getUnitTests : ITestSuite;
@@ -145,15 +146,16 @@ end;
 (*
  * checks if creating a document with a malformed name results in the correct
  * exception
+ * (converted from: domimplementationCreateDocMalFormedXMLNS.js)
 *)
-procedure TDomImplementationFundamentalTests.createDocumentMalformedNameTest;
+procedure TDomImplementationFundamentalTests.createDocMalFormedXMLNSTest;
 var
   document      : IDomDocument;
   namespaceURI  : DomString;
   qualifiedName : DomString;
 begin
-  namespaceURI  := 'http://www.pingpolice.com';
-  qualifiedName := 'x::y';
+  namespaceURI  := '"http://www.ecommerce.org/';
+  qualifiedName := 'prefix::local';
   try
     document := fDomImplementation.createDocument(
             namespaceURI, qualifiedName, nil);
@@ -168,8 +170,9 @@ end;
 (*
  * checks if creating a document with qualified name but nameSpaceURI = ''
  * results in EDomException etNamespaceErr
+ * (converted from: domimplementationCreateDocNullXMLNS.js)
 *)
-procedure TDomImplementationFundamentalTests.createDocumentNulNSTest;
+procedure TDomImplementationFundamentalTests.createDocNullXMLNSTest;
 var
   document      : IDomDocument;
   namespaceURI  : DomString;
@@ -192,8 +195,9 @@ end;
 (*
  * checks if creating a document with a docType belonging to another document
  * results in EDomException etWrongDocumentErr
-*)
-procedure TDomImplementationFundamentalTests.createDocumentDifferentDocTest;
+ * (converted from: domimplementationCreateDocXMLNSDifferentDoc.js)
+ *)
+procedure TDomImplementationFundamentalTests.createDocXMLNSDifferentDocTest;
 var
   document1     : IDomDocument;
   document2     : IDomDocument;
@@ -252,18 +256,18 @@ end;
 (*
  * checks if creating a documentType with a malformed qualified name results in
  * EDomException etNamespaceErr
+ * (converted from: domimplementationCreateDocTypeMalFormedXMLNS.js)
 *)
-procedure TDomImplementationFundamentalTests.
-        createDocumentTypeMalformedNameTest;
+procedure TDomImplementationFundamentalTests.createDocTypeMalFormedXMLNSTest;
 var
   malformedName : DomString;
   publicId      : DomString;
   systemId      : DomString;
   docType       : IDomDocumentType;
 begin
-  malformedName := 'x::y';
-	publicId      := 'http://www.localhost.com';
-	systemId      := 'myDoc.dtd';
+  malformedName := 'prefix::local';
+	publicId      := 'ID';
+	systemId      := 'id';
 
   try
     docType := fDomImplementation.createDocumentType(
@@ -279,8 +283,9 @@ end;
 (*
  * checks if creating a documentType with a qualified name using illegal chars
  * results in EDomException etInvalidCharacterErr
+ * (converted from: domimplementationCreateDocTypeXMLNSIllegalChar.js)
 *)
-procedure TDomImplementationFundamentalTests.createDocumentTypeIllegalCharsTest;
+procedure TDomImplementationFundamentalTests.ceateDocTypeXMLNSIllegalCharTest;
 var
   qualifiedName : DomString;
   prefix        : DomString;
@@ -302,7 +307,7 @@ begin
            'but was not');
     except
       on e : EDomException do
-        check(e.code = NAMESPACE_ERR,
+        check(e.code = INVALID_CHARACTER_ERR,
                 'etInvalidCharacterErr should be thrown but was: ' + e.message);
     end;
   end;
