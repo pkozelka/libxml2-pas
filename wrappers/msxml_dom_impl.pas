@@ -201,7 +201,7 @@ type
 		function  createAttribute(const name: WideString): IXMLDOMAttribute; safecall;
 		function  createEntityReference(const name: WideString): IXMLDOMEntityReference; safecall;
 		function  getElementsByTagName(const tagName: WideString): IXMLDOMNodeList; safecall;
-		function  createNode(type_: OleVariant; const name: WideString; const namespaceURI: WideString): IXMLDOMNode; safecall;
+		function  createNode(aType: OleVariant; const name: WideString; const namespaceURI: WideString): IXMLDOMNode; safecall;
 		function  nodeFromID(const idString: WideString): IXMLDOMNode; safecall;
 		function  load(xmlSource: OleVariant): WordBool; safecall;
 		function  Get_readyState: Integer; safecall;
@@ -221,6 +221,9 @@ type
 		procedure Set_onreadystatechange(Param1: OleVariant); safecall;
 		procedure Set_ondataavailable(Param1: OleVariant); safecall;
 		procedure Set_ontransformnode(Param1: OleVariant); safecall;
+	protected //DOM2 functions (incomplete)
+		function  createElementNS(const namespaceURI, qualifiedName: WideString): IXMLDOMElement; safecall;
+		function  createAttributeNS(const namespaceURI, qualifiedName: WideString): IXMLDOMAttribute; safecall;
 	public
 		constructor Create(aLibXmlObj: xmlNodePtr);
 	end;
@@ -369,6 +372,20 @@ begin
 		end;
 	end else begin
 		Result := TXMLDOMNode(p.node._private) as IUnknown;
+	end;
+end;
+
+procedure SplitQualifiedName(aQualifiedName: widestring; out aPrefix, aLocalName: widestring);
+var
+	n: integer;
+begin
+	n := Pos(':', aQualifiedName);
+	if (n>0) then begin
+		aPrefix := Copy(aQualifiedName, 1, n-1);
+		aLocalName := Copy(aQualifiedName, n+1, Length(aQualifiedName));
+	end else begin
+		aPrefix := '';
+		aLocalName := aQualifiedName;
 	end;
 end;
 
@@ -977,17 +994,33 @@ begin
 	// the underlying xmlDoc object. One way of doing this is to pretend that
 	// one reference always exists.
 
-	//todo: PROBLEM - therefore it will never be automaticaly destroyed... 
+	//todo: PROBLEM - therefore it will never be automaticaly destroyed...
 	_AddRef;
 end;
 
 function TXMLDOMDocument.createAttribute(const name: WideString): IXMLDOMAttribute;
-var
-	s: string;
-	node: xmlAttrPtr;
 begin
-	s := name;
-	node := xmlNewDocProp(FPtr.doc, PChar(s), nil);
+	Result := createAttributeNS('', name);
+end;
+
+function TXMLDOMDocument.createAttributeNS(const namespaceURI, qualifiedName: WideString): IXMLDOMAttribute;
+var
+	node: xmlAttrPtr;
+	ns: xmlNsPtr;
+	prefix, localname: widestring;
+	pfx, lname, href: string;
+begin
+	if (namespaceURI<>'') then begin
+		SplitQualifiedName(qualifiedName, prefix, localname);
+		pfx := prefix;
+		lname := localname;
+		href := namespaceURI;
+		ns := xmlNewNs(nil, PChar(href), PChar(pfx)); //??? is xmlNewNs the right function to call ?
+	end else begin
+		ns := nil;
+		lname := qualifiedName;
+	end;
+	node := xmlNewNsProp(nil, ns, PChar(lname), nil); //??? is xmlNewNsProp the right function to call ?
 	Result := GetDOMObject(node) as IXMLDOMAttribute;
 end;
 
@@ -1020,14 +1053,32 @@ begin
 end;
 
 function TXMLDOMDocument.createElement(const tagName: WideString): IXMLDOMElement;
-var
-	s: string;
-	node: xmlNodePtr;
 begin
-	s := tagName;
-	node := xmlNewDocNode(requestDocPtr, nil, PChar(s), nil);
+	Result := createElementNS('', tagName);
+end;
+
+function TXMLDOMDocument.createElementNS(const namespaceURI, qualifiedName: WideString): IXMLDOMElement;
+var
+	node: xmlNodePtr;
+	ns: xmlNsPtr;
+	prefix, localname: widestring;
+	pfx, lname, href: string;
+begin
+	if (namespaceURI<>'') then begin
+		SplitQualifiedName(qualifiedName, prefix, localname);
+		pfx := prefix;
+		lname := localname;
+		href := namespaceURI;
+		ns := xmlNewGlobalNs(requestDocPtr, PChar(href), PChar(pfx));
+	end else begin
+		ns := nil;
+		lname := qualifiedName;
+	end;
+	node := xmlNewDocNode(requestDocPtr, ns, PChar(lname), nil);
 	Result := GetDOMObject(node) as IXMLDOMElement;
 end;
+
+
 
 function TXMLDOMDocument.createEntityReference(const name: WideString): IXMLDOMEntityReference;
 var
@@ -1039,9 +1090,41 @@ begin
 	Result := GetDOMObject(node) as IXMLDOMEntityReference;
 end;
 
-function TXMLDOMDocument.createNode(type_: OleVariant; const name, namespaceURI: WideString): IXMLDOMNode;
+function TXMLDOMDocument.createNode(aType: OleVariant; const name, namespaceURI: WideString): IXMLDOMNode;
+var
+	tp: DOMNodeType;
 begin
-	ENotImpl('TXMLDOMDocument.createNode');
+	case TVarData(aType).VType of
+	varInteger,
+	varSmallint,
+	varSingle,
+	varDouble,
+	varByte:
+		tp := aType;
+	else
+		tp := NODE_INVALID;
+		ENotImpl('TXMLDOMDocument.createNode for this variant type');
+	end;
+	case tp of
+	NODE_ELEMENT:
+		Result := createElementNS(namespaceURI, name);
+	NODE_ATTRIBUTE:
+		Result := createAttributeNS(namespaceURI, name);
+	NODE_TEXT:
+		Result := createTextNode('');
+	NODE_CDATA_SECTION:
+		Result := createCDATASection('');
+	NODE_ENTITY_REFERENCE:
+		Result := createEntityReference(name);
+	NODE_PROCESSING_INSTRUCTION:
+		Result := createProcessingInstruction(name, '');
+	NODE_COMMENT:
+		Result := createComment('');
+	NODE_DOCUMENT_FRAGMENT:
+		Result := createDocumentFragment;
+	else
+		ENotImpl('TXMLDOMDocument.createNode for this node type');
+	end;
 end;
 
 function TXMLDOMDocument.createProcessingInstruction(const target, data: WideString): IXMLDOMProcessingInstruction;
