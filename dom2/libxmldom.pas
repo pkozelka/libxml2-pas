@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.86 2002-01-28 01:49:13 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.87 2002-01-28 01:53:17 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -1554,44 +1554,10 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
-{$define EXPERIMENTAL}
 function TGDOMElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
-var
-  attr, newa, olda: xmlAttrPtr;
 begin
   if newAttr<>nil then begin
-    newa := xmlAttrPtr(GetGNode(newAttr));
-{$ifdef EXPERIMENTAL}
-    xmlSetPropNode(FGNode, newa);
-{$else}
-    if (newa.ns=nil) then begin
-      olda := xmlHasProp(FGNode, newa.name);
-    end else begin
-      olda := xmlHasNsProp(FGNode, newa.name, newa.ns.href);
-    end;
-    if (newa=olda) then begin
-      Result := newAttr;
-    end else begin
-      if (olda<>nil) then begin
-        xmlUnlinkNode(xmlNodePtr(olda));
-        RegisterFlyingNode(xmlNodePtr(olda));
-      end;
-
-      //put it to the front of attrlist (because it is the simplest way)
-      attr := FGNode.properties;
-      FGNode.properties := newa;
-      newa.next := attr;
-      newa.parent := FGNode;
-      FGNode.nsDef := newa.ns; //[pk] I am not sure if this is really correct, looks strange
-      if attr=nil then begin
-        FGNode.properties := newa;
-      end else begin
-        attr.prev := newa;
-      end;
-      UnregisterFlyingNode(xmlNodePtr(newa));
-      Result := GetDomObject(olda) as IDomAttr;
-    end;
-{$endif}
+    xmlSetPropNode(FGNode, xmlAttrPtr(GetGNode(newAttr)));
   end else begin
     Result := nil;
   end;
@@ -1921,6 +1887,7 @@ var
   fn: String;
   ctxt: xmlParserCtxtPtr;
 begin
+  Result := false;
 {$ifdef WIN32}
   fn := StringReplace(UTF8Encode(source), '\', '\\', [rfReplaceAll]);
 {$else}
@@ -1946,7 +1913,6 @@ begin
   end else begin
     xmlFreeDoc(ctxt.myDoc);
     ctxt.myDoc := nil;
-    Result := false;
   end;
   xmlFreeParserCtxt(ctxt);
 end;
