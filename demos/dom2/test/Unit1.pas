@@ -73,7 +73,7 @@ var
 implementation
 
 uses
-  jkDomTest,feDomTest,conapp,xdom2,libxmldom,msxml_impl;
+  jkDomTest,feDomTest,conapp,idom2,libxmldom,msxml_impl;
 var
   stack: pointer;
 

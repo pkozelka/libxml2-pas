@@ -35,7 +35,7 @@ interface
 
 implementation
 
-uses MicroTime, conapp, sysutils, Dialogs, xdom2, libxml2,libxmldom,
+uses MicroTime, conapp, sysutils, Dialogs, idom2, libxml2,libxmldom,
   jkDomTest;
 
 function TestDom1b(name,vendor:string):double;

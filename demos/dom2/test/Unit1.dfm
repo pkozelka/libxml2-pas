@@ -180,7 +180,7 @@ object Form1: TForm1
       TabOrder = 12
       OnClick = Button5Click
     end
-    object Ignore: TCheckBox
+    object Ignore1: TCheckBox
       Left = 32
       Top = 168
       Width = 137
