@@ -25,7 +25,7 @@ var doc: xmlDocPtr;
     ctxt: xmlXPathContextPtr;
     res:  xmlXPathObjectPtr;
     temp: string;
-    type_: integer;
+    type_: xmlXPathObjectType;
     number: double;
 begin
   // read the input file
