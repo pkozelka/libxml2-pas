@@ -1,76 +1,39 @@
-// CVS-SIGN: [1.0] xmlautomata.h
-/*
+(*
  * automata.h : description of the API to build regexp automats
  *
  * See Copyright for the status of this software.
  *
  * Daniel Veillard <veillard@redhat.com>
- */
+ *)
 
-#ifndef __XML_AUTOMATA_H__
-#define __XML_AUTOMATA_H__
-
-#if defined(WIN32) && defined(_MSC_VER)
-#include <libxml/xmlwin32version.h>
-#else
-#include <libxml/xmlversion.h>
-#endif
-#ifdef LIBXML_AUTOMATA_ENABLED
-
-#include <libxml/xmlregexp.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
+(* 
  * xmlAutomataPtr:
- *
+ * 
  * A libxml automata description, It can be compiled into a regexp
- */
-typedef struct _xmlAutomata xmlAutomata;
-typedef xmlAutomata *xmlAutomataPtr;
+ *)
+type
+  _xmlAutomata = xmlAutomata;
+  xmlAutomataPtr = xmlAutomata;
 
-/**
+(* 
  * xmlAutomataStatePtr:
  *
  * A state int the automata description,
- */
-typedef struct _xmlAutomataState xmlAutomataState;
-typedef xmlAutomataState *xmlAutomataStatePtr;
+ *)
+  _xmlAutomataState = xmlAutomataState;
+  xmlAutomataStatePtr = xmlAutomataState;
 
-/*
+(*
  * Building API
- */
-xmlAutomataPtr		xmlNewAutomata		(void);
-void			xmlFreeAutomata		(xmlAutomataPtr am);
+ *)
+function xmlNewAutomata:xmlAutomataPtr;cdecl;external;
+procedure xmlFreeAutomata(am:xmlAutomataPtr);cdecl;external;
+function xmlAutomataGetInitState(am:xmlAutomataPtr):xmlAutomataStatePtr;cdecl;external;
+function xmlAutomataSetFinalState(am:xmlAutomataPtr; state:xmlAutomataStatePtr):longint;cdecl;external;
+function xmlAutomataNewState(am:xmlAutomataPtr):xmlAutomataStatePtr;cdecl;external;
+function xmlAutomataNewTransition(am:xmlAutomataPtr; from:xmlAutomataStatePtr; to:xmlAutomataStatePtr; token:PxmlChar; data:pointer):xmlAutomataStatePtr;cdecl;external;
+function xmlAutomataNewCountTrans(am:xmlAutomataPtr; from:xmlAutomataStatePtr; to:xmlAutomataStatePtr; token:PxmlChar; min:longint; max:longint; data:pointer):xmlAutomataStatePtr;cdecl;external;
+function xmlAutomataNewEpsilon(am:xmlAutomataPtr; from:xmlAutomataStatePtr; to:xmlAutomataStatePtr):xmlAutomataStatePtr;cdecl;external;
+function xmlAutomataNewCounter(am:xmlAutomataPtr):longint;cdecl;external;
+function xmlAutomataCompile(am:xmlAutomataPtr):xmlRegexpPtr;cdecl;external;
 
-xmlAutomataStatePtr	xmlAutomataGetInitState	(xmlAutomataPtr am);
-int			xmlAutomataSetFinalState(xmlAutomataPtr am,
-						 xmlAutomataStatePtr state);
-xmlAutomataStatePtr	xmlAutomataNewState	(xmlAutomataPtr am);
-xmlAutomataStatePtr	xmlAutomataNewTransition(xmlAutomataPtr am,
-						 xmlAutomataStatePtr from,
-						 xmlAutomataStatePtr to,
-						 const xmlChar *token,
-						 void *data);
-xmlAutomataStatePtr	xmlAutomataNewCountTrans(xmlAutomataPtr am,
-						 xmlAutomataStatePtr from,
-						 xmlAutomataStatePtr to,
-						 const xmlChar *token,
-						 int min,
-						 int max,
-						 void *data);
-xmlAutomataStatePtr	xmlAutomataNewEpsilon	(xmlAutomataPtr am,
-						 xmlAutomataStatePtr from,
-						 xmlAutomataStatePtr to);
-int			xmlAutomataNewCounter	(xmlAutomataPtr am);
-
-xmlRegexpPtr		xmlAutomataCompile	(xmlAutomataPtr am);
-
-#ifdef __cplusplus
-}
-#endif 
-
-#endif /* LIBXML_AUTOMATA_ENABLED */
-#endif /* __XML_AUTOMATA_H__ */

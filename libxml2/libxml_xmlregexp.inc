@@ -1,78 +1,48 @@
 // CVS-SIGN: [1.0] xmlregexp.h
-/*
+(*
  * regexp.h : describes the basic API for libxml regular expressions handling
  *
  * See Copyright for the status of this software.
  *
  * Daniel Veillard <veillard@redhat.com>
- */
+ *)
 
-#ifndef __XML_REGEXP_H__
-#define __XML_REGEXP_H__
 
-#if defined(WIN32) && defined(_MSC_VER)
-#include <libxml/xmlwin32version.h>
-#else
-#include <libxml/xmlversion.h>
-#endif
-#ifdef LIBXML_REGEXP_ENABLED
-
-#include <libxml/tree.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
+(**
  * xmlRegexpPtr:
  *
  * A libxml regular expression, they can actually be far more complex
  * thank the POSIX regex expressions.
- */
-typedef struct _xmlRegexp xmlRegexp;
-typedef xmlRegexp *xmlRegexpPtr;
+ *)
+type
+   _xmlRegexp = xmlRegexp;
+   xmlRegexpPtr = xmlRegexp;
 
-/**
+(**
  * xmlRegExecCtxtPtr:
  *
  * A libxml progressive regular expression evaluation context
- */
-typedef struct _xmlRegExecCtxt xmlRegExecCtxt;
-typedef xmlRegExecCtxt *xmlRegExecCtxtPtr;
+ *)
+   _xmlRegExecCtxt = xmlRegExecCtxt;
+   xmlRegExecCtxtPtr = xmlRegExecCtxt;
 
-/*
+(*
  * The POSIX like API
- */
-xmlRegexpPtr		xmlRegexpCompile(const xmlChar *regexp);
-void			xmlRegFreeRegexp(xmlRegexpPtr regexp);
-int			xmlRegexpExec	(xmlRegexpPtr comp,
-					 const xmlChar *value);
-void			xmlRegexpPrint	(FILE *output,
-					 xmlRegexpPtr regexp);
+ *)
+function xmlRegexpCompile(regexp:PxmlChar):xmlRegexpPtr;cdecl;external;
+procedure xmlRegFreeRegexp(regexp:xmlRegexpPtr);cdecl;external;
+function xmlRegexpExec(comp:xmlRegexpPtr; value:PxmlChar):longint;cdecl;external;
+procedure xmlRegexpPrint(output:PFILE; regexp:xmlRegexpPtr);cdecl;external;
 
-/*
+(*
  * Callback function when doing a transition in the automata
- */
-typedef void (*xmlRegExecCallbacks) (xmlRegExecCtxtPtr exec,
-	                             const xmlChar *token,
-				     void *transdata,
-				     void *inputdata);
+ *)
+type
+  xmlRegExecCallbacks = procedure (exec:xmlRegExecCtxtPtr; token:PxmlChar; transdata:pointer; inputdata:pointer);cdecl;
 
-/*
+(*
  * The progressive API
- */
-xmlRegExecCtxtPtr	xmlRegNewExecCtxt	(xmlRegexpPtr comp,
-						 xmlRegExecCallbacks callback,
-						 void *data);
-void			xmlRegFreeExecCtxt	(xmlRegExecCtxtPtr exec);
-int			xmlRegExecPushString	(xmlRegExecCtxtPtr exec,
-						 const xmlChar *value,
-						 void *data);
-
-#ifdef __cplusplus
-}
-#endif 
-
-#endif /* LIBXML_REGEXP_ENABLED */
-
-#endif /*__XML_REGEXP_H__ */
+ *)
+function xmlRegNewExecCtxt(comp:xmlRegexpPtr; callback:xmlRegExecCallbacks; data:pointer):xmlRegExecCtxtPtr;cdecl;external;
+procedure xmlRegFreeExecCtxt(exec:xmlRegExecCtxtPtr);cdecl;external;
+function xmlRegExecPushString(exec:xmlRegExecCtxtPtr; value:PxmlChar; data:pointer):longint;cdecl;external;
