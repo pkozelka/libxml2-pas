@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.26] xmlmemory.h
+// CVS-SIGN: [1.27] xmlmemory.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -15,10 +15,10 @@
 (**
  * DEBUG_MEMORY:
  *
- * should be activated only done when debugging libxml. It replaces the
- * allocator with a collect and debug shell to the libc allocator.
- * DEBUG_MEMORY should be activated only when debugging
- * libxml i.e. if libxml has been configured with --with-debug-mem too
+ * DEBUG_MEMORY replaces the allocator with a collect and debug
+ * shell to the libc allocator.
+ * DEBUG_MEMORY should only be activated when debugging 
+ * libxml i.e. if libxml has been configured with --with-debug-mem too.
  *)
 {-$define DEBUG_MEMORY_FREED}
 {-$define DEBUG_MEMORY_LOCATION}
@@ -33,7 +33,7 @@
  * DEBUG_MEMORY_LOCATION:
  *
  * DEBUG_MEMORY_LOCATION should be activated only when debugging
- * libxml i.e. if libxml has been configured with --with-debug-mem too
+ * libxml i.e. if libxml has been configured with --with-debug-mem too.
  *)
 
 {$IFDEF DEBUG}
@@ -41,14 +41,14 @@
 
 type
   (*
-   * The XML memory wrapper support 4 basic overloadable functions
+   * The XML memory wrapper support 4 basic overloadable functions.
    *)
 
   (**
    * xmlFreeFunc:
    * @mem: an already allocated block of memory
    *
-   * Signature for a free() implementation
+   * Signature for a free() implementation.
    *)
   xmlFreeFunc = procedure(ptr: Pointer); cdecl;
   PxmlFreeFunc = ^xmlFreeFunc;
@@ -57,9 +57,9 @@ type
    * xmlMallocFunc:
    * @size:  the size requested in bytes
    *
-   * Signature for a malloc() implementation
+   * Signature for a malloc() implementation.
    *
-   * Returns a pointer to the newly allocated block or NULL in case of error
+   * Returns a pointer to the newly allocated block or NULL in case of error.
    *)
   xmlMallocFunc = function(size: size_t): Pointer; cdecl;
   PxmlMallocFunc = ^xmlMallocFunc;
@@ -69,9 +69,9 @@ type
    * @mem: an already allocated block of memory
    * @size:  the new size requested in bytes
    *
-   * Signature for a realloc() implementation
+   * Signature for a realloc() implementation.
    *
-   * Returns a pointer to the newly reallocated block or NULL in case of error
+   * Returns a pointer to the newly reallocated block or NULL in case of error.
    *)
   xmlReallocFunc = function(ptr: Pointer; size: size_t): Pointer; cdecl;
   PxmlReallocFunc = ^xmlReallocFunc;
@@ -80,15 +80,15 @@ type
    * xmlStrdupFunc:
    * @str: a zero terminated string
    *
-   * Signature for an strdup() implementation
+   * Signature for an strdup() implementation.
    *
-   * Returns the copy of the string or NULL in case of error
+   * Returns the copy of the string or NULL in case of error.
    *)
   xmlStrdupFunc = function(str: PChar): PChar; cdecl;
   PxmlStrdupFunc = ^xmlStrdupFunc;
 
 (*
- * The 4 interfaces used for all memory handling within libxml
+ * The 4 interfaces used for all memory handling within libxml.
 LIBXML_DLL_IMPORT extern xmlFreeFunc xmlFree;
 LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMalloc;
 LIBXML_DLL_IMPORT extern xmlReallocFunc xmlRealloc;
@@ -96,18 +96,18 @@ LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
 *)
 
 (*
- * The way to overload the existing functions
+ * The way to overload the existing functions.
  *)
 function  xmlMemSetup(freeFunc: PxmlFreeFunc; mallocFunc: PxmlMallocFunc; reallocFunc: PxmlReallocFunc; strdupFunc: PxmlStrdupFunc): Longint; cdecl; external LIBXML2_SO;
 function  xmlMemGet(var freeFunc: PxmlFreeFunc; var mallocFunc: PxmlMallocFunc; var reallocFunc: PxmlReallocFunc; var strdupFunc: PxmlStrdupFunc): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Initialization of the memory layer
+ * Initialization of the memory layer.
  *)
 function  xmlInitMemory: Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Those are specific to the XML debug memory wrapper
+ * Those are specific to the XML debug memory wrapper.
  *)
 function  xmlMemUsed: Longint; cdecl; external LIBXML2_SO;
 procedure xmlMemDisplay(fp: PLibXml2File); cdecl; external LIBXML2_SO;
@@ -119,9 +119,9 @@ procedure xmlMemoryDump; cdecl; external LIBXML2_SO;
  * xmlMalloc:
  * @size:  number of bytes to allocate
  *
- * Wrapper for the malloc() function used in the XML library
+ * Wrapper for the malloc() function used in the XML library.
  *
- * Returns the pointer to the allocated area or NULL in case of error
+ * Returns the pointer to the allocated area or NULL in case of error.
  *)
 //TODO: #define xmlMalloc(size) xmlMallocLoc((size), __FILE__, __LINE__)
 (**
@@ -129,18 +129,18 @@ procedure xmlMemoryDump; cdecl; external LIBXML2_SO;
  * @ptr:  pointer to the existing allocated area
  * @size:  number of bytes to allocate
  *
- * Wrapper for the realloc() function used in the XML library
+ * Wrapper for the realloc() function used in the XML library.
  *
- * Returns the pointer to the allocated area or NULL in case of error
+ * Returns the pointer to the allocated area or NULL in case of error.
  *)
 //TODO: #define xmlRealloc(ptr, size) xmlReallocLoc((ptr), (size), __FILE__, __LINE__)
 (**
  * xmlMemStrdup:
  * @str:  pointer to the existing string
  *
- * Wrapper for the strdup() function, xmlStrdup() is usually preferred
+ * Wrapper for the strdup() function, xmlStrdup() is usually preferred.
  *
- * Returns the pointer to the allocated area or NULL in case of error
+ * Returns the pointer to the allocated area or NULL in case of error.
  *)
 //TODO: #define xmlMemStrdup(str) xmlMemStrdupLoc((str), __FILE__, __LINE__)
 

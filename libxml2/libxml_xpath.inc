@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.53] xpath.h
+// CVS-SIGN: [1.54] xpath.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -22,7 +22,7 @@ type
 
 const
   (**
-   * The set of XPath error codes
+   * The set of XPath error codes.
    *)
   XPATH_EXPRESSION_OK            = 0;
   XPATH_NUMBER_ERROR             = 1;
@@ -71,7 +71,7 @@ const
 type
   xmlXPathParserContextPtr = ^xmlXPathParserContext;
   (*
-   * A node-set (an unordered collection of nodes without duplicates)
+   * A node-set (an unordered collection of nodes without duplicates).
    *)
   xmlNodeSetPtr = ^xmlNodeSet;
   xmlNodeSet = record
@@ -134,7 +134,7 @@ type
    * @ctxt: an XPath parser context
    * @nargs: the number of arguments passed to the function
    *
-   * an XPath evaluation function, the parameters are on the XPath context stack
+   * an XPath evaluation function, the parameters are on the XPath context stack.
    *)
   xmlXPathEvalFunc = procedure(ctxt: xmlXPathParserContextPtr; nargs: Integer); cdecl;
 
@@ -156,7 +156,7 @@ type
    * the first time with cur == NULL and repeat until the function returns
    * NULL indicating the end of the axis traversal.
    *
-   * Returns the next node in that axis or NULL if at the end of the axis
+   * Returns the next node in that axis or NULL if at the end of the axis.
    *)
   xmlXPathAxisFunc = function(ctxt: xmlXPathParserContextPtr; cur: xmlXPathObjectPtr): xmlXPathObjectPtr; cdecl;
 
@@ -235,7 +235,7 @@ type
   end;
 
   (*
-   * The structure of a compiled expression form is not public
+   * The structure of a compiled expression form is not public.
    *)
   xmlXPathCompExpr = record
   end;
@@ -244,7 +244,7 @@ type
   (**
    * xmlXPathParserContext:
    *
-   * An XPath parser context, it contains pure parsing informations,
+   * An XPath parser context. It contains pure parsing informations,
    * an xmlXPathContext, and the stack of objects.
    *)
   xmlXPathParserContext = record
@@ -265,7 +265,7 @@ type
    * @ctxt:  the XPath interprestation context
    * @nargs:  the number of arguments
    *
-   * An XPath function
+   * An XPath function.
    * The arguments (if any) are popped out from the context stack
    * and the result is pushed on the stack.
    *)
@@ -305,7 +305,7 @@ function  xmlXPathNodeSetGetLength(ns: xmlNodeSetPtr): Integer; { was macro }
  * @ns:  a node-set
  * @index:  index of a node in the set
  *
- * Implements a functionnality similar to the DOM NodeList.item()
+ * Implements a functionnality similar to the DOM NodeList.item().
  *
  * Returns the xmlNodePtr at the given @index in @ns or NULL if
  *         @index is out of range (0 to length-1)
@@ -316,9 +316,9 @@ function  xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: Integer): xmlNodePtr; { 
  * xmlXPathNodeSetIsEmpty:
  * @ns: a node-set
  *
- * Checks whether @ns is empty or not
+ * Checks whether @ns is empty or not.
  *
- * Returns %TRUE if @ns is an empty node-set
+ * Returns %TRUE if @ns is an empty node-set.
  *)
 function  xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): boolean;
 
@@ -330,7 +330,7 @@ function  xmlXPathObjectCopy(val: xmlXPathObjectPtr): xmlXPathObjectPtr; cdecl; 
 function  xmlXPathCmpNodes(node1: xmlNodePtr; node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 
 (**
- * Conversion functions to basic types
+ * Conversion functions to basic types.
  *)
 function  xmlXPathCastNumberToBoolean(val: Double): Longint; cdecl; external LIBXML2_SO;
 function  xmlXPathCastStringToBoolean(val: PxmlChar): Longint; cdecl; external LIBXML2_SO;
@@ -351,7 +351,7 @@ function  xmlXPathConvertNumber(val: xmlXPathObjectPtr): xmlXPathObjectPtr; cdec
 function  xmlXPathConvertString(val: xmlXPathObjectPtr): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
 
 (**
- * Context handling
+ * Context handling.
  *)
 procedure xmlXPathInit; cdecl; external LIBXML2_SO;
 function  xmlXPathNewContext(doc: xmlDocPtr): xmlXPathContextPtr; cdecl; external LIBXML2_SO;
@@ -365,7 +365,7 @@ function  xmlXPathEvalExpression(str: PxmlChar; ctxt: xmlXPathContextPtr): xmlXP
 function  xmlXPathEvalPredicate(ctxt: xmlXPathContextPtr; res: xmlXPathObjectPtr): Longint; cdecl; external LIBXML2_SO;
 
 (**
- * Separate compilation/evaluation entry points
+ * Separate compilation/evaluation entry points.
  *)
 function  xmlXPathCompile(str: PxmlChar): xmlXPathCompExprPtr; cdecl; external LIBXML2_SO;
 function  xmlXPathCompiledEval(comp: xmlXPathCompExprPtr; ctx: xmlXPathContextPtr): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;

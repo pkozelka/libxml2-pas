@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.10] hash.h
+// CVS-SIGN: [1.11] hash.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -24,7 +24,7 @@
 
 type
   (*
-   * The hash table
+   * The hash table.
    *)
   xmlHashTablePtr = ^xmlHashTable;
   xmlHashTable = record end;
@@ -37,7 +37,7 @@ type
    * @payload:  the data in the hash
    * @name:  the name associated
    *
-   * Callback to free data from a hash
+   * Callback to free data from a hash.
    *)
   xmlHashDeallocator = procedure(payload: Pointer; name: PxmlChar); cdecl;
   (**
@@ -45,9 +45,9 @@ type
    * @payload:  the data in the hash
    * @name:  the name associated
    *
-   * Callback to copy data from a hash
+   * Callback to copy data from a hash.
    *
-   * Returns a copy of the data or NULL in case of error
+   * Returns a copy of the data or NULL in case of error.
    *)
   xmlHashCopier = function(payload: Pointer; name: PxmlChar): Pointer; cdecl;
   (**
@@ -56,7 +56,7 @@ type
    * @data:  extra scannner data
    * @name:  the name associated
    *
-   * Callback when scanning data in a hash with the simple scanner
+   * Callback when scanning data in a hash with the simple scanner.
    *)
   xmlHashScanner = procedure(payload: Pointer; data: Pointer; name: PxmlChar); cdecl;
   (**
@@ -67,18 +67,18 @@ type
    * @name2:  the second name associated
    * @name3:  the third name associated
    *
-   * Callback when scanning data in a hash with the full scanner
+   * Callback when scanning data in a hash with the full scanner.
    *)
   xmlHashScannerFull = function(payload: Pointer; data: Pointer; name, name2, name3: PxmlChar): Pointer; cdecl;
 
 (*
- * Constructor and destructor
+ * Constructor and destructor.
  *)
 function  xmlHashCreate(size: Longint): xmlHashTablePtr; cdecl; external LIBXML2_SO;
 procedure xmlHashFree(table: xmlHashTablePtr; f: xmlHashDeallocator); cdecl; external LIBXML2_SO;
 
 (*
- * Add a new entry to the hash table
+ * Add a new entry to the hash table.
  *)
 function  xmlHashAddEntry(table: xmlHashTablePtr; name: PxmlChar; userdata: Pointer): Longint; cdecl; external LIBXML2_SO;
 function  xmlHashUpdateEntry(table: xmlHashTablePtr; name: PxmlChar; userdata: Pointer; f: xmlHashDeallocator): Longint; cdecl; external LIBXML2_SO;
@@ -88,21 +88,21 @@ function  xmlHashAddEntry3(table: xmlHashTablePtr; name: PxmlChar; name2: PxmlCh
 function  xmlHashUpdateEntry3(table: xmlHashTablePtr; name: PxmlChar; name2: PxmlChar; name3: PxmlChar; userdata: Pointer; f: xmlHashDeallocator): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Remove an entry from the hash table
+ * Remove an entry from the hash table.
  *)
 function  xmlHashRemoveEntry(table: xmlHashTablePtr; name: PxmlChar; f: xmlHashDeallocator): Longint; cdecl; external LIBXML2_SO;
 function  xmlHashRemoveEntry2(table: xmlHashTablePtr; name: PxmlChar; name2: PxmlChar; f: xmlHashDeallocator): Longint; cdecl; external LIBXML2_SO;
 function  xmlHashRemoveEntry3(table: xmlHashTablePtr; name: PxmlChar; name2: PxmlChar; name3: PxmlChar; f: xmlHashDeallocator): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Retrieve the userdata
+ * Retrieve the userdata.
  *)
 function  xmlHashLookup(table: xmlHashTablePtr; name: PxmlChar): Pointer; cdecl; external LIBXML2_SO;
 function  xmlHashLookup2(table: xmlHashTablePtr; name: PxmlChar; name2: PxmlChar): Pointer; cdecl; external LIBXML2_SO;
 function  xmlHashLookup3(table: xmlHashTablePtr; name: PxmlChar; name2: PxmlChar; name3: PxmlChar): Pointer; cdecl; external LIBXML2_SO;
 
 (*
- * Helpers
+ * Helpers.
  *)
 function  xmlHashCopy(table: xmlHashTablePtr; f: xmlHashCopier): xmlHashTablePtr; cdecl; external LIBXML2_SO;
 function  xmlHashSize(table: xmlHashTablePtr): Longint; cdecl; external LIBXML2_SO;

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.26] encoding.h
+// CVS-SIGN: [1.27] encoding.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -32,8 +32,8 @@ const
   (**
    * xmlCharEncoding:
    *
-   * Predefined values for some standard encodings
-   * Libxml don't do beforehand translation on UTF8, ISOLatinX
+   * Predefined values for some standard encodings.
+   * Libxml don't do beforehand translation on UTF8, ISOLatinX.
    * It also support UTF16 (LE and BE) by default.
    *
    * Anything else would have to be translated to UTF8 before being
@@ -101,7 +101,7 @@ type
    * Take a block of UTF-8 chars in and try to convert it to an other
    * encoding.
    * Note: a first call designed to produce heading info is called with
-   * in = NULL. If stateful this should also initialize the encoder state
+   * in = NULL. If stateful this should also initialize the encoder state.
    *
    * Returns the number of byte written, or -1 by lack of space, or -2
    *     if the transcoding failed.
@@ -113,7 +113,7 @@ type
 
   (*
    * Block defining the handlers for non UTF-8 encodings.
-   * If iconv is supported, there is two extra fields
+   * If iconv is supported, there is two extra fields.
    *)
   xmlCharEncodingHandlerPtr = ^xmlCharEncodingHandler;
   xmlCharEncodingHandler = record
@@ -127,7 +127,7 @@ type
   end;
 
 (*
- * Interfaces for encoding handlers
+ * Interfaces for encoding handlers.
  *)
 procedure xmlInitCharEncodingHandlers; cdecl; external LIBXML2_SO;
 procedure xmlCleanupCharEncodingHandlers; cdecl; external LIBXML2_SO;
@@ -136,7 +136,7 @@ function  xmlGetCharEncodingHandler(enc: xmlCharEncoding): xmlCharEncodingHandle
 function  xmlFindCharEncodingHandler(name: PChar): xmlCharEncodingHandlerPtr; cdecl; external LIBXML2_SO;
 
 (*
- * Interfaces for encoding names and aliases
+ * Interfaces for encoding names and aliases.
  *)
 function  xmlAddEncodingAlias(name: PChar; alias: PChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlDelEncodingAlias(alias: PChar): Longint; cdecl; external LIBXML2_SO;
@@ -155,13 +155,13 @@ function  xmlCharEncFirstLine(handler: xmlCharEncodingHandlerPtr; aOut: xmlBuffe
 function  xmlCharEncCloseFunc(handler: xmlCharEncodingHandlerPtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Export a few useful functions
+ * Export a few useful functions.
  *)
 function  UTF8Toisolat1(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Longint; cdecl; external LIBXML2_SO;
 function  isolat1ToUTF8(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * exports additional "UTF-8 aware" string routines which are
+ * exports additional "UTF-8 aware" string routines which are.
  *)
 function  xmlCheckUTF8(utf: PByte): Longint; cdecl; external LIBXML2_SO;
 function  xmlUTF8Strsize(utf: PxmlChar; len: Longint): Longint; cdecl; external LIBXML2_SO;

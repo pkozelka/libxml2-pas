@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.33] valid.h
+// CVS-SIGN: [1.34] valid.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -16,7 +16,7 @@
 
 type
   (*
-   * Validation state added for non-determinist content model
+   * Validation state added for non-determinist content model.
    *)
   xmlValidStatePtr = Pointer;
 
@@ -26,7 +26,7 @@ type
    * @msg:  the string to format *printf like vararg
    * @...:  remaining arguments to the format
    *
-   * Callback called when a validity error is found, this is a message
+   * Callback called when a validity error is found. This is a message
    * oriented function similar to an *printf function.
    *)
   xmlValidityErrorFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} {[pk] varargs;} {$ENDIF}
@@ -36,68 +36,68 @@ type
    * @msg:  the string to format *printf like vararg
    * @...:  remaining arguments to the format
    *
-   * Callback called when a validity warning is found, this is a message
+   * Callback called when a validity warning is found. This is a message
    * oriented function similar to an *printf function.
    *)
   xmlValidityWarningFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} {[pk] varargs;} {$ENDIF}
 
   (**
    * xmlValidCtxt:
-   * an xmlValidCtxt is used for error reporting when validating
+   * an xmlValidCtxt is used for error reporting when validating.
    *)
   xmlValidCtxtPtr = ^xmlValidCtxt;
   xmlValidCtxt = record
-    userData: Pointer;                  { user specific data block  }
-    error: xmlValidityErrorFunc;        { the callback in case of errors  }
-    warning: xmlValidityWarningFunc;    { the callback in case of warning  }
+    userData: Pointer;                  (* user specific data block  *)
+    error: xmlValidityErrorFunc;        (* the callback in case of errors  *)
+    warning: xmlValidityWarningFunc;    (* the callback in case of warning  *)
 
     (* Node analysis stack used when validating within entities *)
-    node: xmlNodePtr;                   { Current parsed Node  }
-    nodeNr: Longint;                    { Depth of the parsing stack  }
-    nodeMax: Longint;                   { Max depth of the parsing stack  }
-    nodeTab: ^xmlNodePtr;               { array of nodes  }
-    finishDtd: Longint;                 { finished validating the Dtd ?  }
-    doc: xmlDocPtr;                     { the document  }
-    valid: Longint;                     { temporary validity check result  }
+    node: xmlNodePtr;                   (* Current parsed Node  *)
+    nodeNr: Longint;                    (* Depth of the parsing stack  *)
+    nodeMax: Longint;                   (* Max depth of the parsing stack  *)
+    nodeTab: ^xmlNodePtr;               (* array of nodes  *)
+    finishDtd: Longint;                 (* finished validating the Dtd ?  *)
+    doc: xmlDocPtr;                     (* the document  *)
+    valid: Longint;                     (* temporary validity check result  *)
 
     (* state state used for non-determinist content validation *)
-    vstate: xmlValidStatePtr;           { current state  }
-    vstateNr: Longint;                  { Depth of the validation stack  }
-    vstateMax: Longint;                 { Max depth of the validation stack  }
-    vstateTab: xmlValidStatePtr;        { array of validation states  }
+    vstate: xmlValidStatePtr;           (* current state  *)
+    vstateNr: Longint;                  (* Depth of the validation stack  *)
+    vstateMax: Longint;                 (* Max depth of the validation stack  *)
+    vstateTab: xmlValidStatePtr;        (* array of validation states  *)
   end;
 
   (*
-   * All notation declarations are stored in a table
-   * there is one table per DTD
+   * All notation declarations are stored in a table.
+   * There is one table per DTD.
    *)
   xmlNotationTable = xmlHashTable;
   xmlNotationTablePtr = ^xmlNotationTable;
 
   (*
-   * All element declarations are stored in a table
-   * there is one table per DTD
+   * All element declarations are stored in a table.
+   * There is one table per DTD.
    *)
   xmlElementTable = xmlHashTable;
   xmlElementTablePtr = ^xmlElementTable;
 
   (*
-   * All attribute declarations are stored in a table
-   * there is one table per DTD
+   * All attribute declarations are stored in a table.
+   * There is one table per DTD.
    *)
   xmlAttributeTable = xmlHashTable;
   xmlAttributeTablePtr = ^xmlAttributeTable;
 
   (*
-   * All IDs attributes are stored in a table
-   * there is one table per document
+   * All IDs attributes are stored in a table.
+   * There is one table per document.
    *)
   xmlIDTable = xmlHashTable;
   xmlIDTablePtr = ^xmlIDTable;
 
   (*
-   * All Refs attributes are stored in a table
-   * there is one table per document
+   * All Refs attributes are stored in a table.
+   * There is one table per document.
    *)
   xmlRefTable = xmlHashTable;
   xmlRefTablePtr = ^xmlRefTable;
@@ -154,7 +154,7 @@ function  xmlRemoveRef(doc: xmlDocPtr; attr: xmlAttrPtr): Longint; cdecl; extern
 function  xmlGetRefs(doc: xmlDocPtr; ID: PxmlChar): xmlListPtr; cdecl; external LIBXML2_SO;
 
 (**
- * The public function calls related to validity checking
+ * The public function calls related to validity checking.
  *)
 function  xmlValidateRoot(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateElementDecl(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlElementPtr): Longint; cdecl; external LIBXML2_SO;

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.103] tree.h
+// CVS-SIGN: [1.104] tree.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -43,19 +43,19 @@ const
   (**
    * BASE_BUFFER_SIZE:
    *
-   * default buffer size 4000
+   * default buffer size 4000.
    *)
   BASE_BUFFER_SIZE = 4000;
   (**
    * XML_XML_NAMESPACE:
    *
    * This is the namespace for the special xml: prefix predefined in the
-   * XML Namespace specification
+   * XML Namespace specification.
    *)
   XML_XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
 
   (*
-   * The different element types carried by an XML tree
+   * The different element types carried by an XML tree.
    *
    * NOTE: This is synchronized with DOM Level1 values
    *       See http://www.w3.org/TR/REC-DOM-Level-1/
@@ -183,7 +183,8 @@ type
 
   (**
    * xmlNotation:
-   * a DTD Notation definition
+   *
+   * A DTD Notation definition.
    *)
   xmlNotationPtr = ^xmlNotation;
   xmlNotation = record
@@ -194,20 +195,23 @@ type
 
   (**
    * xmlAttributeType:
-   * a DTD Attribute type definition
+   *
+   * A DTD Attribute type definition.
    *)
 
   xmlAttributeType = Longint;
 
   (**
    * xmlAttributeDefault:
-   * a DTD Attribute default definition
+   *
+   * A DTD Attribute default definition.
    *)
   xmlAttributeDefault = Longint;
 
   (**
    * xmlEnumeration:
-   * list structure used when there is an enumeration in DTDs
+   *
+   * list structure used when there is an enumeration in DTDs.
    *)
   xmlEnumerationPtr = ^xmlEnumeration;
   xmlEnumeration = record
@@ -217,7 +221,8 @@ type
 
   (**
    * xmlAttribute:
-   * an Attribute declaration in a DTD
+   *
+   * An Attribute declaration in a DTD.
    *)
   xmlAttributePtr = ^xmlAttribute;
   xmlAttribute = record
@@ -241,19 +246,22 @@ type
 
   (**
    * xmlElementContentType:
-   * Possible definitions of element content types
+   *
+   * Possible definitions of element content types.
    *)
   xmlElementContentType = Longint;
 
   (**
    * xmlElementContentOccur:
-   * Possible definitions of element content occurences
+   *
+   * Possible definitions of element content occurences.
    *)
   xmlElementContentOccur = Longint;
 
   (**
    * xmlElementContent:
-   * an XML Element content as stored after parsing an element definition
+   *
+   * An XML Element content as stored after parsing an element definition
    * in a DTD.
    *)
   xmlElementContentPtr = ^xmlElementContent;
@@ -269,13 +277,15 @@ type
 
   (**
    * xmlElementTypeVal:
-   * the differnt possibility for an element content type
+   *
+   * The differnt possibility for an element content type.
    *)
   xmlElementTypeVal = Longint;
 
   (**
    * xmlElement:
-   * an XML Element declaration from a DTD
+   *
+   * An XML Element declaration from a DTD.
    *)
   xmlElementPtr = ^xmlElement;
   xmlElement = record
@@ -302,7 +312,7 @@ type
    * Note that prefix == NULL is valid, it defines the default namespace
    * within the subtree (until overriden).
    *
-   * xmlNsType is unified with xmlElementType
+   * xmlNsType is unified with xmlElementType.
    *)
   xmlNsPtr = ^xmlNs;
   PxmlNsPtr = ^xmlNsPtr;
@@ -317,7 +327,7 @@ type
    * xmlDtd:
    *
    * An XML DtD, as defined by <!DOCTYPE ... There is actually one for
-   * the internal subset and for the external subset
+   * the internal subset and for the external subset.
    *)
   xmlDtd = record
     _private: Pointer;              { application data }
@@ -341,6 +351,7 @@ type
 
   (**
    * xmlAttr:
+   *
    * A attribute on an XML node.
    *)
 
@@ -385,14 +396,15 @@ type
    * xmlBufferAllocationScheme:
    *
    * A buffer allocation scheme can be defined to either match exactly the
-   * need or double it's allocated size each time it is found too small
+   * need or double it's allocated size each time it is found too small.
    *)
 
   xmlBufferAllocationScheme = Longint;
 
   (**
    * xmlBuffer:
-   * A buffer structure
+   *
+   * A buffer structure.
    *)
   xmlBufferPtr = ^xmlBuffer;
   xmlBuffer = record
@@ -404,6 +416,7 @@ type
 
   (**
    * xmlNode:
+   *
    * A node in an XML tree.
    *)
   xmlNode = record
@@ -425,6 +438,7 @@ type
 
   (**
    * xmlDoc:
+   *
    * An XML document.
    *)
   xmlDoc = record
@@ -486,7 +500,7 @@ procedure xmlBufferSetAllocationScheme(buf: xmlBufferPtr; scheme: xmlBufferAlloc
 function  xmlBufferLength(buf: xmlBufferPtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Creating/freeing new structures
+ * Creating/freeing new structures.
  *)
 function  xmlCreateIntSubset(doc: xmlDocPtr; name: PxmlChar; ExternalID: PxmlChar; SystemID: PxmlChar): xmlDtdPtr; cdecl; external LIBXML2_SO;
 function  xmlNewDtd(doc: xmlDocPtr; name: PxmlChar; ExternalID: PxmlChar; SystemID: PxmlChar): xmlDtdPtr; cdecl; external LIBXML2_SO;
@@ -509,7 +523,7 @@ function  xmlCopyDtd(dtd: xmlDtdPtr): xmlDtdPtr; cdecl; external LIBXML2_SO;
 function  xmlCopyDoc(doc: xmlDocPtr; recursive: Longint): xmlDocPtr; cdecl; external LIBXML2_SO;
 
 (*
- * Creating new nodes
+ * Creating new nodes.
  *)
 function  xmlNewDocNode(doc: xmlDocPtr; ns: xmlNsPtr; name: PxmlChar; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlNewDocRawNode(doc: xmlDocPtr; ns: xmlNsPtr; name: PxmlChar; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
@@ -532,7 +546,7 @@ function  xmlCopyNodeList(node: xmlNodePtr): xmlNodePtr; cdecl; external LIBXML2
 function  xmlNewDocFragment(doc: xmlDocPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
 
 (*
- * Navigating
+ * Navigating.
  *)
 function  xmlGetLineNo(node: xmlNodePtr): int64; cdecl; external LIBXML2_SO;
 function  xmlGetNodePath(node: xmlNodePtr): PxmlChar; cdecl; external LIBXML2_SO;
@@ -542,7 +556,7 @@ function  xmlNodeIsText(node: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlIsBlankNode(node: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Changing the structure
+ * Changing the structure.
  *)
 function  xmlDocSetRootElement(doc: xmlDocPtr; root: xmlNodePtr): xmlNodePtr; cdecl; external LIBXML2_SO;
 procedure xmlNodeSetName(cur: xmlNodePtr; name: PxmlChar); cdecl; external LIBXML2_SO;
@@ -561,7 +575,7 @@ procedure xmlSetTreeDoc(tree: xmlNodePtr; doc: xmlDocPtr); cdecl; external LIBXM
 procedure xmlSetListDoc(list: xmlNodePtr; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
 
 (*
- * Namespaces
+ * Namespaces.
  *)
 function  xmlSearchNs(doc: xmlDocPtr; node: xmlNodePtr; nameSpace: PxmlChar): xmlNsPtr; cdecl; external LIBXML2_SO;
 function  xmlSearchNsByHref(doc: xmlDocPtr; node: xmlNodePtr; href: PxmlChar): xmlNsPtr; cdecl; external LIBXML2_SO;
@@ -603,7 +617,7 @@ function  xmlUnsetProp(node: xmlNodePtr; name: PxmlChar): Longint; cdecl; extern
 function  xmlUnsetNsProp(node: xmlNodePtr; ns: xmlNsPtr; name: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Internal, don't use
+ * Internal, don't use.
  *)
 {$IFDEF VMS}
 procedure xmlBufferWriteXmlCHAR(buf: xmlBufferPtr; aString: PxmlChar); cdecl; external LIBXML2_SO;
@@ -614,12 +628,12 @@ procedure xmlBufferWriteChar(buf: xmlBufferPtr; aString: PChar); cdecl; external
 procedure xmlBufferWriteQuotedString(buf: xmlBufferPtr; aString: PxmlChar); cdecl; external LIBXML2_SO;
 
 (*
- * Namespace handling
+ * Namespace handling.
  *)
 function  xmlReconciliateNs(doc: xmlDocPtr; tree: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Saving
+ * Saving.
  *)
 procedure xmlDocDumpFormatMemory(cur: xmlDocPtr; var mem: PxmlChar; size: PLongint; format: Longint); cdecl; external LIBXML2_SO;
 procedure xmlDocDumpMemory(cur: xmlDocPtr; var mem: PxmlChar; size: PLongint); cdecl; external LIBXML2_SO;
@@ -639,7 +653,7 @@ function  xmlSaveFormatFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar;
 function  xmlSaveFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Compression
+ * Compression.
  *)
 function  xmlGetDocCompressMode(doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 procedure xmlSetDocCompressMode(doc: xmlDocPtr; mode: Longint); cdecl; external LIBXML2_SO;

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.21] debugXML.h
+// CVS-SIGN: [1.22] debugXML.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
