@@ -63,6 +63,14 @@ procedure xsltCleanupGlobals;cdecl;external LIBXSLT_SO;
 {$I libxslt_imports.inc}
 {$I libxslt_variables.inc}
 
+{TODO: $I libxslt_numbersInternals.inc}
+{TODO: $I libxslt_win32config.inc}
+{TODO: $I libxslt_xslt.inc}
+{TODO: $I libxslt_xsltconfig.inc}
+{TODO: $I libxslt_xsltwin32config.inc}
+
+{TODO: libexslt !!!}
+
 implementation
 
 end.
