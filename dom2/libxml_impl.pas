@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.19 2002-02-17 02:00:15 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.20 2002-02-17 02:12:29 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -354,7 +354,7 @@ type
   TLDomImplementationClass = class of TLDomImplementation;
   TLDomImplementation = class(TLDomObject, IDomImplementation)
   private
-    class function getInstance(aFreeThreading: boolean): IDomImplementation;
+    class function getInstance: IDomImplementation;
   protected //IDomImplementation
     function hasFeature(const feature, version: DomString): Boolean;
     function createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
@@ -367,7 +367,6 @@ type
   TLDomDocumentBuilderClass = class of TLDomDocumentBuilder;
   TLDomDocumentBuilder = class(TLDOMObject, IDomDocumentBuilder)
   private
-    FFreeThreading : Boolean;
   protected //IDomDocumentBuilder
     function  Get_DomImplementation : IDomImplementation;
     function  Get_IsNamespaceAware : Boolean;
@@ -378,7 +377,7 @@ type
     function  parse(const xml : DomString) : IDomDocument;
     function  load(const url : DomString) : IDomDocument;
   protected
-    constructor Create(AFreeThreading : Boolean);
+    constructor Create;
   public
     destructor Destroy; override;
   end;
@@ -387,13 +386,11 @@ type
 
   TLDomDocumentBuilderFactoryClass = class of TLDomDocumentBuilderFactory;
   TLDomDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
-  private
-    FFreeThreading : Boolean;
   protected //IDomDocumentBuilderFactory
     function  NewDocumentBuilder : IDomDocumentBuilder;
     function  Get_VendorID : DomString;
   public
-    constructor Create(aFreeThreading : Boolean);
+    constructor Create;
   end;
 
 //overridable implementations
@@ -453,7 +450,7 @@ const
 const
   DEFAULT_IMPL_FREE_THREADED = false;
 var
-  LDOMImplementation: array[Boolean] of IDomImplementation = (nil, nil);
+  GlbImplementation: IDomImplementation = nil;
 
 function GetDomObject(aNode: pointer): IUnknown;
 var
@@ -1727,12 +1724,12 @@ begin
   end;
 end;
 
-class function TLDomImplementation.getInstance(aFreeThreading: boolean): IDomImplementation;
+class function TLDomImplementation.getInstance: IDomImplementation;
 begin
-  Result := LDOMImplementation[aFreeThreading];
+  Result := GlbImplementation;
   if (Result = nil) then begin
     Result := GlbClasses.DomImplementation.Create; // currently, the same imlementation for both cases
-    LDOMImplementation[aFreeThreading] := Result;
+    GlbImplementation := Result;
   end;
 end;
 
@@ -1743,10 +1740,9 @@ end;
 
 { TLDomDocumentBuilder }
 
-constructor TLDomDocumentBuilder.Create(aFreeThreading : Boolean);
+constructor TLDomDocumentBuilder.Create;
 begin
   inherited Create;
-  FFreeThreading := aFreeThreading;
 end;
 
 destructor TLDOMDocumentBuilder.Destroy;
@@ -1756,7 +1752,7 @@ end;
 
 function TLDomDocumentBuilder.Get_DomImplementation : IDomImplementation;
 begin
-  Result := TLDomImplementation.getInstance(FFreeThreading);
+  Result := GlbClasses.DomImplementation.getInstance;
 end;
 
 function TLDomDocumentBuilder.Get_IsNamespaceAware : Boolean;
@@ -1814,14 +1810,14 @@ end;
 
 { TLDomDocumentBuilderFactory }
 
-constructor TLDomDocumentBuilderFactory.Create(aFreeThreading : Boolean);
+constructor TLDomDocumentBuilderFactory.Create;
 begin
-  FFreeThreading := aFreeThreading;
+  inherited Create;
 end;
 
 function TLDomDocumentBuilderFactory.NewDocumentBuilder : IDomDocumentBuilder;
 begin
-  Result := GlbClasses.DomBuilder.Create(FFreeThreading);
+  Result := GlbClasses.DomBuilder.Create;
 end;
 
 function TLDomDocumentBuilderFactory.Get_VendorID : DomString;
@@ -1832,7 +1828,6 @@ end;
 initialization
 finalization
   // release on-demand created instances
-  LDOMImplementation[false] := nil;
-  LDOMImplementation[true] := nil;
+  GlbImplementation := nil;
 end.
 
