@@ -492,6 +492,8 @@ resourcestring
   SNodeExpected = 'Node cannot be null';
   SGDOMNotInstalled = 'GDOME2 is not installed';
 
+function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
+
 function MakeNode(Node: xmlNodePtr;ADocument:IDOMDocument): IDOMNode;
 const
   NodeClasses: array[ELEMENT_NODE..NOTATION_NODE] of TGDOMNodeClass =
@@ -911,7 +913,9 @@ end;
 function TGDOMNode.removeChild(const childNode: IDOMNode): IDOMNode;
 begin
   if childNode<>nil
-    then xmlUnlinkNode(GetGNode(childNode));
+    then begin
+      xmlUnlinkNode(GetGNode(childNode));
+    end;
   result:=childNode;
 end;
 
@@ -962,13 +966,20 @@ begin
     then CheckError(WRONG_DOCUMENT_ERR);
   if self.isAncestorOrSelf(GetGNode(newChild))
     then CheckError(HIERARCHY_REQUEST_ERR);
+  {if self.isAncestorOrSelf(xmlDocGetRootElement(xmlDocPtr(FGNode)))
+    then if (newChild.nodeType = Element_Node) then begin
+      attr:=node.properties;
+      while attr<>nil do begin
+        (FOwnerDocument as IDOMInternal).appendAttr(attr);
+      end;
+    end;}
   if IsReadOnlyNode(node.parent)
     then CheckError(NO_MODIFICATION_ALLOWED_ERR);
   if node.parent<>nil
     then xmlUnlinkNode(node);
-  if node.type_=XML_ATTRIBUTE_NODE then begin
-    (FOwnerDocument as IDOMInternal).removeAttr(xmlAttrPtr(node));
-  end;
+//  if node.type_=XML_ATTRIBUTE_NODE then begin
+//    (FOwnerDocument as IDOMInternal).removeAttr(xmlAttrPtr(node));
+//  end;
   node:=xmlAddChild(FGNode,node);
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
@@ -1186,38 +1197,20 @@ end;
 
 function TGDOMNamedNodeMap.setNamedItem(const newItem: IDOMNode): IDOMNode;
 var
-  attr: xmlAttrPtr;
-  node,node1: xmlNodePtr;
-  slocalname,value:pchar;
+  xmlNewAttr,attr: xmlAttrPtr;
+  node: xmlNodePtr;
 begin
-  node:=GNamedNodeMap;
-  node1:=GetGNode(newItem);
-  slocalName:=node1.name;
-  attr:=xmlHasProp(FGNamedNodeMap,slocalName);
-  (FOwnerDocument as IDOMInternal).removeAttr(xmlAttrPtr(attr));
-  //if the NamedNodeMap is empty, replace its first element with the newItem
-  if node=nil
-    then begin
-      FGNamedNodeMap.properties:=xmlAttrPtr(node1);
-    end
-    else begin
-
-      // if the newItem does exit, replace it
-      if attr<>nil
-        then begin
-          node:=xmlReplaceNode(node,node1);
-          attr:=xmlAttrPtr(node);
-        end
-        // if the newItem doesn't exist, add it
-        else begin
-          if node1.children<>nil
-            then value:=node1.children.content
-            else value:='';
-          attr:=xmlSetProp(FGNamedNodeMap,slocalName,value);
-        end;
-    end;
+  node:=FGNamedNodeMap;
+  xmlNewAttr:=xmlAttrPtr(GetGNode(newItem));
+  //todo: check type of newItem
+  attr:=setattr(node,xmlNewAttr);
+  (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+  FGNamedNodeMap:=node;
     if attr<>nil
-      then result:=TGDomAttr.Create(attr,FOwnerDocument) as IDOMNode
+      then begin
+        (FOwnerDocument as IDOMInternal).appendAttr(attr);
+        result:=TGDomAttr.Create(attr,FOwnerDocument) as IDOMNode
+      end
       else result:=nil;
 end;
 
@@ -1450,57 +1443,72 @@ begin
     else result:=nil;
 end;
 
+function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr;
+var
+  attr,oldattr: xmlAttrPtr;
+  replace: boolean;
+  temp: string;
+begin
+  result:=nil;
+  if node=nil then exit;
+  if xmlNewAttr=nil then exit;
+  xmlnewAttr.last:=nil;
+  oldattr:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
+  if oldattr<>nil then replace:=true else replace:=false;
+  attr:=node.properties;                         // get the old attr-list
+  if (attr=nil)                                 // if it is empty or its an attribute with the same name
+    then begin
+      xmlNewAttr.next:=nil;
+      xmlNewAttr.last:=nil;
+      node.properties:=xmlnewAttr;               // replace it with the newattr
+    end
+    else begin
+       if xmlStrCmp(attr.name,xmlNewAttr.name)=0 then begin
+         xmlNewAttr.last:=nil;
+         xmlNewAttr.next:=attr.next;
+         node.properties:=xmlnewAttr;               // replace it with the newattr
+       end else begin
+         while attr.next <> nil do begin
+           if xmlStrCmp(attr.next.name,xmlNewattr.name)=0
+             then begin
+               attr.next:=xmlNewAttr;
+               if attr=node.properties
+                 then node.properties.next:=xmlNewAttr;
+               attr:=attr.next;
+               xmlNewAttr.next:=attr.next;
+               temp:=xmlNewAttr.children.content;
+               temp:=attr.children.content;
+               attr:=xmlNewAttr;
+
+               break;
+             end;
+           attr:=attr.next
+         end;
+         if not replace then begin
+           xmlNewAttr.next:=nil;
+           attr.next:=xmlNewAttr
+         end;
+       end;
+    end;
+  result:=oldattr;
+end;
+
 function TGDOMElement.setAttributeNode(const newAttr: IDOMAttr):IDOMAttr;
 var
-  attr,xmlnewAttr,oldattr,debug: xmlAttrPtr;
+  xmlnewAttr,oldattr: xmlAttrPtr;
   temp: string;
-  node,tmp: xmlNodePtr;
+  node: xmlNodePtr;
 begin
   if newAttr<>nil then begin
     xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));     // Get the libxml2-Attribute
     xmlnewAttr.last:=nil;
     node:=xmlNodePtr(GElement);
-    oldattr:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
-    attr:=node.properties;                         // get the old attr-list
-    if (attr=nil)                                 // if it is empty or its an attribute with the same name
-      then begin
-        xmlNewAttr.next:=nil;
-        xmlNewAttr.last:=nil;
-        node.properties:=xmlnewAttr;               // replace it with the newattr
-      end
-      else begin
-         if xmlStrCmp(attr.name,xmlNewAttr.name)=0 then begin
-           xmlNewAttr.last:=nil;
-           xmlNewAttr.next:=attr.next;
-           node.properties:=xmlnewAttr;               // replace it with the newattr
-         end else begin
-           while attr.next <> nil do begin
-             if xmlStrCmp(attr.next.name,xmlNewattr.name)=0
-               then begin
-                 break;
-               end;
-             attr:=attr.next
-           end;
-           xmlNewAttr.last:=attr.last;
-           xmlNewAttr.next:=attr.next;
-           attr.next:=xmlNewAttr;                    // end append the attr there
-           //debug routine:
-           debug:=node.properties;
-           while debug.next <> nil do begin
-             temp:=node.name;
-             debug:=debug.next;
-           end;
-         end;
-      end;
-    if node.parent <> nil
-      then (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+    oldAttr:=setAttr(node,xmlNewAttr);
+    (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
     if oldattr<>nil
       then begin
         temp:=oldattr.name;
         oldattr.parent:=nil;
-        //oldattr.children:=nil;
-        //oldattr.last:=nil;
-        //oldattr.next:=nil;
         result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDOMAttr;
         (FOwnerDocument as IDOMInternal).appendAttr(oldattr);
       end
@@ -1509,6 +1517,7 @@ begin
       end;
   end;
 end;
+
 
 
 function TGDOMElement.removeAttributeNode(const oldAttr: IDOMAttr):IDOMAttr;
@@ -1530,11 +1539,11 @@ begin
            end;
            attr.next:=nil;
         end;
-      //(FOwnerDocument as IDOMInternal).removeAttr(oldAttr1);
+      //(FOwnerDocument as IDOMInternal).appendAttr(oldAttr1);
       if oldattr<>nil
         then begin
           result:=oldattr;
-          //(FOwnerDocument as IDOMInternal).appendAttr(oldattr);
+          (FOwnerDocument as IDOMInternal).appendAttr(xmlNewattr);
         end
         else begin
           result:=nil;
@@ -1677,7 +1686,7 @@ var
   name1: TGdomString;
 begin
   name1:=TGdomString.create(name);
-  if xmlGetProp(xmlNodePtr(GElement),name1.CString) <> nil
+  if xmlHasProp(xmlNodePtr(GElement),name1.CString) <> nil
     then result:=true
     else result:=false;
   name1.free;
@@ -1757,8 +1766,8 @@ destructor TGDOMDocument.destroy;
 var
   i: integer;
   AAttr: xmlAttrPtr;
-  ANode,tmp: xmlNodePtr;
-  ANs:   xmlNsPtr;
+  ANode: xmlNodePtr;
+  //ANs:   xmlNsPtr;
 begin
   if FPGdomeDoc<>nil then begin
 
@@ -1769,6 +1778,25 @@ begin
         then xmlFreeNs(ANs);
     end;
 }
+
+    for i:=0 to FNodeList.Count-1 do begin
+      ANode:=FNodeList[i];
+      if ANode<>nil
+        then if (ANode.parent=nil)
+          then begin
+            //ANode.ns:=nil;
+            //ANode.nsDef:=nil;
+            if ANode.type_=xml_element_node then begin
+              AAttr:=ANode.properties;
+              while AAttr<>nil do begin
+                FAttrList.Remove(AAttr);
+                AAttr:=AAttr.next
+              end;
+            end;
+            xmlFreeNode(ANode)
+          end;
+    end;
+
     for i:=0 to FAttrList.Count-1 do begin
       AAttr:=FAttrList[i];
       if AAttr<>nil then
@@ -1783,17 +1811,7 @@ begin
     end;
 
 
-    for i:=0 to FNodeList.Count-1 do begin
-      ANode:=FNodeList[i];
-      if ANode<>nil
-        then if (ANode.parent=nil)
-          then begin
-            //ANode.ns:=nil;
-            //ANode.nsDef:=nil;
-            ANode.properties:=nil;
-            xmlFreeNode(ANode)
-          end;
-    end;
+
     xmlFreeDoc(FPGdomeDoc);
     dec(doccount);
 
@@ -1846,6 +1864,7 @@ begin
   name1.free;
   if AElement<>nil
     then begin
+      AElement.parent:=nil;
       FNodeList.Add(AElement);
       result:=TGDOMElement.Create(AElement,self)
     end
