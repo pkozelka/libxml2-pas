@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.43 2002-01-16 09:16:28 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.44 2002-01-16 10:43:01 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -765,26 +765,25 @@ begin
 end;
 
 function TGDOMNode.get_localName: DOMString;
-var
-	temp: String;
 begin
 	case FGNode.type_ of
 		//todo: check the result for the other nodetypes
 		//this is necessary, because libxml2 delivers
 		//'text' instead of '#text'
-		3: temp:='#text';
-		9: temp:='#document';
+	XML_TEXT_NODE:
+		Result := '#text';
+	XML_DOCUMENT_NODE:
+		Result := '#document';
 	else
-		begin
-			temp:=FGNode.name;
-			// this is neccessary, because according to the dom2
-			// specification localName has to be nil for nodes,
-			// that don't have a namespace
-			if FGNode.ns=nil
-				then temp:='';
+		// this is neccessary, because according to the dom2
+		// specification localName has to be nil for nodes,
+		// that don't have a namespace
+		if (FGNode.ns<>nil) then begin
+			Result := UTF8Decode(FGNode.name);
+		end else begin
+			Result := '';
 		end;
 	end;
-	result:=temp;
 end;
 
 function TGDOMNode.insertBefore(const newChild, refChild: IDOMNode): IDOMNode;
@@ -1531,6 +1530,41 @@ begin
 	_AddRef; //todo: replace with better solution
 end;
 
+constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
+begin
+	FGdomimpl:=GDOMImpl;
+	//Create root-node as pascal object
+	inherited create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
+	FAttrList:=TList.Create;
+	FNodeList:=TList.Create;
+	inc(doccount);
+	_AddRef; //todo: replace with better solution
+end;
+
+constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
+var
+	fn: string;
+	doc: xmlDocPtr;
+begin
+	//Get root-node
+	{$ifdef WIN32}
+		fn := UTF8Encode(StringReplace(aUrl, '\', '\\', [rfReplaceAll]));
+	{$else}
+		fn := aUrl;
+	{$endif}
+	doc := xmlParseFile(PChar(fn));
+	if (doc=nil) then begin
+		DomAssert(false, 102);
+	end;
+
+	inherited create(xmlNodePtr(doc));
+	FGdomimpl:=GDOMImpl;
+	FAttrList:=TList.Create;
+	FNodeList:=TList.Create;
+	inc(doccount);
+	_AddRef; //todo: replace with better solution
+end;
+
 destructor TGDOMDocument.Destroy;
 var
 	i: integer;
@@ -2271,41 +2305,6 @@ begin
 		node:=node.parent;
 	end;
 	result:=false;
-end;
-
-constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
-begin
-	FGdomimpl:=GDOMImpl;
-	//Create root-node as pascal object
-	inherited create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
-	FAttrList:=TList.Create;
-	FNodeList:=TList.Create;
-	inc(doccount);
-	_AddRef; //todo: replace with better solution
-end;
-
-constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
-var
-	fn: string;
-	doc: xmlDocPtr;
-begin
-	//Get root-node
-	{$ifdef WIN32}
-		fn := UTF8Encode(StringReplace(aUrl, '\', '\\', [rfReplaceAll]));
-	{$else}
-		fn := aUrl;
-	{$endif}
-	doc := xmlParseFile(PChar(fn));
-	if (doc=nil) then begin
-		DomAssert(false, 102);
-	end;
-
-	inherited create(xmlNodePtr(doc));
-	FGdomimpl:=GDOMImpl;
-	FAttrList:=TList.Create;
-	FNodeList:=TList.Create;
-	inc(doccount);
-	_AddRef; //todo: replace with better solution
 end;
 
 procedure TGDOMDocument.removeAttr(attr: xmlAttrPtr);
