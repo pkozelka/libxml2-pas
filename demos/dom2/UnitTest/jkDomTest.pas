@@ -26,7 +26,7 @@ unit jkDomTest;
 interface
 {$DEFINE NodeTypeInteger}
 
-uses dom2,libxmldom,msxml_impl; // IDOMIMplementation, IDOMDocument
+uses xdom2,libxmldom,msxml_impl; // IDOMIMplementation, IDOMDocument
 
 function TestGDom3(name,vendorstr:string;TestSet:integer):double;
 function getDoc(filename,vendorstr: string;TestSet:integer=0): IDOMDocument;
@@ -37,6 +37,7 @@ function test(name: string; testexpr: boolean): boolean;
 // Returns the number of tests, passed OK
 function TestDocument(filename,vendorstr:string;testset: integer):integer;
 function TestElement0(filename,vendorstr:string;TestSet: integer):integer;
+function TestNamedNodemap(filename,vendorstr:string;TestSet: integer):integer;
 
 implementation
 
@@ -100,6 +101,68 @@ begin
   end;
   if ok then result := doc else result := nil;
 end;
+
+function TestNamedNodemap(filename,vendorstr:string;TestSet: integer):integer;
+var
+  document: IDOMDocument;
+  documentElement: IDOMElement;
+  namedNodeMap: IDOMNamedNodeMap;
+  node,node1: IDOMNode;
+  dom2: boolean;
+begin
+  TestsOK:=0;
+  result:=0;
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+  document := getDoc(filename,vendorstr);
+  documentElement:= document.documentElement;
+  namednodemap := documentElement.attributes;
+  if namednodemap<>nil
+    then outlog('namedNodeMap.length: '+inttostr(namedNodeMap.length))
+    else outlog('__namedNodeMap=NIL');
+  documentElement:=nil;
+  node := document.createAttribute('age') as IDOMNode;
+  node.nodeValue := '13';
+  node := namednodemap.setNamedItem(node);
+  node := nil;
+
+  node := namednodemap.getNamedItem('age');
+  test('namedNodeMap.getNamedItem/setNamedItem',(node.nodeValue = '13'));
+
+  node1 := document.createAttribute('sex') as IDOMNode;
+  node1.nodeValue:='male';
+  node1.nodeName;
+  node1 := namednodemap.setNamedItem(node1);
+  if node1<> nil
+    then begin
+      test('namedNodeMap.setNamedItemII',(namedNodeMap[1].nodeValue = 'male'));
+      node1 := namednodemap.removeNamedItem('sex');
+    end
+    else outLog('__namedNodeMap.setNamedItemII doesn''t work!');
+
+  node := namednodemap.removeNamedItem('age');
+  test('namedNodeMap.removeNamedItem',(namednodemap.length = 0));
+  node := nil;
+  namednodemap := nil;
+  if dom2 then
+    try
+      namednodemap := document.documentElement.attributes;
+      node := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:age') as IDOMNode;
+      node.nodeValue := '13';
+      node := namednodemap.setNamedItemNS(node);
+      node := nil;
+      node := namednodemap.getNamedItemNS('http://xmlns.4commerce.de/eva','age');
+      test('namedNodeMap.getNamedItemNS/setNamedItemNS',(node.nodeValue = '13'));
+      node := namednodemap.removeNamedItemNS('http://xmlns.4commerce.de/eva','age');
+      test('namedNodeMap.removeNamedItemNS',(namednodemap.length = 0));
+      node := nil;
+      namednodemap := nil;
+    except
+      OutLog('__namedNodeMap.getNamedItemNS/setNamedItemNS doesn''t work!');
+      OutLog('__namedNodeMap.removeNamedItemNS doesn''t work!');
+    end;
+  result:=TestsOK;
+end;
+
 
 function TestDocument(filename,vendorstr:string;testset: integer):integer;
 var
@@ -632,60 +695,6 @@ begin
   end;
 end;
 
-procedure TestNamedNodemap(filename,vendorstr:string);
-var
-  document: IDOMDocument;
-  documentElement: IDOMElement;
-  namedNodeMap: IDOMNamedNodeMap;
-  node,node1: IDOMNode;
-begin
-  document := getDoc(filename,vendorstr);
-  documentElement:= document.documentElement;
-  namednodemap := documentElement.attributes;
-  if namednodemap<>nil
-    then outlog('namedNodeMap.length: '+inttostr(namedNodeMap.length))
-    else outlog('__namedNodeMap=NIL');
-  documentElement:=nil;
-  node := document.createAttribute('age') as IDOMNode;
-  node.nodeValue := '13';
-  node := namednodemap.setNamedItem(node);
-  node := nil;
-
-  node := namednodemap.getNamedItem('age');
-  test('namedNodeMap.getNamedItem/setNamedItem',(node.nodeValue = '13'));
-
-  node1 := document.createAttribute('sex') as IDOMNode;
-  node1.nodeValue:='male';
-  node1.nodeName;
-  node1 := namednodemap.setNamedItem(node1);
-  if node1<> nil
-    then begin
-      test('namedNodeMap.setNamedItemII',(namedNodeMap[1].nodeValue = 'male'));
-      node1 := namednodemap.removeNamedItem('sex');
-    end
-    else outLog('__namedNodeMap.setNamedItemII doesn''t work!');
-
-  node := namednodemap.removeNamedItem('age');
-  test('namedNodeMap.removeNamedItem',(namednodemap.length = 0));
-  node := nil;
-  namednodemap := nil;
-  try
-    namednodemap := document.documentElement.attributes;
-    node := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:age') as IDOMNode;
-    node.nodeValue := '13';
-    node := namednodemap.setNamedItemNS(node);
-    node := nil;
-    node := namednodemap.getNamedItemNS('http://xmlns.4commerce.de/eva','age');
-    test('namedNodeMap.getNamedItemNS/setNamedItemNS',(node.nodeValue = '13'));
-    node := namednodemap.removeNamedItemNS('http://xmlns.4commerce.de/eva','age');
-    test('namedNodeMap.removeNamedItemNS',(namednodemap.length = 0));
-    node := nil;
-    namednodemap := nil;
-  except
-    OutLog('__namedNodeMap.getNamedItemNS/setNamedItemNS doesn''t work!');
-    OutLog('__namedNodeMap.removeNamedItemNS doesn''t work!');
-  end;
-end;
 
 procedure TestElement1(filename,vendorstr:string);
 var
@@ -804,7 +813,7 @@ begin
 
   // testing namedNodeMap
   if (testset and 128) =128
-    then TestNamedNodemap(filename,vendorstr);
+    then TestNamedNodemap(filename,vendorstr,testset);
 
 
   //document.documentElement.setAttributeNS('http://xmlns.4commerce.de/eva','eva:test','huhu');

@@ -3,7 +3,7 @@ unit LIBXMLTestCase;
 interface
 
 uses
-	SysUtils, Classes, TestFrameWork, libxmldom, dom2, Dialogs, msxml_impl,
+	SysUtils, Classes, TestFrameWork, libxmldom, xdom2, Dialogs, msxml_impl,
 	ActiveX,GUITestRunner,StrUtils;
 
 const
@@ -425,7 +425,6 @@ begin
 		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
 		while (rv=0) do begin
 			Inc(cnt);
-			builder := getDocumentBuilderFactory(DomVendor).newDocumentBuilder;
 			fn := fd + '/' + sr.Name;
       (mydoc as IDOMPersist).load(fn);
 			check(mydoc<>nil, fn+': document not loaded');
