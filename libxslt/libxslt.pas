@@ -39,7 +39,7 @@ const
 	XSLT_DEFAULT_VENDOR = 'libxslt';
 	XSLT_DEFAULT_URL = 'http://xmlsoft.org/XSLT/';
 
-function XSLT_NAMESPACE : PxmlChar;
+	XSLT_NAMESPACE = 'http://www.w3.org/1999/XSL/Transform';
 
 {
 	Global cleanup function
@@ -64,13 +64,6 @@ procedure xsltCleanupGlobals;cdecl;external LIBXSLT_SO;
 {$I libxslt_variables.inc}
 
 implementation
-
-function XSLT_NAMESPACE : PxmlChar;
-begin
-	 XSLT_NAMESPACE:=PxmlChar('http://www.w3.org/1999/XSL/Transform');
-end;
-
-{$I libxslt_extra.imp}
 
 end.
 
