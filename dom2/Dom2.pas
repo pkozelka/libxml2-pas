@@ -43,6 +43,7 @@ uses
   classes;
 
 const
+{$DEFINE NodeTypeInteger}
 
   (*
    * The official DOM specs works with Integer values for Exceptions.
@@ -226,8 +227,12 @@ type
                ntDocumentFragmentNode,
                ntNotationNode);
 
-  (* added for compatibillity with borland xml *)             
-  DomNodeType = TNodeType;
+  (* added for compatibillity with borland xml *)
+  {$IFDEF NodeTypeInteger}
+    DomNodeType = Integer;
+  {$ELSE}
+    DomNodeType = TNodeType;
+  {$ENDIF}
 
   (*
    * Although strict DOM specs works with constants for Exception types, enums
@@ -322,7 +327,7 @@ type
      * @Raises EDomException
     *)
     function  get_NodeValue : DomString;
-    function  get_NodeType : TNodeType;
+    function  get_NodeType : DomNodeType;
     function  get_ParentNode : IDomNode;
     function  get_ChildNodes : IDomNodeList;
     function  get_FirstChild : IDomNode;
@@ -396,7 +401,7 @@ type
      * @Raises EDomException
     *)
     property nodeValue       : DomString read get_NodeValue write set_NodeValue;
-    property nodeType        : TNodeType read get_NodeType;
+    property nodeType        : DomNodeType read get_NodeType;
     property parentNode      : IDomNode read get_ParentNode;
     property childNodes      : IDomNodeList read get_ChildNodes;
     property firstChild      : IDomNode read get_FirstChild;
