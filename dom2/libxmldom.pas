@@ -1423,7 +1423,7 @@ var
 begin
 	uprefix := prefix(qualifiedName);
 	ulocal := localName(qualifiedName);
-	ns := xmlNewGlobalNs(FGNode.doc, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+	ns := xmlNewNs(FGNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
 	xmlSetNSProp(FGNode, ns, PChar(ulocal), PChar(UTF8Encode(value)));
 end;
 
@@ -2385,7 +2385,7 @@ begin
 end;
 
 initialization
-  RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
+	RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
 finalization
 end.
 
