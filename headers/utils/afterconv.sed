@@ -38,8 +38,11 @@ s/^[[:space:]]*{[[:space:]]*__.*__[[:space:]]*}$//i
 # try to make indent=2
 s/^   \([^ ]\)/  \1/
 #
-s/array of const/VARARGS/
+s/\(=.*\);.*: array of const\();.*$\)/\1\2  {\$IFDEF HAS_TVA} varargs; {\$ENDIF}/
+s/\(.*\);.*: array of const\();.*$\)/\1\2  {\$IFDEF HAS_VA} varargs; {\$ENDIF}/
 #
+s:^[[:space:]]*_\(.*\)[[:space:]]*=[[:space:]]*\1;$:  \1 = record end;:
+s:^[[:space:]]*\(.*\)Ptr[[:space:]]*=[[:space:]]*\1;$:  \1Ptr = \^\1;:
 #
 # WHEN ALL IS DONE, REMOVE BLANK LINES:
 /^[[:space:]]*$/d

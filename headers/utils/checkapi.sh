@@ -23,11 +23,14 @@ function toPascal()
 
 		# apply known replacements
 		echo "  applying additional conversions --> $aOutputFile"
-		sed -f "$LIBXML2_PAS/headers/utils/afterconv.sed" $aOutputFile.1 > $aOutputFile || mv $aOutputFile.1 $aOutputFile 
-		rm -f $aOutputFile.1
+		sed -f "$LIBXML2_PAS/headers/utils/afterconv.sed" $aOutputFile.1 > $aOutputFile.2 || mv $aOutputFile.1 $aOutputFile.2 
+		local pfx=${aOutputFile/#*\//}
+		pfx=`echo ${pfx%_*} | tr [:lower:] [:upper:]`
+		sed 's:UNKNOWN_SO:'${pfx}'_SO:' $aOutputFile.2 > $aOutputFile
 
 		# compare original translation and the one with replacements
 #		diff -u4 -w $aOutputFile.1 $aOutputFile >$aOutputFile.diff12
+		rm -f $aOutputFile.?
 	fi
 }
 
@@ -126,6 +129,7 @@ for fn in $FILELIST ; do
 
 	s=${origFilePath%/*}
 	dirPrefix=${origFilePath:${#s}+1}
+	dirPrefix=${dirPrefix/libxml/libxml2}
 
 	TARGETFILE=$TMP/$dirPrefix/$origFileName
 	mkdir -p $TMP/$dirPrefix
@@ -208,6 +212,7 @@ for dir in `cat $TMP/allPaths`; do
 
 		s=${origFilePath%/*}
 		dirPrefix=${origFilePath:${#s}+1}
+		dirPrefix=${dirPrefix/libxml/libxml2}
 
 		newFn=$TMP/$dirPrefix/${dirPrefix}_${origFileName%.h}.inc
 		h2pasFn=${newFn%.inc}.h2pas
