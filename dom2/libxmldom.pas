@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.34 2002-01-14 22:26:53 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.35 2002-01-15 01:28:49 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -326,11 +326,11 @@ type
 		function  get_documentElement: IDOMElement;
 		procedure set_documentElement(const IDOMElement: IDOMElement);
 		function  createElement(const tagName: DOMString): IDOMElement;
-		function  createDocumentFragment: IDOMDocumentFragment;
+		function  createDocumentFragment: IDomDocumentFragment;
 		function  createTextNode(const data: DOMString): IDOMText;
 		function  createComment(const data: DOMString): IDOMComment;
-		function  createCDATASection(const data: DOMString): IDOMCDATASection;
-		function  createProcessingInstruction(const target, data: DOMString): IDOMProcessingInstruction;
+		function  createCDATASection(const data: DOMString): IDomCDataSection;
+		function  createProcessingInstruction(const target, data: DOMString): IDomProcessingInstruction;
 		function  createAttribute(const name: DOMString): IDOMAttr;
 		function  createEntityReference(const name: DOMString): IDOMEntityReference;
 		function  getElementsByTagName(const tagName: DOMString): IDOMNodeList;
@@ -1583,90 +1583,77 @@ begin
 	checkError(NOT_SUPPORTED_ERR);
 end;
 
-function TGDOMDocument.createElement(const tagName: DOMString): IDOMElement;
+function TGDOMDocument.createElement(const tagName: DOMString): IDomElement;
 var
-	AElement: xmlNodePtr;
+	node: xmlNodePtr;
 begin
-	AElement:=xmlNewDocNode(GDoc,nil, PChar(UTF8Encode(tagname)),nil);
-	Result:=TGDOMElement.Create(AElement,self,true)
+	node := xmlNewDocNode(GDoc,nil, PChar(UTF8Encode(tagName)),nil);
+	Result := MakeNode(node) as IDomElement;
 end;
 
-function TGDOMDocument.createDocumentFragment: IDOMDocumentFragment;
+function TGDOMDocument.createDocumentFragment: IDomDocumentFragment;
 var
 	node: xmlNodePtr;
 begin
 	node := xmlNewDocFragment(GDoc);
-	if node<>nil
-	then result:=TGDOMDocumentFragment.Create(node)
-	else result:=nil;
+	Result := MakeNode(node) as IDomDocumentFragment;
 end;
 
-function TGDOMDocument.createTextNode(const data: DOMString): IDOMText;
+function TGDOMDocument.createTextNode(const data: DOMString): IDomText;
 var
-	ATextNode: xmlNodePtr;
+	node: xmlNodePtr;
 begin
-	ATextNode:=xmlNewDocText(GDoc, PChar(UTF8Encode(data)));
-	if ATextNode<> nil
-	then result:=TGDOMText.Create((ATextNode))
-	else result:=nil;
+	node := xmlNewDocText(GDoc, PChar(UTF8Encode(data)));
+	Result := MakeNode(node) as IDomText;
 end;
 
-function TGDOMDocument.createComment(const data: DOMString): IDOMComment;
+function TGDOMDocument.createComment(const data: DOMString): IDomComment;
 var
 	node: xmlNodePtr;
 begin
 	node := xmlNewDocComment(GDoc, PChar(UTF8Encode(data)));
-	Result:=TGDOMComment.Create(node);
+	Result := MakeNode(node) as IDomComment;
 end;
 
-function TGDOMDocument.createCDATASection(const data: DOMString): IDOMCDATASection;
+function TGDOMDocument.createCDATASection(const data: DOMString): IDomCDataSection;
 var
 	s: string;
 	node: xmlNodePtr;
 begin
 	s := UTF8Encode(data);
 	node := xmlNewCDataBlock(GDoc, PChar(s), length(s));
-	Result:=TGDOMCDataSection.Create(node);
+	Result := MakeNode(node) as IDomCDataSection;
 end;
 
-function TGDOMDocument.createProcessingInstruction(const target,
-	data: DOMString): IDOMProcessingInstruction;
+function TGDOMDocument.createProcessingInstruction(const target, data: DOMString): IDomProcessingInstruction;
 var
 	pi: xmlNodePtr;
 begin
 	pi := xmlNewPI(PChar(UTF8Encode(target)), PChar(UTF8Encode(data)));
-	Result := TGDOMProcessingInstruction.Create(xmlNodePtr(pi));
+	Result := MakeNode(pi) as IDomProcessingInstruction;
 end;
 
-function TGDOMDocument.createAttribute(const name: DOMString): IDOMAttr;
+function TGDOMDocument.createAttribute(const name: DOMString): IDomAttr;
 var
 	attr: xmlAttrPtr;
 begin
 	attr := xmlNewProp(nil, PChar(UTF8Encode(name)), nil);
-	if attr<>nil then begin
-		FAttrList.Add(attr);
-	end;
-	Result:=TGDOMAttr.Create(attr)
+	Result := MakeNode(attr) as IDomAttr;
 end;
 
-function TGDOMDocument.createEntityReference(const name: DOMString): IDOMEntityReference;
-//var
-	//name1: string;
-	//AEntityReference: PGdomeEntityReference;
+function TGDOMDocument.createEntityReference(const name: DOMString): IDomEntityReference;
+var
+	node: xmlNodePtr;
 begin
-	checkError(NOT_SUPPORTED_ERR);
-	{name1:=TGdomString.create(name);
-	AEntityReference:=gdome_doc_createEntityReference(FPGdomeDoc,name1.GetPString,@exc);
-	CheckError(exc);
-	name1.free;
-	if AEntityReference<>nil
-		then result:=TGDOMEntityReference.Create(xmlNodePtr(AEntityReference),self)
-		else result:=nil;}
+	node := xmlNewReference(GDoc, PChar(UTF8Encode(name)));
+	Result := MakeNode(node) as IDomEntityReference;
 end;
 
 function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList;
 begin
-	result:=(self.get_documentElement as IDOMNodeSelect).selectNodes(tagName);
+	//todo: restrict tagName to QNAME production
+	//todo: selectNodes must work also directly at docnode
+	Result := (get_documentElement as IDOMNodeSelect).selectNodes(tagName);
 end;
 
 function TGDOMDocument.importNode(importedNode: IDOMNode; deep: Boolean): IDOMNode;
@@ -1776,20 +1763,18 @@ begin
 		ulocal := UTF8Encode(qualifiedName);
 	end;
 	attr := xmlNewNsProp(FGNode, ns, PChar(ulocal), nil);
+	Result := MakeNode(attr) as IDomAttr;
 	if attr<>nil then begin
 		FAttrList.Add(attr);
-		result:=TGDOMAttr.Create(attr)
-	end else begin
-		result:=nil;
 	end;
 end;
 
-function TGDOMDocument.getElementsByTagNameNS(const namespaceURI,
-	localName: DOMString): IDOMNodeList;
-var docElement:IDOMElement;
+function TGDOMDocument.getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
+var
+	docElement: IDOMElement;
 begin
-	docElement:=self.get_documentElement;
-	result:=docElement.getElementsByTagNameNS(namespaceURI,localName);
+	docElement := get_documentElement;
+	Result := docElement.getElementsByTagNameNS(namespaceURI,localName);
 end;
 
 function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
