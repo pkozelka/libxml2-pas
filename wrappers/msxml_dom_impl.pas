@@ -57,7 +57,7 @@ type
 		ILibXml2Node,
 		IXMLDOMNode)
 	private
-		FNode: TUniNode;
+		FPtr: TUniNode;
 		FChildren_OnDemand: TChildNodeList;
 	protected //ILibXml2Node
 		function  NodePtr: xmlNodePtr; virtual;
@@ -378,7 +378,7 @@ var
 	cur: xmlNodePtr;
 begin
 	cur := GetNodePtr(newChild);
-	xmlAddChild(FNode.node, cur);
+	xmlAddChild(FPtr.node, cur);
 	Result := newChild;
 end;
 
@@ -387,24 +387,24 @@ var
 	node: xmlNodePtr;
 begin
 	if (deep) then begin
-		node := xmlCopyNode(FNode.node, 1);
+		node := xmlCopyNode(FPtr.node, 1);
 	end else begin
-		node := xmlCopyNode(FNode.node, 0);
+		node := xmlCopyNode(FPtr.node, 0);
 	end;
 	Result := GetDOMObject(node) as IXMLDOMNode;
 end;
 
 constructor TXMLDOMNode.Create(aLibXmlObj: pointer);
 begin
-	FNode.ptr := aLibXmlObj;
+	FPtr.ptr := aLibXmlObj;
 	if (aLibXmlObj<>nil) then begin
-		pointer(FNode.node._private) := self;
+		pointer(FPtr.node._private) := self;
 	end;
 end;
 
 destructor TXMLDOMNode.Destroy;
 begin
-	pointer(FNode.node._private) := nil;
+	pointer(FPtr.node._private) := nil;
 	inherited;
 end;
 
@@ -418,11 +418,11 @@ var
 	prefixSize: integer;
 begin
 	prefixSize := 0;
-	if (FNode.node.ns<>nil) then begin
-		prefixSize := Length(FNode.node.ns.prefix);
+	if (FPtr.node.ns<>nil) then begin
+		prefixSize := Length(FPtr.node.ns.prefix);
 		if (prefixSize > 0) then Inc(prefixSize);
 	end;
-	Result := UTF8Decode(FNode.node.name + prefixSize);
+	Result := UTF8Decode(FPtr.node.name + prefixSize);
 end;
 
 function TXMLDOMNode.Get_dataType: OleVariant;
@@ -437,13 +437,13 @@ end;
 
 function TXMLDOMNode.Get_firstChild: IXMLDOMNode;
 begin
-	Result := GetDOMObject(FNode.node.children) as IXMLDOMNode;
+	Result := GetDOMObject(FPtr.node.children) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_childNodes: IXMLDOMNodeList;
 begin
 	if FChildren_OnDemand=nil then begin
-		case FNode.node.type_ of
+		case FPtr.node.type_ of
 		XML_ELEMENT_NODE,
 		XML_DOCUMENT_NODE:
 			FChildren_OnDemand := TChildNodeList.Create(self);
@@ -454,27 +454,27 @@ end;
 
 function TXMLDOMNode.Get_lastChild: IXMLDOMNode;
 begin
-	Result := GetDOMObject(FNode.node.last) as IXMLDOMNode;
+	Result := GetDOMObject(FPtr.node.last) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_namespaceURI: WideString;
 begin
-	Result := UTF8Decode(FNode.node.ns.href);
+	Result := UTF8Decode(FPtr.node.ns.href);
 end;
 
 function TXMLDOMNode.Get_nextSibling: IXMLDOMNode;
 begin
-	Result := GetDOMObject(FNode.node.next) as IXMLDOMNode;
+	Result := GetDOMObject(FPtr.node.next) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_nodeName: WideString;
 begin
-	Result := UTF8Decode(FNode.node.name);
+	Result := UTF8Decode(FPtr.node.name);
 end;
 
 function TXMLDOMNode.Get_nodeType: DOMNodeType;
 begin
-	Result := FNode.node.type_;
+	Result := FPtr.node.type_;
 end;
 
 function TXMLDOMNode.Get_nodeTypedValue: OleVariant;
@@ -484,7 +484,7 @@ end;
 
 function TXMLDOMNode.Get_nodeTypeString: WideString;
 begin
-	case FNode.node.type_ of
+	case FPtr.node.type_ of
 		XML_ATTRIBUTE_NODE:
 			Result := 'attribute';
 		XML_ELEMENT_NODE:
@@ -528,23 +528,23 @@ begin
 {$ifdef LIBXML_DOCB_ENABLED}
 		XML_DOCB_DOCUMENT_NODE:
 {$endif}
-	else Result := '*unknown_'+IntToStr(FNode.node.type_);
+	else Result := '*unknown_'+IntToStr(FPtr.node.type_);
 	end;
 end;
 
 function TXMLDOMNode.Get_nodeValue: OleVariant;
 begin
-	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
+	Result := UTF8Decode(xmlNodeGetContent(FPtr.node));
 end;
 
 function TXMLDOMNode.Get_ownerDocument: IXMLDOMDocument;
 begin
-	Result := GetDOMObject(xmlNodePtr(FNode.node.doc)) as IXMLDOMDocument;
+	Result := GetDOMObject(xmlNodePtr(FPtr.node.doc)) as IXMLDOMDocument;
 end;
 
 function TXMLDOMNode.Get_parentNode: IXMLDOMNode;
 begin
-	Result := GetDOMObject(FNode.node.parent) as IXMLDOMNode;
+	Result := GetDOMObject(FPtr.node.parent) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_parsed: WordBool;
@@ -554,12 +554,12 @@ end;
 
 function TXMLDOMNode.Get_prefix: WideString;
 begin
-	Result := UTF8Decode(FNode.node.ns.prefix);
+	Result := UTF8Decode(FPtr.node.ns.prefix);
 end;
 
 function TXMLDOMNode.Get_previousSibling: IXMLDOMNode;
 begin
-	Result := GetDOMObject(FNode.node.prev) as IXMLDOMNode;
+	Result := GetDOMObject(FPtr.node.prev) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_specified: WordBool;
@@ -569,7 +569,7 @@ end;
 
 function TXMLDOMNode.Get_text: WideString;
 begin
-	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
+	Result := UTF8Decode(xmlNodeGetContent(FPtr.node));
 end;
 
 function TXMLDOMNode.Get_xml: WideString;
@@ -579,7 +579,7 @@ end;
 
 function TXMLDOMNode.hasChildNodes: WordBool;
 begin
-	Result := FNode.node.children <> nil;
+	Result := FPtr.node.children <> nil;
 end;
 
 function TXMLDOMNode.insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode;
@@ -599,7 +599,7 @@ end;
 
 function TXMLDOMNode.NodePtr: xmlNodePtr;
 begin
-	Result := FNode.node;
+	Result := FPtr.node;
 end;
 
 function TXMLDOMNode.removeChild(const childNode: IXMLDOMNode): IXMLDOMNode;
@@ -625,7 +625,7 @@ var
 	ctxt: xmlXPathContextPtr;
 	rv: xmlXPathObjectPtr;
 begin
-	ctxt := xmlXPathNewContext(FNode.node.doc);
+	ctxt := xmlXPathNewContext(FPtr.node.doc);
 	s := queryString;
 	rv := xmlXPathEval(PChar(s), ctxt);
 	Result := nil;
@@ -645,7 +645,7 @@ var
 	rv: xmlXPathObjectPtr;
 	node: xmlNodePtr;
 begin
-	ctxt := xmlXPathNewContext(FNode.node.doc);
+	ctxt := xmlXPathNewContext(FPtr.node.doc);
 	s := queryString;
 	rv := xmlXPathEval(PChar(s), ctxt);
 	Result := nil;
@@ -675,7 +675,7 @@ var
 begin
 	//todo: check node type
 	s := VarToStr(value);
-	xmlNodeSetContent(FNode.node, PChar(s));
+	xmlNodeSetContent(FPtr.node, PChar(s));
 end;
 
 procedure TXMLDOMNode.Set_text(const text: WideString);
@@ -684,7 +684,7 @@ var
 begin
 	//todo: check node type
 	s := VarToStr(text);
-	xmlNodeSetContent(FNode.node, PChar(s));
+	xmlNodeSetContent(FPtr.node, PChar(s));
 end;
 
 function TXMLDOMNode.transformNode(const stylesheet: IXMLDOMNode): WideString;
@@ -699,7 +699,7 @@ end;
 
 function TXMLDOMNode.Get_data: WideString;
 begin
-	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
+	Result := UTF8Decode(xmlNodeGetContent(FPtr.node));
 end;
 
 procedure TXMLDOMNode.Set_data(const data: WideString);
@@ -877,7 +877,7 @@ var
 	s: string;
 begin
 	s := name;
-	attr := xmlHasProp(FNode.node, PChar(s));
+	attr := xmlHasProp(FPtr.node, PChar(s));
 	Result := GetDOMObject(xmlNodePtr(attr)) as IXMLDOMAttribute;
 end;
 
@@ -905,7 +905,7 @@ var
 	s: string;
 begin
 	s := name;
-	attr := xmlHasProp(FNode.node, PChar(s));
+	attr := xmlHasProp(FPtr.node, PChar(s));
 	xmlRemoveProp(attr);
 end;
 
@@ -924,7 +924,7 @@ var
 begin
 	s := name;
 	v := value;
-	xmlSetProp(FNode.node, PChar(s), PChar(v));
+	xmlSetProp(FPtr.node, PChar(s), PChar(v));
 end;
 
 function TXMLDOMElement.setAttributeNode(const DOMAttribute: IXMLDOMAttribute): IXMLDOMAttribute;
@@ -934,13 +934,13 @@ var
 	v: string;
 begin
 	s := DOMAttribute.name;
-	attr := xmlHasProp(FNode.node, PChar(s));
+	attr := xmlHasProp(FPtr.node, PChar(s));
 	if (attr=nil) then begin
 		v := DOMAttribute.value;
-		xmlSetProp(FNode.node, PChar(s), PChar(v));
+		xmlSetProp(FPtr.node, PChar(s), PChar(v));
 		Result := GetDOMObject(xmlNodePtr(attr)) as IXMLDOMAttribute;
 	end else begin
-		xmlAddChild(FNode.node, xmlNodePtr(DOMAttribute)); //???
+		xmlAddChild(FPtr.node, xmlNodePtr(DOMAttribute)); //???
 		Result := DOMAttribute;
 	end;
 end;
@@ -970,7 +970,7 @@ var
 	node: xmlAttrPtr;
 begin
 	s := name;
-	node := xmlNewDocProp(FNode.doc, PChar(s), nil);
+	node := xmlNewDocProp(FPtr.doc, PChar(s), nil);
 	Result := GetDOMObject(node) as IXMLDOMAttribute;
 end;
 
@@ -980,7 +980,7 @@ var
 	node: xmlNodePtr;
 begin
 	s := data;
-	node := xmlNewCDataBlock(FNode.doc, PChar(s), -1);
+	node := xmlNewCDataBlock(FPtr.doc, PChar(s), -1);
 	Result := GetDOMObject(node) as IXMLDOMCDataSection;
 end;
 
@@ -990,7 +990,7 @@ var
 	node: xmlNodePtr;
 begin
 	s := data;
-	node := xmlNewDocComment(FNode.doc, PChar(s));
+	node := xmlNewDocComment(FPtr.doc, PChar(s));
 	Result := GetDOMObject(node) as IXMLDOMComment;
 end;
 
@@ -998,7 +998,7 @@ function TXMLDOMDocument.createDocumentFragment: IXMLDOMDocumentFragment;
 var
 	node: xmlNodePtr;
 begin
-	node := xmlNewDocFragment(FNode.doc);
+	node := xmlNewDocFragment(FPtr.doc);
 	Result := GetDOMObject(node) as IXMLDOMDocumentFragment;
 end;
 
@@ -1114,11 +1114,11 @@ var
 	fn: string;
 begin
 	fn := xmlSource;
-	if (FNode.doc <>nil) then begin
-		xmlFreeDoc(FNode.doc);
-		FNode.doc := nil;
+	if (FPtr.doc <>nil) then begin
+		xmlFreeDoc(FPtr.doc);
+		FPtr.doc := nil;
 	end;
-	FNode.doc := xmlParseFile(PChar(fn));
+	FPtr.doc := xmlParseFile(PChar(fn));
 	//todo: update the ParseError object
 end;
 
@@ -1147,7 +1147,7 @@ begin
 	varEmpty,
 	varNull:
 		begin
-			rv := xmlSaveFile(requestDocPtr.URL, FNode.doc);
+			rv := xmlSaveFile(requestDocPtr.URL, FPtr.doc);
 		end;
 	varString:
 		begin
@@ -1170,7 +1170,7 @@ end;
 
 procedure TXMLDOMDocument.Set_documentElement(const DOMElement: IXMLDOMElement);
 begin
-	xmlDocSetRootElement(FNode.doc, GetNodePtr(DOMElement));
+	xmlDocSetRootElement(FPtr.doc, GetNodePtr(DOMElement));
 end;
 
 procedure TXMLDOMDocument.Set_ondataavailable(Param1: OleVariant);
@@ -1205,10 +1205,10 @@ end;
 
 function TXMLDOMDocument.requestDocPtr: xmlDocPtr;
 begin
-	if (FNode.doc=nil) then begin
-		FNode.doc := xmlNewDoc(XML_DEFAULT_VERSION);
+	if (FPtr.doc=nil) then begin
+		FPtr.doc := xmlNewDoc(XML_DEFAULT_VERSION);
 	end;
-	Result := FNode.doc;
+	Result := FPtr.doc;
 end;
 
 function TXMLDOMDocument.NodePtr: xmlNodePtr;
@@ -1223,7 +1223,7 @@ var
 	s: string;
 begin
 	s := data;
-	xmlNodeAddContent(FNode.node, PChar(s));
+	xmlNodeAddContent(FPtr.node, PChar(s));
 end;
 
 procedure TXMLDOMCharacterData.deleteData(offset, count: Integer);
@@ -1274,12 +1274,12 @@ end;
 
 function TXMLDOMEntity.Get_publicId: OleVariant;
 begin
-	Result := UTF8Decode(FNode.entity.ExternalID);
+	Result := UTF8Decode(FPtr.entity.ExternalID);
 end;
 
 function TXMLDOMEntity.Get_systemId: OleVariant;
 begin
-	Result := UTF8Decode(FNode.entity.SystemID);
+	Result := UTF8Decode(FPtr.entity.SystemID);
 end;
 
 { TXMLDOMDocumentType }
@@ -1298,12 +1298,12 @@ end;
 
 function TXMLDOMNotation.Get_publicId: OleVariant;
 begin
-	Result := UTF8Decode(FNode.notation.PublicID);
+	Result := UTF8Decode(FPtr.notation.PublicID);
 end;
 
 function TXMLDOMNotation.Get_systemId: OleVariant;
 begin
-	Result := UTF8Decode(FNode.notation.SystemID);
+	Result := UTF8Decode(FPtr.notation.SystemID);
 end;
 
 end.
