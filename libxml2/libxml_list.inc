@@ -23,10 +23,10 @@
  *)
 
 type
-  xmlLink = pointer;
+  xmlLink = Pointer;
   xmlLinkPtr = ^xmlLink;
 
-  xmlList = pointer;
+  xmlList = Pointer;
   xmlListPtr = ^xmlList;
   (**
    * xmlListDeallocator:
@@ -34,7 +34,7 @@ type
    *
    * Callback function used to free data from a list
    *)
-  xmlListDeallocator = procedure (lk: xmlLinkPtr);
+  xmlListDeallocator = procedure(lk: xmlLinkPtr);
   (**
    * xmlListDataCompare:
    * @data0: the first data
@@ -44,7 +44,7 @@ type
    *
    * Returns 0 is equality, -1 or 1 otherwise depending on the ordering
    *)
-  xmlListDataCompare = function (data0,data1: pointer): integer;
+  xmlListDataCompare = function(data0, data1: Pointer): Integer;
   (**
    * xmlListWalker:
    * @data: the data found in the list
@@ -54,41 +54,41 @@ type
    *
    * Returns 0 to stop walking the list, 1 otherwise
    *)
-  xmlListWalker = function (data, user: pointer): integer;
+  xmlListWalker = function(data, user: Pointer): Integer;
 
 (* Creation/Deletion *)
-function  xmlListCreate(deallocator:xmlListDeallocator; compare:xmlListDataCompare):xmlListPtr;cdecl;external LIBXML2_SO;
-procedure xmlListDelete(l:xmlListPtr);cdecl;external LIBXML2_SO;
+function  xmlListCreate(deallocator: xmlListDeallocator; compare: xmlListDataCompare): xmlListPtr; cdecl; external LIBXML2_SO;
+procedure xmlListDelete(l: xmlListPtr); cdecl; external LIBXML2_SO;
 
 (* Basic Operators *)
-function  xmlListSearch(l:xmlListPtr; data:pointer):pointer;cdecl;external LIBXML2_SO;
-function  xmlListReverseSearch(l:xmlListPtr; data:pointer):pointer;cdecl;external LIBXML2_SO;
-function  xmlListInsert(l:xmlListPtr; data:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlListAppend(l:xmlListPtr; data:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlListRemoveFirst(l:xmlListPtr; data:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlListRemoveLast(l:xmlListPtr; data:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlListRemoveAll(l:xmlListPtr; data:pointer):longint;cdecl;external LIBXML2_SO;
-procedure xmlListClear(l:xmlListPtr);cdecl;external LIBXML2_SO;
-function  xmlListEmpty(l:xmlListPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlListFront(l:xmlListPtr):xmlLinkPtr;cdecl;external LIBXML2_SO;
-function  xmlListEnd(l:xmlListPtr):xmlLinkPtr;cdecl;external LIBXML2_SO;
-function  xmlListSize(l:xmlListPtr):longint;cdecl;external LIBXML2_SO;
-procedure xmlListPopFront(l:xmlListPtr);cdecl;external LIBXML2_SO;
-procedure xmlListPopBack(l:xmlListPtr);cdecl;external LIBXML2_SO;
-function  xmlListPushFront(l:xmlListPtr; data:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlListPushBack(l:xmlListPtr; data:pointer):longint;cdecl;external LIBXML2_SO;
+function  xmlListSearch(l: xmlListPtr; data: Pointer): Pointer; cdecl; external LIBXML2_SO;
+function  xmlListReverseSearch(l: xmlListPtr; data: Pointer): Pointer; cdecl; external LIBXML2_SO;
+function  xmlListInsert(l: xmlListPtr; data: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlListAppend(l: xmlListPtr; data: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlListRemoveFirst(l: xmlListPtr; data: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlListRemoveLast(l: xmlListPtr; data: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlListRemoveAll(l: xmlListPtr; data: Pointer): Longint; cdecl; external LIBXML2_SO;
+procedure xmlListClear(l: xmlListPtr); cdecl; external LIBXML2_SO;
+function  xmlListEmpty(l: xmlListPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlListFront(l: xmlListPtr): xmlLinkPtr; cdecl; external LIBXML2_SO;
+function  xmlListEnd(l: xmlListPtr): xmlLinkPtr; cdecl; external LIBXML2_SO;
+function  xmlListSize(l: xmlListPtr): Longint; cdecl; external LIBXML2_SO;
+procedure xmlListPopFront(l: xmlListPtr); cdecl; external LIBXML2_SO;
+procedure xmlListPopBack(l: xmlListPtr); cdecl; external LIBXML2_SO;
+function  xmlListPushFront(l: xmlListPtr; data: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlListPushBack(l: xmlListPtr; data: Pointer): Longint; cdecl; external LIBXML2_SO;
 
 (* Advanced Operators *)
-procedure xmlListReverse(l:xmlListPtr);cdecl;external LIBXML2_SO;
-procedure xmlListSort(l:xmlListPtr);cdecl;external LIBXML2_SO;
-procedure xmlListWalk(l:xmlListPtr; walker:xmlListWalker; user:pointer);cdecl;external LIBXML2_SO;
-procedure xmlListReverseWalk(l:xmlListPtr; walker:xmlListWalker; user:pointer);cdecl;external LIBXML2_SO;
-procedure xmlListMerge(l1:xmlListPtr; l2:xmlListPtr);cdecl;external LIBXML2_SO;
-function  xmlListDup(old:xmlListPtr):xmlListPtr;cdecl;external LIBXML2_SO;
-function  xmlListCopy(cur:xmlListPtr; old:xmlListPtr):longint;cdecl;external LIBXML2_SO;
+procedure xmlListReverse(l: xmlListPtr); cdecl; external LIBXML2_SO;
+procedure xmlListSort(l: xmlListPtr); cdecl; external LIBXML2_SO;
+procedure xmlListWalk(l: xmlListPtr; walker: xmlListWalker; user: Pointer); cdecl; external LIBXML2_SO;
+procedure xmlListReverseWalk(l: xmlListPtr; walker: xmlListWalker; user: Pointer); cdecl; external LIBXML2_SO;
+procedure xmlListMerge(l1: xmlListPtr; l2: xmlListPtr); cdecl; external LIBXML2_SO;
+function  xmlListDup(old: xmlListPtr): xmlListPtr; cdecl; external LIBXML2_SO;
+function  xmlListCopy(cur: xmlListPtr; old: xmlListPtr): Longint; cdecl; external LIBXML2_SO;
 
 (* Link operators *)
-function  xmlLinkGetData(lk:xmlLinkPtr):pointer;cdecl;external LIBXML2_SO;
+function  xmlLinkGetData(lk: xmlLinkPtr): Pointer; cdecl; external LIBXML2_SO;
 (* xmlListUnique() *)
 (* xmlListSwap *)
 

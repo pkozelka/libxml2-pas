@@ -16,5 +16,5 @@
  *
  * daniel@veillard.com
  *)
-function xmlXIncludeProcess(doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlXIncludeProcess(doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 

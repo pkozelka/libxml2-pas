@@ -30,18 +30,18 @@ type
 (*
  * There is only few public functions.
  *)
-function  docbEncodeEntities(aOut:Pbyte; outlen:Plongint; aIn:Pbyte; inlen:Plongint; quoteChar:longint):longint;cdecl;external LIBXML2_SO;
-function  docbSAXParseDoc(cur:PxmlChar; encoding:Pchar; sax:docbSAXHandlerPtr; userData:pointer):docbDocPtr;cdecl;external LIBXML2_SO;
-function  docbParseDoc(cur:PxmlChar; encoding:Pchar):docbDocPtr;cdecl;external LIBXML2_SO;
-function  docbSAXParseFile(filename:Pchar; encoding:Pchar; sax:docbSAXHandlerPtr; userData:pointer):docbDocPtr;cdecl;external LIBXML2_SO;
-function  docbParseFile(filename:Pchar; encoding:Pchar):docbDocPtr;cdecl;external LIBXML2_SO;
+function  docbEncodeEntities(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint; quoteChar: Longint): Longint; cdecl; external LIBXML2_SO;
+function  docbSAXParseDoc(cur: PxmlChar; encoding: PChar; sax: docbSAXHandlerPtr; userData: Pointer): docbDocPtr; cdecl; external LIBXML2_SO;
+function  docbParseDoc(cur: PxmlChar; encoding: PChar): docbDocPtr; cdecl; external LIBXML2_SO;
+function  docbSAXParseFile(filename: PChar; encoding: PChar; sax: docbSAXHandlerPtr; userData: Pointer): docbDocPtr; cdecl; external LIBXML2_SO;
+function  docbParseFile(filename: PChar; encoding: PChar): docbDocPtr; cdecl; external LIBXML2_SO;
 
 (**
  * Interfaces for the Push mode
  *)
-procedure docbFreeParserCtxt(ctxt:docbParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  docbCreatePushParserCtxt(sax:docbSAXHandlerPtr; user_data:pointer; chunk:Pchar; size:longint; filename:Pchar; enc:xmlCharEncoding):docbParserCtxtPtr;cdecl;external LIBXML2_SO;
-function  docbParseChunk(ctxt:docbParserCtxtPtr; chunk:Pchar; size:longint; terminate:longint):longint;cdecl;external LIBXML2_SO;
-function  docbCreateFileParserCtxt(filename:Pchar; encoding:Pchar):docbParserCtxtPtr;cdecl;external LIBXML2_SO;
-function  docbParseDocument(ctxt:docbParserCtxtPtr):longint;cdecl;external LIBXML2_SO;
+procedure docbFreeParserCtxt(ctxt: docbParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  docbCreatePushParserCtxt(sax: docbSAXHandlerPtr; user_data: Pointer; chunk: PChar; size: Longint; filename: PChar; enc: xmlCharEncoding): docbParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  docbParseChunk(ctxt: docbParserCtxtPtr; chunk: PChar; size: Longint; terminate: Longint): Longint; cdecl; external LIBXML2_SO;
+function  docbCreateFileParserCtxt(filename: PChar; encoding: PChar): docbParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  docbParseDocument(ctxt: docbParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
 

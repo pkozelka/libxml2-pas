@@ -16,18 +16,18 @@
 (*
  * The standard Dump routines
  *)
-procedure xmlDebugDumpString(var aOutput: TextFile; str:PxmlChar);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpAttr(var aOutput: TextFile; attr:xmlAttrPtr; depth:longint);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpAttrList(var aOutput: TextFile; attr:xmlAttrPtr; depth:longint);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpOneNode(var aOutput: TextFile; node:xmlNodePtr; depth:longint);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpNode(var aOutput: TextFile; node:xmlNodePtr; depth:longint);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpNodeList(var aOutput: TextFile; node:xmlNodePtr; depth:longint);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpDocumentHead(var aOutput: TextFile; doc:xmlDocPtr);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpDocument(var aOutput: TextFile; doc:xmlDocPtr);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpDTD(var aOutput: TextFile; dtd:xmlDtdPtr);cdecl;external LIBXML2_SO;
-procedure xmlDebugDumpEntities(var aOutput: TextFile; doc:xmlDocPtr);cdecl;external LIBXML2_SO;
-procedure xmlLsOneNode(var aOutput: TextFile; node:xmlNodePtr);cdecl;external LIBXML2_SO;
-function  xmlBoolToText(boolval: longint): PChar; cdecl;external LIBXML2_SO;
+procedure xmlDebugDumpString(var aOutput: TextFile; str: PxmlChar); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpAttr(var aOutput: TextFile; attr: xmlAttrPtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpAttrList(var aOutput: TextFile; attr: xmlAttrPtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpOneNode(var aOutput: TextFile; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpNode(var aOutput: TextFile; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpNodeList(var aOutput: TextFile; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpDocumentHead(var aOutput: TextFile; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpDocument(var aOutput: TextFile; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpDTD(var aOutput: TextFile; dtd: xmlDtdPtr); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpEntities(var aOutput: TextFile; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
+procedure xmlLsOneNode(var aOutput: TextFile; node: xmlNodePtr); cdecl; external LIBXML2_SO;
+function  xmlBoolToText(boolval: Longint): PChar; cdecl; external LIBXML2_SO;
 
 (****************************************************************
  *                                                              *
@@ -44,7 +44,7 @@ type
    *
    * Returns a string which will be freed by the Shell
    *)
-  xmlShellReadlineFunc = function (prompt:Pchar):Pchar;cdecl;
+  xmlShellReadlineFunc = function(prompt: PChar): PChar; cdecl;
 
   (**
    * xmlShellCtxt:
@@ -54,13 +54,13 @@ type
    *)
   xmlShellCtxtPtr = ^xmlShellCtxt;
   xmlShellCtxt = record
-    filename : Pchar;
-    doc : xmlDocPtr;
-    node : xmlNodePtr;
-    pctxt : xmlXPathContextPtr;
-    loaded : longint;
-    output : ^TextFile;
-    input : xmlShellReadlineFunc;
+    filename: PChar;
+    doc: xmlDocPtr;
+    node: xmlNodePtr;
+    pctxt: xmlXPathContextPtr;
+    loaded: Longint;
+    output: ^TextFile;
+    input: xmlShellReadlineFunc;
   end;
 
   (**
@@ -74,25 +74,24 @@ type
    *
    * Returns an int, negative returns indicating errors
    *)
-  xmlShellCmd = function(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;
+  xmlShellCmd = function(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): Longint; cdecl;
 
-
-procedure xmlShellPrintXPathError(errorType: longint; arg: PChar); cdecl;external LIBXML2_SO;
-procedure xmlShellPrintNode(node: xmlNodePtr); cdecl;external LIBXML2_SO;
-procedure xmlShellPrintXPathResult(list: xmlXPathObjectPtr); cdecl;external LIBXML2_SO;
-function  xmlShellList(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellBase(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellDir(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellCat(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellLoad(ctxt: xmlShellCtxtPtr; filename: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellWrite(ctxt: xmlShellCtxtPtr; filename: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellSave(ctxt: xmlShellCtxtPtr; filename: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellValidate(ctxt: xmlShellCtxtPtr; dtd: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellDu(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
-function  xmlShellPwd(ctxt: xmlShellCtxtPtr; buffer: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
+procedure xmlShellPrintXPathError(errorType: Longint; arg: PChar); cdecl; external LIBXML2_SO;
+procedure xmlShellPrintNode(node: xmlNodePtr); cdecl; external LIBXML2_SO;
+procedure xmlShellPrintXPathResult(list: xmlXPathObjectPtr); cdecl; external LIBXML2_SO;
+function  xmlShellList(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellBase(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellDir(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellCat(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellLoad(ctxt: xmlShellCtxtPtr; filename: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellWrite(ctxt: xmlShellCtxtPtr; filename: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellSave(ctxt: xmlShellCtxtPtr; filename: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellValidate(ctxt: xmlShellCtxtPtr; dtd: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellDu(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlShellPwd(ctxt: xmlShellCtxtPtr; buffer: PChar; node, node2: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * The Shell interface.
  *)
-procedure xmlShell(doc:xmlDocPtr; filename:Pchar; input:xmlShellReadlineFunc; var aOutput: TextFile);cdecl;external LIBXML2_SO;
+procedure xmlShell(doc: xmlDocPtr; filename: PChar; input: xmlShellReadlineFunc; var aOutput: TextFile); cdecl; external LIBXML2_SO;
 

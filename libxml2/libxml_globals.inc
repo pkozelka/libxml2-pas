@@ -25,34 +25,33 @@
 type
   xmlGlobalStatePtr = ^xmlGlobalState;
   xmlGlobalState = record
-    xmlParserVersion : ^char;
-    xmlDefaultSAXLocator : xmlSAXLocator;
-    xmlDefaultSAXHandler : xmlSAXHandler;
-    docbDefaultSAXHandler : xmlSAXHandler;
-    htmlDefaultSAXHandler : xmlSAXHandler;
-    xmlFree : xmlFreeFunc;
-    xmlMalloc : xmlMallocFunc;
-    xmlMemStrdup : xmlStrdupFunc;
-    xmlRealloc : xmlReallocFunc;
-    xmlGenericError : xmlGenericErrorFunc;
-    xmlGenericErrorContext : pointer;
-    oldXMLWDcompatibility : longint;
-    xmlBufferAllocScheme : xmlBufferAllocationScheme;
-    xmlDefaultBufferSize : longint;
-    xmlSubstituteEntitiesDefaultValue : longint;
-    xmlDoValidityCheckingDefaultValue : longint;
-    xmlGetWarningsDefaultValue : longint;
-    xmlKeepBlanksDefaultValue : longint;
-    xmlLineNumbersDefaultValue : longint;
-    xmlLoadExtDtdDefaultValue : longint;
-    xmlParserDebugEntities : longint;
-    xmlPedanticParserDefaultValue : longint;
-    xmlSaveNoEmptyTags : longint;
-    xmlIndentTreeOutput : longint;
+    xmlParserVersion: ^Char;
+    xmlDefaultSAXLocator: xmlSAXLocator;
+    xmlDefaultSAXHandler: xmlSAXHandler;
+    docbDefaultSAXHandler: xmlSAXHandler;
+    htmlDefaultSAXHandler: xmlSAXHandler;
+    xmlFree: xmlFreeFunc;
+    xmlMalloc: xmlMallocFunc;
+    xmlMemStrdup: xmlStrdupFunc;
+    xmlRealloc: xmlReallocFunc;
+    xmlGenericError: xmlGenericErrorFunc;
+    xmlGenericErrorContext: Pointer;
+    oldXMLWDcompatibility: Longint;
+    xmlBufferAllocScheme: xmlBufferAllocationScheme;
+    xmlDefaultBufferSize: Longint;
+    xmlSubstituteEntitiesDefaultValue: Longint;
+    xmlDoValidityCheckingDefaultValue: Longint;
+    xmlGetWarningsDefaultValue: Longint;
+    xmlKeepBlanksDefaultValue: Longint;
+    xmlLineNumbersDefaultValue: Longint;
+    xmlLoadExtDtdDefaultValue: Longint;
+    xmlParserDebugEntities: Longint;
+    xmlPedanticParserDefaultValue: Longint;
+    xmlSaveNoEmptyTags: Longint;
+    xmlIndentTreeOutput: Longint;
   end;
 
-
-procedure xmlInitializeGlobalState(gs:xmlGlobalStatePtr);cdecl;external LIBXML2_SO;
+procedure xmlInitializeGlobalState(gs: xmlGlobalStatePtr); cdecl; external LIBXML2_SO;
 (*
  * In general the memory allocation entry points are not kept
  * thread specific but this can be overridden by LIBXML_THREAD_ALLOC_ENABLED
@@ -61,8 +60,8 @@ procedure xmlInitializeGlobalState(gs:xmlGlobalStatePtr);cdecl;external LIBXML2_
  *    - xmlMemStrdup
  *    - xmlFree
  *)
-{$ifdef LIBXML_THREAD_ALLOC_ENABLED}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$IFDEF LIBXML_THREAD_ALLOC_ENABLED}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __xmlMalloc:^xmlMallocFunc;cdecl;external LIBXML2_SO;
 (* error
@@ -72,8 +71,8 @@ in define line 105 *)
 (*(__xmlMalloc()))
 {$else}
 in declaration at line 108 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __xmlRealloc:^xmlReallocFunc;cdecl;external LIBXML2_SO;
 (* error
@@ -83,8 +82,8 @@ in define line 113 *)
 (*(__xmlRealloc()))
 {$else}
 in declaration at line 116 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //function __xmlFree:^xmlFreeFunc;cdecl;external LIBXML2_SO;
 (* error
@@ -94,8 +93,8 @@ in define line 121 *)
 (*(__xmlFree()))
 {$else}
 in declaration at line 124 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __xmlMemStrdup:^xmlStrdupFunc;cdecl;external LIBXML2_SO;
 (* error
@@ -105,8 +104,8 @@ in define line 129 *)
 (*(__xmlMemStrdup()))
 {$else}
 in declaration at line 132 *)
-{$endif}
-{$else}
+{$ENDIF}
+{$ELSE}
     { !LIBXML_THREAD_ALLOC_ENABLED  }
 (* error
 LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMalloc;
@@ -120,11 +119,11 @@ in declaration at line 137 *)
 (* error
 LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
 in declaration at line 138 *)
-{$endif}
+{$ENDIF}
     { LIBXML_THREAD_ALLOC_ENABLED  }
 
 //TODO following part is mostly untranslated; its corresponding source was generated
-{$ifdef LIBXML_THREAD_ENABLED}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __docbDefaultSAXHandler:^xmlSAXHandler;cdecl;external LIBXML2_SO;
 (* error
@@ -134,19 +133,19 @@ in define line 150 *)
 (*(__docbDefaultSAXHandler()))
 {$else}
 in declaration at line 153 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __htmlDefaultSAXHandler:^xmlSAXHandler;cdecl;external LIBXML2_SO;
 (* error
 #define htmlDefaultSAXHandler \
 in define line 158 *)
-(* error 
+(* error
 (*(__htmlDefaultSAXHandler()))
 {$else}
 in declaration at line 161 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 (*
  * Everything starting from the line below is
@@ -154,16 +153,16 @@ in declaration at line 161 *)
  * Do not modify the previous line.
  *)
 
-//[pk] function __oldXMLWDcompatibility:^longint;cdecl;external LIBXML2_SO;
+//[pk] function __oldXMLWDcompatibility:^Longint;cdecl;external LIBXML2_SO;
 (* error
 #define oldXMLWDcompatibility \
 in define line 166 *)
-(* error 
+(* error
 (*(__oldXMLWDcompatibility()))
 {$else}
 in declaration at line 169 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __xmlBufferAllocScheme:^xmlBufferAllocationScheme;cdecl;external LIBXML2_SO;
 (* error
@@ -173,10 +172,10 @@ in define line 174 *)
 (*(__xmlBufferAllocScheme()))
 {$else}
 in declaration at line 177 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlDefaultBufferSize:^longint;cdecl;external LIBXML2_SO;
+//[pk] function __xmlDefaultBufferSize:^Longint;cdecl;external LIBXML2_SO;
 (* error
 #define xmlDefaultBufferSize \
 in define line 182 *)
@@ -184,32 +183,32 @@ in define line 182 *)
 (*(__xmlDefaultBufferSize()))
 {$else}
 in declaration at line 185 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __xmlDefaultSAXHandler:^xmlSAXHandler;cdecl;external LIBXML2_SO;
-(* error 
+(* error
 #define xmlDefaultSAXHandler \
 in define line 190 *)
 (* error
 (*(__xmlDefaultSAXHandler()))
 {$else}
 in declaration at line 193 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __xmlDefaultSAXLocator:^xmlSAXLocator;cdecl;external LIBXML2_SO;
-(* error 
+(* error
 #define xmlDefaultSAXLocator \
 in define line 198 *)
-(* error 
+(* error
 (*(__xmlDefaultSAXLocator()))
 {$else}
 in declaration at line 201 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlDoValidityCheckingDefaultValue:^longint;cdecl;external LIBXML2_SO;
+//[pk] function __xmlDoValidityCheckingDefaultValue:^Longint;cdecl;external LIBXML2_SO;
 (* error
 #define xmlDoValidityCheckingDefaultValue \
 in define line 206 *)
@@ -217,8 +216,8 @@ in define line 206 *)
 (*(__xmlDoValidityCheckingDefaultValue()))
 {$else}
 in declaration at line 209 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __xmlGenericError:^xmlGenericErrorFunc;cdecl;external LIBXML2_SO;
 (* error
@@ -228,10 +227,10 @@ in define line 214 *)
 (*(__xmlGenericError()))
 {$else}
 in declaration at line 217 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlGenericErrorContext:^pointer;cdecl;external LIBXML2_SO;
+//[pk] function __xmlGenericErrorContext:^Pointer;cdecl;external LIBXML2_SO;
 (* error
 #define xmlGenericErrorContext \
 in define line 222 *)
@@ -239,10 +238,10 @@ in define line 222 *)
 (*(__xmlGenericErrorContext()))
 {$else}
 in declaration at line 225 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlGetWarningsDefaultValue:^longint;cdecl;external LIBXML2_SO;
+//[pk] function __xmlGetWarningsDefaultValue:^Longint;cdecl;external LIBXML2_SO;
 (* error
 #define xmlGetWarningsDefaultValue \
 in define line 230 *)
@@ -250,43 +249,43 @@ in define line 230 *)
 (*(__xmlGetWarningsDefaultValue()))
 {$else}
 in declaration at line 233 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlIndentTreeOutput:^longint;cdecl;external LIBXML2_SO;
-(* error 
+//[pk] function __xmlIndentTreeOutput:^Longint;cdecl;external LIBXML2_SO;
+(* error
 #define xmlIndentTreeOutput \
 in define line 238 *)
 (* error
 (*(__xmlIndentTreeOutput()))
 {$else}
 in declaration at line 241 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlKeepBlanksDefaultValue:^longint;cdecl;external LIBXML2_SO;
-(* error 
+//[pk] function __xmlKeepBlanksDefaultValue:^Longint;cdecl;external LIBXML2_SO;
+(* error
 #define xmlKeepBlanksDefaultValue \
 in define line 246 *)
-(* error 
+(* error
 (*(__xmlKeepBlanksDefaultValue()))
 {$else}
 in declaration at line 249 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlLineNumbersDefaultValue:^longint;cdecl;external LIBXML2_SO;
-(* error 
+//[pk] function __xmlLineNumbersDefaultValue:^Longint;cdecl;external LIBXML2_SO;
+(* error
 #define xmlLineNumbersDefaultValue \
 in define line 254 *)
-(* error 
+(* error
 (*(__xmlLineNumbersDefaultValue()))
 {$else}
 in declaration at line 257 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlLoadExtDtdDefaultValue:^longint;cdecl;external LIBXML2_SO;
+//[pk] function __xmlLoadExtDtdDefaultValue:^Longint;cdecl;external LIBXML2_SO;
 (* error
 #define xmlLoadExtDtdDefaultValue \
 in define line 262 *)
@@ -294,33 +293,33 @@ in define line 262 *)
 (*(__xmlLoadExtDtdDefaultValue()))
 {$else}
 in declaration at line 265 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlParserDebugEntities:^longint;cdecl;external LIBXML2_SO;
-(* error 
+//[pk] function __xmlParserDebugEntities:^Longint;cdecl;external LIBXML2_SO;
+(* error
 #define xmlParserDebugEntities \
 in define line 270 *)
-(* error 
+(* error
 (*(__xmlParserDebugEntities()))
 {$else}
 in declaration at line 273 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 (* Const before type ignored *)
 
-//[pk] function __xmlParserVersion:^^char;cdecl;external LIBXML2_SO;
-(* error 
+//[pk] function __xmlParserVersion:^^Char; cdecl; external LIBXML2_SO;
+(* error
 #define xmlParserVersion \
 in define line 278 *)
-(* error 
+(* error
 (*(__xmlParserVersion()))
 {$else}
 in declaration at line 281 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlPedanticParserDefaultValue:^longint;cdecl;external LIBXML2_SO;
+//[pk] function __xmlPedanticParserDefaultValue:^Longint;cdecl;external LIBXML2_SO;
 (* error
 #define xmlPedanticParserDefaultValue \
 in define line 286 *)
@@ -328,10 +327,10 @@ in define line 286 *)
 (*(__xmlPedanticParserDefaultValue()))
 {$else}
 in declaration at line 289 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlSaveNoEmptyTags:^longint;cdecl;external LIBXML2_SO;
+//[pk] function __xmlSaveNoEmptyTags:^Longint;cdecl;external LIBXML2_SO;
 (* error
 #define xmlSaveNoEmptyTags \
 in define line 294 *)
@@ -339,16 +338,16 @@ in define line 294 *)
 (*(__xmlSaveNoEmptyTags()))
 {$else}
 in declaration at line 297 *)
-{$endif}
-{$ifdef LIBXML_THREAD_ENABLED}
+{$ENDIF}
+{$IFDEF LIBXML_THREAD_ENABLED}
 
-//[pk] function __xmlSubstituteEntitiesDefaultValue:^longint;cdecl;external LIBXML2_SO;
-(* error 
+//[pk] function __xmlSubstituteEntitiesDefaultValue:^Longint;cdecl;external LIBXML2_SO;
+(* error
 #define xmlSubstituteEntitiesDefaultValue \
 in define line 302 *)
-(* error 
+(* error
 (*(__xmlSubstituteEntitiesDefaultValue()))
 {$else}
 in declaration at line 305 *)
-{$endif}
+{$ENDIF}
 

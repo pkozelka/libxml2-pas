@@ -32,8 +32,7 @@ type
    * A callback for the xmlNanoFTPList command
    * Note that only one of year and day:minute are specified
    *)
-  ftpListCallback = procedure (userData: pointer; filename, attrib, owner, group: PChar;
-    size: Longint; links: longint; year: longint; month: byte; day, hour, minute: longint); cdecl;
+  ftpListCallback = procedure(userData: Pointer; filename, attrib, owner, group: PChar; size: Longint; links: Longint; year: Longint; month: Byte; day, hour, minute: Longint); cdecl;
 
   (**
    * ftpDataCallback:
@@ -43,46 +42,46 @@ type
    *
    * A callback for the xmlNanoFTPGet command
    *)
-  ftpDataCallback = procedure (userData: pointer; data: PChar; len: longint);
+  ftpDataCallback = procedure(userData: Pointer; data: PChar; len: Longint);
 
 (*
  * Init
  *)
-procedure xmlNanoFTPInit;cdecl;external LIBXML2_SO;
-procedure xmlNanoFTPCleanup;cdecl;external LIBXML2_SO;
+procedure xmlNanoFTPInit; cdecl; external LIBXML2_SO;
+procedure xmlNanoFTPCleanup; cdecl; external LIBXML2_SO;
 
 (*
  * Creating/freeing contexts
  *)
-function  xmlNanoFTPNewCtxt(URL:Pchar):pointer;cdecl;external LIBXML2_SO;
-procedure xmlNanoFTPFreeCtxt(ctx:pointer);cdecl;external LIBXML2_SO;
-function  xmlNanoFTPConnectTo(server:Pchar; port:longint):pointer;cdecl;external LIBXML2_SO;
+function  xmlNanoFTPNewCtxt(URL: PChar): Pointer; cdecl; external LIBXML2_SO;
+procedure xmlNanoFTPFreeCtxt(ctx: Pointer); cdecl; external LIBXML2_SO;
+function  xmlNanoFTPConnectTo(server: PChar; port: Longint): Pointer; cdecl; external LIBXML2_SO;
 
 (*
  * Opening/closing session connections
  *)
-function  xmlNanoFTPOpen(URL:Pchar):pointer;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPConnect(ctx:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPClose(ctx:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPQuit(ctx:pointer):longint;cdecl;external LIBXML2_SO;
-procedure xmlNanoFTPScanProxy(URL:Pchar);cdecl;external LIBXML2_SO;
-procedure xmlNanoFTPProxy(host:Pchar; port:longint; user:Pchar; passwd:Pchar; type_:longint);cdecl;external LIBXML2_SO;
-function  xmlNanoFTPUpdateURL(ctx:pointer; URL:Pchar):longint;cdecl;external LIBXML2_SO;
+function  xmlNanoFTPOpen(URL: PChar): Pointer; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPConnect(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPClose(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPQuit(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
+procedure xmlNanoFTPScanProxy(URL: PChar); cdecl; external LIBXML2_SO;
+procedure xmlNanoFTPProxy(host: PChar; port: Longint; user: PChar; passwd: PChar; type_: Longint); cdecl; external LIBXML2_SO;
+function  xmlNanoFTPUpdateURL(ctx: Pointer; URL: PChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Rathern internal commands
  *)
-function  xmlNanoFTPGetResponse(ctx:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPCheckResponse(ctx:pointer):longint;cdecl;external LIBXML2_SO;
+function  xmlNanoFTPGetResponse(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPCheckResponse(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * CD/DIR/GET handlers
  *)
-function  xmlNanoFTPCwd(ctx:pointer; directory:PChar):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPGetConnection(ctx:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPCloseConnection(ctx:pointer):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPList(ctx:pointer; callback:ftpListCallback; userData:pointer; filename:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPGetSocket(ctx:pointer; filename:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPGet(ctx:pointer; callback:ftpDataCallback; userData:pointer; filename:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlNanoFTPRead(ctx:pointer; dest:pointer; len:longint):longint;cdecl;external LIBXML2_SO;
+function  xmlNanoFTPCwd(ctx: Pointer; directory: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPGetConnection(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPCloseConnection(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPList(ctx: Pointer; callback: ftpListCallback; userData: Pointer; filename: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPGetSocket(ctx: Pointer; filename: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPGet(ctx: Pointer; callback: ftpDataCallback; userData: Pointer; filename: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPRead(ctx: Pointer; dest: Pointer; len: Longint): Longint; cdecl; external LIBXML2_SO;
 

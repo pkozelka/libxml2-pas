@@ -19,10 +19,10 @@
  * use those to be sure nothing nasty will happen if
  * your library and includes mismatch
  *)
-{$ifndef LIBXML2_COMPILING_MSCCDEF}
+{$IFNDEF LIBXML2_COMPILING_MSCCDEF}
 
-procedure xmlCheckVersion(version:longint);cdecl;external LIBXML2_SO;
-{$endif}
+procedure xmlCheckVersion(version: Longint); cdecl; external LIBXML2_SO;
+{$ENDIF}
 { LIBXML2_COMPILING_MSCCDEF  }
 const
 (**
@@ -30,7 +30,7 @@ const
  *
  * the version string like "1.2.3"
  *)
-   LIBXML_DOTTED_VERSION = '2.4.15';
+  LIBXML_DOTTED_VERSION = '2.4.15';
 
 (**
  * LIBXML_VERSION:
@@ -44,7 +44,7 @@ const
  *
  * the version number string, 1.2.3 value is "1002003"
  *)
-   LIBXML_VERSION_STRING = '20415';
+  LIBXML_VERSION_STRING = '20415';
 
 (**
  * LIBXML_TEST_VERSION:
@@ -53,136 +53,136 @@ const
  * the version the software has been compiled against
  *)
 //TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20414);
-{$if false}
+{$IF false}
 
 (**
  * WITH_TRIO:
  *
  * defined if the trio support need to be configured in
  *)
-{$define WITH_TRIO}
-{$else}
+{$DEFINE WITH_TRIO}
+{$ELSE}
 
 (**
  * WITHOUT_TRIO:
  *
  * defined if the trio support should not be configured in
  *)
-{$define WITHOUT_TRIO}
-{$ifend}
+{$DEFINE WITHOUT_TRIO}
+{$IFEND}
 
 (**
  * LIBXML_THREADS_ENABLED:
  *
  * Whether the thread support is configured in
  *)
-{$if false}
-{$define LIBXML_THREAD_ENABLED}
-{$ifend}
+{$IF false}
+{$DEFINE LIBXML_THREAD_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_FTP_ENABLED:
  *
  * Whether the FTP support is configured in
  *)
-{$if true}
-{$define LIBXML_FTP_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_FTP_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_HTTP_ENABLED:
  *
  * Whether the HTTP support is configured in
  *)
-{$if true}
-{$define LIBXML_HTTP_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_HTTP_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_HTML_ENABLED:
  *
  * Whether the HTML support is configured in
  *)
-{$if true}
-{$define LIBXML_HTML_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_HTML_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_CATALOG_ENABLED:
  *
  * Whether the Catalog support is configured in
  *)
-{$if true}
-{$define LIBXML_CATALOG_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_CATALOG_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_DOCB_ENABLED:
  *
  * Whether the SGML Docbook support is configured in
  *)
-{$if true}
-{$define LIBXML_DOCB_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_DOCB_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_XPATH_ENABLED:
  *
  * Whether XPath is configured in
  *)
-{$if true}
-{$define LIBXML_XPATH_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_XPATH_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_XPTR_ENABLED:
  *
  * Whether XPointer is configured in
  *)
-{$if true}
-{$define LIBXML_XPTR_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_XPTR_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_XINCLUDE_ENABLED:
  *
  * Whether XInclude is configured in
  *)
-{$if true}
-{$define LIBXML_XINCLUDE_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_XINCLUDE_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_ICONV_ENABLED:
  *
  * Whether iconv support is available
  *)
-{$if false}
-{$define LIBXML_ICONV_ENABLED}
-{$ifend}
+{$IF false}
+{$DEFINE LIBXML_ICONV_ENABLED}
+{$IFEND}
 
 (**
  * LIBXML_DEBUG_ENABLED:
  *
  * Whether Debugging module is configured in
  *)
-{$if true}
-{$define LIBXML_DEBUG_ENABLED}
-{$ifend}
+{$IF true}
+{$DEFINE LIBXML_DEBUG_ENABLED}
+{$IFEND}
 
 (**
  * DEBUG_MEMORY_LOCATION:
  *
  * Whether the memory debugging is configured in
  *)
-{$if false}
-{$define DEBUG_MEMORY_LOCATION}
-{$ifend}
+{$IF false}
+{$DEFINE DEBUG_MEMORY_LOCATION}
+{$IFEND}
 
 (**
  * LIBXML_DLL_IMPORT:
  *
- * Used on Windows (MS C compiler only) to declare a variable as 
+ * Used on Windows (MS C compiler only) to declare a variable as
  * imported from the library. This macro should be empty when compiling
  * libxml itself. It should expand to __declspec(dllimport)
  * when the client code includes this header, and that only if the client
@@ -190,28 +190,28 @@ const
  * For this to work, we need three macros. One tells us which compiler is
  * being used and luckily the compiler defines such a thing: _MSC_VER. The
  * second macro tells us if we are compiling libxml or the client code and
- * we define the macro IN_LIBXML on the compiler's command line for this 
- * purpose. The third macro, LIBXML_STATIC, must be defined by any client 
- * code which links against libxml statically. 
+ * we define the macro IN_LIBXML on the compiler's command line for this
+ * purpose. The third macro, LIBXML_STATIC, must be defined by any client
+ * code which links against libxml statically.
  *)
-{$ifndef LIBXML_DLL_IMPORT}
-{$endif}
+{$IFNDEF LIBXML_DLL_IMPORT}
+{$ENDIF}
 
 (**
  * ATTRIBUTE_UNUSED:
  *
  * Macro used to signal to GCC unused function parameters
  *)
-{$ifdef __GNUC__}
-{$ifdef HAVE_ANSIDECL_H}
-{$include <ansidecl.h>}
-{$endif}
-{$ifndef ATTRIBUTE_UNUSED}
-{$define ATTRIBUTE_UNUSED}
-{$endif}
-{$else}
-{$define ATTRIBUTE_UNUSED}
-{$endif}
+{$IFDEF __GNUC__}
+{$IFDEF HAVE_ANSIDECL_H}
+{$INCLUDE <ansidecl.h>}
+{$ENDIF}
+{$IFNDEF ATTRIBUTE_UNUSED}
+{$DEFINE ATTRIBUTE_UNUSED}
+{$ENDIF}
+{$ELSE}
+{$DEFINE ATTRIBUTE_UNUSED}
+{$ENDIF}
 
 (**
  * #pragma comment(lib, "iconv.lib")
@@ -219,9 +219,9 @@ const
  * pragma understood my MS compiler which enables a conditional link with
  * iconv.
  *)
-{$ifdef _MSC_VER}
-{$if (defined(LIBXML_ICONV_ENABLED) and not defined(LIBXML2_COMPILING_MSCCDEF))}
+{$IFDEF _MSC_VER}
+{$IF (defined(LIBXML_ICONV_ENABLED) and not defined(LIBXML2_COMPILING_MSCCDEF))}
 (** unsupported pragma#pragma comment(lib, "iconv.lib")*)
-{$ifend}
-{$endif}
+{$IFEND}
+{$ENDIF}
 

@@ -6,7 +6,7 @@
   ------------------------------------------------------------------------------
 }
 (**
- * threads.c: set of generic threading related routines 
+ * threads.c: set of generic threading related routines
  *
  * See Copyright for the status of this software.
  *
@@ -16,34 +16,34 @@
  * xmlMutex are a simple mutual exception locks
  *)
 type
-  xmlMutex = pointer;
+  xmlMutex = Pointer;
   xmlMutexPtr = ^xmlMutex;
 
 (*
  * xmlRMutex are reentrant mutual exception locks
  *)
 type
-  xmlRMutex = pointer;
+  xmlRMutex = Pointer;
   xmlRMutexPtr = ^xmlRMutex;
 
-function  xmlNewMutex:xmlMutexPtr;cdecl;external LIBXML2_SO;
-procedure xmlMutexLock(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
-procedure xmlMutexUnlock(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
-procedure xmlFreeMutex(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
+function  xmlNewMutex: xmlMutexPtr; cdecl; external LIBXML2_SO;
+procedure xmlMutexLock(tok: xmlMutexPtr); cdecl; external LIBXML2_SO;
+procedure xmlMutexUnlock(tok: xmlMutexPtr); cdecl; external LIBXML2_SO;
+procedure xmlFreeMutex(tok: xmlMutexPtr); cdecl; external LIBXML2_SO;
 
-function  xmlNewRMutex:xmlRMutexPtr;cdecl;external LIBXML2_SO;
-procedure xmlRMutexLock(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
-procedure xmlRMutexUnlock(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
-procedure xmlFreeRMutex(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
+function  xmlNewRMutex: xmlRMutexPtr; cdecl; external LIBXML2_SO;
+procedure xmlRMutexLock(tok: xmlRMutexPtr); cdecl; external LIBXML2_SO;
+procedure xmlRMutexUnlock(tok: xmlRMutexPtr); cdecl; external LIBXML2_SO;
+procedure xmlFreeRMutex(tok: xmlRMutexPtr); cdecl; external LIBXML2_SO;
 
 (*
  * Library wide APIs
  *)
-procedure xmlInitThreads;cdecl;external LIBXML2_SO;
-procedure xmlLockLibrary;cdecl;external LIBXML2_SO;
-procedure xmlUnlockLibrary;cdecl;external LIBXML2_SO;
-function  xmlGetThreadId:longint;cdecl;external LIBXML2_SO;
-function  xmlIsMainThread:longint;cdecl;external LIBXML2_SO;
-procedure xmlCleanupThreads;cdecl;external LIBXML2_SO;
-function  xmlGetGlobalState:xmlGlobalStatePtr;cdecl;external LIBXML2_SO;
+procedure xmlInitThreads; cdecl; external LIBXML2_SO;
+procedure xmlLockLibrary; cdecl; external LIBXML2_SO;
+procedure xmlUnlockLibrary; cdecl; external LIBXML2_SO;
+function  xmlGetThreadId: Longint; cdecl; external LIBXML2_SO;
+function  xmlIsMainThread: Longint; cdecl; external LIBXML2_SO;
+procedure xmlCleanupThreads; cdecl; external LIBXML2_SO;
+function  xmlGetGlobalState: xmlGlobalStatePtr; cdecl; external LIBXML2_SO;
 
