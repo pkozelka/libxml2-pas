@@ -1,5 +1,5 @@
 unit libxml_impl_utils;
-//$Id: libxml_impl_utils.pas,v 1.1 2002-02-10 22:40:32 pkozelka Exp $
+//$Id: libxml_impl_utils.pas,v 1.2 2002-02-17 01:40:11 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -27,6 +27,7 @@ function  xmlSetPropNode(elem: xmlNodePtr; attr: xmlAttrPtr): xmlAttrPtr;
 function  isNameChar(c: Longint): boolean;
 function  isNCName(aStr: DomString): boolean;
 function  isNamespaceUri(aStr: DomString): boolean;
+function  featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
 
 // object counters
 var
@@ -182,6 +183,25 @@ begin
     if xmlIsBlank(Ord(aStr[i])) then exit;  //???
   end;
   Result := true;
+end;
+
+function featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
+var
+  i: integer;
+  fea: string;
+  ver: string;
+begin
+  fea := UpperCase(aFeature);
+  ver := UpperCase(aVersion);
+  i := Low(aFeatures);
+  while (i<High(aFeatures)) do begin
+    Result := (fea = aFeatures[i]);
+    Inc(i);
+    Result := Result and (ver=aFeatures[i]);
+    if Result then exit;
+    Inc(i);
+  end;
+  Result := false;
 end;
 
 end.

@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.17 2002-02-14 23:24:50 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.18 2002-02-17 01:40:11 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -359,7 +359,6 @@ type
     function createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
     function createDocument(const namespaceURI, qualifiedName: DomString; doctype: IDomDocumentType): IDomDocument;
   public
-    class function featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
   end;
 
   { TLDomDocumentBuilder class }
@@ -868,7 +867,7 @@ end;
 
 function TLDomNode.isSupported(const feature, version: DomString): Boolean;
 begin
-//TODO!  Result := TLDomImplementation.featureIsSupported(feature, version, IMPLEMENTATION_FEATURES);
+  Result := featureIsSupported(feature, version, IMPLEMENTATION_FEATURES);
 end;
 
 function TLDomNode.LibXml2NodePtr: xmlNodePtr;
@@ -1711,25 +1710,6 @@ begin
   end else begin
     DomAssert(namespaceURI='', NAMESPACE_ERR, 'cannot create documentElement in namespace "'+namespaceURI+'", because qualifiedName was not specified.');
   end;
-end;
-
-class function TLDomImplementation.featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
-var
-  i: integer;
-  fea: string;
-  ver: string;
-begin
-  fea := UpperCase(aFeature);
-  ver := UpperCase(aVersion);
-  i := Low(aFeatures);
-  while (i<High(aFeatures)) do begin
-    Result := (fea = aFeatures[i]);
-    Inc(i);
-    Result := Result and (ver=aFeatures[i]);
-    if Result then exit;
-    Inc(i);
-  end;
-  Result := false;
 end;
 
 class function TLDomImplementation.getInstance(aFreeThreading: boolean): IDomImplementation;
