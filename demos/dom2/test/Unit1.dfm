@@ -15,9 +15,9 @@ object Form1: TForm1
   TextHeight = 13
   object Memo1: TMemo
     Left = 0
-    Top = 233
+    Top = 241
     Width = 655
-    Height = 282
+    Height = 274
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -32,7 +32,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 655
-    Height = 201
+    Height = 209
     Align = alTop
     TabOrder = 1
     object Label1: TLabel
@@ -42,15 +42,8 @@ object Form1: TForm1
       Height = 13
       Caption = 'TestFile for Test and Traverse:'
     end
-    object Label2: TLabel
-      Left = 200
-      Top = 16
-      Width = 29
-      Height = 13
-      Caption = 'Tests:'
-    end
     object Button2: TButton
-      Left = 352
+      Left = 360
       Top = 8
       Width = 89
       Height = 25
@@ -59,7 +52,7 @@ object Form1: TForm1
       OnClick = Button2Click
     end
     object Button6: TButton
-      Left = 352
+      Left = 360
       Top = 40
       Width = 89
       Height = 25
@@ -68,7 +61,7 @@ object Form1: TForm1
       OnClick = Button6Click
     end
     object Button7: TButton
-      Left = 352
+      Left = 360
       Top = 72
       Width = 89
       Height = 25
@@ -77,7 +70,7 @@ object Form1: TForm1
       OnClick = Button7Click
     end
     object TestGdome100: TButton
-      Left = 448
+      Left = 456
       Top = 8
       Width = 89
       Height = 25
@@ -126,7 +119,7 @@ object Form1: TForm1
       end
     end
     object Button9: TButton
-      Left = 448
+      Left = 456
       Top = 72
       Width = 89
       Height = 25
@@ -135,7 +128,7 @@ object Form1: TForm1
       OnClick = Button9Click
     end
     object Button12: TButton
-      Left = 448
+      Left = 456
       Top = 40
       Width = 89
       Height = 25
@@ -152,135 +145,151 @@ object Form1: TForm1
       TabOrder = 8
       OnClick = Button1Click
     end
-    object Test1: TCheckBox
-      Left = 200
-      Top = 40
-      Width = 137
-      Height = 17
-      Caption = 'IDOMDocumentBuilder'
-      TabOrder = 9
-    end
-    object Test2: TCheckBox
-      Left = 200
-      Top = 56
-      Width = 137
-      Height = 17
-      Caption = 'TestDocument'
-      TabOrder = 10
-    end
-    object Test3: TCheckBox
-      Left = 200
-      Top = 72
-      Width = 137
-      Height = 17
-      Caption = 'TestElement'
-      TabOrder = 11
-    end
-    object Test4: TCheckBox
-      Left = 200
-      Top = 88
-      Width = 137
-      Height = 17
-      Caption = 'TestNode'
-      TabOrder = 12
-    end
-    object Test5: TCheckBox
-      Left = 200
-      Top = 104
-      Width = 137
-      Height = 17
-      Caption = 'TestDocType'
-      TabOrder = 13
-    end
-    object Test6: TCheckBox
-      Left = 200
-      Top = 120
-      Width = 137
-      Height = 17
-      Caption = 'TestDomImplementation'
-      TabOrder = 14
-    end
-    object Test7: TCheckBox
-      Left = 200
-      Top = 136
-      Width = 137
-      Height = 17
-      Caption = 'TestCDATA_PI_Text'
-      TabOrder = 15
-    end
-    object Test8: TCheckBox
-      Left = 200
-      Top = 152
-      Width = 137
-      Height = 17
-      Caption = 'TestNamedNodemap'
-      TabOrder = 16
-    end
-    object Test9: TCheckBox
-      Left = 200
-      Top = 168
-      Width = 137
-      Height = 17
-      Caption = 'IDomPersist'
-      TabOrder = 17
-    end
     object dom2: TCheckBox
       Left = 32
       Top = 144
       Width = 137
       Height = 17
       Caption = 'TestDOM2 Methods'
-      TabOrder = 18
+      TabOrder = 9
     end
     object TestDocument5000: TButton
-      Left = 448
+      Left = 456
       Top = 104
       Width = 121
       Height = 25
       Caption = 'TestDocument10000'
-      TabOrder = 19
+      TabOrder = 10
       OnClick = TestDocument5000Click
     end
     object Button3: TButton
-      Left = 448
+      Left = 456
       Top = 136
       Width = 121
       Height = 25
       Caption = 'TestElement10000'
-      TabOrder = 20
+      TabOrder = 11
       OnClick = Button3Click
     end
     object Button5: TButton
-      Left = 448
+      Left = 456
       Top = 168
       Width = 121
       Height = 25
       Caption = 'TestNode10000'
-      TabOrder = 21
+      TabOrder = 12
       OnClick = Button5Click
     end
-    object Button8: TButton
-      Left = 232
-      Top = 16
-      Width = 41
+    object Ignore: TCheckBox
+      Left = 32
+      Top = 168
+      Width = 137
       Height = 17
-      Caption = 'all'
-      TabOrder = 22
-      OnClick = Button8Click
+      Caption = 'Ignore Whitespace'
+      TabOrder = 13
     end
-    object Button10: TButton
-      Left = 280
-      Top = 16
-      Width = 41
-      Height = 17
-      Caption = 'none'
-      TabOrder = 23
-      OnClick = Button10Click
+    object GroupBox1: TGroupBox
+      Left = 192
+      Top = 8
+      Width = 153
+      Height = 193
+      Caption = 'Tests'
+      TabOrder = 14
+      object Test9: TCheckBox
+        Left = 8
+        Top = 168
+        Width = 137
+        Height = 17
+        Caption = 'IDomPersist'
+        TabOrder = 0
+      end
+      object Test8: TCheckBox
+        Left = 8
+        Top = 152
+        Width = 137
+        Height = 17
+        Caption = 'TestNamedNodemap'
+        TabOrder = 1
+      end
+      object Test7: TCheckBox
+        Left = 8
+        Top = 136
+        Width = 137
+        Height = 17
+        Caption = 'TestCDATA_PI_Text'
+        TabOrder = 2
+      end
+      object Test6: TCheckBox
+        Left = 8
+        Top = 120
+        Width = 137
+        Height = 17
+        Caption = 'TestDomImplementation'
+        TabOrder = 3
+      end
+      object Test5: TCheckBox
+        Left = 8
+        Top = 104
+        Width = 137
+        Height = 17
+        Caption = 'TestDocType'
+        TabOrder = 4
+      end
+      object Test4: TCheckBox
+        Left = 8
+        Top = 88
+        Width = 137
+        Height = 17
+        Caption = 'TestNode'
+        TabOrder = 5
+      end
+      object Test3: TCheckBox
+        Left = 8
+        Top = 72
+        Width = 137
+        Height = 17
+        Caption = 'TestElement'
+        TabOrder = 6
+      end
+      object Test2: TCheckBox
+        Left = 8
+        Top = 56
+        Width = 137
+        Height = 17
+        Caption = 'TestDocument'
+        TabOrder = 7
+      end
+      object Test1: TCheckBox
+        Left = 8
+        Top = 40
+        Width = 137
+        Height = 17
+        Caption = 'IDOMDocumentBuilder'
+        TabOrder = 8
+      end
+      object Button8: TButton
+        Left = 8
+        Top = 16
+        Width = 65
+        Height = 17
+        Caption = 'all'
+        TabOrder = 9
+        OnClick = Button8Click
+      end
+      object Button10: TButton
+        Left = 80
+        Top = 16
+        Width = 65
+        Height = 17
+        Caption = 'none'
+        TabOrder = 10
+        OnClick = Button10Click
+      end
     end
   end
   object Panel2: TPanel
     Left = 0
-    Top = 201
+    Top = 209
     Width = 655
     Height = 32
     Align = alTop
@@ -307,6 +316,15 @@ object Form1: TForm1
       Caption = 'clear'
       TabOrder = 1
       OnClick = Button4Click
+    end
+    object Button11: TButton
+      Left = 464
+      Top = 8
+      Width = 89
+      Height = 17
+      Caption = 'MemoryUsage'
+      TabOrder = 2
+      OnClick = Button11Click
     end
   end
 end
