@@ -145,13 +145,13 @@ for dir in `cat $TMP/allPaths`; do
 		# report any other files
 		echo "CONVERTING $sfn"
 
-		ORIGFILENAME=`basename $sfn`
+		ORIGFILENAME=NEWLIB_`basename $sfn`
 		ORIGFILEPATH=`dirname $sfn`
 		TARGETFILE=$TMP/`basename $ORIGFILEPATH`/$ORIGFILENAME
 		mkdir -p `dirname $TARGETFILE`
 
 		echo "  copying $ORIGFILENAME to $TARGETFILE"
-		cp $LOCALROOT/$ORIGFILE $TARGETFILE
+		cp $fn $TARGETFILE
 		toPascal $TARGETFILE
 
 		CHGCOUNT=$((CHGCOUNT + 1))
