@@ -39,12 +39,20 @@ function copyCommonSourcesToDist()
 	cp $HEADERS_DIR/../common/license/COPYING* $DIST
 
 	# demo files
+
 	d="demos/libxml2-test"
 	mkdir -p $DIST/$d
 	cp $HEADERS_DIR/$d/Makefile $DIST/$d
 	cp $HEADERS_DIR/$d/README.txt $DIST/$d
 	cp $HEADERS_DIR/$d/test.xml $DIST/$d
-	cp $HEADERS_DIR/$d/TestParseFile.dpr $DIST/$d
+	cp $HEADERS_DIR/$d/*.dpr $DIST/$d
+
+	d="demos/simplexslt"
+	mkdir -p $DIST/$d
+	cp $HEADERS_DIR/$d/Makefile $DIST/$d
+	cp $HEADERS_DIR/$d/README.txt $DIST/$d
+	cp $HEADERS_DIR/$d/birds.* $DIST/$d
+	cp $HEADERS_DIR/$d/*.dpr $DIST/$d
 
 
 	# prepare JEDI info file
