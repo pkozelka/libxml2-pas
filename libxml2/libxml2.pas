@@ -198,6 +198,12 @@ begin
   Move(str^, Result^, sz);
 end;
 
+// error output redirected to OutputDebugString 
+procedure myGenericErrorFunc(ctx: pointer; msg: PChar); cdecl;
+begin
+  OutputDebugString(msg);
+end;            
+
 //[pk] DEPRECATED, TEMPORARY:
 procedure InitExportedVar;
 {$ifdef WIN32}
@@ -227,5 +233,7 @@ initialization
 //end of deprecated part
   // setup Delphi memory handler
   xmlMemSetup(@DelphiFreeFunc, @DelphiMallocFunc, @DelphiReallocFunc, @DelphiStrdupFunc);
+  // redirect error output
+  xmlSetGenericErrorFunc(nil, @myGenericErrorFunc);
 end.
 
