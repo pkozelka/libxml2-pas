@@ -74,9 +74,8 @@ EOF
 function prepareWin32Src()
 {
 	# prepare resource script file
-	DCC_VER=`$DCC --version | tr -d '\015' | tr '\012' ';'` 
 sed -f - $SRC/libxml2_pas.rc.template > $DIST/src/libxml2_pas.rc <<EOF
-s:@COMPILER_VERSION@:$DCC_VER:g
+s:@COMPILER_VERSION@:$DCCVERSIONLINE:g
 s:@CURRENT_YEAR@:`date +%Y`:g
 s:@LIBXML_MAJOR_VERSION@:$LIBXML_MAJOR_VERSION:g
 s:@LIBXML_MINOR_VERSION@:$LIBXML_MINOR_VERSION:g
@@ -204,7 +203,12 @@ function compile()
 	fi
 	for fn in *.pas libxml2_pas.dpk; do
 		echo "Compiling $fn:"
-		$DCC -H -Q -N. -E. $fn | grep -i 'error\|warning\|hint'
+		case "$DV" in
+		D5)
+			extraopt="-U"$(cygpath -w $(dirname $(which $DCC))/../Lib)
+			;;
+		esac
+		$DCC -H -Q -N. -E. $extraopt $fn | grep -i 'error\|warning\|hint\|fatal'
 	done
 	rm -f libxml2_pas.dcu $archName
 	mv -f *.dcp *.bpl *.dcu *.so $DIST/lib 2>/dev/null
@@ -236,11 +240,12 @@ if [ ! -d "$LIBXML2_PAS" ]; then
 	exit -1
 fi
 
-DELPHIVERSION=`dcc --version | head -2 | tail -1 | sed 's/[^[:digit:]]*//'`
 case `uname` in
 CYGWIN*)
 	CYGWIN="true"
 	DCC="dcc32"
+	DCCVERSIONLINE="`$DCC | head -1`"
+	DELPHIVERSION=`echo $DCCVERSIONLINE | sed 's/.*Version[[:space:]]*\([[:digit:]]*.[[:digit:]]*\).*/\1/'`
 	case "$DELPHIVERSION" in
 	13*)
 		DV='D5'
@@ -257,6 +262,8 @@ CYGWIN*)
 *)
 	CYGWIN="false"
 	DCC="dcc"
+	DCCVERSIONLINE="`$DCC | head -1`"
+	DELPHIVERSION=`echo $DCCVERSIONLINE | sed 's/.*Version[[:space:]]*\([[:digit:]]*.[[:digit:]]*\).*/\1/'`
 	case "$DELPHIVERSION" in
 	13*)
 		DV='K1'
@@ -272,6 +279,7 @@ CYGWIN*)
 	;;
 esac
 
+echo "$DV:"
 # check that GNOMECVSROOT env. var. is correct
 if [ ! -d "$GNOMECVSROOT/gnome-xml" ]; then
 	echo "ERROR - variable GNOMECVSROOT must point to the root of libxml2-pas working copy" >/dev/stderr
