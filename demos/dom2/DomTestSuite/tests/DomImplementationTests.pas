@@ -28,16 +28,18 @@ type
       procedure hasFeatureCoreTest2;
       procedure hasFeatureCoreTest3;
 
-      procedure createDocMalFormedXMLNSTest; //*
-      procedure createDocNullXMLNSTest;      //*
+      procedure createDocMalFormedXMLNSTest;
+      procedure createDocNullXMLNSTest;
 
       procedure createEmptyDocumentTest;
       procedure createDocumentNoDocTypeTest;
-      procedure createDocXMLNSDifferentDocTest; //*
+      procedure createDocXMLNSDifferentDocTest;
+      procedure createDocXMLNSIllegalName;
+      procedure createDocXMLNSPrefixXMLNSTest;
 
       procedure createDocumentTypeTest;
-      procedure createDocTypeMalFormedXMLNSTest; //**
-      procedure ceateDocTypeXMLNSIllegalCharTest; //*
+      procedure createDocTypeMalFormedXMLNSTest;
+      procedure ceateDocTypeXMLNSIllegalCharTest;
   end;
 
   function getUnitTests : ITestSuite;
@@ -159,11 +161,11 @@ begin
   try
     document := fDomImplementation.createDocument(
             namespaceURI, qualifiedName, nil);
-    fail('EDomException etNamespaceErr should have been thrown but was not');
+    fail('EDomException NAMESPACE_ERR should have been thrown but was not');
   except
     on e : EDomException do
       check(e.code = NAMESPACE_ERR,
-              'etNamespaceErr should be thrown but was: ' + e.message);
+              'NAMESPACE_ERR should be thrown but was: ' + e.message);
   end;
 end;
 
@@ -183,11 +185,11 @@ begin
   try
     document := fDomImplementation.createDocument(
             namespaceURI, qualifiedName, nil);
-    fail('EDomException etNamespaceErr should have been thrown but was not');
+    fail('EDomException NAMESPACE_ERR should have been thrown but was not');
   except
     on e : EDomException do
       check(e.code = NAMESPACE_ERR,
-              'etNamespaceErr should be thrown but was: ' + e.message);
+              'NAMESPACE_ERR should be thrown but was: ' + e.message);
   end;
 end;
 
@@ -224,11 +226,11 @@ begin
     document2 := fDomImplementation.createDocument(
             namespaceURI, qualifiedName, docType);
     fail(
-        'EDomException etWrongDocumentErr should have been thrown but was not');
+        'EDomException WRONG_DOCUMENT_ERR should have been thrown but was not');
   except
     on e : EDomException do
       check(e.code = WRONG_DOCUMENT_ERR,
-              'etWrongDocumentErr should be thrown but was: ' + e.message);
+              'WRONG_DOCUMENT_ERR should be thrown but was: ' + e.message);
   end;
 end;
 
@@ -272,11 +274,11 @@ begin
   try
     docType := fDomImplementation.createDocumentType(
                        malformedName, publicId, systemId);
-    fail('EDomException etNamespaceErr should have been thrown but was not');
+    fail('EDomException NAMESPACE_ERR should have been thrown but was not');
   except
     on e : EDomException do
       check(e.code = NAMESPACE_ERR,
-              'etNamespaceErr should be thrown but was: ' + e.message);
+              'NAMESPACE_ERR should be thrown but was: ' + e.message);
   end;
 end;
 
@@ -303,19 +305,71 @@ begin
       qualifiedName := prefix + DomSetup.illegalChars[i];
       docType := fDomImplementation.createDocumentType(
                          qualifiedName, publicId, systemId);
-      fail('EDomException etInvalidCharacterErr should have been thrown ' + 
+      fail('EDomException INVALID_CHARACTER_ERR should have been thrown ' +
            'but was not');
     except
       on e : EDomException do
         check(e.code = INVALID_CHARACTER_ERR,
-                'etInvalidCharacterErr should be thrown but was: ' + e.message);
+                'INVALID_CHARACTER_ERR should be thrown but was: ' + e.message);
     end;
   end;
 end;
 
 
+(*
+ * checks if creating a document with a qualified name using illegal chars
+ * results in EDomException etInvalidCharacterErr
+ * (converted from: domimplementationCreateDocXMLNSIllegalName.js)
+*)
+procedure TDomImplementationFundamentalTests.createDocXMLNSIllegalName;
+var
+  namespaceURI  : DomString;
+  qualifiedName : DomString;
+  prefix        : DomString;
+  document      : IDomDocument;
+  i             : Integer;
+begin
+  namespaceURI := 'http://www.ecommerce.org/schema';
+  prefix := 'prefix:';
+  for i := low(DomSetup.illegalChars) to high(DomSetup.illegalChars) do
+  begin
+    try
+      qualifiedName := prefix + DomSetup.illegalChars[i];
+      document := fDomImplementation.createDocument(
+                         namespaceURI, qualifiedName, nil);
+      fail('EDomException INVALID_CHARACTER_ERR should have been thrown ' +
+           'but was not');
+    except
+      on e : EDomException do
+        check(e.code = INVALID_CHARACTER_ERR,
+                'INVALID_CHARACTER_ERR should be thrown but was: ' + e.message);
+    end;
+  end;
+end;
 
 
+(*
+ * tests if prefixing a qualified name with xml results in INVALID_ACCESS_ERR
+ * (converted from: domimplementationCreateDocXMLNSPrefixXMLNS.js)
+*)
+procedure TDomImplementationFundamentalTests.createDocXMLNSPrefixXMLNSTest;
+var
+  document      : IDomDocument;
+  namespaceURI  : DomString;
+  qualifiedName : DomString;
+begin
+  namespaceURI  := 'http://ecommerce.org/schema';
+  qualifiedName := 'xml:local';
+  try
+    document := fDomImplementation.createDocument(
+            namespaceURI, qualifiedName, nil);
+    fail('EDomException INVALID_ACCESS_ERR should have been thrown but was not');
+  except
+    on e : EDomException do
+      check(e.code = INVALID_ACCESS_ERR,
+              'INVALID_ACCESS_ERR should be thrown but was: ' + e.message);
+  end;
+end;
 
 
 (******************************************************************************)
