@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.84 2002-01-27 22:25:59 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.85 2002-01-27 23:04:53 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -861,8 +861,9 @@ begin
   XML_DOCB_DOCUMENT_NODE,
   XML_DOCUMENT_NODE:
     Result := '#document';
+  XML_CDATA_SECTION_NODE:
+    Result := '#cdata-section';
   XML_TEXT_NODE,
-  XML_CDATA_SECTION_NODE,
   XML_COMMENT_NODE,
   XML_DOCUMENT_FRAG_NODE:
     Result := '#'+UTF8Decode(FGNode.name);
@@ -1271,7 +1272,9 @@ constructor TGDOMXPathNodeList.Create(aBaseNode: TGDOMNode; aQuery: String);
 begin
   inherited Create;
   DomAssert(aBaseNode<>nil, HIERARCHY_REQUEST_ERR, 'XPath query must have a parent');
-  FXPathCtxt := xmlXPathNewContext(aBaseNode.Gnode.doc);
+  FXPathCtxt := xmlXPathNewContext(aBaseNode.GNode.doc);
+  FXPathCtxt.node := aBaseNode.GNode;
+  FQuery := aQuery;
   Eval;
 end;
 
@@ -1306,8 +1309,8 @@ end;
 
 function TGDOMXPathNodeList.get_item(index: Integer): IDomNode;
 begin
-  DomAssert(index<0, INVALID_ACCESS_ERR, 'Index below zero');
-  DomAssert(index>=FXPathObj.nodesetval.nodeNr, INVALID_ACCESS_ERR, 'Index too high');
+  DomAssert(index>=0, INVALID_ACCESS_ERR, 'Index below zero');
+  DomAssert(index<FXPathObj.nodesetval.nodeNr, INVALID_ACCESS_ERR, 'Index too high');
   Result := GetDomObject(xmlXPathNodeSetItem(FXPathObj.nodesetval, index)) as IDomNode;
 end;
 
@@ -2133,21 +2136,26 @@ begin
 end;
 
 function TGDOMCharacterData.substringData(offset, count: Integer): DomString;
-//var
-//  temp:PGdomeDomString;
 begin
-  DomAssert(false, NOT_SUPPORTED_ERR);
-  {temp:=gdome_cd_substringData(GCharacterData,offset,count,@exc);
-  DomAssert(false, exc);
-  Result:=GdomeDOMStringToString(temp);}
+  Result := Copy(get_nodeValue, offset, count);
 end;
 
 { TGDOMText }
 
 function TGDOMText.splitText(offset: Integer): IDomText;
+var
+  v: DomString;
+  rest: DomString;
+  p: IDomNode;
 begin
-  set_nodeValue(Copy(get_nodeValue, 1, offset));
-  Result := self;
+  v := get_nodeValue;
+  rest := Copy(v, offset+1, Length(v)-offset);
+  set_nodeValue(Copy(v, 1, offset));
+  Result := get_ownerDocument.createTextNode(rest);
+  p := get_parentNode;
+  if p=nil then exit;
+  // nodes must be kept as siblings
+  Result := p.insertBefore(Result, get_nextSibling) as IDomText;
 end;
 
 { TMSDOMEntity }
