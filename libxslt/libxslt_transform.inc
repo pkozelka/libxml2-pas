@@ -34,7 +34,7 @@ function  xsltGetXIncludeDefault:longint;cdecl;external LIBXSLT_SO;
 }
 function  xsltNewTransformContext(style:xsltStylesheetPtr; doc:xmlDocPtr):xsltTransformContextPtr;cdecl;external LIBXSLT_SO;
 procedure xsltFreeTransformContext(ctxt:xsltTransformContextPtr);cdecl;external LIBXSLT_SO;
-function  xsltApplyStylesheetUser(style:xsltStylesheetPtr; doc:xmlDocPtr; params:PPchar; output:Pchar; profile:PFILE; userCtxt:xsltTransformContextPtr):xmlDocPtr;cdecl;external LIBXSLT_SO;
+function  xsltApplyStylesheetUser(style:xsltStylesheetPtr; doc:xmlDocPtr; params:PPchar; output:Pchar; var profile:TextFile; userCtxt:xsltTransformContextPtr):xmlDocPtr;cdecl;external LIBXSLT_SO;
 
 {
 	Private Interfaces
@@ -42,7 +42,7 @@ function  xsltApplyStylesheetUser(style:xsltStylesheetPtr; doc:xmlDocPtr; params
 procedure xsltApplyStripSpaces(ctxt:xsltTransformContextPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
 function  xsltExtElementLookup(ctxt:xsltTransformContextPtr; name:PxmlChar; URI:PxmlChar):xsltTransformFunction;cdecl;external LIBXSLT_SO;
 function  xsltApplyStylesheet(style:xsltStylesheetPtr; doc:xmlDocPtr; params:PPchar):xmlDocPtr;cdecl;external LIBXSLT_SO;
-function  xsltProfileStylesheet(style:xsltStylesheetPtr; doc:xmlDocPtr; params:PPchar; output:PFILE):xmlDocPtr;cdecl;external LIBXSLT_SO;
+function  xsltProfileStylesheet(style:xsltStylesheetPtr; doc:xmlDocPtr; params:PPchar; var output:TextFile):xmlDocPtr;cdecl;external LIBXSLT_SO;
 function  xsltRunStylesheet(style:xsltStylesheetPtr; doc:xmlDocPtr; params:PPchar; output:Pchar; SAX:xmlSAXHandlerPtr; IObuf:xmlOutputBufferPtr):longint;cdecl;external LIBXSLT_SO;
 procedure xsltApplyOneTemplate(ctxt:xsltTransformContextPtr; node:xmlNodePtr; list:xmlNodePtr; templ:xsltTemplatePtr; params:xsltStackElemPtr);cdecl;external LIBXSLT_SO;
 procedure xsltDocumentElem(ctxt:xsltTransformContextPtr; node:xmlNodePtr; inst:xmlNodePtr; comp:xsltStylePreCompPtr);cdecl;external LIBXSLT_SO;

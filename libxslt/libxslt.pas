@@ -34,10 +34,6 @@ const
 	XSLT_DEFAULT_VENDOR = 'libxslt';
 	XSLT_DEFAULT_URL = 'http://xmlsoft.org/XSLT/';
 
-type
-	PFILE = ^file; // work around
-								 // access to filehandles doesn't work yet
-
 function XSLT_NAMESPACE : PxmlChar;
 
 {

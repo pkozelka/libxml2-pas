@@ -124,13 +124,13 @@ function xsltGetQNameURI(node:xmlNodePtr; name:PPxmlChar):PxmlChar;cdecl;externa
 }
 function  xsltSaveResultTo(buf:xmlOutputBufferPtr; result:xmlDocPtr; style:xsltStylesheetPtr):longint;cdecl;external LIBXSLT_SO;
 function  xsltSaveResultToFilename(URI:Pchar; result:xmlDocPtr; style:xsltStylesheetPtr; compression:longint):longint;cdecl;external LIBXSLT_SO;
-function  xsltSaveResultToFile(file_:PFILE; result:xmlDocPtr; style:xsltStylesheetPtr):longint;cdecl;external LIBXSLT_SO;
+function  xsltSaveResultToFile(var file_:TextFile; result:xmlDocPtr; style:xsltStylesheetPtr):longint;cdecl;external LIBXSLT_SO;
 function  xsltSaveResultToFd(fd:longint; result:xmlDocPtr; style:xsltStylesheetPtr):longint;cdecl;external LIBXSLT_SO;
 
 {
 	profiling
 }
-procedure xsltSaveProfiling(ctxt:xsltTransformContextPtr; output:PFILE);cdecl;external LIBXSLT_SO;
+procedure xsltSaveProfiling(ctxt:xsltTransformContextPtr; var output:TextFile);cdecl;external LIBXSLT_SO;
 function  xsltTimestamp:longint;cdecl;external LIBXSLT_SO;
 procedure xsltCalibrateAdjust(delta:longint);cdecl;external LIBXSLT_SO;
 
