@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.109:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.110:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -608,6 +608,7 @@ procedure xmlDocDumpFormatMemory(cur: xmlDocPtr; var mem: PxmlChar; size: PLongi
 procedure xmlDocDumpMemory(cur: xmlDocPtr; var mem: PxmlChar; size: PLongint); cdecl; external LIBXML2_SO;
 procedure xmlDocDumpMemoryEnc(out_doc: xmlDocPtr; var doc_txt_ptr: PxmlChar; doc_txt_len: PLongint; txt_encoding: PChar); cdecl; external LIBXML2_SO;
 procedure xmlDocDumpFormatMemoryEnc(out_doc: xmlDocPtr; var doc_txt_ptr: PxmlChar; doc_txt_len: PLongint; txt_encoding: PChar; format: Longint); cdecl; external LIBXML2_SO;
+function  xmlDocFormatDump(f: PLibXml2File; cur: xmlDocPtr; format: Longint): Longint; cdecl; external LIBXML2_SO;
 function  xmlDocDump(f: PLibXml2File; cur: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 procedure xmlElemDump(f: PLibXml2File; doc: xmlDocPtr; cur: xmlNodePtr); cdecl; external LIBXML2_SO;
 function  xmlSaveFile(filename: PChar; cur: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
