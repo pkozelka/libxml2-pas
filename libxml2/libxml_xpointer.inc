@@ -1,3 +1,9 @@
+{ [1.9] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
    xpointer.h : API to handle XML Pointers
   
@@ -7,13 +13,6 @@
    See Copyright for the status of this software.
   
    daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 type

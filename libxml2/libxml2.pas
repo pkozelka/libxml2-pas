@@ -36,6 +36,9 @@ type
 	PPChar = ^PChar;
 	size_t = longint;
 
+{TODO: $I libxml_xmlversion.inc}
+{TODO: $I libxml_xmlwin32version.inc}
+
 {$I libxml_xmlmemory.inc}
 {$I libxml_tree.inc}
 {$I libxml_encoding.inc}
@@ -48,19 +51,23 @@ type
 {$I libxml_SAX.inc}
 
 {$I libxml_xpath.inc}
+{TODO: $I libxml_xpathInternals.inc}
 {$I libxml_xpointer.inc}
 
 {$I libxml_xmlerror.inc}
 {$I libxml_xlink.inc}
-{$I libxml_DOCBparser.inc}
-{$I libxml_HTMLparser.inc}
-{$I libxml_HTMLtree.inc}
 {$I libxml_xinclude.inc}
 {$I libxml_debugXML.inc}
-{$I libxml_catalog.inc}
 {$I libxml_nanoftp.inc}
 {$I libxml_nanohttp.inc}
 {$I libxml_uri.inc}
+{$I libxml_HTMLparser.inc}
+{$I libxml_HTMLtree.inc}
+{$I libxml_DOCBparser.inc}
+{$I libxml_catalog.inc}
+
+// this will later be in libxml_xpathInternals.inc
+function  xmlXPathRegisterNs(ctxt:xmlXPathContextPtr;prefix,ns_uri:PxmlChar):longint;cdecl;external LIBXML2_SO;
 
 // xmlFree overloaded functions
 procedure xmlFree(str: PxmlChar); overload;
@@ -83,13 +90,39 @@ function xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxt
 
 implementation
 
-{$I libxml_xpath_IMPL.inc}
-
 procedure xmlFree(str: PxmlChar);
 begin
 	FreeMem(PChar(str));
 end;
 
+// macros from xpath.h
+
+function xmlXPathNodeSetGetLength(ns : xmlNodeSetPtr) : integer;
+begin
+	if ns=nil then begin
+		Result := 0;
+	end else begin
+		Result := ns^.nodeNr;
+	end;
+end;
+
+function xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: integer): xmlNodePtr;
+var
+	p: PxmlNodePtr;
+begin
+	Result := nil;
+	if ns=nil then exit;
+	if index<0 then exit;
+	if index>=ns^.nodeNr then exit;
+	p := ns^.nodeTab;
+	Inc(p, index);
+	Result := p^;
+end;
+
+function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): boolean;
+begin
+	Result := ((ns = nil) or (ns.nodeNr = 0) or (ns.nodeTab = nil));
+end;
 end.
 
 

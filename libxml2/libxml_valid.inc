@@ -1,16 +1,16 @@
+{ [1.31] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
+
 {
 	valid.h : interface to the DTD handling and the validity checking
   
 	See Copyright for the status of this software.
   
 	daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 type
@@ -96,7 +96,8 @@ procedure xmlDumpNotationTable(buf:xmlBufferPtr; table:xmlNotationTablePtr);cdec
 function  xmlNewElementContent(name:PxmlChar; aType:xmlElementContentType):xmlElementContentPtr;cdecl;external LIBXML2_SO;
 function  xmlCopyElementContent(content:xmlElementContentPtr):xmlElementContentPtr;cdecl;external LIBXML2_SO;
 procedure xmlFreeElementContent(cur:xmlElementContentPtr);cdecl;external LIBXML2_SO;
-procedure xmlSprintfElementContent(buf:Pchar; content:xmlElementContentPtr; glob:longint);cdecl;external LIBXML2_SO;
+procedure xmlSnprintfElementContent(buf:Pchar; size: integer; content:xmlElementContentPtr; glob:longint);cdecl;external LIBXML2_SO; {$ifdef VER140} deprecated; {$endif}
+procedure xmlSprintfElementContent(buf:Pchar; content:xmlElementContentPtr; glob:longint);cdecl;external LIBXML2_SO; {$ifdef VER140} deprecated; {$endif}
 
 { Element  }
 function  xmlAddElementDecl(ctxt:xmlValidCtxtPtr; dtd:xmlDtdPtr; name:PxmlChar; aType:xmlElementTypeVal; content:xmlElementContentPtr):xmlElementPtr;cdecl;external LIBXML2_SO;
@@ -118,44 +119,43 @@ procedure xmlDumpAttributeTable(buf:xmlBufferPtr; table:xmlAttributeTablePtr);cd
 procedure xmlDumpAttributeDecl(buf:xmlBufferPtr; attr:xmlAttributePtr);cdecl;external LIBXML2_SO;
 
 { IDs  }
-function xmlAddID(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; value:PxmlChar; attr:xmlAttrPtr):xmlIDPtr;cdecl;external LIBXML2_SO;
-function xmlCopyIDTable(table:xmlIDTablePtr):xmlIDTablePtr;cdecl;external LIBXML2_SO;
+function  xmlAddID(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; value:PxmlChar; attr:xmlAttrPtr):xmlIDPtr;cdecl;external LIBXML2_SO;
 procedure xmlFreeIDTable(table:xmlIDTablePtr);cdecl;external LIBXML2_SO;
 
-function xmlGetID(doc:xmlDocPtr; ID:PxmlChar):xmlAttrPtr;cdecl;external LIBXML2_SO;
-function xmlIsID(doc:xmlDocPtr; elem:xmlNodePtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
-function xmlRemoveID(doc:xmlDocPtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlGetID(doc:xmlDocPtr; ID:PxmlChar):xmlAttrPtr;cdecl;external LIBXML2_SO;
+function  xmlIsID(doc:xmlDocPtr; elem:xmlNodePtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlRemoveID(doc:xmlDocPtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
 
 { IDREFs  }
-function xmlAddRef(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; value:PxmlChar; attr:xmlAttrPtr):xmlRefPtr;cdecl;external LIBXML2_SO;
-function xmlCopyRefTable(table:xmlRefTablePtr):xmlRefTablePtr;cdecl;external LIBXML2_SO;
+function  xmlAddRef(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; value:PxmlChar; attr:xmlAttrPtr):xmlRefPtr;cdecl;external LIBXML2_SO;
 procedure xmlFreeRefTable(table:xmlRefTablePtr);cdecl;external LIBXML2_SO;
-function xmlIsRef(doc:xmlDocPtr; elem:xmlNodePtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
-function xmlRemoveRef(doc:xmlDocPtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
-
-function xmlGetRefs(doc:xmlDocPtr; ID:PxmlChar):xmlListPtr;cdecl;external LIBXML2_SO;
+function  xmlIsRef(doc:xmlDocPtr; elem:xmlNodePtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlRemoveRef(doc:xmlDocPtr; attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlGetRefs(doc:xmlDocPtr; ID:PxmlChar):xmlListPtr;cdecl;external LIBXML2_SO;
 
 {
 	The public function calls related to validity checking
 }
-function xmlValidateRoot(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateElementDecl(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlElementPtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidNormalizeAttributeValue(doc:xmlDocPtr; elem:xmlNodePtr; name:PxmlChar; value:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function xmlValidateAttributeDecl(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; attr:xmlAttributePtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateAttributeValue(aType:xmlAttributeType; value:PxmlChar):longint;cdecl;external LIBXML2_SO;
-function xmlValidateNotationDecl(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; nota:xmlNotationPtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateDtd(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; dtd:xmlDtdPtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateDtdFinal(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateDocument(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateElement(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateOneElement(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateOneAttribute(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlNodePtr; attr:xmlAttrPtr; value:PxmlChar):longint;cdecl;external LIBXML2_SO;
-function xmlValidateDocumentFinal(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
-function xmlValidateNotationUse(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; notationName:PxmlChar):longint;cdecl;external LIBXML2_SO;
-function xmlIsMixedElement(doc:xmlDocPtr; name:PxmlChar):longint;cdecl;external LIBXML2_SO;
-function xmlGetDtdAttrDesc(dtd:xmlDtdPtr; elem:PxmlChar; name:PxmlChar):xmlAttributePtr;cdecl;external LIBXML2_SO;
-function xmlGetDtdNotationDesc(dtd:xmlDtdPtr; name:PxmlChar):xmlNotationPtr;cdecl;external LIBXML2_SO;
-function xmlGetDtdElementDesc(dtd:xmlDtdPtr; name:PxmlChar):xmlElementPtr;cdecl;external LIBXML2_SO;
-function xmlValidGetValidElements(prev:xmlNodePtr; next:xmlNodePtr; list:PPxmlChar; max:longint):longint;cdecl;external LIBXML2_SO;
-function xmlValidGetPotentialChildren(ctree:xmlElementContentPtr; list:PPxmlChar; len:Plongint; max:longint):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateRoot(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateElementDecl(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlElementPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidNormalizeAttributeValue(doc:xmlDocPtr; elem:xmlNodePtr; name:PxmlChar; value:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
+function  xmlValidateAttributeDecl(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; attr:xmlAttributePtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateAttributeValue(aType:xmlAttributeType; value:PxmlChar):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateNotationDecl(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; nota:xmlNotationPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateDtd(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; dtd:xmlDtdPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateDtdFinal(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateDocument(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateElement(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateOneElement(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateOneAttribute(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; elem:xmlNodePtr; attr:xmlAttrPtr; value:PxmlChar):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateDocumentFinal(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlValidateNotationUse(ctxt:xmlValidCtxtPtr; doc:xmlDocPtr; notationName:PxmlChar):longint;cdecl;external LIBXML2_SO;
+function  xmlIsMixedElement(doc:xmlDocPtr; name:PxmlChar):longint;cdecl;external LIBXML2_SO;
+function  xmlGetDtdAttrDesc(dtd:xmlDtdPtr; elem:PxmlChar; name:PxmlChar):xmlAttributePtr;cdecl;external LIBXML2_SO;
+function  xmlGetDtdQAttrDesc(dtd:xmlDtdPtr; elem:PxmlChar; name, prefix:PxmlChar):xmlAttributePtr;cdecl;external LIBXML2_SO;
+function  xmlGetDtdNotationDesc(dtd:xmlDtdPtr; name:PxmlChar):xmlNotationPtr;cdecl;external LIBXML2_SO;
+function  xmlGetDtdQElementDesc(dtd:xmlDtdPtr; name, prefix:PxmlChar):xmlElementPtr;cdecl;external LIBXML2_SO;
+function  xmlGetDtdElementDesc(dtd:xmlDtdPtr; name:PxmlChar):xmlElementPtr;cdecl;external LIBXML2_SO;
+function  xmlValidGetValidElements(prev:xmlNodePtr; next:xmlNodePtr; list:PPxmlChar; max:longint):longint;cdecl;external LIBXML2_SO;
+function  xmlValidGetPotentialChildren(ctree:xmlElementContentPtr; list:PPxmlChar; len:Plongint; max:longint):longint;cdecl;external LIBXML2_SO;
 

@@ -1,3 +1,10 @@
+{ [1.4] libxml2-1.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
+
 {
 	xinclude.c : API to handle XInclude processing
   
@@ -7,13 +14,6 @@
 	See Copyright for the status of this software.
   
 	daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 function xmlXIncludeProcess(doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;

@@ -1,3 +1,9 @@
+{ [1.9] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	hash.c: chained hash tables
 
@@ -15,13 +21,6 @@
 	Author: bjorn.reese@systematic.dk
 }
 
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
-}
-
 type
 	{
 		The hash table
@@ -34,7 +33,8 @@ type
 	xmlHashDeallocator = procedure (payload:pointer; name:PxmlChar);cdecl;
 	xmlHashCopier = function (payload:pointer; name:PxmlChar):pointer;cdecl;
 	xmlHashScanner = function (payload:pointer; data:pointer; name:PxmlChar):pointer;cdecl;
-	
+	xmlHashScannerFull = function (payload:pointer; data:pointer; name,name2,name3:PxmlChar):pointer;cdecl;
+
 {
 	Constructor and destructor
 }
@@ -69,9 +69,9 @@ function  xmlHashLookup3(table:xmlHashTablePtr; name:PxmlChar; name2:PxmlChar; n
 	Helpers
 }
 function  xmlHashCopy(table:xmlHashTablePtr; f:xmlHashCopier):xmlHashTablePtr;cdecl;external LIBXML2_SO;
-function  xmlHashSize(_para1:xmlHashTablePtr):longint;cdecl;external LIBXML2_SO;
+function  xmlHashSize(table:xmlHashTablePtr):longint;cdecl;external LIBXML2_SO;
 procedure xmlHashScan(table:xmlHashTablePtr; f:xmlHashScanner; data:pointer);cdecl;external LIBXML2_SO;
-procedure xmlHashScan1(table:xmlHashTablePtr; name:PxmlChar; f:xmlHashScanner; data:pointer);cdecl;external LIBXML2_SO;
-procedure xmlHashScan2(table:xmlHashTablePtr; name:PxmlChar; name2:PxmlChar; f:xmlHashScanner; data:pointer);cdecl;external LIBXML2_SO;
-procedure xmlHashScan3(table:xmlHashTablePtr; name:PxmlChar; name2:PxmlChar; name3:PxmlChar; f:xmlHashScanner;data:pointer);cdecl;external LIBXML2_SO;
+procedure xmlHashScan3(table:xmlHashTablePtr; name,name2,name3:PxmlChar; f:xmlHashScanner;data:pointer);cdecl;external LIBXML2_SO;
+procedure xmlHashScanFull(table:xmlHashTablePtr; f:xmlHashScannerFull; data:pointer);cdecl;external LIBXML2_SO;
+procedure xmlHashScanFull3(table:xmlHashTablePtr; name,name2,name3:PxmlChar; f:xmlHashScannerFull; data:pointer);cdecl;external LIBXML2_SO;
 

@@ -1,4 +1,4 @@
-{
+{ [1.10] libxml2-2.4.12
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
@@ -101,26 +101,27 @@ const
 	XML_ERR_ENTITY_BOUNDARY = 90;
 	XML_ERR_INVALID_URI = 91;
 	XML_ERR_URI_FRAGMENT = 92;
+	XML_WAR_CATALOG_PI = 93;
+	XML_ERR_NO_DTD = 94;
 
 {
 	 Signature of the function to use when there is an error and
 	 no parsing or validity context available
 }
 type
-	xmlGenericErrorFunc = procedure (ctx: pointer; msg: PChar); cdecl; //varargs;
-
+	xmlGenericErrorFunc = procedure (ctx: pointer; msg: PChar); cdecl; {$ifdef VER140} {varargs;} {$endif}
+	// note: the above modifier is commented because this syntax is not supported.
+	//TODO: report it to Borland!
 {
 	Those are the default error function and associated context to use
 	when when there is an error and no parsing or validity context available
 }
-(* TODO somehow
-LIBXML_DLL_IMPORT extern xmlGenericErrorFunc xmlGenericError;
-LIBXML_DLL_IMPORT extern void *xmlGenericErrorContext;
-*)
 {
 	Use the following function to reset the two previous global variables.
 }
 procedure xmlSetGenericErrorFunc(ctx:pointer; handler:xmlGenericErrorFunc);cdecl;external LIBXML2_SO;
+procedure xmlInitGenericErrorDefaultFunc(var handler:xmlGenericErrorFunc);cdecl;external LIBXML2_SO;
+
 {
 	Default message routines used by SAX and Valid context for error
 	and warning reporting

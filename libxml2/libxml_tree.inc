@@ -17,14 +17,14 @@
 type
 	xmlElementType =  Longint;
 
-{[pk] following declarations are only in xmlIO.inc:
+{[pk] following declarations are in xmlIO.inc:
 xmlParserInputBuffer
 xmlParserInputBufferPtr
 xmlOutputBuffer
 xmlOutputBufferPtr
 }
 
-{[pk] following declarations are only in parser.inc:
+{[pk] following declarations are in parser.inc:
 xmlParserInput
 xmlParserInputPtr
 xmlParserCtxt
@@ -157,7 +157,6 @@ type
 
 	{
 		xmlAttributeType:
-
 		a DTD Attribute type definition
 	}
 
@@ -185,9 +184,7 @@ type
 	}
 	xmlAttributePtr = ^xmlAttribute;
 	xmlAttribute = record
-{$ifndef XML_WITHOUT_CORBA}
-		_private : pointer;             { for Corba, must be first !  }
-{$endif}
+		_private : pointer;             { application data }
 		type_ : xmlElementType;         { XML_ATTRIBUTE_DECL, must be second !  }
 		name : PxmlChar;                { Attribute name  }
 		children : xmlNodePtr;          { NULL  }
@@ -207,14 +204,12 @@ type
 
 	{
 		xmlElementContentType:
-
 		Possible definitions of element content types
 	}
 	xmlElementContentType =  Longint;
 
 	{
 		xmlElementContentOccur:
-
 		Possible definitions of element content occurences
 	}
 	xmlElementContentOccur =  Longint;
@@ -237,21 +232,17 @@ type
 
 	{
 		xmlElementTypeVal:
-
 		the differnt possibility for an element content type
 	}
 	xmlElementTypeVal =  Longint;
 
 	{
 		xmlElement:
-
 		an XML Element declaration from a DTD
 	}
 	xmlElementPtr = ^xmlElement;
 	xmlElement = record
-{$ifndef XML_WITHOUT_CORBA}
-		_private : pointer;             { for Corba, must be first !  }
-{$endif}
+		_private : pointer;             { application data }
 		type_ : xmlElementType;         { XML_ELEMENT_DECL, must be second !  }
 		name : PxmlChar;                { Element name  }
 		children : xmlNodePtr;          { NULL  }
@@ -292,9 +283,7 @@ type
 		the internal subset and for the external subset
 	}
 	xmlDtd = record
-{$ifndef XML_WITHOUT_CORBA}
-		_private : pointer;             { for Corba, must be first !  }
-{$endif}
+		_private : pointer;             { application data }
 		type_ : xmlElementType;         { XML_DTD_NODE, must be second !  }
 		name : PxmlChar;                { Name of the DTD  }
 		children : xmlNodePtr;          { the value of the property link  }
@@ -315,15 +304,12 @@ type
 
 	{
 		xmlAttr:
-
 		A attribute on an XML node.
 	}
 
 	xmlAttrPtr = ^xmlAttr;
 	xmlAttr = record
-{$ifndef XML_WITHOUT_CORBA}
-		_private : pointer;             { for Corba, must be first !  }
-{$endif}
+		_private : pointer;             { application data }
 		type_ : xmlElementType;         { XML_ATTRIBUTE_NODE, must be second !  }
 		name : PxmlChar;                { the name of the property  }
 		children : xmlNodePtr;          { the value of the property  }
@@ -338,7 +324,6 @@ type
 
 	{
 		xmlID:
-
 		An XML ID instance.
 	}
 	xmlIDPtr = ^xmlID;
@@ -350,7 +335,6 @@ type
 
 	{
 		xmlRef:
-
 		An XML IDREF instance.
 	}
 	xmlRefPtr = ^xmlRef;
@@ -371,7 +355,6 @@ type
 
 	{
 		xmlBuffer:
-
 		A buffer structure
 	}
 	xmlBufferPtr = ^xmlBuffer;
@@ -384,13 +367,10 @@ type
 
 	{
 		xmlNode:
-
 		A node in an XML tree.
 	}
 	xmlNode = record
-{$ifndef XML_WITHOUT_CORBA}
-		_private : pointer;             { for Corba, must be first !  }
-{$endif}
+		_private : pointer;             { application data }
 		type_ : xmlElementType;         { type number, must be second !  }
 		name : PxmlChar;                { the name of the node, or the entity  }
 		children : xmlNodePtr;          { parent->childs link  }
@@ -412,13 +392,10 @@ type
 
 	{
 		xmlDoc:
-
 		An XML document.
 	}
 	xmlDoc = record
-{$ifndef XML_WITHOUT_CORBA}
-		_private : pointer;             { for Corba, must be first !  }
-{$endif}
+		_private : pointer;             { application data }
 		type_ : xmlElementType;         { XML_DOCUMENT_NODE, must be second !  }
 		name : Pchar;                 	{ name/filename/URI of the document  }
 		children : xmlNodePtr;          { the document tree  }

@@ -1,3 +1,9 @@
+{ [1.4] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	list.h: lists interfaces
   
@@ -15,18 +21,11 @@
 	Author: Gary.Pennington@uk.sun.com
 }
 
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
-}
-
 type
 	xmlLink = pointer;
 	xmlLinkPtr = ^xmlLink;
 
-	xmlList = pointer; //???
+	xmlList = pointer;
 	xmlListPtr = ^xmlList;
 	xmlListDeallocator = procedure (lk: xmlLinkPtr);
 	xmlListDataCompare = function (data0,data1: pointer): integer;

@@ -1,16 +1,15 @@
+{ [1.31] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	entities.h : interface for the XML entities handking
 
 	See Copyright for the status of this software.
 
 	daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 type
@@ -33,10 +32,8 @@ const
 type
 	xmlEntityPtr = ^xmlEntity;
 	xmlEntity = record
-{$ifndef XML_WITHOUT_CORBA}
-		_private : pointer;             { for Corba, must be first !  }
-{$endif}
-		type_ : xmlElementType;      { XML_ENTITY_DECL, must be second !  }
+		_private : pointer;             { application data  }
+		type_ : xmlElementType;         { XML_ENTITY_DECL, must be second !  }
 		name : PxmlChar;                { Attribute name  }
 		children : ^xmlNode;            { NULL  }
 		last : ^xmlNode;                { NULL  }

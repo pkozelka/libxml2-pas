@@ -1,3 +1,9 @@
+{ [1.51] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	 xpath.c: interface for XML Path Language implementation
 
@@ -7,13 +13,6 @@
 	 See COPYRIGHT for the status of this software
 
 	 Author: daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 type
@@ -119,9 +118,13 @@ type
 		value : xmlXPathObjectPtr;      { the value  }
 	end;
 
-	{
-		an evaluation function, the parameters are on the context stack
-	}
+	(**
+	 * xmlXPathEvalFunc:
+	 * @ctxt: an XPath parser context
+	 * @nargs: the number of arguments passed to the function
+	 *
+	 * an XPath evaluation function, the parameters are on the XPath context stack
+	 *)
 	xmlXPathEvalFunc = procedure (ctxt: xmlXPathParserContextPtr; nargs: integer);cdecl;
 
 	{
@@ -194,8 +197,14 @@ type
 		varLookupFunc : pointer;        { variable lookup func  }
 		varLookupData : pointer;        { variable lookup data  }
 		extra : pointer;                { Possibility to link in an extra item  }
-		function_ : PxmlChar;            { needed for XSLT  }
+		function_ : PxmlChar;           { needed for XSLT  }
 		functionURI : PxmlChar;         { The function name and URI when calling a function  }
+		{ function lookup function and data }
+		funcLookupFunc : pointer;	      { function lookup func }
+		funcLookupData : pointer;		    { function lookup data }
+		{ temporary namespace lists kept for walking the namespace axis }
+		tmpNsList : xmlNsPtr;		        { Array of namespaces }
+		tmpNsNr: longint;			          { number of namespace in scope }
 	end;
 
 	{
@@ -239,8 +248,48 @@ type
 {
 	Objects and Nodesets handling
 }
+(* TODO:
+LIBXML_DLL_IMPORT extern double xmlXPathNAN;
+LIBXML_DLL_IMPORT extern double xmlXPathPINF;
+LIBXML_DLL_IMPORT extern double xmlXPathNINF;
+*)
+
+function  xmlXPathIsNaN(val: Double): longint; cdecl;external LIBXML2_SO;
+function  xmlXPathIsInf(val: Double): longint; cdecl;external LIBXML2_SO;
+
+(* These macros may later turn into functions *)
+
+(**
+ * xmlXPathNodeSetGetLength:
+ * @ns:  a node-set
+ *
+ * Implement a functionnality similar to the DOM NodeList.length
+ *
+ * Returns the number of nodes in the node-set.
+ *)
 function  xmlXPathNodeSetGetLength(ns: xmlNodeSetPtr): integer; { was macro }
+
+(**
+ * xmlXPathNodeSetItem:
+ * @ns:  a node-set
+ * @index:  index of a node in the set
+ *
+ * Implements a functionnality similar to the DOM NodeList.item()
+ *
+ * Returns the xmlNodePtr at the given @index in @ns or NULL if
+ *         @index is out of range (0 to length-1)
+ *)
 function  xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: integer): xmlNodePtr; { was macro }
+
+(**
+ * xmlXPathNodeSetIsEmpty:
+ * @ns: a node-set
+ *
+ * Checks whether @ns is empty or not
+ *
+ * Returns %TRUE if @ns is an empty node-set
+ *)
+function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): boolean;
 
 procedure xmlXPathFreeObject(obj:xmlXPathObjectPtr);cdecl;external LIBXML2_SO;
 function  xmlXPathNodeSetCreate(val:xmlNodePtr):xmlNodeSetPtr;cdecl;external LIBXML2_SO;
@@ -278,18 +327,9 @@ function  xmlXPathNewContext(doc:xmlDocPtr):xmlXPathContextPtr;cdecl;external LI
 procedure xmlXPathFreeContext(ctxt:xmlXPathContextPtr);cdecl;external LIBXML2_SO;
 
 {
-from xmlXpathInternals
-}
-//int		   xmlXPathRegisterNs		(xmlXPathContextPtr ctxt,
-//						 const xmlChar *prefix,
-//						 const xmlChar *ns_uri);
-function xmlXPathRegisterNs(ctxt:xmlXPathContextPtr;prefix,ns_uri:PxmlChar):longint;cdecl;external LIBXML2_SO;
-
-{
 	Evaluation functions.
 }
 function  xmlXPathEval(str:PxmlChar; ctxt:xmlXPathContextPtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
-function  xmlXPathEvalXPtrExpr(str:PxmlChar; ctxt:xmlXPathContextPtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
 function  xmlXPathEvalExpression(str:PxmlChar; ctxt:xmlXPathContextPtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
 function  xmlXPathEvalPredicate(ctxt:xmlXPathContextPtr; res:xmlXPathObjectPtr):longint;cdecl;external LIBXML2_SO;
 

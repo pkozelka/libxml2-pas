@@ -1,3 +1,9 @@
+{ [1.11] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	xlink.h : interfaces to the hyperlinks detection module
 
@@ -8,13 +14,6 @@
 		 and XBase
 
 	daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 {
@@ -67,7 +66,7 @@ type
 	xlinkNodeDetectFunc = procedure (ctx: pointer; node: xmlNodePtr); stdcall;
 
 	{
-		The link detection module interract with the upper layers using
+		The link detection module interact with the upper layers using
 		a set of callback registered at parsing time.
 	}
 	{
@@ -149,3 +148,4 @@ procedure xlinkSetDefaultHandler(handler:xlinkHandlerPtr);cdecl;external LIBXML2
 	Link detection module itself.
 }
 function xlinkIsLink(doc:xmlDocPtr; node:xmlNodePtr):xlinkType;cdecl;external LIBXML2_SO;
+

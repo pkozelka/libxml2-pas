@@ -98,6 +98,6 @@ procedure xmlRegisterHTTPPostCallbacks; cdecl;external LIBXML2_SO;
 (**
  * A predefined entity loader disabling network accesses
  *)
-{ [pk] moved to libxml2.pas
+{ [pk] declared in libxml2.pas
 function xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
 }

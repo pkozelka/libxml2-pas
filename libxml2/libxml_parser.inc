@@ -1,3 +1,9 @@
+{ [1.71] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	parser.h : Interfaces, constants and types related to the XML parser.
 
@@ -6,17 +12,12 @@
 	daniel@veillard.com
 }
 
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
-}
-
 const
-	{
-		Constants.
-	}
+	(**
+	 * XML_DEFAULT_VERSION:
+	 *
+	 * The default version of XML used: 1.0
+	 *)
 	XML_DEFAULT_VERSION = '1.0';
 
 type
@@ -37,10 +38,10 @@ type
 	xmlParserInput = record
 		buf : xmlParserInputBufferPtr;  { UTF-8 encoded buffer  }
 		filename : Pchar;               { The file analyzed, if any  }
-		directory : Pchar;              { the directory/base of teh file  }
+		directory : Pchar;              { the directory/base of the file  }
 		base : PxmlChar;                { Base of the array to parse  }
 		cur : PxmlChar;                 { Current char being parsed  }
-		_end : PxmlChar;                { end of the arry to parse  }
+		_end : PxmlChar;                { end of the array to parse  }
 		length : longint;               { length if known  }
 		line : longint;                 { Current line  }
 		col : longint;                  { Current column  }
@@ -57,12 +58,12 @@ const
 		xmlParserInputState:
 
 		The parser is now working also as a state based parser
-		The recursive one use the stagte info for entities processing
+		The recursive one use the state info for entities processing
 	}
 	XML_PARSER_EOF = -(1);             { nothing is to be parsed }
 	XML_PARSER_START = 0;              { nothing has been parsed }
 	XML_PARSER_MISC = 1;               { Misc  before int subset }
-	XML_PARSER_PI = 2;                 { Whithin a processing instruction }
+	XML_PARSER_PI = 2;                 { Within a processing instruction }
 	XML_PARSER_DTD = 3;                { within some DTD content }
 	XML_PARSER_PROLOG = 4;             { Misc  after internal subset }
 	XML_PARSER_COMMENT = 5;            { within a comment }
@@ -192,6 +193,8 @@ type
 		pedantic : longint;                   { signal pedantic warnings  }
 		_private : pointer;                   { For user data, libxml won't touch it  }
 		loadsubset : longint;                 { should the external subset be loaded  }
+		linenumbers : longint;                { set line number in element content }
+		catalogs : pointer;                   { document's own catalog }
 	end;
 
 	{
@@ -269,6 +272,7 @@ type
 		getParameterEntity : getParameterEntitySAXFunc;
 		cdataBlock : cdataBlockSAXFunc;
 		externalSubset : externalSubsetSAXFunc;
+		initialized: integer;
 	end;
 
 	{
@@ -278,19 +282,28 @@ type
 		@xmlParserCtxtPtr: the XML parser context
 
 		External entity loaders types
+
+		Returns the entity input parser
 	}
 	xmlExternalEntityLoader = function (URL, ID: PChar; context: xmlParserCtxtPtr): xmlParserInputPtr;
 
-	{
-		Global variables: just the default SAX interface tables and XML
-		version infos.
-	}
+(*
+ * Global variables: just the default SAX interface tables and XML
+ * version infos.
+ *)
 (* TODO somehow
 LIBXML_DLL_IMPORT extern const char *xmlParserVersion;
 LIBXML_DLL_IMPORT extern xmlSAXLocator xmlDefaultSAXLocator;
 LIBXML_DLL_IMPORT extern xmlSAXHandler xmlDefaultSAXHandler;
 LIBXML_DLL_IMPORT extern xmlSAXHandler htmlDefaultSAXHandler;
 LIBXML_DLL_IMPORT extern xmlSAXHandler docbDefaultSAXHandler;
+*)
+(**
+ * xmlSubstituteEntitiesDefaultValue:
+ *
+ * global variable controlling the entity substitution default behavior
+ *)
+(*
 LIBXML_DLL_IMPORT extern int xmlSubstituteEntitiesDefaultValue;
 LIBXML_DLL_IMPORT extern int xmlGetWarningsDefaultValue;
 *)
@@ -331,19 +344,20 @@ function  xmlStrncat(cur:PxmlChar; add:PxmlChar; len:longint):PxmlChar;cdecl;ext
 	Basic parsing Interfaces
 }
 function  xmlParseDoc(cur:PxmlChar):xmlDocPtr;cdecl;external LIBXML2_SO;
-function  xmlParseMemory(buffer:Pchar; size:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
-function  xmlParseFile(filename:Pchar):xmlDocPtr;cdecl;external LIBXML2_SO;
+function  xmlParseMemory(buffer:PChar; size:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
+function  xmlParseFile(filename:PChar):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlSubstituteEntitiesDefault(val:longint):longint;cdecl;external LIBXML2_SO;
 function  xmlKeepBlanksDefault(val:longint):longint;cdecl;external LIBXML2_SO;
 procedure xmlStopParser(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
 function  xmlPedanticParserDefault(val:longint):longint;cdecl;external LIBXML2_SO;
+function  xmlLineNumbersDefault(val:longint):longint;cdecl;external LIBXML2_SO;
 
 {
 	Recovery mode
 }
 function  xmlRecoverDoc(cur:PxmlChar):xmlDocPtr;cdecl;external LIBXML2_SO;
-function  xmlRecoverMemory(buffer:Pchar; size:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
-function  xmlRecoverFile(filename:Pchar):xmlDocPtr;cdecl;external LIBXML2_SO;
+function  xmlRecoverMemory(buffer:PChar; size:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
+function  xmlRecoverFile(filename:PChar):xmlDocPtr;cdecl;external LIBXML2_SO;
 
 {
 	Less common routines and SAX interfaces
@@ -355,14 +369,15 @@ function  xmlSAXUserParseFile(sax:xmlSAXHandlerPtr; user_data:pointer; filename:
 function  xmlSAXUserParseMemory(sax:xmlSAXHandlerPtr; user_data:pointer; buffer:Pchar; size:longint):longint;cdecl;external LIBXML2_SO;
 function  xmlSAXParseMemory(sax:xmlSAXHandlerPtr; buffer:Pchar; size:longint; recovery:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlSAXParseFile(sax:xmlSAXHandlerPtr; filename:Pchar; recovery:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
+function  xmlSAXParseFileWithData(sax:xmlSAXHandlerPtr; filename:Pchar; recovery:longint; data: pointer):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlSAXParseEntity(sax:xmlSAXHandlerPtr; filename:Pchar):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlParseEntity(filename:Pchar):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlParseDTD(ExternalID:PxmlChar; SystemID:PxmlChar):xmlDtdPtr;cdecl;external LIBXML2_SO;
 function  xmlSAXParseDTD(sax:xmlSAXHandlerPtr; ExternalID:PxmlChar; SystemID:PxmlChar):xmlDtdPtr;cdecl;external LIBXML2_SO;
 function  xmlIOParseDTD(sax:xmlSAXHandlerPtr; input:xmlParserInputBufferPtr; enc:xmlCharEncoding):xmlDtdPtr;cdecl;external LIBXML2_SO;
-function  xmlParseBalancedChunkMemory(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_data:pointer; depth:longint; aString:PxmlChar; list:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
-function  xmlParseExternalEntity(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_data:pointer; depth:longint; URL:PxmlChar; ID:PxmlChar; list:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
-function  xmlParseCtxtExternalEntity(ctx:xmlParserCtxtPtr; URL:PxmlChar; ID:PxmlChar; list:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
+function  xmlParseBalancedChunkMemory(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_data:pointer; depth:longint; aString:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
+function  xmlParseExternalEntity(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_data:pointer; depth:longint; URL:PxmlChar; ID:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
+function  xmlParseCtxtExternalEntity(ctx:xmlParserCtxtPtr; URL:PxmlChar; ID:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
 
 {
 	SAX initialization routines
@@ -387,16 +402,19 @@ function  xmlCreateDocParserCtxt(cur:PxmlChar):xmlParserCtxtPtr;cdecl;external L
 function  xmlGetFeaturesList(len:Plongint; result:PPchar):longint;cdecl;external LIBXML2_SO;
 function  xmlGetFeature(ctxt:xmlParserCtxtPtr; name:Pchar; result:pointer):longint;cdecl;external LIBXML2_SO;
 function  xmlSetFeature(ctxt:xmlParserCtxtPtr; name:Pchar; value:pointer):longint;cdecl;external LIBXML2_SO;
+
 {
 	Interfaces for the Push mode
 }
 function  xmlCreatePushParserCtxt(sax:xmlSAXHandlerPtr; user_data:pointer; chunk:Pchar; size:longint; filename:Pchar):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 function  xmlParseChunk(ctxt:xmlParserCtxtPtr; chunk:Pchar; size:longint; terminate:longint):longint;cdecl;external LIBXML2_SO;
+
 {
 	Special I/O mode
 }
 function  xmlCreateIOParserCtxt(sax:xmlSAXHandlerPtr; user_data:pointer; ioread:xmlInputReadCallback; ioclose:xmlInputCloseCallback; ioctx:pointer; enc:xmlCharEncoding):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 function  xmlNewIOInputStream(ctxt:xmlParserCtxtPtr; input:xmlParserInputBufferPtr; enc:xmlCharEncoding):xmlParserInputPtr;cdecl;external LIBXML2_SO;
+
 {
 	Node infos
 }
@@ -405,6 +423,7 @@ procedure xmlInitNodeInfoSeq(seq:xmlParserNodeInfoSeqPtr);cdecl;external LIBXML2
 procedure xmlClearNodeInfoSeq(seq:xmlParserNodeInfoSeqPtr);cdecl;external LIBXML2_SO;
 function  xmlParserFindNodeInfoIndex(seq:xmlParserNodeInfoSeqPtr; node:xmlNodePtr):dword;cdecl;external LIBXML2_SO;
 procedure xmlParserAddNodeInfo(ctxt:xmlParserCtxtPtr; info:xmlParserNodeInfoPtr);cdecl;external LIBXML2_SO;
+
 {
 	External entities handling actually implemented in xmlIO
 }
