@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.38 2002-01-15 10:08:18 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.39 2002-01-15 10:28:28 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -464,14 +464,6 @@ begin
 	Result := obj;
 end;
 
-function GetGNode(const aNode: IDOMNode): xmlNodePtr;
-begin
-	if not Assigned(aNode) then begin
-		raise EDOMException.Create(INVALID_ACCESS_ERR, SNodeExpected);
-	end;
-	Result := (aNode as ILibXml2Node).LibXml2NodePtr;
-end;
-
 function ErrorString(err:integer):string;
 begin
 	case err of
@@ -512,6 +504,12 @@ begin
 		aMsg := ErrorString(aErrorCode);
 	end;
 	raise EDOMException.Create(aMsg);
+end;
+
+function GetGNode(const aNode: IDOMNode): xmlNodePtr;
+begin
+	DomAssert(Assigned(aNode), INVALID_ACCESS_ERR, SNodeExpected);
+	Result := (aNode as ILibXml2Node).LibXml2NodePtr;
 end;
 
 function IsReadOnlyNode(node:xmlNodePtr): boolean;
@@ -862,7 +860,7 @@ begin
 	node:=GetGNode(newChild);
 	DomAssert(node<>nil, NOT_SUPPORTED_ERR);
 	DomAssert(not IsReadOnly, NO_MODIFICATION_ALLOWED_ERR);
-	DomAssert(not (newChild.NodeType in FAllowedChildTypes), HIERARCHY_REQUEST_ERR);
+	DomAssert((newChild.NodeType in FAllowedChildTypes), HIERARCHY_REQUEST_ERR);
 	if (FGNode.type_=XML_DOCUMENT_NODE) and (newChild.nodeType = XML_ELEMENT_NODE) then begin
 		DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR);
 	end;
@@ -1520,9 +1518,7 @@ end;
 
 constructor TGDOMDocument.create(GDOMImpl:IDOMImplementation; const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType);
 begin
-	if (doctype=nil) then begin
-		raise EDomException.create(NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
-	end;
+//	DomAssert(doctype<>nil, NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
 	FGdomimpl:=GDOMImpl;
 	//Create doc-node as pascal object
 	inherited create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
@@ -1766,6 +1762,7 @@ begin
 		ulocal := UTF8Encode(qualifiedName);
 	end;
 	node := xmlNewDocNode(GDoc, ns, PChar(UTF8Encode(qualifiedName)), nil);
+	xmlSetNs(node, ns);
 	Result := GetDOMObject(node) as IDomElement;
 end;
 
