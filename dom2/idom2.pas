@@ -932,7 +932,7 @@ type
   (*
    * IDOMParseOptions
    *)
-  IDOMParseOptions = interface
+  IDomParseOptions = interface
     ['{FA884EC2-A131-4992-904A-0D71289FB87A}']
     { Property Acessors }
     function get_async : Boolean;
@@ -965,15 +965,15 @@ type
     procedure registerNs(const prefix : DomString; const uri : DomString);
   end;
 	
-	IDOMNodeEx = interface(IDOMNode)
+  IDomNodeEx = interface(IDomNode)
     ['{17D937A2-C6EE-448F-8530-221D744AC083}']
-	  { Property Acessors }
+    { Property Acessors }
     //function get_text: DOMString; safecall;
     //function get_xml: DOMString; safecall;
     //procedure set_text(const Value: DOMString); safecall;
     { Methods }
-    procedure transformNode(const stylesheet: IDOMNode; var output: WideString); overload;
-    procedure transformNode(const stylesheet: IDOMNode; var output: IDOMDocument); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: WideString); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
     { Properties }
     //property text: DOMString read get_text write set_text;
     //property xml: DOMString read get_xml;
