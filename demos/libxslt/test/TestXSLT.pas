@@ -27,7 +27,7 @@ procedure test2(xmlfile,xslfile,outputfile: string);
 implementation
 
 uses
-  libxml2,libxslt,MicroTime,conApp,SysUtils;
+  libxml2,libxslt,MicroTime,conapp,SysUtils;
 
 procedure test2(xmlfile,xslfile,outputfile: string);
 var

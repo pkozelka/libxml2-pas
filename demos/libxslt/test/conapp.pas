@@ -1,4 +1,4 @@
-unit conApp;
+unit conapp;
 {Unit for application methods and variables
 which are in the application object if you have a gui-application}
 
