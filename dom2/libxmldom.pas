@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.76 2002-01-21 00:40:56 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.77 2002-01-21 01:23:22 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -54,16 +54,18 @@ type
   TGDOMChildNodeList = class;
   TGDOMElement = class;
 
-  { TGDOMInterface }
+  { TGDOMObject }
 
-  TGDOMInterface = class(TInterfacedObject)
+  TGDOMObject = class(TInterfacedObject)
+  protected
+    procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: widestring='');
   public
     function SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT; override;
   end;
 
   { TGDOMImplementation }
 
-  TGDOMImplementation = class(TGDOMInterface, IDomImplementation)
+  TGDOMImplementation = class(TGDOMObject, IDomImplementation)
   private
     class function getInstance(aFreeThreading: boolean): IDomImplementation;
   protected //IDomImplementation
@@ -76,7 +78,7 @@ type
   { TGDOMNode }
 
   TGDOMNodeClass = class of TGDOMNode;
-  TGDOMNode = class(TGDOMInterface, IDomNode, ILibXml2Node, IDomNodeSelect)
+  TGDOMNode = class(TGDOMObject, IDomNode, ILibXml2Node, IDomNodeSelect)
   private
     FGNode: xmlNodePtr;
     FChildNodes: TGDOMChildNodeList; // non-counted reference
@@ -127,7 +129,7 @@ type
 
   { TGDOMChildNodeList }
 
-  TGDOMChildNodeList = class(TGDOMInterface, IDomNodeList)
+  TGDOMChildNodeList = class(TGDOMObject, IDomNodeList)
   private
     FOwnerNode: TGDOMNode; // non-counted reference
   protected //IDomNodeList
@@ -141,7 +143,7 @@ type
 
   { TGDOMXPathNodeList }
 
-  TGDOMXPathNodeList = class(TGDOMInterface, IDomNodeList)
+  TGDOMXPathNodeList = class(TGDOMObject, IDomNodeList)
   private
     FXPathCtxt: xmlXPathContextPtr;
     FXPathObj: xmlXPathObjectPtr;
@@ -158,7 +160,7 @@ type
 
   { TGDOMAttributes }
 
-  TGDOMAttributes = class(TGDOMInterface, IDomNamedNodeMap)
+  TGDOMAttributes = class(TGDOMObject, IDomNamedNodeMap)
   private
     FOwnerElement: TGDOMElement; // non-counted reference
   protected //IDomNamedNodeMap
@@ -470,12 +472,15 @@ end;
 (**
  * Checks if the condition is true, and raises specified exception if not.
  *)
-procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: widestring='');
+procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: widestring=''; aClassName: string='');
 begin
   if aErrorCode=0 then exit;
   if aCondition then exit;
   if aMsg='' then begin
     aMsg := ErrorString(aErrorCode);
+  end;
+  if (aClassName<>'') then begin
+    aMsg := 'in class '+aClassName+': '+aMsg;
   end;
   raise EDOMException.Create(aMsg);
 end;
@@ -704,9 +709,14 @@ begin
   Result := doc;
 end;
 
-{ TGDOMInterface }
+{ TGDOMObject }
 
-function TGDOMInterface.SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT;
+procedure TGDOMObject.DomAssert(aCondition: boolean; aErrorCode: integer; aMsg: widestring);
+begin
+  libxmldom.DomAssert(aCondition, aErrorCode, aMsg, ClassName);
+end;
+
+function TGDOMObject.SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT;
 begin
   Result := 0; //todo
 end;
