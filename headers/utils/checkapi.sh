@@ -57,10 +57,8 @@ function cacheGet()
 	local repos=`cat $filePath/CVS/Repository`
 
 	local cachedFile=$TMPBASE/$repos/$fileName-$aRev
-	if [ -s "$cachedFile" ]; then
-		cp $cachedFile $aTarget
-		return
-	fi
+	[ -s "$cachedFile" ] || return -1
+	cp $cachedFile $aTarget
 }
 
 function cachePut()
@@ -153,14 +151,31 @@ for fn in $FILELIST ; do
 	CVSROOT="`cat $LOCALROOT/$origFilePath/CVS/Root`"
 
 	oldHfile="$TMP/$dirPrefix/${origFileName%.h}-${curRev}.h"
+#	if [ ! -s "$oldHfile" ]; then
+	if false; then
+		echo "Retrieving file ${origFileName%.h}-${curRev}.h" >&2
+		pushd $LOCALROOT >/dev/null
+		cmd="cvs -z4 -d$CVSROOT up -r $curRev $origFilePath/$origFileName"
+		echo "$cmd"
+		$cmd
+		cmd="cp $origFilePath/$origFileName $oldHfile"
+		echo "$cmd"
+		$cmd
+		cmd="cvs -z4 -d$CVSROOT up -r $newRev $origFilePath/$origFileName"
+		echo "$cmd"
+		$cmd
+		popd >/dev/null
+	fi
 	if cacheGet "$LOCALROOT/$origFile" "$curRev" "$oldHfile"; then
 		diff -u4 $oldHfile $LOCALROOT/$origFile >$TARGETFILE.$curRev-$newRev.diff
 	else
-		cmd="cvs -z4 -d$CVSROOT diff -r $curRev -r $newRev $origFile"
-		echo "$cmd" >$TARGETFILE.$curRev-$newRev.diff
-		$cmd
+		cmd="cvs -z4 -d$CVSROOT diff -u4 -r $curRev -r $newRev $origFile"
+		echo "$cmd"
+		pushd $LOCALROOT >/dev/null
+		$cmd >$TARGETFILE.$curRev-$newRev.diff
+		popd >/dev/null
 	fi
-	if $haveH2Pas; then
+	if $haveH2Pas && [ -s "$oldHfile" ]; then
 		oldPasFile=${oldHfile%.h}.pas
 		toPascal "$oldHfile" "$oldPasFile" "$dirPrefix"
 		diff -u4 $oldPasFile $pasFile >$TMP/$dirPrefix/${origFileName%.h}.pas.$curRev-$newRev.diff

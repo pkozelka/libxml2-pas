@@ -32,7 +32,7 @@ s:^{$:(\*:
 s/^\([[:space:]]*\)[[:space:]]}$/\1\*)/
 s/[[:space:]]*{\$include .*}$//gi
 # prefix content of comments with ' *'
-/^(\*$/,/^ \*)/{s/^   / * /;s/^$/ */}
+/^(\*$/,/^ \*)/{s/^   / * /;s/^$/ */;}
 # remove header's global ifdef construct
 s/^[[:space:]]*{\$ifndef[[:space:]]*__.*__[[:space:]]*}$//i
 s/^[[:space:]]*{\$define[[:space:]]*__.*__[[:space:]]*}$//i
