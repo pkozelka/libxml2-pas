@@ -1,14 +1,14 @@
 s/\([[:alnum:]]*\)[[:space:]]*:[[:space:]]*\([[:alnum:]]\)/\1: \2/
 s/longint/Longint/gi
-s/\(\* Const before type ignored \*\)//g
+s/(\* Const before type ignored \*)//g
 s/{ C++ end of extern C conditionnal removed }//g
-s/[[:space:]]*Const/const/gi
+s/^[[:space:]]*Const/const/gi
 s/[[:space:]]*pointer/ Pointer/gi
 s/[[:space:]]pvoid/ Pointer/gi
 s/ to:/ aTo:/g
 s/;cdecl;/; cdecl;/gi
 s/;external/; external/gi
-s/external;/external LIBXML2_SO;/gi
+s/external;/external UNKNOWN_SO;/gi
 s/\^xmlChar/PxmlChar/g
 s/ file:/ aFile:/gi
 s/:\([[:alnum:]]\)/: \1/g
@@ -25,3 +25,21 @@ s/{\$ifend/{\$IFEND/gi
 s:/\*:(\*:g
 s:\*/:\*):g
 s/[[:space:]]*$//
+s:^{.*PACKRECORDS.*$::
+s:^{$:(\*:
+s/^\([[:space:]]*\)[[:space:]]}$/\1\*)/
+s/[[:space:]]*{\$include .*}$//gi
+# prefix content of comments with ' *'
+/^(\*$/,/^ \*)/{s/^   / * /;s/^$/ */}
+# remove header's global ifdef construct
+s/^[[:space:]]*{\$ifndef[[:space:]]*__.*__[[:space:]]*}$//i
+s/^[[:space:]]*{\$define[[:space:]]*__.*__[[:space:]]*}$//i
+s/^[[:space:]]*{[[:space:]]*__.*__[[:space:]]*}$//i
+# try to make indent=2
+s/^   \([^ ]\)/  \1/
+#
+s/array of const/VARARGS/
+#
+#
+# WHEN ALL IS DONE, REMOVE BLANK LINES:
+/^[[:space:]]*$/d

@@ -14,20 +14,31 @@
 function toPascal()
 {
 	local aFileName=$1
-	if [ "x$H2PAS" != "x" ] ; then
+	local aOutputFile=${2?'output file not specified'}
+	if [ "$H2PAS" != "" ] ; then
 		echo "---------------- [$aFileName] -----------------" >>$TMP/h2pas.log
 		# translate
-		echo "  translating $aFileName to $aFileName.1.pas"
-		h2pas -d -c -i $aFileName -o $aFileName.1.pas 1>&2 >>$TMP/h2pas.log
+		echo "  translating $aFileName to $aOutputFile.1"
+		h2pas -d -c -i $aFileName -o $aOutputFile.1 1>&2 >>$TMP/h2pas.log
 
 		# apply known replacements
-		echo "  applying additional conversions --> $aFileName.2.pas"
-		sed -f "$LIBXML2_PAS/headers/utils/afterconv.sed" $aFileName.1.pas > $aFileName.2.pas
+		echo "  applying additional conversions --> $aOutputFile"
+		sed -f "$LIBXML2_PAS/headers/utils/afterconv.sed" $aOutputFile.1 > $aOutputFile || mv $aOutputFile.1 $aOutputFile 
 
 		# compare original translation and the one with replacements
-		diff $aFileName.1.pas $aFileName.2.pas >$aFileName.pas.diff12
+		diff -u4 -w $aOutputFile.1 $aOutputFile >$aOutputFile.diff12
 	fi
 }
+
+function getCvsRevision()
+{
+	local aFileName=$1
+	local dirName=${aFileName%/*}
+	local entry=${aFileName:${#dirName}+1}
+
+	sed -n '/^\/'$entry'\//{s:^/'$entry'/\([^/]*\)/.*:\1:;p}' $dirName/CVS/Entries
+}
+
 
 LOCALROOT=$1
 shift 1
@@ -52,26 +63,23 @@ for fn in $FILELIST ; do
 	LINE=`head $fn | grep CVS-REV`
 	if [ "x$LINE" = "x" ]; then
 		echo
-		echo "ERROR: no CVS-REV in $fn"
+		echo "ERROR: no CVS-REV in $fn" >&2
 		continue
 	fi
 	ORIGFILE=`echo $LINE | cut -d: -f2`
 	ORIGFILENAME=`basename $ORIGFILE`
 	ORIGFILEPATH=`dirname $ORIGFILE`
 	REV=`echo $LINE | cut -d: -f3`
-	CVSENTRY=`grep "^/$ORIGFILENAME/" $LOCALROOT/$ORIGFILEPATH/CVS/Entries`
 
 	echo "$ORIGFILEPATH/$ORIGFILENAME" >>$TMP/allFiles
 	echo "$ORIGFILEPATH" >>$TMP/allPaths1
-
-	if [ "x$CVSENTRY" = "x" ]; then
-		echo
-		echo "ERROR: file $ORIGFILENAME not found in $LOCALROOT/$ORIGFILEPATH/CVS/Entries"
+	NEWREV=`getCvsRevision $LOCALROOT/$ORIGFILE`
+	if [ "$NEWREV" = "" ]; then
+		echo "ERROR: file $ORIGFILENAME is not under revision control" >&2
 		continue
 	fi
-	NEWREV=`echo $CVSENTRY | cut -d/ -f3`
-	if [ "x$REV" = "x$NEWREV" ]; then
-		echo "ok"
+	if [ "$REV" = "$NEWREV" ]; then
+		echo "ok, $NEWREV ($ORIGFILE)"
 		continue
 	fi
 	echo "changed from $REV to $NEWREV - gathering info:"
@@ -96,7 +104,7 @@ for fn in $FILELIST ; do
 	CVSROOT="`cat $LOCALROOT/$ORIGFILEPATH/CVS/Root`"
 
 	# get diff
-	cmd="cvs -z4 -d$CVSROOT rdiff -r $REV -r $NEWREV $ORIGFILE"
+	cmd="cvs -z4 -d$CVSROOT rdiff -u4 -r $REV -r $NEWREV $ORIGFILE"
 	echo "Extracting diff file ($TARGETFILE.diff):"
 	echo "$cmd"
 	$cmd >$TARGETFILE.diff
@@ -113,6 +121,8 @@ done
 
 # prepare list of files that do not use CVS SIGN and should not be reported as unconverted
 cat >$TMP/ignoredFiles <<EOF
+gnome-xml/include/libxml/xmlversion.h
+libxslt/libexslt/exsltconfig.h
 libxslt/libexslt/libexslt.h
 libxslt/libxslt/libxslt.h
 libxslt/libxslt/win32config.h
@@ -145,14 +155,37 @@ for dir in `cat $TMP/allPaths`; do
 		# report any other files
 		echo "CONVERTING $sfn"
 
-		ORIGFILENAME=NEWLIB_`basename $sfn`
+		origFileName=`basename $sfn`
 		ORIGFILEPATH=`dirname $sfn`
-		TARGETFILE=$TMP/`basename $ORIGFILEPATH`/$ORIGFILENAME
-		mkdir -p `dirname $TARGETFILE`
+		basePath=`basename $ORIGFILEPATH`
+		newFn=$TMP/$basePath/${basePath}_${origFileName%.h}.inc
+		h2pasFn=${newFn%.inc}.h2pas
+		HFILE=$TMP/$basePath/${basePath}_${origFileName}
+		mkdir -p `dirname $HFILE`
+		echo "  copying $origFileName to $HFILE"
+		cp $fn $HFILE
 
-		echo "  copying $ORIGFILENAME to $TARGETFILE"
-		cp $fn $TARGETFILE
-		toPascal $TARGETFILE
+		toPascal $HFILE $h2pasFn
+
+		cat >$newFn <<EOF
+// CVS-REV:$sfn:`getCvsRevision $fn`:
+{
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+}
+
+//////////// h2pas translation:
+EOF
+
+		if [ -s $h2pasFn ]; then
+			cat $h2pasFn >>$newFn
+		else
+			echo "//   Sorry - h2pas is not available" >>$newFn
+			echo "//   Use original C code instead:" >>$newFn
+			cat $fn >>$newFn
+		fi
 
 		CHGCOUNT=$((CHGCOUNT + 1))
 	done
