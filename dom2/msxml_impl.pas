@@ -13,11 +13,17 @@ unit msxml_impl;
 *)
 
 interface
+{$define MSXML3}
 
 uses
-  MSXML_TLB,
+  {$ifdef MSXML3}
+    MSXML3,
+  {$else}
+    MSXML_TLB,
+  {$endif}
+  windows,
+  ComObj,
   Dom2;
-
 
   const MSXML2Rental = 'MSXML2_RENTAL_MODEL';
   const MSXML2Free = 'MSXML2_FREETHREADING_MODEL';
@@ -90,6 +96,7 @@ type
        *it does represent a specific document
       *)
       fMSDomImplementation : IXMLDOMImplementation;
+      fFreeThreading: boolean;
 
       constructor create(msDomImplementation : IXMLDOMImplementation);
 
@@ -494,6 +501,33 @@ begin
 end;
 
 
+
+function TryObjectCreate(const GuidList: array of TGuid): IUnknown;
+var
+  I: Integer;
+  Status: HResult;
+begin
+  for I := Low(GuidList) to High(GuidList) do
+  begin
+    Status := CoCreateInstance(GuidList[I], nil, CLSCTX_INPROC_SERVER or
+      CLSCTX_LOCAL_SERVER, IDispatch, Result);
+    if Status = S_OK then Break;
+    if Status <> REGDB_E_CLASSNOTREG then
+      OleCheck(Status);
+  end;
+end;
+
+function CreateDOMDocument: IXMLDOMDocument;
+const
+ CLASS_DOMDocument40: TGUID = '{88D969C0-F192-11D4-A65F-0040963251E5}';
+begin
+  Result := TryObjectCreate([CLASS_DOMDocument40, CLASS_DOMDocument30, CLASS_DOMDocument26])
+    as IXMLDOMDocument;
+  if not Assigned(Result) then
+    raise EDOMException.Create(etNotFoundErr,'MSDOM not installed!');
+end;
+
+
 (*
  *  TXDomDocumentBuilderFactory
 *)
@@ -532,15 +566,13 @@ end;
 
 function TMSXMLDocumentBuilder.get_DomImplementation : IDomImplementation;
 begin
-  (* GetDomImplementation is not supported *)
-  raise EDomException.create(
-          etNotSupportedErr, 'GetDomImplementation is not supported');
+  result:=TMSXMLImplementation.create(nil);
 end;
 
 function TMSXMLDocumentBuilder.NewDocument : IDomDocument;
 begin
   if fFreeThreading then
-    result := TMSXMLDocument.create(CoDOMFreeThreadedDocument.create)
+    //result := TMSXMLDocument.create(CoDOMFreeThreadedDocument.create)
   else
     result := TMSXMLDocument.create(CoDOMDocument.create);
 end;
@@ -605,7 +637,10 @@ function TMSXMLImplementation.hasFeature(
         const feature : DomString;
         const version : DomString) : Boolean;
 begin
-  result := fMSDomImplementation.hasFeature(feature, version);
+  //todo: check version of msdom installed
+  if (feature ='CORE') and (version = '2.0')
+    then result:=true
+    else result:=false;
 end;
 
 
@@ -623,10 +658,17 @@ function TMSXMLImplementation.createDocument(
         const namespaceURI  : DomString;
         const qualifiedName : DomString;
         docType             : IDomDocumentType) : IDomDocument;
+var
+  document: IXMLDOMDocument;
+  fFreeThreading: boolean;
 begin
-  (* CreateDocument is not supported *)
-  raise EDomException.create(
-          etNotSupportedErr, 'CreateDocument is not supported');
+  //fFreeThreading:=false; //TODO: correct this line
+  //if fFreeThreading then
+    //document := CoDOMFreeThreadedDocument.create
+  //else
+  //  document := CoDOMDocument.create;
+  document:= CreateDOMDocument;
+  Result := TMSXMLDocument.Create(document);
 end;
 
 
@@ -811,9 +853,10 @@ function TMSXMLDocument.createAttributeNS(
         const qualifiedName : DomString) : IDomAttr;
 var
   msAttr : IXMLDOMAttribute;
+  node: IXMLDOMNode;
 begin
-  (* namespace not supported *)
-  msAttr := fMSDomDocument.createAttribute(qualifiedName);
+  node := fMSDomDocument.createNode(NODE_ATTRIBUTE, qualifiedName, namespaceURI);
+  msAttr:=node as IXMLDOMAttribute;
   if msAttr = nil then
     result := nil
   else
@@ -823,15 +866,15 @@ end;
 function TMSXMLDocument.getElementsByTagNameNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomNodeList;
-var
-  msNodeList : IXMLDOMNodeList;
+var temp: IXMLDOMElement;
 begin
-  (* namespace not supported *)
-  msNodeList := fMSDomDocument.getElementsByTagName(localName);
-  if msNodeList = nil then
-    result := nil
-  else
-    result := TMSXMLNodeList.create(msNodeList);
+  (fMSDomDocument as IXMLDomDocument2).setProperty('SelectionNamespaces',
+    'xmlns:xyz4ct='''+namespaceURI+'''');
+  temp:=fMSDomDocument.DocumentElement;
+  temp.selectNodes('xyz4ct:'+localName);
+  if temp<>nil
+    then result:=TMSXMLNodeList.create(temp.selectNodes('xyz4ct:'+localName))
+    else result:=nil;
 end;
 
 function TMSXMLDocument.getElementById(
@@ -1190,10 +1233,11 @@ function TMSXMLNode.isSupported(
         const feature : DomString;
         const version : DomString) : Boolean;
 begin
-  (* not supported *)
-  raise EDomException.create(etNotSupportedErr, 'IsSupported is not supported');
+  if (((upperCase(feature)='CORE') and (version='2.0')) or
+     (upperCase(feature)='XML')  and (version='2.0'))
+    then result:=true
+    else result:=false;
 end;
-
 
 (*
  *  TMSXMLNodeList
@@ -1519,9 +1563,11 @@ end;
 function TMSXMLElement.getElementsByTagNameNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomNodeList;
+var  msNodeList : IXMLDOMNodeList;
 begin
-  (* namespace not supported *)
-  result := getElementsByTagName(localName);
+  (fMSElement.ownerDocument as IXMLDomDocument2).setProperty('SelectionNamespaces',
+    'xmlns:xyz4ct='''+namespaceURI+'''');
+  result:=selectNodes('xyz4ct:'+localName);
 end;
 
 function TMSXMLElement.hasAttribute(const name : DomString) : Boolean;
@@ -1533,8 +1579,11 @@ function TMSXMLElement.hasAttributeNS(
         const namespaceURI : DomString;
         const localName    : DomString) : Boolean;
 begin
-  (* namespace not supported *)
-  result := hasAttribute(localName);
+  try
+    Result := getAttributeNodeNS(namespaceURI, localName) <> nil;
+  except
+    Result := False;
+  end;
 end;
 
 
@@ -1852,14 +1901,19 @@ var
   Node: IXMLDOMNode;
 begin
   Node := fMSDomNode.selectSingleNode(nodePath);
-  if Assigned(Node) then
-    Result := createXMLNode(Node) else
-    Result := nil;
+  if Assigned(Node)
+    then Result := createXMLNode(Node)
+    else Result := nil;
 end;
 
 function TMSXMLNode.selectNodes(const nodePath: WideString): IDOMNodeList;
+var
+  NodeList: IXMLDOMNodeList;
 begin
-
+  NodeList := fMSDomNode.selectNodes(nodePath);
+  if Assigned(NodeList)
+    then Result :=  TMSXMLNodeList.Create(NodeList)
+    else Result := nil;
 end;
 
 initialization
