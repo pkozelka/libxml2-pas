@@ -1,4 +1,4 @@
-unit libxmldom;
+unit libxmldom; //$Id: libxmldom.pas,v 1.32 2002-01-14 21:43:04 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -53,8 +53,6 @@ const
 type
 
 { TGDOMInterface }
-	WordBool=boolean;
-
 	TGDOMInterface = class(TInterfacedObject)
 	public
 		function SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT; override;
@@ -66,11 +64,9 @@ type
 	private
 		protected
 		 { IDOMImplementation }
-		function hasFeature(const feature, version: DOMString): WordBool;
-		function createDocumentType(const qualifiedName, publicId,
-			systemId: DOMString): IDOMDocumentType;
-		function createDocument(const namespaceURI, qualifiedName: DOMString;
-			doctype: IDOMDocumentType): IDOMDocument;
+		function hasFeature(const feature, version: DOMString): Boolean;
+		function createDocumentType(const qualifiedName, publicId, systemId: DOMString): IDOMDocumentType;
+		function createDocument(const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType): IDOMDocument;
 	public
 	end;
 
@@ -109,17 +105,17 @@ type
 		function  replaceChild(const newChild, oldChild: IDOMNode): IDOMNode;
 		function  removeChild(const childNode: IDOMNode): IDOMNode;
 		function  appendChild(const newChild: IDOMNode): IDOMNode;
-		function  hasChildNodes: WordBool;
-		function  hasAttributes : WordBool;
-		function  cloneNode(deep: WordBool): IDOMNode;
+		function  hasChildNodes: Boolean;
+		function  hasAttributes : Boolean;
+		function  cloneNode(deep: Boolean): IDOMNode;
 		procedure normalize;
 	protected //IDOMNodeSelect
 		function  selectNode(const nodePath: WideString): IDOMNode;
 		function  selectNodes(const nodePath: WideString): IDOMNodeList;
 		procedure RegisterNS(const prefix,URI: DomString);
 	protected
-		//function supports(const feature, version: DOMString): WordBool;
-		function  isSupported(const feature, version: DOMString): WordBool;
+		//function supports(const feature, version: DOMString): Boolean;
+		function  isSupported(const feature, version: DOMString): Boolean;
 		function  IsReadOnly: boolean;
 		function  IsAncestorOrSelf(newNode:xmlNodePtr): boolean; //new
 	public
@@ -177,13 +173,13 @@ type
 	protected
 		{ Property Get/Set }
 		function get_name: DOMString;
-		function get_specified: WordBool;
+		function get_specified: Boolean;
 		function get_value: DOMString;
 		procedure set_value(const attributeValue: DOMString);
 		function get_ownerElement: IDOMElement;
 		{ Properties }
 		property name: DOMString read get_name;
-		property specified: WordBool read get_specified;
+		property specified: Boolean read get_specified;
 		property value: DOMString read get_value write set_value;
 		property ownerElement: IDOMElement read get_ownerElement;
 	public
@@ -234,8 +230,8 @@ type
 		function setAttributeNodeNS(const newAttr: IDOMAttr): IDOMAttr;
 		function getElementsByTagNameNS(const namespaceURI,
 			localName: DOMString): IDOMNodeList;
-		function hasAttribute(const name: DOMString): WordBool;
-		function hasAttributeNS(const namespaceURI, localName: DOMString): WordBool;
+		function hasAttribute(const name: DOMString): Boolean;
+		function hasAttributeNS(const namespaceURI, localName: DOMString): Boolean;
 		procedure normalize;
 	public
 		constructor Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
@@ -362,7 +358,7 @@ type
 		function createAttribute(const name: DOMString): IDOMAttr;
 		function createEntityReference(const name: DOMString): IDOMEntityReference;
 		function getElementsByTagName(const tagName: DOMString): IDOMNodeList;
-		function importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
+		function importNode(importedNode: IDOMNode; deep: Boolean): IDOMNode;
 		function createElementNS(const namespaceURI, qualifiedName: DOMString): IDOMElement;
 		function createAttributeNS(const namespaceURI, qualifiedName: DOMString): IDOMAttr;
 		function getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
@@ -379,9 +375,9 @@ type
 		// IDOMPersist
 		function get_xml: DOMString;
 		function asyncLoadState: Integer;
-		function load(source: OleVariant): WordBool;
-		function loadFromStream(const stream: TStream): WordBool;
-		function loadxml(const Value: DOMString): WordBool;
+		function load(source: OleVariant): Boolean;
+		function loadFromStream(const stream: TStream): Boolean;
+		function loadxml(const Value: DOMString): Boolean;
 		procedure save(destination: OleVariant);
 		procedure saveToStream(const stream: TStream);
 		procedure set_OnAsyncLoad(const Sender: TObject;
@@ -599,7 +595,7 @@ begin
 	Result := false;
 end;
 
-function TGDOMImplementation.hasFeature(const feature, version: DOMString): WordBool;
+function TGDOMImplementation.hasFeature(const feature, version: DOMString): Boolean;
 begin
 	if (uppercase(feature) ='CORE') and (version = '2.0')
 		then result:=true
@@ -895,19 +891,19 @@ begin
 	Result:=MakeNode(node) as IDOMNode;
 end;
 
-function TGDOMNode.hasChildNodes: WordBool;
+function TGDOMNode.hasChildNodes: Boolean;
 begin
 	if FGNode.children<>nil
 		then result:=true
 		else result:=false;
 end;
 
-function TGDOMNode.hasAttributes: WordBool;
+function TGDOMNode.hasAttributes: Boolean;
 begin
 	result:=false;
 end;
 
-function TGDOMNode.cloneNode(deep: WordBool): IDOMNode;
+function TGDOMNode.cloneNode(deep: Boolean): IDOMNode;
 var
 	node: xmlNodePtr;
 	recursive: Integer;
@@ -945,7 +941,7 @@ begin
 	end;
 end;
 
-function TGDOMNode.isSupported(const feature, version: DOMString): WordBool;
+function TGDOMNode.isSupported(const feature, version: DOMString): Boolean;
 begin
 	if (((upperCase(feature)='CORE') and (version='2.0')) or
 		 (upperCase(feature)='XML')  and (version='2.0')) //[pk] ??? what ???
@@ -1256,7 +1252,7 @@ begin
 	Result := nil;
 end;
 
-function TGDOMAttr.get_specified: WordBool;
+function TGDOMAttr.get_specified: Boolean;
 begin
 	//todo: implement it correctly
 	result:=true;
@@ -1493,13 +1489,13 @@ begin
 	result:=selectNodes('xyz4ct:'+localName);
 end;
 
-function TGDOMElement.hasAttribute(const name: DOMString): WordBool;
+function TGDOMElement.hasAttribute(const name: DOMString): Boolean;
 begin
 	Result := xmlHasProp(FGNode, PChar(UTF8Encode(name)))<>nil;
 end;
 
 
-function TGDOMElement.hasAttributeNS(const namespaceURI, localName: DOMString): WordBool;
+function TGDOMElement.hasAttributeNS(const namespaceURI, localName: DOMString): Boolean;
 begin
 	Result := (nil<>xmlHasNsProp(FGNode,
 		PChar(UTF8Encode(localName)),
@@ -1698,7 +1694,7 @@ begin
 	result:=(self.get_documentElement as IDOMNodeSelect).selectNodes(tagName);
 end;
 
-function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
+function TGDOMDocument.importNode(importedNode: IDOMNode; deep: Boolean): IDOMNode;
 var
 	recurse: integer;
 	node: xmlNodePtr;
@@ -1894,7 +1890,7 @@ begin
 	result:=0;
 end;
 
-function TGDOMDocument.load(source: OleVariant): WordBool;
+function TGDOMDocument.load(source: OleVariant): Boolean;
 // Load dom from file
 var filename: string;
 		root: xmlNodePtr;
@@ -1914,13 +1910,13 @@ begin
 		else result:=false;
 end;
 
-function TGDOMDocument.loadFromStream(const stream: TStream): WordBool;
+function TGDOMDocument.loadFromStream(const stream: TStream): Boolean;
 begin
 	checkError(NOT_SUPPORTED_ERR);
 	result:=false;
 end;
 
-function TGDOMDocument.loadxml(const Value: DOMString): WordBool;
+function TGDOMDocument.loadxml(const Value: DOMString): Boolean;
 var
 	newdoc: xmlDocPtr;
 begin
