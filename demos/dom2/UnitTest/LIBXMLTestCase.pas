@@ -3,43 +3,44 @@ unit LIBXMLTestCase;
 interface
 
 uses
-  SysUtils, Classes, TestFrameWork, libxmldom, dom2, Dialogs, msxml_impl,
-  ActiveX,GUITestRunner,StrUtils;
+	SysUtils, Classes, TestFrameWork, libxmldom, dom2, Dialogs, msxml_impl,
+	ActiveX,GUITestRunner,StrUtils;
 
 const
-  xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
-  xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
+	xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
+	xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
 
 type TTestDOM2Methods = class(TTestCase)
-  private
-    doc: IDOMDocument;
-    doc1: IDOMDocument;
-  protected
-    procedure SetUp; override;
-    procedure TearDown; override;
-    function getCont(xml:string):string;
-  public
-  published
-    procedure ShowDom;
-    procedure AppendExistingChild;
-    procedure TestDocumentElement;
-    procedure CreateElementNS;
-    procedure CreateElementNS1;
-    procedure CreateAttributeNS;
-    procedure TestDocCount;
-    procedure TestElementByID;
-  end;
+	private
+		doc: IDOMDocument;
+		doc1: IDOMDocument;
+	protected
+		procedure SetUp; override;
+		procedure TearDown; override;
+		function getCont(xml:string):string;
+	public
+	published
+		procedure ShowDom;
+		procedure AppendExistingChild;
+		procedure TestDocumentElement;
+		procedure CreateElementNS;
+		procedure CreateElementNS1;
+		procedure CreateAttributeNS;
+		procedure TestDocCount;
+		procedure TestElementByID;
+		procedure LoadFiles;
+	end;
 
 type TTestDomExceptions = class(TTestCase)
-  private
-    doc: IDOMDocument;
-    doc1: IDOMDocument;
-  protected
-    procedure SetUp; override;
-    procedure TearDown; override;
-  public
-  published
-    procedure AppendAttribute;
+	private
+		doc: IDOMDocument;
+		doc1: IDOMDocument;
+	protected
+		procedure SetUp; override;
+		procedure TearDown; override;
+	public
+	published
+		procedure AppendAttribute;
 
     procedure AppendNilNode;
     procedure InsertNilNode;
@@ -55,19 +56,19 @@ type TTestMemoryLeaks = class(TTestCase)
     procedure SetUp; override;
     procedure TearDown; override;
   public
-  published
-    procedure CreateElement10000Times;
-    procedure CreateAttribute10000Times;
-    procedure SetAttributeNode10000Times;
-    procedure SetAttributeNodes1000Times;
-    procedure SetAttributeNodesReplace10000Times;
-    procedure CreateAttributeNS10000Times;
-    procedure CreateComment10000Times;
-    procedure CreateCDataSection10000Times;
-    procedure CreateDocumentFragment10000Times;
-    procedure CreateTextNode10000Times;
-    procedure AppendElement10000Times;
-  end;
+	published
+		procedure CreateElement10000Times;
+		procedure CreateAttribute10000Times;
+		procedure SetAttributeNode10000Times;
+		procedure SetAttributeNodes1000Times;
+		procedure SetAttributeNodesReplace10000Times;
+		procedure CreateAttributeNS10000Times;
+		procedure CreateComment10000Times;
+		procedure CreateCDataSection10000Times;
+		procedure CreateDocumentFragment10000Times;
+		procedure CreateTextNode10000Times;
+		procedure AppendElement10000Times;
+	end;
 
 
 implementation
@@ -76,13 +77,11 @@ var impl: IDOMImplementation;
 
 { TTestCaseLIBXML }
 
-{ TTestCaseLIBXML }
-
 procedure TTestDom2Methods.SetUp;
 begin
   inherited;
-  impl := GetDom(domvendor);
-  doc := impl.createDocument('','',nil);
+	impl := GetDom(domvendor);
+	doc := impl.createDocument('','',nil);
   (doc as IDOMPersist).loadxml(xmlstr);
   doc1 := impl.createDocument('','',nil);
   (doc1 as IDOMPersist).loadxml(xmlstr1);
@@ -347,7 +346,7 @@ begin
   attr.value:='hund';
   doc.documentElement.setAttributeNodeNS(attr);
   temp:=(doc as IDOMPersist).xml;
-  temp:=getCont(temp);
+	temp:=getCont(temp);
   //OutLog(temp);
   check(temp='<test xmlns:ct="http://ns.4ct.de" ct:name1="hund"/>','failed')
 end;
@@ -358,7 +357,7 @@ function TTestDOM2Methods.getCont(xml:string):string;
 // ToDo: should be replaced by a more general implementation
 begin
   if domvendor='LIBXML' then begin
-    result:=rightstr(xml,length(xml)-44);
+		result:=rightstr(xml,length(xml)-44);
     result:=leftstr(result,length(result)-1);
   end else begin
     result:=rightstr(xml,length(xml)-23);
@@ -375,6 +374,37 @@ begin
   doc.documentElement.appendChild(el);
   temp:=((doc as IDOMPersist).xml);
   outlog(getCont(temp));
+end;
+
+procedure TTestDOM2Methods.LoadFiles;
+var
+	builder: IDomDocumentBuilder;
+	mydoc: IDomDocument;
+	fd: string; // file directory
+	fn: string; // file name
+	sr: TSearchRec;
+	rv: integer; // returned value
+	cnt: integer; // tested file counter
+begin
+	fd := '../../data';
+	try
+		cnt := 0;
+		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
+		while (rv=0) do begin
+			Inc(cnt);
+			builder := getDocumentBuilderFactory(DomVendor).newDocumentBuilder;
+			fn := fd + '/' + sr.Name;
+			mydoc := builder.load(fn);
+			check(mydoc<>nil, fn+': document not loaded');
+			check(mydoc.documentElement<>nil, fn+': documentElement is nil');
+			rv := FindNext(sr);
+		end;
+		if (cnt=0) then begin
+			check(false, 'No XML file available for testing in directory '+fd); 
+		end;
+	finally
+		FindClose(sr);
+	end;
 end;
 
 initialization
