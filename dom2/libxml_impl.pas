@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.28 2002-03-02 18:02:33 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.29 2002-03-03 13:27:03 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -111,15 +111,16 @@ type
 
   TLDomAttr = class(TLDomNode, IDomNode, IDomAttr)
   protected //IDomNode
-    function  IDomNode.get_childNodes = returnChildNodes;
+//    function  IDomNode.get_childNodes = returnChildNodes;
+    function  get_childNodes: IDomNodeList;
     function  IDomNode.get_parentNode = returnNullDomNode;
-    function  IDomNode.get_firstChild = returnNullDomNode;
-    function  IDomNode.get_lastChild = returnNullDomNode;
+//    function  IDomNode.get_firstChild = returnNullDomNode;
+//    function  IDomNode.get_lastChild = returnNullDomNode;
     function  IDomNode.get_previousSibling = returnNullDomNode;
     function  IDomNode.get_nextSibling = returnNullDomNode;
   protected //IDomAttr
     function  IDomAttr.get_name = get_nodeName;
-    function  IDomAttr.get_childNodes = returnChildNodes;
+//    function  IDomAttr.get_childNodes = returnChildNodes;
     function  get_specified: Boolean;
     function  IDomAttr.get_value = get_nodeValue;
     procedure IDomAttr.set_value = set_nodeValue;
@@ -1664,6 +1665,11 @@ begin
 end;
 
 { TLDomAttr }
+
+function TLDomAttr.get_childNodes: IDomNodeList;
+begin
+  Result := returnChildNodes;
+end;
 
 function TLDomAttr.get_ownerElement: IDomElement;
 begin
