@@ -339,6 +339,13 @@ uses
 {$endif}
 	SysUtils;
 
+{$ifdef VER130}
+function UTF8Decode(aUTF8Chars: string): widestring;
+begin
+	Result := aUTF8Chars;
+end;
+{$endif}
+
 procedure ENotImpl(aFunctionName: widestring);
 begin
 	raise Exception.CreateFmt('Function %s is not implemented yet', [aFunctionName]);
