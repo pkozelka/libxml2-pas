@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.64 2002-01-18 22:12:03 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.65 2002-01-20 18:33:28 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ type
   TGDOMNode = class(TGDOMInterface, IDomNode, ILibXml2Node, IDomNodeSelect)
   private
     FGNode: xmlNodePtr;
-    function  returnDomNode: IDomNode;
+    function  returnNullDomNode: IDomNode;
     function  returnEmptyString: DomString;
   protected //IXMLDOMNodeRef
     function  LibXml2NodePtr: xmlNodePtr;
@@ -171,11 +171,11 @@ type
   protected //IDomNode
     function  IDomNode.get_nodeValue = get_value;
     procedure IDomNode.set_nodeValue = set_value;
-    function  IDomNode.get_parentNode = returnDomNode;
-    function  IDomNode.get_firstChild = returnDomNode;
-    function  IDomNode.get_lastChild = returnDomNode;
-    function  IDomNode.get_previousSibling = returnDomNode;
-    function  IDomNode.get_nextSibling = returnDomNode;
+    function  IDomNode.get_parentNode = returnNullDomNode;
+    function  IDomNode.get_firstChild = returnNullDomNode;
+    function  IDomNode.get_lastChild = returnNullDomNode;
+    function  IDomNode.get_previousSibling = returnNullDomNode;
+    function  IDomNode.get_nextSibling = returnNullDomNode;
   protected //IDomAttr
   protected
     { Property Get/Set }
@@ -277,7 +277,7 @@ type
   private
     function GetGNotation: xmlNotationPtr;
   protected //IDomNode
-    function  IDomNode.get_parentNode = returnDomNode;
+    function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomNotation
     function get_publicId: DOMString;
     function get_systemId: DOMString;
@@ -291,7 +291,7 @@ type
   private
     function GetGEntity: xmlEntityPtr;
   protected //IDomNode
-    function  IDomNode.get_parentNode = returnDomNode;
+    function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomEntity
     function get_publicId: DOMString;
     function get_systemId: DOMString;
@@ -332,9 +332,9 @@ type
     function  IDomNode.get_nodeValue = returnEmptyString;
     procedure set_nodeValue(const value: DOMString);
     function  get_nodeType: DOMNodeType;
-    function  IDomNode.get_parentNode = returnDomNode;
-    function  IDomNode.get_previousSibling = returnDomNode;
-    function  IDomNode.get_nextSibling = returnDomNode;
+    function  IDomNode.get_parentNode = returnNullDomNode;
+    function  IDomNode.get_previousSibling = returnNullDomNode;
+    function  IDomNode.get_nextSibling = returnNullDomNode;
     function  get_ownerDocument: IDomDocument; override;
     function  IDomNode.get_namespaceURI = returnEmptyString;
     function  IDomNode.get_prefix = returnEmptyString;
@@ -395,7 +395,7 @@ type
     IDomNode,
     IDomDocumentFragment)
   protected //IDomNode
-    function  IDomNode.get_parentNode = returnDomNode;
+    function  IDomNode.get_parentNode = returnNullDomNode;
   end;
 
   TGDOMDocumentBuilderFactory = class(TInterfacedObject,
@@ -715,7 +715,7 @@ end;
  * This function implements null return value for all the traversal functions
  * where null is required by DOM spec. in Attr interface
  *)
-function TGDOMNode.returnDomNode: IDOMNode;
+function TGDOMNode.returnNullDomNode: IDOMNode;
 begin
   Result := nil;
 end;
