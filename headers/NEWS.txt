@@ -2,6 +2,12 @@
 *************************  LATEST CHANGES  *************************
 ********************************************************************
 
+- Delphi 5 compatibility completed
+
+********************************************************************
+*************************  OLDER  CHANGES  *************************
+********************************************************************
+
 - moved all files related to libxml2 and libxslt into CVS module "headers"
 - first attempt to produce also binary releases
 - header source distribution were merged. There is now only one deliverable, 
@@ -23,10 +29,6 @@ libexslt-pas 0.7.10:
 iconv 0.7: 
 ----------
 [unchanged]
-
-********************************************************************
-*************************  OLDER  CHANGES  *************************
-********************************************************************
 
 - release process compatible with libxml part
 
