@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.22 2002-02-22 23:52:37 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.23 2002-02-25 12:50:57 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -1213,7 +1213,7 @@ end;
 function TLDomDocument.get_domImplementation: IDomImplementation;
 begin
   if FGDOMImpl=nil then begin
-    FGDOMImpl := TLDomImplementation.Create(TLDomDocument); //todo: default class, global instance ???
+    FGDOMImpl := TLDomImplementation.Create(TLDomDocumentClass(GlbNodeClasses[XML_DOCUMENT_NODE])); //todo: ??? default class, global instance ???
   end;
   Result := FGDOMImpl;
 end;
@@ -1843,7 +1843,7 @@ function TLDomDocumentBuilder.GetImplInstance: TLDomImplementation;
 begin
   // on-demand creation
   if (fImplInstance=nil) then begin
-    fImplInstance := fImplementationClass.Create(TLDomDocument); //???
+    fImplInstance := fImplementationClass.Create(TLDomDocumentClass(GlbNodeClasses[XML_DOCUMENT_NODE])); //???
     fImplInstance._AddRef;
   end;
   Result := fImplInstance;
