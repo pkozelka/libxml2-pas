@@ -4,17 +4,29 @@ unit msxml_libxml;
 interface
 
 uses
+{$ifdef VER130}
+	ActiveX,
+{$endif}
 {$ifdef VER140}
 	Variants,
 {$endif}
-	ActiveX,
 	Classes;
 
+type
+{$ifndef VER130}
+	//the things that we need from the ActiveX unit:
+	TOleEnum = type LongWord;
+	{$EXTERNALSYM SYSINT}
+	SYSINT = Integer;
+	{$EXTERNALSYM SYSUINT}
+	SYSUINT = LongWord;
+{$endif}
+
 // *********************************************************************//
-// GUIDS declared in the TypeLibrary. Following prefixes are used:        
-//   Type Libraries     : LIBID_xxxx                                      
-//   CoClasses          : CLASS_xxxx                                      
-//   Non-DISP interfaces: IID_xxxx                                        
+// GUIDS declared in the TypeLibrary. Following prefixes are used:
+//   Type Libraries     : LIBID_xxxx
+//   CoClasses          : CLASS_xxxx
+//   Non-DISP interfaces: IID_xxxx
 // *********************************************************************//
 const
 	// TypeLibrary Major and minor versions
