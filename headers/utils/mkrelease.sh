@@ -35,10 +35,28 @@ function copySourceFilesToDist()
 	cp $HEADERS_DIR/*.txt $DIST
 	cp $HEADERS_DIR/../common/license/COPYING* $DIST
 
-	local pkgVer="$LIBXML_MAJOR_VERSION"_"$LIBXML_MINOR_VERSION"_"$LIBXML_MICRO_VERSION"
-	# remove resource include directive
-	sed 's/\$R \*.res//' $SRC/libxml2_pas.dpk >$DIST/src/libxml2_pas.dpk
+	if $CYGWIN; then
+		cp $SRC/libxml2_pas.dpk $DIST/src
+		# prepare resource script file
+		DCC_VER=`$DCC --version | tr -d '\015' | tr '\012' ';'` 
+sed -f - $SRC/libxml2_pas.rc.template > $DIST/src/libxml2_pas.rc <<EOF
+s:@COMPILER_VERSION@:$DCC_VER:g
+s:@CURRENT_YEAR@:`date +%Y`:g
+s:@LIBXML_MAJOR_VERSION@:$LIBXML_MAJOR_VERSION:g
+s:@LIBXML_MINOR_VERSION@:$LIBXML_MINOR_VERSION:g
+s:@LIBXML_MICRO_VERSION@:$LIBXML_MICRO_VERSION:g
+EOF
 
+		# create the resource file
+		pwd=`pwd`
+		cd $DIST/src
+		brcc32 libxml2_pas.rc
+		rm libxml2_pas.rc
+		cd $pwd
+	else
+		# remove resource include directive (I don't know how to make resources in Kylix)
+		sed 's/\$R \*.res//' $SRC/libxml2_pas.dpk >$DIST/src/libxml2_pas.dpk
+	fi
 	# prepare JEDI info file
 sed -f - INFO.txt.template > $DIST/INFO.txt <<EOF
 s:@DATE@:`date +'%d %b %Y'`:g
@@ -104,7 +122,7 @@ function compressDist()
 function compile()
 {
 	cd $DIST/src
-	dcc -H -Q -N. -E. libxml2_pas.dpk
+	$DCC -H -Q -N. -E. libxml2_pas.dpk
 	zip -qr $HEADERS_DIR/libxml2-pas-$LIBXML_VER-D6.zip *.dcp *.bpl
 }
 
@@ -114,6 +132,14 @@ if [ ! -d "$LIBXML2_PAS" ]; then
 	exit -1
 fi
 
+CYGWIN="false"
+DCC="dcc"
+case `uname` in
+CYGWIN*)
+	CYGWIN="true"
+	DCC="dcc32"
+	;;
+esac
 # check that GNOMECVSROOT env. var. is correct
 if [ ! -d "$GNOMECVSROOT/gnome-xml" ]; then
 	echo "ERROR - variable GNOMECVSROOT must point to the root of libxml2-pas working copy" >/dev/stderr
