@@ -1,14 +1,54 @@
-MYTMP=dunit.tmp
+#REV=build_5_0_1
+REV=build_5_0_2
+#REV=HEAD
+
 TGZFILE=dunit-kylix-4.1.3.tar.gz
 ZIPFILE=dunit-5.0.1.zip
 URLBASE=http://prdownloads.sourceforge.net/dunit
+CVS_DUNIT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/dunit
+
+MYTMP=$(TMP)/dunit-$(REV).tmp
 
 # The directory where you locally store downloaded files
 # please your usual download location here, otherwise current dir will be used
 DOWNLOADDIR=.
 
-all: extract
+all: cvsexport
 
+cvsclean:
+	rm -rf $(MYTMP)
+
+#
+# Extracts the specified build (tag) out from the dunit's CVS repository
+# if necessary (it is cached in the $TMP directory)
+# and makes it ready for compiling
+#
+cvsexport: $(MYTMP)
+	rm -rf *.dcu *.pas *.dfm *.txt *.kfm dunit.* images
+	rm -rf $(MYTMP)/Makefile $(MYTMP)/.cvsignore
+	cp -R $(MYTMP)/* .
+	echo "$(REV)" >REVINFO.TXT
+	
+$(MYTMP):
+	rm -rf $(MYTMP)
+	cvs -d $(CVS_DUNIT) export -d $(REV).tmp -r $(REV) dunit/src
+	mv $(REV).tmp $(MYTMP) 
+
+#
+# Copies dunit's sources from a local working copy,
+# assuming that it is placed in the same directory base as the whole
+# libxml2-pas project
+#
+cp:
+	rm -rf tmp
+	cp -R ../../../dunit/dunit/src tmp
+	rm -rf *.dcu *.pas *.dfm *.txt *.kfm dunit.* images
+	rm -rf tmp/CVS tmp/Makefile tmp/.cvsignore tmp/bin
+	cp -R tmp/* .
+	rm -rf tmp
+	echo "LOCAL COPY" >REVINFO.TXT
+
+#################################################33
 
 download: download-$(OSTYPE)
 download-cygwin:
@@ -37,4 +77,3 @@ compile-linux-gnu: extract-linux-gnu
 
 src/dunit.exe: compile-cygwin
 src/dunit: compile-linux-gnu
-
