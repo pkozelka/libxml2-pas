@@ -747,44 +747,6 @@ begin
   result:=temp;
 end;
 
-(**
-/**
- * gdome_xmlSetAttrValue:
- * @attr:  the attribute which the value is to be set
- * @value:  the value to set
- *
- * Set a new value to an Attribute node.
- */
-void
-gdome_xmlSetAttrValue(xmlAttr *attr, xmlChar *value) {
-  if(attr == NULL)
-    return;
-
-  if (attr->children != NULL)
-    xmlFreeNodeList(attr->children);
-  attr->children = NULL;
-  attr->last = NULL;
-
-  if (value != NULL) {
-    xmlChar *buffer;
-    xmlNode *tmp;
-
-    buffer = xmlEncodeEntitiesReentrant(attr->doc, value);
-    attr->children = xmlStringGetNodeList(attr->doc, buffer);
-    attr->last = NULL;
-    tmp = attr->children;
-    for(tmp = attr->children; tmp != NULL; tmp = tmp->next) {
-      tmp->parent = (xmlNode *  )attr;
-      tmp->doc = attr->doc;
-      if (tmp->next == NULL)
-        attr->last = tmp;
-    }
-    xmlFree (buffer);
-  }
-
-  return;
-}
-**)
 
 procedure TGDOMNode.set_nodeValue(const value: DOMString);
 var
@@ -1385,7 +1347,6 @@ end;
 function TGDOMNamedNodeMap.setNamedItemNS(const newItem: IDOMNode): IDOMNode;
 var
   attr,oldattr,xmlnewAttr: xmlAttrPtr;
-  //value:pchar;
   temp,slocalName: string;
   ns:xmlNSPtr;
   namespace:pchar;
@@ -1430,9 +1391,7 @@ end;
 function TGDOMNamedNodeMap.removeNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
 var
   attr: xmlAttrPtr;
-  //tmp: xmlAttrPtr;
   name1,name2:TGdomString;
-  //ref: integer;
 begin
   attr:=nil;
   if FGNamedNodeMap<>nil then begin
@@ -2250,26 +2209,6 @@ function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMN
 var
   recurse: integer;
   node: xmlNodePtr;
-(**
- * gdome_xml_doc_importNode:
- * @self:  Document Objects ref
- * @importedNode:  The node to import.
- * @deep:  If %TRUE, recursively import the subtree under the specified node;
- *         if %FALSE, import only the node itself. This has no effect on Attr,
- *         EntityReference, and Notation nodes.
- * @exc:  Exception Object ref
- *
- *
- * Imports a node from another document to this document. The returned node has
- * no parent; (parentNode is %NULL). The source node is not altered or removed
- * from the original document; this method creates a new copy of the source
- * node. %GDOME_DOCUMENT_NODE, %GDOME_DOCUMENT_TYPE_NODE, %GDOME_NOTATION_NODE
- * and %GDOME_ENTITY_NODE nodes are not supported.
- *
- * %GDOME_NOT_SUPPORTED_ERR: Raised if the type of node being imported is not
- * supported.
- * Returns: the imported node that belongs to this Document.
- *)
 begin
   result:=nil;
   if importedNode=nil then exit;
@@ -2286,41 +2225,6 @@ begin
       else result:=nil;
   end;
 end;
-(* the c-code to translate (from gdome)
-
-GdomeNode *
-gdome_xml_doc_importNode (GdomeDocument *self, GdomeNode *importedNode, GdomeBoolean deep, GdomeException *exc) {
-  Gdome_xml_Document *priv = (Gdome_xml_Document * )self;
-  Gdome_xml_Node *priv_node = (Gdome_xml_Node * )importedNode;
-  xmlNode *ret = NULL;
-
-  g_return_val_if_fail (priv != NULL, NULL);
-  g_return_val_if_fail (GDOME_XML_IS_DOC (priv), NULL);
-  g_return_val_if_fail (importedNode != NULL, NULL);
-  g_return_val_if_fail (exc != NULL, NULL);
-
-  switch (gdome_xml_n_nodeType (importedNode, exc)) {
-  case XML_ATTRIBUTE_NODE:
-    g_assert (gdome_xmlGetOwner ((xmlNode * )priv->n) == priv->n);
-    ret = (xmlNode * )xmlCopyProp ((xmlNode * )priv->n, (xmlAttr * )priv_node->n);
-    gdome_xmlSetParent (ret, NULL);
-    break;
-  case XML_DOCUMENT_FRAG_NODE:
-  case XML_ELEMENT_NODE:
-  case XML_ENTITY_REF_NODE:
-  case XML_PI_NODE:
-  case XML_TEXT_NODE:
-  case XML_CDATA_SECTION_NODE:
-  case XML_COMMENT_NODE:
-    ret = xmlDocCopyNode (priv_node->n, priv->n, deep);
-    break;
-  default:
-    *exc = GDOME_NOT_SUPPORTED_ERR;
-  }
-
-  return gdome_xml_n_mkref (ret);
-}
-*)
 
 function TGDOMDocument.createElementNS(const namespaceURI,
   qualifiedName: DOMString): IDOMElement;
