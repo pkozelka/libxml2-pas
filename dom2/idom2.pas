@@ -1028,13 +1028,13 @@ type
     (*
      * true if asbsolute URLs are supported, false if only relative or local
      * URLs are supported
-    *)
+     *)
     property hasAbsoluteURLSupport : Boolean read get_HasAbsoluteURLSupport;
   end;
 
   (*
    * DomDocumentBuilder Factory for creating Vendor specified DocumentBuilder.
-  *)
+   *)
   IDomDocumentBuilderFactory = interface
     ['{27E9F2B1-98D6-49D0-AAE4-2B0D2DF128BE}']
     {property setters/getters}
@@ -1047,6 +1047,29 @@ type
 
     (* the vendorID under which this factory is registered *)
     property vendorID : DomString read get_VendorID;
+  end;
+
+
+  (**
+   * Interface for enumerating vendors.
+   *)
+  IDomVendorList = interface
+    ['{2739F26E-98D6-49D0-AAE4-2B0D2DF128BE}']
+
+    (**
+     * @return  number of registered vendors
+     *)
+    function  get_Count: integer;
+
+    (**
+     * Get one of the registered vendors
+     * @param aIndex  zero-based index of the factory to retrieve
+     * @return  a document builder factory
+     *)
+    function  get_Item(const aIndex: integer): IDomDocumentBuilderFactory;
+
+    property Count: integer read get_Count;
+    property Item: IDomDocumentBuilderFactory read get_Item;
   end;
 
   (*
