@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.13 2002-02-11 20:58:17 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.14 2002-02-12 00:18:04 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -23,6 +23,7 @@ uses
 
 type
   TLDOMChildNodeList = class;
+  TLDOMElement = class;
 
   { TLDOMObject class }
 
@@ -102,6 +103,26 @@ type
     function  get_ownerElement: IDomElement;
   end;
 
+  { TLDOMAttributeMap }
+
+  TLDOMAttributeMap = class(TLDOMObject, IDomNamedNodeMap)
+  private
+    FOwnerElement: TLDOMElement; // non-counted reference
+  protected //IDomNamedNodeMap
+    function get_item(index: Integer): IDomNode;
+    function get_length: Integer;
+    function getNamedItem(const name: DomString): IDomNode;
+    function setNamedItem(const newItem: IDomNode): IDomNode;
+    function removeNamedItem(const name: DomString): IDomNode;
+    function getNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
+    function setNamedItemNS(const newItem: IDomNode): IDomNode;
+    function removeNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
+  protected
+    constructor Create(aOwnerElement: TLDOMElement);
+  public
+    destructor Destroy; override;
+  end;
+
   { TLDOMChildNodeList class }
 
   TLDOMChildNodeList = class(TLDOMObject, IDomNodeList)
@@ -175,6 +196,38 @@ type
   protected //IDomDocumentFragment
     function  IDomDocumentFragment.get_childNodes = returnChildNodes;
     function  IDomDocumentFragment.get_parentNode = returnNullDomNode;
+  end;
+
+  { TLDOMElement class }
+
+  TLDOMElement = class(TLDOMNode, IDomElement, IDomNode)
+  private
+    FAttributes: TLDOMAttributeMap; // non-counted reference
+  protected //IDomNode
+    function  IDomNode.get_childNodes = returnChildNodes;
+    function  get_attributes: IDomNamedNodeMap;
+  protected //IDomElement
+    function  IDomElement.get_tagName = get_nodeName;
+    function  IDomElement.get_childNodes = returnChildNodes;
+    function  getAttribute(const name: DomString): DomString;
+    procedure setAttribute(const name, value: DomString);
+    procedure removeAttribute(const name: DomString);
+    function  getAttributeNode(const name: DomString): IDomAttr;
+    function  IDomElement.setAttributeNode = setAttributeNodeNS;
+    function  removeAttributeNode(const oldAttr: IDomAttr):IDomAttr;
+    function  getAttributeNS(const namespaceURI, localName: DomString): DomString;
+    procedure setAttributeNS(const namespaceURI, qualifiedName, value: DomString);
+    procedure removeAttributeNS(const namespaceURI, localName: DomString);
+    function  getAttributeNodeNS(const namespaceURI, localName: DomString): IDomAttr;
+    function  setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
+    function  hasAttribute(const name: DomString): Boolean;
+    function  hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
+    function  getElementsByTagName(const name: DomString): IDomNodeList;
+    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
+  protected
+    constructor Create(aLibXml2Node: pointer); override;
+  public
+    destructor Destroy; override;
   end;
 
   { TLDOMEntity class }
@@ -300,7 +353,7 @@ type
 //overridable implementations
 var
   GlbNodeClasses: array[XML_ELEMENT_NODE..XML_DOCB_DOCUMENT_NODE] of TLDOMNodeClass = (
-    nil, //TGDOMElement, //XML_ELEMENT_NODE
+    TLDOMElement, //XML_ELEMENT_NODE
     TLDOMAttr, //XML_ATTRIBUTE_NODE
     TLDOMText, //XML_TEXT_NODE
     TLDOMCDataSection, //XML_CDATA_SECTION_NODE
@@ -1363,6 +1416,222 @@ begin
   //todo: implement it correctly
   Result := true;
   DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+{ TLDOMAttributeMap }
+
+constructor TLDOMAttributeMap.Create(aOwnerElement: TLDOMElement);
+begin
+  inherited Create;
+  DomAssert(aOwnerElement<>nil, HIERARCHY_REQUEST_ERR, 'Attribute list must have an owner element');
+  FOwnerElement := aOwnerElement;
+  FOwnerElement.FAttributes := self;
+  FOwnerElement._AddRef; //as long as the map exists, its owner must exist too
+end;
+
+destructor TLDOMAttributeMap.Destroy;
+begin
+  FOwnerElement.FAttributes := nil;
+  FOwnerElement._Release;
+  FOwnerElement := nil;
+  inherited destroy;
+end;
+
+function TLDOMAttributeMap.get_item(index: Integer): IDomNode;
+var
+  node: xmlAttrPtr;
+  cnt: integer;
+begin
+  DomAssert(index>=0, INDEX_SIZE_ERR);
+  node := FOwnerElement.requestNodePtr.properties;
+  cnt := 0;
+  while (cnt<index) do begin
+    if (node=nil) then begin
+      DomAssert(false, INDEX_SIZE_ERR, Format('Trying to access item %d [zero based] of %d items', [index, cnt]));
+    end;
+    Inc(cnt);
+    node := node.next;
+  end;
+  Result := GetDOMObject(node) as IDomNode;
+end;
+
+function TLDOMAttributeMap.get_length: Integer;
+var
+  node: xmlAttrPtr;
+begin
+  Result := 0;
+  node := FOwnerElement.GNode.properties;
+  while (node<>nil) do begin
+    Inc(Result);
+    node := node.next;
+  end;
+end;
+
+function TLDOMAttributeMap.getNamedItem(const name: DomString): IDomNode;
+begin
+  Result := FOwnerElement.getAttributeNode(name);
+end;
+
+function TLDOMAttributeMap.getNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
+begin
+  Result := FOwnerElement.getAttributeNodeNS(namespaceURI, localName);
+end;
+
+function TLDOMAttributeMap.removeNamedItem(const name: DomString): IDomNode;
+begin
+  Result := FOwnerElement.removeAttributeNode(FOwnerElement.getAttributeNode(name) as IDomAttr);
+end;
+
+function TLDOMAttributeMap.removeNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
+begin
+  Result := FOwnerElement.removeAttributeNode(FOwnerElement.getAttributeNodeNS(namespaceURI, localName) as IDomAttr);
+end;
+
+function TLDOMAttributeMap.setNamedItem(const newItem: IDomNode): IDomNode;
+begin
+  Result := FOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
+end;
+
+function TLDOMAttributeMap.setNamedItemNS(const newItem: IDomNode): IDomNode;
+begin
+  Result := FOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
+end;
+
+{ TLDOMElement }
+
+constructor TLDOMElement.Create(aLibXml2Node: pointer);
+begin
+  inherited Create(aLibXml2Node);
+  Inc(GlbElementCount);
+end;
+
+destructor TLDOMElement.Destroy;
+begin
+  Dec(GlbElementCount);
+  inherited Destroy;
+end;
+
+function TLDOMElement.get_attributes: IDomNamedNodeMap;
+begin
+  if (FAttributes=nil) then begin
+    TLDOMAttributeMap.Create(self); // assigns FAttributes
+  end;
+  Result := FAttributes;
+end;
+
+function TLDOMElement.getAttribute(const name: DomString): DomString;
+var
+  p: PxmlChar;
+begin
+  //todo: handle prefixed case
+  p := xmlGetProp(FGNode,PChar(UTF8Encode(name)));
+  Result := UTF8Decode(p);
+  xmlFree(p);
+end;
+
+function TLDOMElement.getAttributeNode(const name: DomString): IDomAttr;
+var
+  attr: xmlAttrPtr;
+begin
+  attr := xmlHasProp(FGNode, PChar(UTF8Encode(name)));
+  Result := GetDOMObject(attr) as IDomAttr;
+end;
+
+function TLDOMElement.getAttributeNodeNS(const namespaceURI, localName: DomString): IDomAttr;
+var
+  attr: xmlAttrPtr;
+begin
+  attr := xmlHasNSProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
+  Result := GetDOMObject(attr) as IDomAttr;
+end;
+
+function TLDOMElement.getAttributeNS(const namespaceURI, localName: DomString): DomString;
+var
+  p: PxmlChar;
+begin
+  p := xmlGetNSProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
+  Result := UTF8Decode(p);
+  xmlFree(p);
+end;
+
+function TLDOMElement.getElementsByTagName(const name: DomString): IDomNodeList;
+begin
+  //TODO!
+end;
+
+function TLDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
+begin
+  //TODO!                                      
+end;
+
+function TLDOMElement.hasAttribute(const name: DomString): Boolean;
+begin
+  Result := xmlHasProp(FGNode, PChar(UTF8Encode(name)))<>nil;
+end;
+
+function TLDOMElement.hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
+begin
+  Result := (nil<>xmlHasNsProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI))));
+end;
+
+procedure TLDOMElement.removeAttribute(const name: DomString);
+var
+  attr: xmlAttrPtr;
+begin
+  attr := xmlHasProp(FGNode, PChar(UTF8Encode(name)));
+  if attr <> nil then begin
+    xmlUnlinkNode(xmlNodePtr(attr));
+    RegisterFlyingNode(xmlNodePtr(attr));
+  end;
+end;
+
+function TLDOMElement.removeAttributeNode(const oldAttr: IDomAttr): IDomAttr;
+var
+  attr: xmlAttrPtr;
+begin
+  Result := oldAttr;
+  if oldAttr=nil then exit;
+  attr := xmlAttrPtr(GetGNode(oldAttr));
+  xmlUnlinkNode(xmlNodePtr(attr));
+  RegisterFlyingNode(xmlNodePtr(attr));
+end;
+
+procedure TLDOMElement.removeAttributeNS(const namespaceURI, localName: DomString);
+var
+  attr: xmlAttrPtr;
+  uns, ulocal: String;
+begin
+  uns := UTF8Encode(localName);
+  ulocal := UTF8Encode(namespaceURI);
+  attr := xmlHasNsProp(FGNode, PChar(uns), PChar(ulocal));
+  if (attr <> nil) then begin
+    xmlUnlinkNode(xmlNodePtr(attr));
+    RegisterFlyingNode(xmlNodePtr(attr));
+  end;
+end;
+
+procedure TLDOMElement.setAttribute(const name, value: DomString);
+begin
+  xmlSetProp(FGNode, PChar(UTF8Encode(name)), PChar(UTF8Encode(value)));
+end;
+
+function TLDOMElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
+begin
+  if newAttr<>nil then begin
+    Result := GetDomObject(xmlSetPropNode(FGNode, xmlAttrPtr(GetGNode(newAttr)))) as IDomAttr;
+  end else begin
+    Result := nil;
+  end;
+end;
+
+procedure TLDOMElement.setAttributeNS(const namespaceURI, qualifiedName, value: DomString);
+var
+  uprefix, ulocal: String;
+  ns: xmlNsPtr;
+begin
+  SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
+  ns := xmlNewNs(FGNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+  xmlSetNSProp(FGNode, ns, PChar(ulocal), PChar(UTF8Encode(value)));
 end;
 
 end.
