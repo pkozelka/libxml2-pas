@@ -880,7 +880,9 @@ begin
   if (TestSet and 64) = 64
     then testCount:=testCount+11;
   if (TestSet and 128) = 128
-    then testCount:=testCount+5;
+    then if dom2
+      then testCount:=testCount+5
+      else testCount:=testCount+3;
   if (TestSet and 256) = 256
     then testCount:=testCount+1;
 
