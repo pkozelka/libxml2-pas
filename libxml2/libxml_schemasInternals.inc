@@ -1,6 +1,6 @@
-// CVS-SIGN: [1.0] schemasInternals.h
+// CVS-SIGN: [1.1] schemasInternals.h
 (*
- * schemasInternals.h : internal interfaces for the XML Schemas handling
+ * schemasInternals.h: internal interfaces for the XML Schemas handling
  *                      and schema validity checking
  *
  * See Copyright for the status of this software.
@@ -58,107 +58,19 @@ const
   XML_SCHEMA_CONTENT_MIXED_OR_ELEMENTS = 5;
   XML_SCHEMA_CONTENT_BASIC = 6;
 
-type
-   _xmlSchemaVal = xmlSchemaVal;
-
-   xmlSchemaValPtr = xmlSchemaVal;
-   _xmlSchemaType = xmlSchemaType;
-
-   xmlSchemaTypePtr = xmlSchemaType;
-   _xmlSchemaFacet = xmlSchemaFacet;
-
-   xmlSchemaFacetPtr = xmlSchemaFacet;
-(**
- * Annotation
- *)
-   _xmlSchemaAnnot = xmlSchemaAnnot;
-   xmlSchemaAnnotPtr = xmlSchemaAnnot;
-   _xmlSchemaAnnot = record
-        next : ^_xmlSchemaAnnot;
-        content : xmlNodePtr;                     (* the annotation *)
-     end;
-
+{[pk] I moved many constants here, because of internal references in pointer forward declarations }
 (*
  * An attribute definition.
  *)
 
 const
-   XML_SCHEMAS_ANYATTR_SKIP = 1;
-   XML_SCHEMAS_ANYATTR_LAX = 2;
-   XML_SCHEMAS_ANYATTR_STRICT = 3;
-type
-   _xmlSchemaAttribute = xmlSchemaAttribute;
+  XML_SCHEMAS_ANYATTR_SKIP = 1;
+  XML_SCHEMAS_ANYATTR_LAX = 2;
+  XML_SCHEMAS_ANYATTR_STRICT = 3;
 
-   xmlSchemaAttributePtr = xmlSchemaAttribute;
-   _xmlSchemaAttribute = record
-        _type : xmlSchemaTypeType;                (* The kind of type *)
-        next : ^_xmlSchemaAttribute;              (* the next attribute if in a group ... *)
-        name : ^xmlChar;
-        id : ^xmlChar;
-        ref : ^xmlChar;
-        refNs : ^xmlChar;
-        typeName : ^xmlChar;
-        typeNs : ^xmlChar;
-        annot : xmlSchemaAnnotPtr;
-        base : xmlSchemaTypePtr;
-        occurs : longint;
-        defValue : ^xmlChar;
-        subtypes : xmlSchemaTypePtr;
-     end;
-
-(**
- * An attribute group definition.
- *
- * xmlSchemaAttribute and xmlSchemaAttributeGroup start of structures
- * must be kept similar
- *)
-  _xmlSchemaAttributeGroup = xmlSchemaAttributeGroup;
-
-  xmlSchemaAttributeGroupPtr = xmlSchemaAttributeGroup;
-  _xmlSchemaAttributeGroup = record
-    _type : xmlSchemaTypeType;                   (* The kind of type *)
-    next : ^_xmlSchemaAttribute;                 (* the next attribute if in a group ... *)
-    name : ^xmlChar;
-    id : ^xmlChar;
-    ref : ^xmlChar;
-    refNs : ^xmlChar;
-    annot : xmlSchemaAnnotPtr;
-    attributes : xmlSchemaAttributePtr;
-  end;
-
-(*
- * Schemas type definition.
- *)
 const
   XML_SCHEMAS_TYPE_MIXED = 1;//1 << 0
-type
-  _xmlSchemaType = record                        (* The kind of type *)
-    _type : xmlSchemaTypeType;                   (* the next type if in a sequence ... *)
-    next : ^_xmlSchemaType;
-    name : ^xmlChar;
-    id : ^xmlChar;
-    ref : ^xmlChar;
-    refNs : ^xmlChar;
-    annot : xmlSchemaAnnotPtr;
-    subtypes : xmlSchemaTypePtr;
-    attributes : xmlSchemaAttributePtr;
-    node : xmlNodePtr;
-    minOccurs : longint;
-    maxOccurs : longint;
-    flags : longint;
-    contentType : xmlSchemaContentType;
-    base : ^xmlChar;
-    baseNs : ^xmlChar;
-    baseType : xmlSchemaTypePtr;
-    facets : xmlSchemaFacetPtr;
-  end;
 
-(**
- * An element definition.
- *
- * xmlSchemaType, xmlSchemaFacet and xmlSchemaElement start of
- * structures must be kept similar
- *)
 const
   XML_SCHEMAS_ELEM_NILLABLE	= 1; //1 << 0
   XML_SCHEMAS_ELEM_GLOBAL		= 2; //1 << 1
@@ -167,93 +79,173 @@ const
   XML_SCHEMAS_ELEM_ABSTRACT	=16; //1 << 4
   XML_SCHEMAS_ELEM_TOPLEVEL	=32; //1 << 5
   XML_SCHEMAS_ELEM_REF		  =64; //1 << 6
-type
-  _xmlSchemaElement = xmlSchemaElement;
-  xmlSchemaElementPtr = xmlSchemaElement;
-  _xmlSchemaElement = record
-    _type : xmlSchemaTypeType;                   (* The kind of type *)
-    next : ^_xmlSchemaType;                      (* the next type if in a sequence ... *)
-    name : ^xmlChar;
-    id : ^xmlChar;
-    ref : ^xmlChar;
-    refNs : ^xmlChar;
-    annot : xmlSchemaAnnotPtr;
-    subtypes : xmlSchemaTypePtr;
-    attributes : xmlSchemaAttributePtr;
-    node : xmlNodePtr;
-    minOccurs : longint;
-    maxOccurs : longint;
-    flags : longint;
-    targetNamespace : ^xmlChar;
-    namedType : ^xmlChar;
-    namedTypeNs : ^xmlChar;
-    substGroup : ^xmlChar;
-    substGroupNs : ^xmlChar;
-    scope : ^xmlChar;
-    value : ^xmlChar;
-    refDecl : ^_xmlSchemaElement;
-    contModel : xmlRegexpPtr;
-  end;
 
-(**
- * An facet definition.
- *
- *)
 const
   XML_SCHEMAS_FACET_UNKNOWN = 0;
   XML_SCHEMAS_FACET_PRESERVE = 1;
   XML_SCHEMAS_FACET_REPLACE = 2;
   XML_SCHEMAS_FACET_COLLAPSE = 3;
+
+const
+  XML_SCHEMAS_QUALIF_ELEM = 1; //1 << 0
+  XML_SCHEMAS_QUALIF_ATTR	= 2; //1 << 1
+
+{}
+
 type
-  _xmlSchemaFacet = record
-    _type : xmlSchemaTypeType;                   (* The kind of type *)
-    next : ^_xmlSchemaFacet;                     (* the next type if in a sequence ... *)
-    value : ^xmlChar;
-    id : ^xmlChar;
-    annot : xmlSchemaAnnotPtr;
-    node : xmlNodePtr;
-    fixed : longint;
-    whitespace : longint;
-    val : xmlSchemaValPtr;
-    regexp : xmlRegexpPtr;
+  xmlSchemaVal = record end;
+  xmlSchemaValPtr = ^xmlSchemaVal;
+
+  xmlSchemaType = record end;
+  xmlSchemaTypePtr = ^xmlSchemaType;
+
+  xmlSchemaFacetPtr = ^xmlSchemaFacet;
+  (**
+   * Annotation
+   *)
+  xmlSchemaAnnotPtr = ^xmlSchemaAnnot;
+  xmlSchemaAnnot = record
+    next: xmlSchemaAnnotpTR;
+    content: xmlNodePtr;                         (* the annotation *)
+  end;
+
+  xmlSchemaAttributePtr = ^xmlSchemaAttribute;
+  xmlSchemaAttribute = record
+    _type: xmlSchemaTypeType;                    (* The kind of type *)
+    next: xmlSchemaAttributePtr;                 (* the next attribute if in a group ... *)
+    name: PxmlChar;
+    id: PxmlChar;
+    ref: PxmlChar;
+    refNs: PxmlChar;
+    typeName: PxmlChar;
+    typeNs: PxmlChar;
+    annot: xmlSchemaAnnotPtr;
+    base: xmlSchemaTypePtr;
+    occurs: Longint;
+    defValue: PxmlChar;
+    subtypes: xmlSchemaTypePtr;
+  end;
+
+  (**
+   * An attribute group definition.
+   *
+   * xmlSchemaAttribute and xmlSchemaAttributeGroup start of structures
+   * must be kept similar
+   *)
+  xmlSchemaAttributeGroupPtr = ^xmlSchemaAttributeGroup;
+  xmlSchemaAttributeGroup = record
+    _type: xmlSchemaTypeType;                    (* The kind of type *)
+    next: xmlSchemaAttributePtr;                 (* the next attribute if in a group ... *)
+    name: PxmlChar;
+    id: PxmlChar;
+    ref: PxmlChar;
+    refNs: PxmlChar;
+    annot: xmlSchemaAnnotPtr;
+    attributes: xmlSchemaAttributePtr;
+  end;
+
+  (*
+   * Schemas type definition.
+   *)
+  _xmlSchemaType = record
+    _type: xmlSchemaTypeType;                    (* The kind of type *)
+    next: xmlSchemaTypePtr;                      (* the next type if in a sequence ... *)
+    name: PxmlChar;
+    id: PxmlChar;
+    ref: PxmlChar;
+    refNs: PxmlChar;
+    annot: xmlSchemaAnnotPtr;
+    subtypes: xmlSchemaTypePtr;
+    attributes: xmlSchemaAttributePtr;
+    node: xmlNodePtr;
+    minOccurs: Longint;
+    maxOccurs: Longint;
+    flags: Longint;
+    contentType: xmlSchemaContentType;
+    base: PxmlChar;
+    baseNs: PxmlChar;
+    baseType: xmlSchemaTypePtr;
+    facets: xmlSchemaFacetPtr;
+  end;
+
+  (**
+   * An element definition.
+   *
+   * xmlSchemaType, xmlSchemaFacet and xmlSchemaElement start of
+   * structures must be kept similar
+   *)
+  xmlSchemaElementPtr = ^xmlSchemaElement;
+  xmlSchemaElement = record
+    _type: xmlSchemaTypeType;                   (* The kind of type *)
+    next: ^_xmlSchemaType;                      (* the next type if in a sequence ... *)
+    name: PxmlChar;
+    id: PxmlChar;
+    ref: PxmlChar;
+    refNs: PxmlChar;
+    annot: xmlSchemaAnnotPtr;
+    subtypes: xmlSchemaTypePtr;
+    attributes: xmlSchemaAttributePtr;
+    node: xmlNodePtr;
+    minOccurs: Longint;
+    maxOccurs: Longint;
+    flags: Longint;
+    targetNamespace: PxmlChar;
+    namedType: PxmlChar;
+    namedTypeNs: PxmlChar;
+    substGroup: PxmlChar;
+    substGroupNs: PxmlChar;
+    scope: PxmlChar;
+    value: PxmlChar;
+    refDecl: xmlSchemaElementPtr;
+    contModel: xmlRegexpPtr;
+  end;
+
+  (**
+   * An facet definition.
+   *
+   *)
+  xmlSchemaFacet = record
+    _type: xmlSchemaTypeType;                   (* The kind of type *)
+    next: xmlSchemaFacetPtr;                     (* the next type if in a sequence ... *)
+    value: PxmlChar;
+    id: PxmlChar;
+    annot: xmlSchemaAnnotPtr;
+    node: xmlNodePtr;
+    fixed: Longint;
+    whitespace: Longint;
+    val: xmlSchemaValPtr;
+    regexp: xmlRegexpPtr;
   end;
 
   (**
    * A notation definition.
    *)
-  _xmlSchemaNotation = xmlSchemaNotation;
-
-  xmlSchemaNotationPtr = xmlSchemaNotation;
-  _xmlSchemaNotation = record
-    _type : xmlSchemaTypeType;
-    name : ^xmlChar;                             (* The kind of type *)
-    annot : xmlSchemaAnnotPtr;
-    identifier : ^xmlChar;
+  xmlSchemaNotationPtr = ^xmlSchemaNotation;
+  xmlSchemaNotation = record
+    _type: xmlSchemaTypeType;
+    name: PxmlChar;                              (* The kind of type *)
+    annot: xmlSchemaAnnotPtr;
+    identifier: PxmlChar;
   end;
 
-(**
- * A Schemas definition
- *)
-const
-  XML_SCHEMAS_QUALIF_ELEM = 1; //1 << 0
-  XML_SCHEMAS_QUALIF_ATTR	= 2; //1 << 1
-
-type
+  (**
+   * A Schemas definition
+   *)
   _xmlSchema = record
-    name : ^xmlChar;                             (* schema name *)
-    targetNamespace : ^xmlChar;                  (* the target namespace *)
-    version : ^xmlChar;
-    id : ^xmlChar;
-    doc : xmlDocPtr;
-    annot : xmlSchemaAnnotPtr;
-    flags : longint;
-    typeDecl : xmlHashTablePtr;
-    attrDecl : xmlHashTablePtr;
-    attrgrpDecl : xmlHashTablePtr;
-    elemDecl : xmlHashTablePtr;
-    notaDecl : xmlHashTablePtr;
+    name: PxmlChar;                              (* schema name *)
+    targetNamespace: PxmlChar;                   (* the target namespace *)
+    version: PxmlChar;
+    id: PxmlChar;
+    doc: xmlDocPtr;
+    annot: xmlSchemaAnnotPtr;
+    flags: Longint;
+    typeDecl: xmlHashTablePtr;
+    attrDecl: xmlHashTablePtr;
+    attrgrpDecl: xmlHashTablePtr;
+    elemDecl: xmlHashTablePtr;
+    notaDecl: xmlHashTablePtr;
   end;
 
 
-procedure xmlSchemaFreeType(_type:xmlSchemaTypePtr);cdecl;external;
+procedure xmlSchemaFreeType(aType: xmlSchemaTypePtr); cdecl; external LIBXML2_SO;
 
