@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.65 2002-01-20 18:33:28 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.66 2002-01-20 19:35:33 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -51,6 +51,7 @@ const
   SLIBXML = 'LIBXML';  { Do not localize }
 
 type
+  TGDOMChildNodeList = class;
 
 { TGDOMInterface }
   TGDOMInterface = class(TInterfacedObject)
@@ -58,7 +59,7 @@ type
     function SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT; override;
   end;
 
-{ TGDOMImplementation }
+  { TGDOMImplementation }
 
   TGDOMImplementation = class(TGDOMInterface,
     IDomImplementation)
@@ -78,22 +79,23 @@ type
   TGDOMNode = class(TGDOMInterface, IDomNode, ILibXml2Node, IDomNodeSelect)
   private
     FGNode: xmlNodePtr;
+    FChildNodes: TGDOMChildNodeList; // non-counted reference
     function  returnNullDomNode: IDomNode;
     function  returnEmptyString: DomString;
   protected //IXMLDOMNodeRef
     function  LibXml2NodePtr: xmlNodePtr;
-  protected //IDOMNode
+  protected //IDomNode
     function  get_nodeName: DOMString;
     function  get_nodeValue: DOMString;
     procedure set_nodeValue(const value: DOMString);
     function  get_nodeType: DOMNodeType;
     function  get_parentNode: IDOMNode;
-    function  get_childNodes: IDOMNodeList;
+    function  get_childNodes: IDomNodeList;
     function  get_firstChild: IDOMNode;
     function  get_lastChild: IDOMNode;
     function  get_previousSibling: IDOMNode;
     function  get_nextSibling: IDOMNode;
-    function  get_attributes: IDOMNamedNodeMap;
+    function  get_attributes: IDomNamedNodeMap;
     function  get_ownerDocument: IDOMDocument; virtual;
     function  get_namespaceURI: DOMString;
     function  get_prefix: DOMString;
@@ -123,28 +125,26 @@ type
     property GNode: xmlNodePtr read FGNode;
   end;
 
-  TGDOMNodeList = class(TGDOMInterface, IDOMNodeList)
+  { TGDOMChildNodeList }
+  
+  TGDOMChildNodeList = class(TGDOMInterface, IDOMNodeList)
   private
-    FParent: xmlNodePtr;
-    FXPathObject: xmlXPathObjectPtr;
-    FOwnerDocument: IDomDocument;
-  protected
-    { IDOMNodeList }
+    FOwnerNode: TGDOMNode; // non-counted reference
+  protected // IDOMNodeList
     function get_item(index: Integer): IDOMNode;
     function get_length: Integer;
   public
-    constructor Create(aParent: xmlNodePtr; aOwnerDocument: IDomDocument); overload;
-    constructor Create(aXPathObject: xmlXPathObjectPtr; aOwnerDocument: IDOMDocument); overload;
-    destructor destroy; override;
+    constructor Create(aOwnerNode: TGDOMNode);
+    destructor Destroy; override;
   end;
 
+  { TGDOMNamedNodeMap }
+  
   TGDOMNamedNodeMap = class(TGDOMInterface, IDOMNamedNodeMap)
-  // this class is used for attributes, entities and notations
   private
     FGNamedNodeMap: xmlNodePtr;
     FOwnerDocument: IDomDocument;
-  protected
-    { IDOMNamedNodeMap }
+  protected // IDOMNamedNodeMap
     function get_GNamedNodeMap: xmlNodePtr;
     function get_item(index: Integer): IDOMNode;
     function get_length: Integer;
@@ -212,8 +212,10 @@ type
 
   TGDOMElement = class(TGDOMNode, IDOMElement)
   private
-  protected
-    // IDOMElement
+    FAttributes: TGDOMNamedNodeMap; // non-counted reference
+  protected // IDomNode
+    function  get_attributes: IDomNamedNodeMap;
+  protected // IDomElement
     function  get_tagName: DOMString;
     function  getAttribute(const name: DOMString): DOMString;
     procedure setAttribute(const name, value: DOMString);
@@ -791,8 +793,15 @@ end;
 
 function TGDOMNode.get_childNodes: IDOMNodeList;
 begin
-  //todo: only if it does not exist yet ! (BUG)
-  result:=TGDOMNodeList.Create(FGNode, get_OwnerDocument) as IDOMNodeList;
+  if (FChildNodes=nil) then begin
+    // create wrapper for child list, if relevant
+    case get_nodeType of
+    DOCUMENT_NODE,
+    ELEMENT_NODE:
+      TGDOMChildNodeList.Create(self); // assigns FChildNodes
+    end;
+  end;
+  Result := FChildNodes;
 end;
 
 function TGDOMNode.get_firstChild: IDOMNode;
@@ -826,11 +835,6 @@ end;
 function TGDOMNode.get_attributes: IDOMNamedNodeMap;
 begin
   Result := nil;
-  if FGNode=nil then exit;
-  //todo: only if it does not exist yet ! (BUG)
-  if FGNode.type_=ELEMENT_NODE then begin
-    Result := TGDOMNamedNodeMap.Create(FGNode, get_ownerDocument) as IDOMNamedNodeMap;
-  end;
 end;
 
 function TGDOMNode.get_ownerDocument: IDOMDocument;
@@ -1079,80 +1083,55 @@ begin
   if (FGNode<>nil) then begin
     FGNode._private := nil;
   end;
+  FChildNodes.Free;
   Dec(nodecount);
   inherited Destroy;
 end;
 
-{ TGDOMNodeList }
+{ TGDOMChildNodeList }
 
-constructor TGDOMNodeList.Create(aParent: xmlNodePtr; aOwnerDocument: IDomDocument);
-// create a IDOMNodeList from a var of type xmlNodePtr
-// xmlNodePtr is the same as xmlNodePtrList, because in libxml2 there is no
-// difference in the definition of both
+constructor TGDOMChildNodeList.Create(aOwnerNode: TGDOMNode);
 begin
   inherited Create;
-  FParent := aParent;
-  FXpathObject := nil;
-  FOwnerDocument := aOwnerDocument;
+  DomAssert(aOwnerNode<>nil, HIERARCHY_REQUEST_ERR, 'Child list must have a parent');
+  FOwnerNode := aOwnerNode;
+  FOwnerNode.FChildNodes := self;
 end;
 
-constructor TGDOMNodeList.Create(aXPathObject: xmlXPathObjectPtr; aOwnerDocument: IDOMDocument);
-// create a IDOMNodeList from a var of type xmlNodeSetPtr
-//	xmlNodeSetPtr = ^xmlNodeSet;
-//	xmlNodeSet = record
-//		nodeNr : longint;               { number of nodes in the set  }
-//		nodeMax : longint;              { size of the array as allocated  }
-//		nodeTab : PxmlNodePtr;          { array of nodes in no particular order  }
-//	end;
+destructor TGDOMChildNodeList.Destroy;
 begin
-  inherited Create;
-  FParent := nil;
-  FXPathObject := aXPathObject;
-end;
-
-destructor TGDOMNodeList.Destroy;
-begin
-  if FXPathObject<>nil then begin
-    xmlXPathFreeObject(FXPathObject);
-  end;
+  FOwnerNode.FChildNodes := nil;
+  FOwnerNode := nil;
   inherited Destroy;
 end;
 
-function TGDOMNodeList.get_item(index: Integer): IDOMNode;
+function TGDOMChildNodeList.get_item(index: Integer): IDOMNode;
 var
   node: xmlNodePtr;
-  i: integer;
+  cnt: integer;
 begin
-  i:=index;
-  if FParent<>nil then begin
-    node:=FParent.children;
-    while (i>0) and (node.next<>nil) do begin
-      dec(i);
-      node:=node.next;
+  DomAssert(index>=0, INDEX_SIZE_ERR);
+  node := FOwnerNode.requestNodePtr.children;
+  cnt := 0;
+  while (cnt<index) do begin
+    if (node=nil) then begin
+      DomAssert(false, INDEX_SIZE_ERR, Format('Trying to access item %d [zero based] of %d items', [index, cnt]));
     end;
-    DomAssert(i>0, INDEX_SIZE_ERR);
-  end else begin
-    DomAssert(FXPathObject<>nil, 101);
-    node := xmlXPathNodeSetItem(FXPathObject.nodesetval,i)
+    Inc(cnt);
+    node := node.next;
   end;
-  Result:=GetDOMObject(node) as IDOMNode;
+  Result := GetDOMObject(node) as IDOMNode;
 end;
 
-function TGDOMNodeList.get_length: Integer;
+function TGDOMChildNodeList.get_length: Integer;
 var
   node: xmlNodePtr;
-  i: integer;
 begin
-  if FParent<>nil then begin
-    i:=1;
-    node:=FParent.children;
-    while (node.next<>nil) do begin
-      inc(i);
-      node:=node.next
-    end;
-    result:=i;
-  end else begin
-    result:=FXPathObject.nodesetval.nodeNr;
+  Result := 0;
+  node := FOwnerNode.GNode.children;
+  while (node<>nil) do begin
+    Inc(Result);
+    node := node.next;
   end;
 end;
 
@@ -1407,11 +1386,8 @@ begin
   end;
 end;
 
-//***************************
-//TGDOMElement Implementation
-//***************************
+{ TGDOMElement }
 
-// IDOMElement
 function TGDOMElement.get_tagName: DOMString;
 begin
   result:=self.get_nodeName;
@@ -1425,6 +1401,13 @@ begin
   p := xmlGetProp(FGNode,PChar(UTF8Encode(name)));
   Result := UTF8Decode(p);
   xmlFree(p);
+end;
+
+function TGDOMElement.get_attributes: IDomNamedNodeMap;
+begin
+  Result := FAttributes;
+  if (Result<>nil) then exit;
+  Result := TGDOMNamedNodeMap.Create(FGNode, get_ownerDocument) as IDOMNamedNodeMap;
 end;
 
 procedure TGDOMElement.setAttribute(const name, value: DOMString);
@@ -2368,7 +2351,7 @@ begin
     XPATH_NODESET:
       begin
         nodecount:=res.nodesetval.nodeNr;
-        result:=TGDOMNodeList.Create(res, get_OwnerDocument)
+//TODO!!        result:=TGDOMXPathNodeList.Create(res, get_OwnerDocument)
       end
     else
       result:=nil;
