@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.75] parser.h
+// CVS-SIGN: [1.76] parser.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -43,20 +43,20 @@ type
   xmlParserInputPtr = ^xmlParserInput;
   xmlParserInput = record
     (* Input buffer *)
-    buf: xmlParserInputBufferPtr;   { UTF-8 encoded buffer  }
-    filename: PChar;                { The file analyzed, if any  }
-    directory: PChar;               { the directory/base of the file  }
-    base: PxmlChar;                 { Base of the array to parse  }
-    cur: PxmlChar;                  { Current char being parsed  }
-    _end: PxmlChar;                 { end of the array to parse  }
-    length: Longint;                { length if known  }
-    line: Longint;                  { Current line  }
-    col: Longint;                   { Current column  }
-    consumed: Longint;              { How many xmlChars already consumed  }
-    free: xmlParserInputDeallocate; { function to deallocate the base  }
-    encoding: PxmlChar;             { the encoding string for entity  }
-    version: PxmlChar;              { the version string for entity  }
-    standalone: Longint;            { Was that entity marked standalone  }
+    buf: xmlParserInputBufferPtr;   (* UTF-8 encoded buffer  *)
+    filename: PChar;                (* The file analyzed, if any  *)
+    directory: PChar;               (* the directory/base of the file  *)
+    base: PxmlChar;                 (* Base of the array to parse  *)
+    cur: PxmlChar;                  (* Current char being parsed  *)
+    _end: PxmlChar;                 (* end of the array to parse  *)
+    length: Longint;                (* length if known  *)
+    line: Longint;                  (* Current line  *)
+    col: Longint;                   (* Current column  *)
+    consumed: Longint;              (* How many xmlChars already consumed  *)
+    free: xmlParserInputDeallocate; (* function to deallocate the base  *)
+    encoding: PxmlChar;             (* the encoding string for entity  *)
+    version: PxmlChar;              (* the version string for entity  *)
+    standalone: Longint;            (* Was that entity marked standalone  *)
   end;
 
   (**
@@ -68,23 +68,24 @@ type
 type
   xmlParserInputState = Longint;
 const
-  XML_PARSER_EOF             = -1; { nothing is to be parsed }
-  XML_PARSER_START           =  0; { nothing has been parsed }
-  XML_PARSER_MISC            =  1; { Misc  before int subset }
-  XML_PARSER_PI              =  2; { Within a processing instruction }
-  XML_PARSER_DTD             =  3; { within some DTD content }
-  XML_PARSER_PROLOG          =  4; { Misc  after internal subset }
-  XML_PARSER_COMMENT         =  5; { within a comment }
-  XML_PARSER_START_TAG       =  6; { within a start tag }
-  XML_PARSER_CONTENT         =  7; { within the content }
-  XML_PARSER_CDATA_SECTION   =  8; { within a CDATA section }
-  XML_PARSER_END_TAG         =  9; { within a closing tag }
-  XML_PARSER_ENTITY_DECL     = 10; { within an entity declaration }
-  XML_PARSER_ENTITY_VALUE    = 11; { within an entity value in a decl }
-  XML_PARSER_ATTRIBUTE_VALUE = 12; { within an attribute value }
-  XML_PARSER_SYSTEM_LITERAL  = 13; { within a SYSTEM value }
-  XML_PARSER_EPILOG          = 14; { the Misc  after the last end tag }
-  XML_PARSER_IGNORE          = 15; { within an IGNORED section }
+  XML_PARSER_EOF             = -1; (* nothing is to be parsed *)
+  XML_PARSER_START           =  0; (* nothing has been parsed *)
+  XML_PARSER_MISC            =  1; (* Misc  before int subset *)
+  XML_PARSER_PI              =  2; (* Within a processing instruction *)
+  XML_PARSER_DTD             =  3; (* within some DTD content *)
+  XML_PARSER_PROLOG          =  4; (* Misc  after internal subset *)
+  XML_PARSER_COMMENT         =  5; (* within a comment *)
+  XML_PARSER_START_TAG       =  6; (* within a start tag *)
+  XML_PARSER_CONTENT         =  7; (* within the content *)
+  XML_PARSER_CDATA_SECTION   =  8; (* within a CDATA section *)
+  XML_PARSER_END_TAG         =  9; (* within a closing tag *)
+  XML_PARSER_ENTITY_DECL     = 10; (* within an entity declaration *)
+  XML_PARSER_ENTITY_VALUE    = 11; (* within an entity value in a decl *)
+  XML_PARSER_ATTRIBUTE_VALUE = 12; (* within an attribute value *)
+  XML_PARSER_SYSTEM_LITERAL  = 13; (* within a SYSTEM value *)
+  XML_PARSER_EPILOG          = 14; (* the Misc  after the last end tag *)
+  XML_PARSER_IGNORE          = 15; (* within an IGNORED section *)
+  XML_PARSER_PUBLIC_LITERAL  = 16; (* within a PUBLIC value *)
 
   (**
    * XML_DETECT_IDS:

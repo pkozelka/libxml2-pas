@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.46] parserInternals.h
+// CVS-SIGN: [1.47] parserInternals.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -337,6 +337,8 @@ procedure xmlParserInputShrink(inp: xmlParserInputPtr); cdecl; external LIBXML2_
  *)
 procedure htmlInitAutoClose; cdecl; external LIBXML2_SO;
 function  htmlCreateFileParserCtxt(filename: PChar; encoding: PChar): htmlParserCtxtPtr; cdecl; external LIBXML2_SO;
+{$ENDIF}
+
 (**
  * xmlEntityReferenceFunc:
  * @ent: the entity
@@ -354,5 +356,4 @@ type
  * and used by the XSLT debugger
  *)
 procedure xmlSetEntityReferenceFunc(func: xmlEntityReferenceFunc); cdecl; external LIBXML2_SO;
-{$ENDIF}
 
