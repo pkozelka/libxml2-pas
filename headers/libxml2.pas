@@ -15,9 +15,11 @@ const
   LIBXML2_SO = 'libxml2.so';
 {$ENDIF}
 
+const
+  XML_DETECT_IDS = 2;
+  XML_COMPLETE_ATTRS = 4;
+  XML_SKIP_IDS = 8;
 type
-
-
       PFILE = Pointer;
       iconv_t = Cardinal;
       size_t = Cardinal;
@@ -4082,7 +4084,6 @@ type charTab = array[0..255] of Byte;
 
 var
   xmlIsPubidChar_tab: charTab;
-
 
 implementation
 uses
