@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.97 2002-01-30 09:59:10 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.98 2002-01-30 11:46:21 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -48,7 +48,8 @@ uses
   sysutils;
 
 const
-  SLIBXML = 'LIBXML';  { Do not localize }
+  SLIBXML = 'LIBXML';  (**@deprecated Do not localize *)
+  vendorID = 'LIBXML';  { Do not localize }
 
 type
   TGDOMChildNodeList = class;
