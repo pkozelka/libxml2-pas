@@ -227,7 +227,7 @@ begin
         'EDomException etWrongDocumentErr should have been thrown but was not');
   except
     on e : EDomException do
-      check(e.code = NAMESPACE_ERR,
+      check(e.code = WRONG_DOCUMENT_ERR,
               'etWrongDocumentErr should be thrown but was: ' + e.message);
   end;
 end;
