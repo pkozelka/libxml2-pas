@@ -45,10 +45,10 @@ unit libxmldom;
 // see tests_libxml2.txt
 
 // Partly supported by libxml2:
-// IDOMPersist, IDOMNodeEx
+// IDomPersist
 //
 // Not Supported by libxml2:
-// IDOMParseError (extended interface, not part of dom-spec)
+// IDomParseError (extended interface, not part of dom-spec)
 
 
 interface
@@ -80,15 +80,15 @@ type
 
 { TGDOMImplementation }
 
-  TGDOMImplementation = class(TGDOMInterface, IDOMImplementation)
+  TGDOMImplementation = class(TGDOMInterface, IDomImplementation)
   private
     protected
-     { IDOMImplementation }
+     { IDomImplementation }
     function hasFeature(const feature, version: DOMString): WordBool;
     function createDocumentType(const qualifiedName, publicId,
-      systemId: DOMString): IDOMDocumentType;
+      systemId: DOMString): IDomDocumentType;
     function createDocument(const namespaceURI, qualifiedName: DOMString;
-      doctype: IDOMDocumentType): IDOMDocument;
+      doctype: IDomDocumentType): IDomDocument;
   public
     constructor Create;
     destructor Destroy; override;
@@ -103,26 +103,44 @@ type
 
   { IXMLDOMNodeCompare }
 
-  IDOMNodeCompare = Interface
+  IDomNodeCompare = Interface
   ['{ED63440C-6A94-4267-89A9-E093247F10F8}']
-    function IsSameNode(node:IDOMNode): boolean;
+    function IsSameNode(node:IDomNode): boolean;
   end;
 
-  (*
+  // this inteface is similar to the interface IDomNodeEx from Borland,
+  // but not the same, therefore a slightly different name is used
+  IDomNodeExt = interface(IDomNode)
+    ['{1B41AE3F-6365-41FC-AFDD-26BC143F9C0F}']
+    { Property Acessors }
+    function get_text: DomString;
+    function get_xml: DomString;
+    procedure set_text(const Value: DomString);
+    { Methods }
+    procedure transformNode(const stylesheet: IDomNode; var output: DomString); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
+    { Properties }
+    property text: DomString read get_text write set_text;
+    property xml: DomString read get_xml;
+  end;
+
+   (*
    * IDomOutputOptions
    *)
-  IDomOutputOptions = interface
+   IDomOutputOptions = interface
     ['{B2ECC3F1-CC9B-4445-85C6-3D62638F7835}']
     { Property Acessors }
-    function get_beautify: Boolean;
+    function get_prettyPrint: Boolean;
     function get_encoding: DomString;
+    function get_parsedEncoding: DomString;
     function get_compressionLevel: Integer;
-    procedure set_beautify(beautify: boolean);
+    procedure set_prettyPrint(prettyPrint: boolean);
     procedure set_encoding(encoding: DomString);
     procedure set_compressionLevel(compressionLevel: Integer);
     { Properties }
-    property beautify: Boolean read get_beautify write set_beautify;
+    property prettyPrint: Boolean read get_prettyPrint write set_prettyPrint;
     property encoding: DomString read get_encoding write set_encoding;
+    property parsedEncoding: DomString read get_parsedEncoding;
     property compressionLevel: Integer
       read get_compressionLevel
       write set_compressionLevel;
@@ -130,102 +148,108 @@ type
 
  TGDOMNodeClass = class of TGDOMNode;
 
- TGDOMNode = class(TGDOMInterface, IDOMNode, IXMLDOMNodeRef,IDOMNodeSelect,
-   IDOMNodeEx,IDOMNodeCompare)
+ TGDOMNode = class(TGDOMInterface, IDomNode, IXMLDOMNodeRef,IDomNodeSelect,
+   IDomNodeExt,IDomNodeCompare)
   private
     FGNode: xmlNodePtr;
-    FOwnerDocument: IDOMDocument;
+    FOwnerDocument: IDomDocument;
     FPrefix: String; //for xpath
     FURI: String;    //for xpath
   protected
     function GetGDOMNode: xmlNodePtr; //new
     function IsReadOnly: boolean;     //new
     function IsAncestorOrSelf(newNode:xmlNodePtr): boolean; //new
-    // IDOMNode
+    // IDomNode
     function  get_nodeName: DOMString;
     function  get_nodeValue: DOMString;
     procedure set_nodeValue(const value: DOMString);
     function get_nodeType: DOMNodeType;
-    function get_parentNode: IDOMNode;
-    function get_childNodes: IDOMNodeList;
-    function get_firstChild: IDOMNode;
-    function get_lastChild: IDOMNode;
-    function get_previousSibling: IDOMNode;
-    function get_nextSibling: IDOMNode;
-    function get_attributes: IDOMNamedNodeMap;
-    function get_ownerDocument: IDOMDocument;
+    function get_parentNode: IDomNode;
+    function get_childNodes: IDomNodeList;
+    function get_firstChild: IDomNode;
+    function get_lastChild: IDomNode;
+    function get_previousSibling: IDomNode;
+    function get_nextSibling: IDomNode;
+    function get_attributes: IDomNamedNodeMap;
+    function get_ownerDocument: IDomDocument;
     function  get_namespaceURI: DOMString;
     function  get_prefix: DOMString;
     procedure set_Prefix(const prefix : DomString);
     function  get_localName: DOMString;
-    function insertBefore(const newChild, refChild: IDOMNode): IDOMNode;
-    function replaceChild(const newChild, oldChild: IDOMNode): IDOMNode;
-    function removeChild(const childNode: IDOMNode): IDOMNode;
-    function appendChild(const newChild: IDOMNode): IDOMNode;
+    function insertBefore(const newChild, refChild: IDomNode): IDomNode;
+    function replaceChild(const newChild, oldChild: IDomNode): IDomNode;
+    function removeChild(const childNode: IDomNode): IDomNode;
+    function appendChild(const newChild: IDomNode): IDomNode;
     function hasChildNodes: WordBool;
     function  hasAttributes : WordBool;
-    function cloneNode(deep: WordBool): IDOMNode;
+    function cloneNode(deep: WordBool): IDomNode;
     procedure normalize;
     function IsSupported(const feature, version: DOMString): WordBool;
-    { IDOMNodeSelect }
-    function selectNode(const nodePath: WideString): IDOMNode;
-    function selectNodes(const nodePath: WideString): IDOMNodeList;
+    { IDomNodeSelect }
+    function selectNode(const nodePath: WideString): IDomNode;
+    function selectNodes(const nodePath: WideString): IDomNodeList;
     procedure RegisterNS(const prefix,URI: DomString);
-    { IDOMNodeEx}
-    procedure transformNode(const stylesheet: IDOMNode; var output: DomString); overload;
-    procedure transformNode(const stylesheet: IDOMNode; var output: IDOMDocument); overload;
-    { IDOMNodeCompare }
-    function IsSameNode(node:IDOMNode): boolean;
+    { IDomNodeEx}
+    procedure transformNode(const stylesheet: IDomNode; var output: DomString); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
+    function get_text: DomString;
+    procedure set_text(const Value: DomString);
+    function get_xml: DOMString;
+    property text: DomString read get_text write set_text;
+    property xml: DOMString read get_xml;
+    { IDomNodeCompare }
+    function IsSameNode(node:IDomNode): boolean;
   public
-    constructor Create(ANode: xmlNodePtr;ADocument:IDOMDocument);
+    constructor Create(ANode: xmlNodePtr;ADocument:IDomDocument);
     destructor destroy; override;
     property GNode: xmlNodePtr read FGNode;
+
   end;
 
-  TGDOMNodeList = class(TGDOMInterface, IDOMNodeList)
+  TGDOMNodeList = class(TGDOMInterface, IDomNodeList)
   private
      FParent: xmlNodePtr;
      FXPathObject: xmlXPathObjectPtr;
-     FOwnerDocument: IDOMDocument;
+     FOwnerDocument: IDomDocument;
      FAdditionalNode: xmlNodePtr;
   protected
-    { IDOMNodeList }
-    function get_item(index: Integer): IDOMNode;
+    { IDomNodeList }
+    function get_item(index: Integer): IDomNode;
     function get_length: Integer;
     {IXMLDOMNodeListExt}
     procedure AddNode(node:xmlNodePtr);
   public
-    constructor Create(AParent: xmlNodePtr;ADocument:IDOMDocument); overload;
-    constructor Create(AXpathObject: xmlXPathObjectPtr;ADocument:IDOMDocument); overload;
+    constructor Create(AParent: xmlNodePtr;ADocument:IDomDocument); overload;
+    constructor Create(AXpathObject: xmlXPathObjectPtr;ADocument:IDomDocument); overload;
     destructor destroy; override;
   end;
 
-  TGDOMNamedNodeMap = class(TGDOMInterface, IDOMNamedNodeMap)
+  TGDOMNamedNodeMap = class(TGDOMInterface, IDomNamedNodeMap)
   // this class is used for attributes, entities and notations
   private
     FGNamedNodeMap: xmlNodePtr;  //for attribute-lists only
     FGDTD: xmlDtdPtr;            //for dtd.enties etc
-    FOwnerDocument: IDOMDocument;
+    FOwnerDocument: IDomDocument;
   protected
-    { IDOMNamedNodeMap }
+    { IDomNamedNodeMap }
     function get_GNamedNodeMap: xmlNodePtr;
-    function get_item(index: Integer): IDOMNode;
+    function get_item(index: Integer): IDomNode;
     function get_length: Integer;
-    function getNamedItem(const name: DOMString): IDOMNode;
-    function setNamedItem(const newItem: IDOMNode): IDOMNode;
-    function removeNamedItem(const name: DOMString): IDOMNode;
-    function getNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
-    function setNamedItemNS(const newItem: IDOMNode): IDOMNode;
-    function removeNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
+    function getNamedItem(const name: DOMString): IDomNode;
+    function setNamedItem(const newItem: IDomNode): IDomNode;
+    function removeNamedItem(const name: DOMString): IDomNode;
+    function getNamedItemNS(const namespaceURI, localName: DOMString): IDomNode;
+    function setNamedItemNS(const newItem: IDomNode): IDomNode;
+    function removeNamedItemNS(const namespaceURI, localName: DOMString): IDomNode;
   public
-    constructor Create(ANamedNodeMap: xmlNodePtr; AOwnerDocument: IDOMDocument;typ:integer=0);
+    constructor Create(ANamedNodeMap: xmlNodePtr; AOwnerDocument: IDomDocument;typ:integer=0);
     destructor destroy; override;
     property GNamedNodeMap: xmlNodePtr read get_GNamedNodeMap;
   end;
 
   { TGDOMAttr }
 
-  TGDOMAttr = class(TGDOMNode, IDOMAttr)
+  TGDOMAttr = class(TGDOMNode, IDomAttr)
   private
     //ns:
     function GetGAttribute: xmlAttrPtr;
@@ -235,25 +259,25 @@ type
     function get_specified: WordBool;
     function get_value: DOMString;
     procedure set_value(const attributeValue: DOMString);
-    function get_ownerElement: IDOMElement;
+    function get_ownerElement: IDomElement;
     { Properties }
     property name: DOMString read get_name;
     property specified: WordBool read get_specified;
     property value: DOMString read get_value write set_value;
-    property ownerElement: IDOMElement read get_ownerElement;
+    property ownerElement: IDomElement read get_ownerElement;
   public
     property GAttribute: xmlAttrPtr read GetGAttribute;
-    constructor Create(AAttribute: xmlAttrPtr;ADocument:IDOMDocument;freenode:boolean=false);
+    constructor Create(AAttribute: xmlAttrPtr;ADocument:IDomDocument;freenode:boolean=false);
     destructor destroy; override;
   end;
 
   PGDomeCharacterData=Pointer;
 
-  TGDOMCharacterData = class(TGDOMNode, IDOMCharacterData)
+  TGDOMCharacterData = class(TGDOMNode, IDomCharacterData)
   private
     function GetGCharacterData: PGDomeCharacterData;
   protected
-    { IDOMCharacterData }
+    { IDomCharacterData }
     function get_data: DOMString;
     procedure set_data(const data: DOMString);
     function get_length: Integer;
@@ -263,57 +287,57 @@ type
     procedure deleteData(offset, count: Integer);
     procedure replaceData(offset, count: Integer; const data: DOMString);
   public
-    constructor Create(ACharacterData: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
+    constructor Create(ACharacterData: xmlNodePtr;ADocument:IDomDocument;freenode:boolean=false);
     destructor destroy; override;
     property GCharacterData: PGDomeCharacterData read GetGCharacterData;
   end;
 
   { TGDOMElement }
 
-  TGDOMElement = class(TGDOMNode, IDOMElement)
+  TGDOMElement = class(TGDOMNode, IDomElement)
   private
     function GetGElement: xmlNodePtr;
   protected
-    // IDOMElement
+    // IDomElement
     function get_tagName: DOMString;
     function getAttribute(const name: DOMString): DOMString;
     procedure setAttribute(const name, value: DOMString);
     procedure removeAttribute(const name: DOMString);
-    function getAttributeNode(const name: DOMString): IDOMAttr;
-    function setAttributeNode(const newAttr: IDOMAttr): IDOMAttr;
-    function removeAttributeNode(const oldAttr: IDOMAttr):IDOMAttr;
-    function getElementsByTagName(const name: DOMString): IDOMNodeList;
+    function getAttributeNode(const name: DOMString): IDomAttr;
+    function setAttributeNode(const newAttr: IDomAttr): IDomAttr;
+    function removeAttributeNode(const oldAttr: IDomAttr):IDomAttr;
+    function getElementsByTagName(const name: DOMString): IDomNodeList;
     function getAttributeNS(const namespaceURI, localName: DOMString): DOMString;
     procedure setAttributeNS(const namespaceURI, qualifiedName, value: DOMString);
     procedure removeAttributeNS(const namespaceURI, localName: DOMString);
-    function getAttributeNodeNS(const namespaceURI, localName: DOMString): IDOMAttr;
-    function setAttributeNodeNS(const newAttr: IDOMAttr): IDOMAttr;
+    function getAttributeNodeNS(const namespaceURI, localName: DOMString): IDomAttr;
+    function setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
     function getElementsByTagNameNS(const namespaceURI,
-      localName: DOMString): IDOMNodeList;
+      localName: DOMString): IDomNodeList;
     function hasAttribute(const name: DOMString): WordBool;
     function hasAttributeNS(const namespaceURI, localName: DOMString): WordBool;
     procedure normalize;
   public
-    constructor Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
+    constructor Create(AElement: xmlNodePtr;ADocument:IDomDocument;freenode:boolean=false);
     destructor destroy; override;
     property GElement: xmlNodePtr read GetGElement;
   end;
 
   { TMSDOMText }
 
-  TGDOMText = class(TGDOMCharacterData, IDOMText)
+  TGDOMText = class(TGDOMCharacterData, IDomText)
   protected
-    function splitText(offset: Integer): IDOMText;
+    function splitText(offset: Integer): IDomText;
   end;
 
   { TGDOMComment }
 
-  TGDOMComment = class(TGDOMCharacterData, IDOMComment)
+  TGDOMComment = class(TGDOMCharacterData, IDomComment)
   end;
 
   { TGDOMCDATASection }
 
-  TGDOMCDATASection = class(TGDOMText, IDOMCDATASection)
+  TGDOMCDATASection = class(TGDOMText, IDomCDATASection)
   private
   public
   end;
@@ -321,31 +345,31 @@ type
   PGdomeDocumentType=Pointer;
   PGdomeDomImplementation=Pointer;
 
-  TGDOMDocumentType = class(TGDOMNode, IDOMDocumentType)
+  TGDOMDocumentType = class(TGDOMNode, IDomDocumentType)
   private
     function GetGDocumentType: xmlDtdPtr;
   protected
-    { IDOMDocumentType }
+    { IDomDocumentType }
     function get_name: DOMString;
-    function get_entities: IDOMNamedNodeMap;
-    function get_notations: IDOMNamedNodeMap;
+    function get_entities: IDomNamedNodeMap;
+    function get_notations: IDomNamedNodeMap;
     function get_publicId: DOMString;
     function get_systemId: DOMString;
     function get_internalSubset: DOMString;
   public
     property GDocumentType: xmlDtdPtr read GetGDocumentType;
-    constructor Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
+    constructor Create(dtd:xmlDtdPtr;ADocument:IDomDocument);
     destructor destroy; override;
   end;
 
   { TMSDOMNotation }
   PGdomeNotation=xmlNotationPtr;
 
-  TGDOMNotation = class(TGDOMNode, IDOMNotation)
+  TGDOMNotation = class(TGDOMNode, IDomNotation)
   private
     function GetGNotation: PGdomeNotation;
 	protected
-    { IDOMNotation }
+    { IDomNotation }
     function get_publicId: DOMString;
     function get_systemId: DOMString;
   public
@@ -354,11 +378,11 @@ type
 
   PGdomeEntity=Pointer;
 
-  TGDOMEntity = class(TGDOMNode, IDOMEntity)
+  TGDOMEntity = class(TGDOMNode, IDomEntity)
   private
     function GetGEntity: PGdomeEntity;
   protected
-    { IDOMEntity }
+    { IDomEntity }
     function get_publicId: DOMString;
     function get_systemId: DOMString;
     function get_notationName: DOMString;
@@ -366,18 +390,18 @@ type
     property GEntity: PGdomeEntity read GetGEntity;
   end;
 
-  TGDOMEntityReference = class(TGDOMNode, IDOMEntityReference)
+  TGDOMEntityReference = class(TGDOMNode, IDomEntityReference)
   end;
 
   { TGDOMProcessingInstruction }
 
   PGdomeProcessingInstruction=xmlNodePtr;
 
-  TGDOMProcessingInstruction = class(TGDOMNode, IDOMProcessingInstruction)
+  TGDOMProcessingInstruction = class(TGDOMNode, IDomProcessingInstruction)
   private
     function GetGProcessingInstruction: PGdomeProcessingInstruction;
   protected
-    { IDOMProcessingInstruction }
+    { IDomProcessingInstruction }
     function get_target: DOMString;
     function get_data: DOMString;
     procedure set_data(const value: DOMString);
@@ -399,9 +423,10 @@ type
     procedure set_FtempXSL(tempXSL:xsltStylesheetPtr);
   end;
 
-  TGDOMDocument = class(TGDOMNode, IDOMDocument, IDOMParseOptions, IDOMPersist, IDOMInternal)
+  TGDOMDocument = class(TGDOMNode, IDomDocument, IDomParseOptions, IDomPersist,
+    IDomInternal, IDomOutputOptions)
   private
-    FGDOMImpl: IDOMImplementation;
+    FGDOMImpl: IDomImplementation;
     FPGdomeDoc: xmlDocPtr;
     FtempXSL: xsltStylesheetPtr;   //if the document was used as stylesheet,
                                   //this Pointer has to be freed and not
@@ -412,31 +437,34 @@ type
     Fvalidate: boolean;           //check if default is ok
     FAttrList:TList; //keeps a list of attributes, created on this document                                    this document
     FNodeList:TList; //keeps a list of nodes, created on this document
+    FCompressionLevel: Integer;
+    Fencoding: DomString;
+    FprettyPrint: Boolean;
   protected
-    // IDOMDocument
-    function get_doctype: IDOMDocumentType;
-    function get_domImplementation: IDOMImplementation;
-    function get_documentElement: IDOMElement;
-    procedure set_documentElement(const IDOMElement: IDOMElement);
-    function createElement(const tagName: DOMString): IDOMElement;
-    function createDocumentFragment: IDOMDocumentFragment;
-    function createTextNode(const data: DOMString): IDOMText;
-    function createComment(const data: DOMString): IDOMComment;
-    function createCDATASection(const data: DOMString): IDOMCDATASection;
+    // IDomDocument
+    function get_doctype: IDomDocumentType;
+    function get_domImplementation: IDomImplementation;
+    function get_documentElement: IDomElement;
+    procedure set_documentElement(const IDomElement: IDomElement);
+    function createElement(const tagName: DOMString): IDomElement;
+    function createDocumentFragment: IDomDocumentFragment;
+    function createTextNode(const data: DOMString): IDomText;
+    function createComment(const data: DOMString): IDomComment;
+    function createCDATASection(const data: DOMString): IDomCDATASection;
     function createProcessingInstruction(const target,
-      data: DOMString): IDOMProcessingInstruction;
-    function createAttribute(const name: DOMString): IDOMAttr;
-    function createEntityReference(const name: DOMString): IDOMEntityReference;
-    function getElementsByTagName(const tagName: DOMString): IDOMNodeList;
-    function importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
+      data: DOMString): IDomProcessingInstruction;
+    function createAttribute(const name: DOMString): IDomAttr;
+    function createEntityReference(const name: DOMString): IDomEntityReference;
+    function getElementsByTagName(const tagName: DOMString): IDomNodeList;
+    function importNode(importedNode: IDomNode; deep: WordBool): IDomNode;
     function createElementNS(const namespaceURI,
-      qualifiedName: DOMString): IDOMElement;
+      qualifiedName: DOMString): IDomElement;
     function createAttributeNS(const namespaceURI,
-      qualifiedName: DOMString): IDOMAttr;
+      qualifiedName: DOMString): IDomAttr;
     function getElementsByTagNameNS(const namespaceURI,
-      localName: DOMString): IDOMNodeList;
-    function getElementById(const elementId: DOMString): IDOMElement;
-    // IDOMParseOptions
+      localName: DOMString): IDomNodeList;
+    function getElementById(const elementId: DOMString): IDomElement;
+    // IDomParseOptions
     function get_async: Boolean;
     function get_preserveWhiteSpace: Boolean;
     function get_resolveExternals: Boolean;
@@ -445,7 +473,7 @@ type
     procedure set_preserveWhiteSpace(Value: Boolean);
     procedure set_resolveExternals(Value: Boolean);
     procedure set_validate(Value: Boolean);
-    // IDOMPersist
+    // IDomPersist
     function get_xml: DOMString;
     function asyncLoadState: Integer;
     function load(source: DOMString): WordBool;
@@ -455,26 +483,34 @@ type
     procedure saveToStream(const stream: TStream);
     procedure set_OnAsyncLoad(const Sender: TObject;
       EventHandler: TAsyncEventHandler);
-    // IDOMInternal
+    // IDomInternal
     procedure removeNode(node: xmlNodePtr);
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
     procedure set_FtempXSL(tempXSL:xsltStylesheetPtr);
+    // IDomOutputOptions
+    function get_prettyPrint: Boolean;
+    function get_encoding: DomString;
+    function get_parsedEncoding: DomString;
+    function get_compressionLevel: Integer;
+    procedure set_prettyPrint(prettyPrint: boolean);
+    procedure set_encoding(encoding: DomString);
+    procedure set_compressionLevel(compressionLevel: Integer);
   public
     constructor Create(
-      GDOMImpl:IDOMImplementation;
+      GDOMImpl:IDomImplementation;
       const namespaceURI, qualifiedName: DOMString;
-      doctype: IDOMDocumentType); overload;
-    constructor Create(GDOMImpl:IDOMImplementation); overload;
-    constructor Create(GDOMImpl:IDOMImplementation; aUrl: DomString); overload;
-    constructor Create(GDOMImpl:IDOMImplementation;docnode:xmlNodePtr); overload;
+      doctype: IDomDocumentType); overload;
+    constructor Create(GDOMImpl:IDomImplementation); overload;
+    constructor Create(GDOMImpl:IDomImplementation; aUrl: DomString); overload;
+    constructor Create(GDOMImpl:IDomImplementation;docnode:xmlNodePtr); overload;
     destructor destroy; override;
   end;
 
   { TMSDOMDocumentFragment }
 
-  TGDOMDocumentFragment = class(TGDOMNode, IDOMDocumentFragment)
+  TGDOMDocumentFragment = class(TGDOMNode, IDomDocumentFragment)
   end;
 
   TGDOMDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
@@ -518,10 +554,10 @@ type
   private
     Ns:xmlNSPtr;
     localName,FqualifiedName: TGdomString;
-    FOwnerDoc:IDOMDocument;
+    FOwnerDoc:IDomDocument;
   public
     constructor create(node:xmlNodePtr;namespaceURI,qualifiedName: DOMString;
-      OwnerDoc:IDOMDocument);
+      OwnerDoc:IDomDocument);
     destructor destroy; override;
   end;
 
@@ -533,7 +569,7 @@ var
   elementcount: integer=0;
   node,temp2: xmlNodePtr;
 
-function GetGNode(const Node: IDOMNode): xmlNodePtr;
+function GetGNode(const Node: IDomNode): xmlNodePtr;
 
 procedure CheckError(err:integer);
 
@@ -541,9 +577,16 @@ function IsReadOnlyNode(node:xmlNodePtr): boolean;
 
 function ErrorString(err:integer):string;
 
-function IsSameNode(node1,node2: IDOMNode):boolean;
+function IsSameNode(node1,node2: IDomNode):boolean;
 
 implementation
+{$ifdef WIN32}
+uses
+  windows;
+{$endif}
+
+var
+  xmlIndentTreeOutputPtr: PInteger;
 
 function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
 function removeAttr(element:xmlNodePtr;attr: xmlAttrPtr):xmlAttrPtr; forward;
@@ -552,7 +595,7 @@ function IsXmlName(const S: wideString): boolean; forward;
 function IsXmlChars(const S: wideString): boolean; forward;
 function appendNamespace(element:xmlNodePtr;ns: xmlNsPtr): boolean; forward;
 
-function MakeNode(Node: xmlNodePtr;ADocument:IDOMDocument): IDOMNode;
+function MakeNode(Node: xmlNodePtr;ADocument:IDomDocument): IDomNode;
 const
   NodeClasses: array[ELEMENT_NODE..NOTATION_NODE] of TGDOMNodeClass =
     (TGDOMElement, TGDOMAttr, TGDOMText, TGDOMCDataSection,
@@ -604,7 +647,7 @@ function libxmlStringToString(libstring:pchar):WideString;
       else result:='';
   end;
 
-function IsSameNode(node1,node2: IDOMNode):boolean;
+function IsSameNode(node1,node2: IDomNode):boolean;
 begin
   try
     result := (node1 as IDomNodeCompare).IsSameNode(node2);
@@ -616,7 +659,7 @@ begin
 end;
 
 (*
-function TGDOMImplementationFactory.DOMImplementation: IDOMImplementation;
+function TGDOMImplementationFactory.DOMImplementation: IDomImplementation;
 begin
   Result := TGDOMImplementation.Create;
 end;
@@ -683,7 +726,7 @@ begin
 end;
 
 function TGDOMImplementation.createDocumentType(const qualifiedName, publicId,
-                systemId: DOMString): IDOMDocumentType;
+                systemId: DOMString): IDomDocumentType;
 var
   dtd:xmlDtdPtr;
   name1,name2,name3: TGdomString;
@@ -704,14 +747,14 @@ begin
   name2.free;
   name3.free;
   if dtd<>nil
-    then Result := TGDOMDocumentType.Create(dtd,nil) as IDOMDocumentType
+    then Result := TGDOMDocumentType.Create(dtd,nil) as IDomDocumentType
     else Result := nil;
 end;
 
 function TGDOMImplementation.createDocument(const namespaceURI, qualifiedName: DOMString;
-      doctype: IDOMDocumentType): IDOMDocument;
+      doctype: IDomDocumentType): IDomDocument;
 begin
-  Result := TGDOMDocument.Create(self,namespaceURI, qualifiedName,doctype) as IDOMDocument;
+  Result := TGDOMDocument.Create(self,namespaceURI, qualifiedName,doctype) as IDomDocument;
 end;
 
 constructor TGDomImplementation.Create;
@@ -728,12 +771,38 @@ end;
 // TGDomeNode Implementation
 // *************************************************************
 
+function TGDomNode.get_text: DomString;
+var i: integer; node: IDomNode;
+begin
+  // concat content of all text node children of node
+  result := '';
+  node := self as IDomNode;
+  for i := 0 to node.childNodes.length-1 do begin
+    if node.childNodes[i].nodeType = TEXT_NODE then begin
+      result := result + node.childnodes[i].nodeValue;
+    end;
+  end;
+end;
+
+procedure TGDomNode.set_text(const Value: DomString);
+var node,child: IDomNode; text: IDomText;
+begin
+  // replace all children of node with value as text node
+  node := self as IDomNode;
+  while node.hasChildNodes do begin
+    child := node.lastChild;
+    node.removeChild(child);
+  end;
+  text := node.ownerDocument.createTextNode(Value);
+  node.appendChild(text);
+end;
+
 function TGDOMNode.GetGDOMNode: xmlNodePtr;
 begin
   result:=FGNode;
 end;
 
-// IDOMNode
+// IDomNode
 function TGDOMNode.get_nodeName: DOMString;
 begin
   case FGNode.type_ of
@@ -760,7 +829,6 @@ end;
 
 function TGDOMNode.get_nodeValue: DOMString;
 var
-  temp: string;
   temp1:pchar;
 begin
   if FGNode.type_=ATTRIBUTE_NODE
@@ -771,8 +839,7 @@ begin
         temp1:=nil;
     end
     else temp1:=FGNode.content;
-  temp:=libxmlStringToString(temp1);
-  result:=temp;
+  result:=libxmlStringToString(temp1);
 end;
 
 
@@ -819,69 +886,69 @@ begin
   result:=domNodeType(FGNode.type_);
 end;
 
-function TGDOMNode.get_parentNode: IDOMNode;
+function TGDOMNode.get_parentNode: IDomNode;
 var node: xmlNodePtr;
 begin
   node:=FGNode.parent;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNode.get_childNodes: IDOMNodeList;
+function TGDOMNode.get_childNodes: IDomNodeList;
 var
   Parent: xmlNodePtr;
 begin
   Parent:=FGNode;
-  result:=TGDOMNodeList.Create(Parent,FOwnerDocument) as IDOMNodeList;
+  result:=TGDOMNodeList.Create(Parent,FOwnerDocument) as IDomNodeList;
 end;
 
-function TGDOMNode.get_firstChild: IDOMNode;
+function TGDOMNode.get_firstChild: IDomNode;
 var node: xmlNodePtr;
 begin
   node:=FGNode.children; //firstChild
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNode.get_lastChild: IDOMNode;
+function TGDOMNode.get_lastChild: IDomNode;
 var node: xmlNodePtr;
 begin
   node:=FGNode.last; //lastChild
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNode.get_previousSibling: IDOMNode;
+function TGDOMNode.get_previousSibling: IDomNode;
 var node: xmlNodePtr;
 begin
   node:=FGNode.prev;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNode.get_nextSibling: IDOMNode;
+function TGDOMNode.get_nextSibling: IDomNode;
 
 var node: xmlNodePtr;
 begin
   node:=FGNode.next;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNode.get_attributes: IDOMNamedNodeMap;
+function TGDOMNode.get_attributes: IDomNamedNodeMap;
 begin
   if FGNode.type_=ELEMENT_NODE
     then result:=TGDOMNamedNodeMap.Create(FGNode,FOwnerDocument)
-      as IDOMNamedNodeMap
+      as IDomNamedNodeMap
     else result:=nil;
 end;
 
-function TGDOMNode.get_ownerDocument: IDOMDocument;
+function TGDOMNode.get_ownerDocument: IDomDocument;
 begin
   result:=FOwnerDocument
 end;
@@ -940,7 +1007,7 @@ begin
   result:=temp;
 end;
 
-function TGDOMNode.insertBefore(const newChild, refChild: IDOMNode): IDOMNode;
+function TGDOMNode.insertBefore(const newChild, refChild: IDomNode): IDomNode;
 const
   FAllowedChildTypes= [ Element_Node,
                         Text_Node,
@@ -968,7 +1035,7 @@ begin
     else result:=nil;
 end;
 
-function TGDOMNode.replaceChild(const newChild, oldChild: IDOMNode): IDOMNode;
+function TGDOMNode.replaceChild(const newChild, oldChild: IDomNode): IDomNode;
 
 begin
   result:=self.removeChild(oldchild);
@@ -977,7 +1044,7 @@ begin
   self.appendChild(newChild);
 end;
 
-function TGDOMNode.removeChild(const childNode: IDOMNode): IDOMNode;
+function TGDOMNode.removeChild(const childNode: IDomNode): IDomNode;
 var
   node: xmlNodePtr;
 begin
@@ -990,7 +1057,7 @@ begin
       if node=nil
         then checkError(NOT_FOUND_ERR);
       node.parent:=nil;
-      (FOwnerDocument as IDOMInternal).appendNode(node);
+      (FOwnerDocument as IDomInternal).appendNode(node);
     end;
   result:=childNode;
 end;
@@ -1014,7 +1081,7 @@ end;
  * %GDOME_NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly.
  * Returns: the node added.
  *)
-function TGDOMNode.appendChild(const newChild: IDOMNode): IDOMNode;
+function TGDOMNode.appendChild(const newChild: IDomNode): IDomNode;
 
 const
   FAllowedChildTypes= [ Element_Node,
@@ -1051,7 +1118,7 @@ begin
     then node:=xmlRemoveChild(node.parent,node)
     //if it wasn't already in the tree, then remove it from the list of
     //nodes, that have to be freed
-    else (FOwnerDocument as IDOMInternal).removeNode((node));
+    else (FOwnerDocument as IDomInternal).removeNode((node));
   // if the new child is a document_fragment, then the entire contents of the document fragment are
   // moved into the child list of this node
   if node.type_=XML_DOCUMENT_FRAG_NODE
@@ -1065,7 +1132,7 @@ begin
        then if FGNode.children.last<>nil
         then if FGNode.children.last.type_ = XML_TEXT_NODE
           then if (node.type_=XML_TEXT_NODE)then begin
-           (FOwnerDocument as IDOMInternal).removeNode((node));
+           (FOwnerDocument as IDomInternal).removeNode((node));
           end;
       node:=xmlAddChild(FGNode,node);
       FGNode.children.last:=node;
@@ -1087,7 +1154,7 @@ begin
   result:=false;
 end;
 
-function TGDOMNode.cloneNode(deep: WordBool): IDOMNode;
+function TGDOMNode.cloneNode(deep: WordBool): IDomNode;
 var
   node: xmlNodePtr;
   recursive: Integer;
@@ -1100,8 +1167,8 @@ begin
     then begin
       node.doc:=FGNode.doc;
       if node.parent=nil
-        then (FOwnerDocument as IDOMInternal).appendNode(node);
-      result:=MakeNode(node,FOwnerDocument) as IDOMNode
+        then (FOwnerDocument as IDomInternal).appendNode(node);
+      result:=MakeNode(node,FOwnerDocument) as IDomNode
     end
     else result:=nil;
 end;
@@ -1123,7 +1190,7 @@ begin
         xmlTextConcat(node,pchar(temp),length(temp));
         new_next:=next.next;
         next.parent:=nil;
-        //(FOwnerDocument as IDOMInternal).appendNode(next);
+        //(FOwnerDocument as IDomInternal).appendNode(next);
         xmlUnlinkNode(next);
         xmlFreeNode(next); //carefull!!
         next:=new_next;
@@ -1143,7 +1210,7 @@ begin
   else result:=false;
 end;
 
-constructor TGDOMNode.Create(ANode: xmlNodePtr;ADocument:IDOMDocument);
+constructor TGDOMNode.Create(ANode: xmlNodePtr;ADocument:IDomDocument);
 begin
   inherited create;
   Assert(Assigned(ANode));
@@ -1161,8 +1228,8 @@ end;
 
 { TGDOMNodeList }
 
-constructor TGDOMNodeList.Create(AParent: xmlNodePtr;ADocument:IDOMDocument);
-// create a IDOMNodeList from a var of type xmlNodePtr
+constructor TGDOMNodeList.Create(AParent: xmlNodePtr;ADocument:IDomDocument);
+// create a IDomNodeList from a var of type xmlNodePtr
 // xmlNodePtr is the same as xmlNodePtrList, because in libxml2 there is no
 // difference in the definition of both
 begin
@@ -1179,8 +1246,8 @@ begin
 end;
 
 constructor TGDOMNodeList.Create(AXpathObject: xmlXPathObjectPtr;
-  ADocument: IDOMDocument);
-// create a IDOMNodeList from a var of type xmlNodeSetPtr
+  ADocument: IDomDocument);
+// create a IDomNodeList from a var of type xmlNodeSetPtr
 //  xmlNodeSetPtr = ^xmlNodeSet;
 //  xmlNodeSet = record
 //    nodeNr : longint;                { number of nodes in the set  }
@@ -1203,7 +1270,7 @@ begin
   inherited destroy;
 end;
 
-function TGDOMNodeList.get_item(index: Integer): IDOMNode;
+function TGDOMNodeList.get_item(index: Integer): IDomNode;
 var
   node: xmlNodePtr;
   i: integer;
@@ -1229,7 +1296,7 @@ begin
       end;
     end;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
@@ -1258,7 +1325,7 @@ begin
 end;
 
 {TGDOMNamedNodeMap}
-function TGDOMNamedNodeMap.get_item(index: Integer): IDOMNode;
+function TGDOMNamedNodeMap.get_item(index: Integer): IDomNode;
 //same as NodeList.get_item
 var
   node: xmlNodePtr;
@@ -1271,7 +1338,7 @@ begin
     node:=node.next
   end;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
@@ -1295,7 +1362,7 @@ begin
 	result:=i;
 end;
 
-function TGDOMNamedNodeMap.getNamedItem(const name: DOMString): IDOMNode;
+function TGDOMNamedNodeMap.getNamedItem(const name: DOMString): IDomNode;
 var
   node: xmlNodePtr;
   name1:TGdomString;
@@ -1307,11 +1374,11 @@ begin
     name1.free;
   end;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNamedNodeMap.setNamedItem(const newItem: IDOMNode): IDOMNode;
+function TGDOMNamedNodeMap.setNamedItem(const newItem: IDomNode): IDomNode;
 var
   xmlNewAttr,attr: xmlAttrPtr;
   node: xmlNodePtr;
@@ -1320,17 +1387,17 @@ begin
   xmlNewAttr:=xmlAttrPtr(GetGNode(newItem));
   //todo: check type of newItem
   attr:=setattr(node,xmlNewAttr);
-  (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+  (FOwnerDocument as IDomInternal).removeAttr(xmlnewAttr);
   FGNamedNodeMap:=node;
     if attr<>nil
       then begin
-        (FOwnerDocument as IDOMInternal).appendAttr(attr);
-        result:=TGDomAttr.Create(attr,FOwnerDocument) as IDOMNode
+        (FOwnerDocument as IDomInternal).appendAttr(attr);
+        result:=TGDomAttr.Create(attr,FOwnerDocument) as IDomNode
       end
       else result:=nil;
 end;
 
-function TGDOMNamedNodeMap.removeNamedItem(const name: DOMString): IDOMNode;
+function TGDOMNamedNodeMap.removeNamedItem(const name: DOMString): IDomNode;
 var
   attr: xmlAttrPtr;
   name1:TGdomString;
@@ -1346,14 +1413,14 @@ begin
       end;
     name1.free;
     attr:=removeAttr(FGNamedNodeMap,attr);
-    (FOwnerDocument as IDOMInternal).appendAttr(attr);
+    (FOwnerDocument as IDomInternal).appendAttr(attr);
   end;
   if attr<>nil
-    then result:=MakeNode(xmlNodePtr(attr),FOwnerDocument) as IDOMNode
+    then result:=MakeNode(xmlNodePtr(attr),FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNamedNodeMap.getNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
+function TGDOMNamedNodeMap.getNamedItemNS(const namespaceURI, localName: DOMString): IDomNode;
 var
   node: xmlNodePtr;
   name1,name2:TGdomString;
@@ -1367,19 +1434,19 @@ begin
     name2.free;
   end;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=MakeNode(node,FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-function TGDOMNamedNodeMap.setNamedItemNS(const newItem: IDOMNode): IDOMNode;
+function TGDOMNamedNodeMap.setNamedItemNS(const newItem: IDomNode): IDomNode;
 var
   attr,oldattr,xmlnewAttr: xmlAttrPtr;
   temp,slocalName: string;
   ns:xmlNSPtr;
   namespace:pchar;
-  newAttr: IDOMAttr;
+  newAttr: IDomAttr;
 begin
-  newAttr:=newItem as IDOMAttr;
+  newAttr:=newItem as IDomAttr;
   if newAttr<>nil then begin
     xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));    // Get the libxml2-Attribute
     node:=FGNamedNodeMap;
@@ -1401,13 +1468,13 @@ begin
          end;
          attr.next:=xmlNewAttr;
       end;
-    (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+    (FOwnerDocument as IDomInternal).removeAttr(xmlnewAttr);
     if oldattr<>nil
       then begin
         temp:=oldattr.name;
-        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDOMAttr;
+        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDomAttr;
         oldattr.parent:=nil;
-        (FOwnerDocument as IDOMInternal).appendAttr(oldattr);
+        (FOwnerDocument as IDomInternal).appendAttr(oldattr);
       end
       else begin
         result:=nil;
@@ -1415,7 +1482,7 @@ begin
   end;
 end;
 
-function TGDOMNamedNodeMap.removeNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
+function TGDOMNamedNodeMap.removeNamedItemNS(const namespaceURI, localName: DOMString): IDomNode;
 var
   attr: xmlAttrPtr;
   name1,name2:TGdomString;
@@ -1430,14 +1497,14 @@ begin
     if attr = nil
         then checkError(NOT_FOUND_ERR);
     attr:=removeAttr(FGNamedNodeMap,attr);
-    (FOwnerDocument as IDOMInternal).appendAttr(attr);
+    (FOwnerDocument as IDomInternal).appendAttr(attr);
 	end;
   if attr<>nil
-    then result:=MakeNode(xmlNodePtr(attr),FOwnerDocument) as IDOMNode
+    then result:=MakeNode(xmlNodePtr(attr),FOwnerDocument) as IDomNode
     else result:=nil;
 end;
 
-constructor TGDOMNamedNodeMap.Create(ANamedNodeMap: xmlNodePtr;AOwnerDocument:IDOMDocument;typ:integer=0);
+constructor TGDOMNamedNodeMap.Create(ANamedNodeMap: xmlNodePtr;AOwnerDocument:IDomDocument;typ:integer=0);
 // ANamedNodeMap=nil for empty NodeMap
 begin
 	FOwnerDocument:=AOwnerDocument;
@@ -1482,9 +1549,9 @@ begin
   result:=temp;
 end;
 
-function TGDOMAttr.get_ownerElement: IDOMElement;
+function TGDOMAttr.get_ownerElement: IDomElement;
 begin
-  result:=((self as IDOMNode).parentNode) as IDOMElement;
+  result:=((self as IDomNode).parentNode) as IDomElement;
 end;
 
 function TGDOMAttr.get_specified: WordBool;
@@ -1503,7 +1570,7 @@ begin
   inherited set_nodeValue(attributeValue);
 end;
 
-constructor TGDOMAttr.Create(AAttribute: xmlAttrPtr;ADocument:IDOMDocument;freenode:boolean=false);
+constructor TGDOMAttr.Create(AAttribute: xmlAttrPtr;ADocument:IDomDocument;freenode:boolean=false);
 begin
   inherited create(xmlNodePtr(AAttribute),ADocument);
 end;
@@ -1522,7 +1589,7 @@ function TGDOMElement.GetGElement: xmlNodePtr;
 begin
   result:=xmlNodePtr(GNode);
 end;
-// IDOMElement
+// IDomElement
 function TGDOMElement.get_tagName: DOMString;
 begin
   result:=self.get_nodeName;
@@ -1559,7 +1626,7 @@ begin
   temp:=xmlSetProp(node,name1.CString,name2.CString);
   temp.parent:=node;
   temp.doc:=node.doc;
-  //(FOwnerDocument as IDOMInternal).appendAttr(temp);
+  //(FOwnerDocument as IDomInternal).appendAttr(temp);
   //todo: raise exception if temp=nil?
   name1.free;
   name2.free;
@@ -1579,7 +1646,7 @@ begin
     then xmlRemoveProp(oldattr);
 end;
 
-function TGDOMElement.getAttributeNode(const name: DOMString): IDOMAttr;
+function TGDOMElement.getAttributeNode(const name: DOMString): IDomAttr;
 var
   temp: xmlAttrPtr;
   name1: TGdomString;
@@ -1588,7 +1655,7 @@ begin
   temp:=xmlHasProp(xmlNodePtr(GElement), name1.CString);
   name1.Free;
   if temp<>nil
-    then result:=TGDOMAttr.Create(temp,FOwnerDocument) as IDOMAttr
+    then result:=TGDOMAttr.Create(temp,FOwnerDocument) as IDomAttr
     else result:=nil;
 end;
 
@@ -1642,7 +1709,7 @@ begin
   result:=oldattr;
 end;
 
-function TGDOMElement.setAttributeNode(const newAttr: IDOMAttr):IDOMAttr;
+function TGDOMElement.setAttributeNode(const newAttr: IDomAttr):IDomAttr;
 var
   xmlnewAttr,oldattr: xmlAttrPtr;
   temp: string;
@@ -1654,13 +1721,13 @@ begin
     node:=xmlNodePtr(GElement);
     xmlnewAttr.parent:=node;
     oldAttr:=setAttr(node,xmlNewAttr);
-    (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+    (FOwnerDocument as IDomInternal).removeAttr(xmlnewAttr);
     if oldattr<>nil
       then begin
         temp:=oldattr.name;
         oldattr.parent:=nil;
-        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDOMAttr;
-        (FOwnerDocument as IDOMInternal).appendAttr(oldattr);
+        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDomAttr;
+        (FOwnerDocument as IDomInternal).appendAttr(oldattr);
       end
       else begin
         result:=nil;
@@ -1670,7 +1737,7 @@ end;
 
 
 
-function TGDOMElement.removeAttributeNode(const oldAttr: IDOMAttr):IDOMAttr;
+function TGDOMElement.removeAttributeNode(const oldAttr: IDomAttr):IDomAttr;
 var
   attr,xmlnewAttr,oldattr1: xmlAttrPtr;
   node: xmlNodePtr;
@@ -1693,7 +1760,7 @@ begin
         then begin
           result:=oldattr;
           xmlNewAttr.parent:=nil;     //important, otherwise it would be freed
-          (FOwnerDocument as IDOMInternal).appendAttr(xmlNewattr);
+          (FOwnerDocument as IDomInternal).appendAttr(xmlNewattr);
         end
         else begin
           result:=nil;
@@ -1702,7 +1769,7 @@ begin
   end else result:=nil;
 end;
 
-function TGDOMElement.getElementsByTagName(const name: DOMString): IDOMNodeList;
+function TGDOMElement.getElementsByTagName(const name: DOMString): IDomNodeList;
 begin
   result:=selectNodes(name);
 end;
@@ -1764,7 +1831,7 @@ begin
     end;
 end;
 
-function TGDOMElement.getAttributeNodeNS(const namespaceURI, localName: DOMString): IDOMAttr;
+function TGDOMElement.getAttributeNodeNS(const namespaceURI, localName: DOMString): IDomAttr;
 var
   temp: xmlAttrPtr;
   name1,name2: TGdomString;
@@ -1778,11 +1845,11 @@ begin
   name1.Free;
   name2.free;
   if temp<>nil
-    then result:=TGDOMAttr.Create(temp,FOwnerDocument) as IDOMAttr
+    then result:=TGDOMAttr.Create(temp,FOwnerDocument) as IDomAttr
     else result:=nil;
 end;
 
-function TGDOMElement.setAttributeNodeNS(const newAttr: IDOMAttr): IDOMAttr;
+function TGDOMElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
 var
   attr,xmlnewAttr,oldattr: xmlAttrPtr;
   temp: string;
@@ -1810,13 +1877,13 @@ begin
          end;
          attr.next:=xmlNewAttr;
       end;
-    (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+    (FOwnerDocument as IDomInternal).removeAttr(xmlnewAttr);
     if oldattr<>nil
       then begin
         temp:=oldattr.name;
-        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDOMAttr;
+        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDomAttr;
         oldattr.parent:=nil;
-        (FOwnerDocument as IDOMInternal).appendAttr(oldattr);
+        (FOwnerDocument as IDomInternal).appendAttr(oldattr);
       end
       else begin
         result:=nil;
@@ -1904,7 +1971,7 @@ begin
 end;
 
 
-function TGDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
+function TGDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDomNodeList;
 begin
   //todo: more generic code
   RegisterNs('xyz4ct',namespaceURI);
@@ -1949,7 +2016,7 @@ begin
   inherited normalize;
 end;
 
-constructor TGDOMElement.Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
+constructor TGDOMElement.Create(AElement: xmlNodePtr;ADocument:IDomDocument;freenode:boolean=false);
 begin
   inc(elementcount);
   inherited create(xmlNodePtr(AElement),ADocument);
@@ -1969,9 +2036,9 @@ end;
 //************************************************************************
 
 constructor TGDOMDocument.create(
-               GDOMImpl:IDOMImplementation;
+               GDOMImpl:IDomImplementation;
                const namespaceURI, qualifiedName: DOMString;
-               doctype: IDOMDocumentType);
+               doctype: IDomDocumentType);
 var
   root:xmlNodePtr;
   ns: TGDOMNamespace;
@@ -2045,7 +2112,10 @@ begin
     end;
     if FtempXSL=nil
       then xmlFreeDoc(FPGdomeDoc)
-      else xsltFreeStylesheet(FtempXSL);
+      else begin
+        xsltFreeStylesheet(FtempXSL);
+        //xmlFreeDoc(FPGdomeDoc);
+      end;
     dec(doccount);
     FAttrList.Free;
     FNodeList.Free;
@@ -2053,8 +2123,8 @@ begin
   inherited Destroy;
 end;
 
-// IDOMDocument
-function TGDOMDocument.get_doctype: IDOMDocumentType;
+// IDomDocument
+function TGDOMDocument.get_doctype: IDomDocumentType;
 var dtd: xmlDtdPtr;
 begin
   dtd:=FPGdomeDoc.intSubset;
@@ -2063,12 +2133,12 @@ begin
     else result:=nil;
 end;
 
-function TGDOMDocument.get_domImplementation: IDOMImplementation;
+function TGDOMDocument.get_domImplementation: IDomImplementation;
 begin
   result:=FGDOMImpl;
 end;
 
-function TGDOMDocument.get_documentElement: IDOMElement;
+function TGDOMDocument.get_documentElement: IDomElement;
 var
   root1:xmlNodePtr;
   FGRoot: TGDOMElement;
@@ -2080,12 +2150,12 @@ begin
   Result := FGRoot;
 end;
 
-procedure TGDOMDocument.set_documentElement(const IDOMElement: IDOMElement);
+procedure TGDOMDocument.set_documentElement(const IDomElement: IDomElement);
 begin
   checkError(NOT_SUPPORTED_ERR);
 end;
 
-function TGDOMDocument.createElement(const tagName: DOMString): IDOMElement;
+function TGDOMDocument.createElement(const tagName: DOMString): IDomElement;
 var
   name1: TGdomString;
   AElement: xmlNodePtr;
@@ -2104,7 +2174,7 @@ begin
     else result:=nil;
 end;
 
-function TGDOMDocument.createDocumentFragment: IDOMDocumentFragment;
+function TGDOMDocument.createDocumentFragment: IDomDocumentFragment;
 var
   node: xmlNodePtr;
 begin
@@ -2117,7 +2187,7 @@ begin
     else result:=nil;
 end;
 
-function TGDOMDocument.createTextNode(const data: DOMString): IDOMText;
+function TGDOMDocument.createTextNode(const data: DOMString): IDomText;
 var
   data1: TGdomString;
   ATextNode: xmlNodePtr;
@@ -2133,7 +2203,7 @@ begin
     else result:=nil;
 end;
 
-function TGDOMDocument.createComment(const data: DOMString): IDOMComment;
+function TGDOMDocument.createComment(const data: DOMString): IDomComment;
 var
   data1: TGdomString;
   node: xmlNodePtr;
@@ -2149,7 +2219,7 @@ begin
     else result:=nil;
 end;
 
-function TGDOMDocument.createCDATASection(const data: DOMString): IDOMCDATASection;
+function TGDOMDocument.createCDATASection(const data: DOMString): IDomCDATASection;
 var
   name1: TGdomString;
   node: xmlNodePtr;
@@ -2166,7 +2236,7 @@ begin
 end;
 
 function TGDOMDocument.createProcessingInstruction(const target,
-  data: DOMString): IDOMProcessingInstruction;
+  data: DOMString): IDomProcessingInstruction;
 var
   name1,name2: TGdomString;
   AProcessingInstruction: PGdomeProcessingInstruction;
@@ -2188,7 +2258,7 @@ begin
     else result:=nil;
 end;
 
-function TGDOMDocument.createAttribute(const name: DOMString): IDOMAttr;
+function TGDOMDocument.createAttribute(const name: DOMString): IDomAttr;
 var
   name1: TGdomString;
   AAttr: xmlAttrPtr;
@@ -2206,7 +2276,7 @@ begin
     end else result:=nil;
 end;
 
-function TGDOMDocument.createEntityReference(const name: DOMString): IDOMEntityReference;
+function TGDOMDocument.createEntityReference(const name: DOMString): IDomEntityReference;
 var
   name1: TGdomString;
   AEntityReference: xmlNodePtr;
@@ -2224,15 +2294,15 @@ begin
     else result:=nil;
 end;
 
-function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList;
+function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDomNodeList;
 var
-  tmp:IDOMNodeList;
+  tmp:IDomNodeList;
 begin
-  tmp:=(self.get_documentElement as IDOMNodeSelect).selectNodes('//'+tagName);
+  tmp:=(self.get_documentElement as IDomNodeSelect).selectNodes('//'+tagName);
   result:=tmp;
 end;
 
-function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
+function TGDOMDocument.importNode(importedNode: IDomNode; deep: WordBool): IDomNode;
 var
   recurse: integer;
   node: xmlNodePtr;
@@ -2254,7 +2324,7 @@ begin
 end;
 
 function TGDOMDocument.createElementNS(const namespaceURI,
-  qualifiedName: DOMString): IDOMElement;
+  qualifiedName: DOMString): IDomElement;
 var
   AElement: xmlNodePtr;
   ns: TGDOMNamespace;
@@ -2286,7 +2356,7 @@ begin
 end;
 
 function TGDOMDocument.createAttributeNS(const namespaceURI,
-  qualifiedName: DOMString): IDOMAttr;
+  qualifiedName: DOMString): IDomAttr;
 var
   AAttr: xmlAttrPtr;
   ns: TGDOMNameSpace;
@@ -2314,31 +2384,31 @@ begin
 end;
 
 function TGDOMDocument.getElementsByTagNameNS(const namespaceURI,
-  localName: DOMString): IDOMNodeList;
+  localName: DOMString): IDomNodeList;
 var
-  docElement:IDOMElement;
-  tmp1:IDOMNodeList;
+  docElement:IDomElement;
+  tmp1:IDomNodeList;
 begin
   if (namespaceURI='*')
     then if (localname<>'*')
       then begin
         docElement:=self.get_documentElement;
-        tmp1:=(docElement as IDOMNodeSelect).selectNodes('//*[local-name()="'+localname+'"]');
+        tmp1:=(docElement as IDomNodeSelect).selectNodes('//*[local-name()="'+localname+'"]');
         result:=tmp1;
       end else begin
         docElement:=self.get_documentElement;
-        tmp1:=(docElement as IDOMNodeSelect).selectNodes('//*');
+        tmp1:=(docElement as IDomNodeSelect).selectNodes('//*');
         result:=tmp1;
       end
     else begin
         docElement:=self.get_documentElement;
-        (docElement as IDOMNodeSelect).registerNs('xyz4ct',namespaceURI);
-        tmp1:=(docElement as IDOMNodeSelect).selectNodes('//xyz4ct:'+localName);
+        (docElement as IDomNodeSelect).registerNs('xyz4ct',namespaceURI);
+        tmp1:=(docElement as IDomNodeSelect).selectNodes('//xyz4ct:'+localName);
         result:=tmp1;
     end;
 end;
 
-function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
+function TGDOMDocument.getElementById(const elementId: DOMString): IDomElement;
 var
   AAttr: xmlAttrPtr;
   AElement: xmlNodePtr;
@@ -2355,7 +2425,7 @@ begin
     else result:=nil;
 end;
 
-// IDOMParseOptions
+// IDomParseOptions
 function TGDOMDocument.get_async: Boolean;
 begin
   result:=FAsync;
@@ -2402,14 +2472,25 @@ begin
   Fvalidate:=value;
 end;
 
-// IDOMPersist
+// IDomPersist
 function TGDOMDocument.get_xml: DOMString;
 var
   CString,encoding:pchar;
   length:LongInt;
+  temp: string;
+  format: integer;
 begin
-  encoding:=FPGdomeDoc.encoding;
-  xmlDocDumpMemoryEnc(FPGdomeDoc,CString,@length,encoding);
+  temp:=Fencoding;
+  if Fencoding=''
+    then encoding:=FPGdomeDoc.encoding
+    else encoding:=pchar(temp);
+  format:=0;
+  if FprettyPrint
+    then begin
+      format:=-1;
+      //xmlIndentTreeOutputPtr^:=0;
+    end;
+  xmlDocDumpFormatMemoryEnc(FPGdomeDoc,CString,@length,encoding,format);
   result:=CString;
   xmlFree(CString);  //this works with the new dll from 2001-01-25
 end;
@@ -2426,7 +2507,7 @@ var
   ctxt: xmlParserCtxtPtr;
   root: xmlNodePtr;
 begin
-  result:=true;
+  result:=false;
   fn:=source;
   {$ifdef WIN32}
     fn := UTF8Encode(StringReplace(source, '\', '\\', [rfReplaceAll]));
@@ -2437,12 +2518,7 @@ begin
   ctxt := xmlCreateFileParserCtxt(PChar(fn));
   if (ctxt <> nil) then begin
     // validation
-    if Fvalidate then begin
-      ctxt.validate := -1;
-    end else begin
-      ctxt.validate := 0;
-    end;
-    //todo: preserve whitespace
+    ctxt.validate := -1;
     //todo: async (separate thread)
     //todo: resolveExternals
     xmlParseDocument(ctxt);
@@ -2451,7 +2527,8 @@ begin
         then begin
           xmlFreeDoc(FPGdomeDoc);
           inherited Destroy;
-          FPGdomeDoc := ctxt.myDoc
+          FPGdomeDoc := ctxt.myDoc;
+          result:=true;
         end
         else begin
           xmlFreeDoc(ctxt.myDoc);
@@ -2482,17 +2559,13 @@ var
   root: xmlNodePtr;
   ctxt: xmlParserCtxtPtr;
 begin
-  result:=true;
+  // to do: add the following line to the other load methods
+  result:=false;
   temp:=TGdomString.create(Value);
   xmlInitParser();
   ctxt := xmlCreateDocParserCtxt(temp.CString);
   if (ctxt <> nil) then begin
-    // validation
-    //if Fvalidate then begin
-      ctxt.validate := -1;
-    //end else begin
-    //  ctxt.validate := 0;
-    //end;
+    ctxt.validate := -1;
     //todo: async (separate thread)
     //todo: resolveExternals
     xmlParseDocument(ctxt);
@@ -2501,6 +2574,8 @@ begin
         then begin
           xmlFreeDoc(FPGdomeDoc);
           inherited Destroy;
+          // to do: add the following line to the other load methods
+          Result:=True;
           FPGdomeDoc := ctxt.myDoc
         end
         else begin
@@ -2524,11 +2599,21 @@ procedure TGDOMDocument.save(source: DOMString);
 var
   encoding:pchar;
   bytes: integer;
-  temp: string;
+  temp,temp1: string;
+  format: integer;
 begin
-  temp:=source;
-  encoding:=FPGdomeDoc.encoding;
-  bytes:=xmlSaveFileEnc(pchar(temp),FPGdomeDoc,encoding);
+  temp:=Fencoding;
+  if Fencoding=''
+    then encoding:=FPGdomeDoc.encoding
+    else encoding:=pchar(temp);
+  format:=0;
+  if FprettyPrint
+    then begin
+      format:=-1;
+      //xmlIndentTreeOutputPtr^:=-1;
+    end;
+  temp1:=source;
+  bytes:=xmlSaveFormatFileEnc(pchar(temp1),FPGdomeDoc,encoding,format);
   if bytes<0 then CheckError(22); //write error
 end;
 
@@ -2543,7 +2628,7 @@ begin
   checkError(NOT_SUPPORTED_ERR);
 end;
 
-function GetGNode(const Node: IDOMNode): xmlNodePtr;
+function GetGNode(const Node: IDomNode): xmlNodePtr;
 begin
   if not Assigned(Node) then
     checkError(INVALID_ACCESS_ERR);
@@ -2699,7 +2784,7 @@ begin
 end;
 
 constructor TGDOMCharacterData.Create(ACharacterData: xmlNodePtr;
-  ADocument: IDOMDocument;freenode:boolean=false);
+  ADocument: IDomDocument;freenode:boolean=false);
 begin
   inherited create(xmlNodePtr(ACharacterData),ADocument);
 end;
@@ -2711,11 +2796,11 @@ end;
 
 { TGDOMText }
 
-function TGDOMText.splitText(offset: Integer): IDOMText;
+function TGDOMText.splitText(offset: Integer): IDomText;
 var
   s,s1: WideString;
-  tmp: IDOMText;
-  node: IDOMNode;
+  tmp: IDomText;
+  node: IDomNode;
 begin
   s := Get_data;
   if (offset < 0) or (offset > length(s))
@@ -2787,13 +2872,13 @@ end;
 
 { TGDOMDocumentType }
 
-function TGDOMDocumentType.get_entities: IDOMNamedNodeMap;
+function TGDOMDocumentType.get_entities: IDomNamedNodeMap;
 var
   dtd:xmlDtdPtr;
 begin
   dtd:=GDocumentType;
   if dtd<>nil
-    then result:=TGDOMNamedNodeMap.Create(xmlNodePtr(dtd),FOwnerDocument,1) as IDOMNamedNodeMap
+    then result:=TGDOMNamedNodeMap.Create(xmlNodePtr(dtd),FOwnerDocument,1) as IDomNamedNodeMap
     else result:=nil;
 end;
 
@@ -2812,7 +2897,7 @@ begin
   result:=self.get_nodeName;
 end;
 
-function TGDOMDocumentType.get_notations: IDOMNamedNodeMap;
+function TGDOMDocumentType.get_notations: IDomNamedNodeMap;
 //var
 //  notations: PGdomeNamedNodeMap;
 //  exc: GdomeException;
@@ -2824,7 +2909,7 @@ begin
   {notations:=gdome_dt_notations(GDocumentType,@exc);
   CheckError(exc);
   if notations<>nil
-    then result:=TGDOMNamedNodeMap.Create(notations,FOwnerDocument) as IDOMNamedNodeMap
+    then result:=TGDOMNamedNodeMap.Create(notations,FOwnerDocument) as IDomNamedNodeMap
     else result:=nil;}
 end;
 
@@ -2843,7 +2928,7 @@ begin
   result:=xmlDtdPtr(GNode);
 end;
 
-constructor TGDOMDocumentType.Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
+constructor TGDOMDocumentType.Create(dtd:xmlDtdPtr;ADocument:IDomDocument);
 var
   root:xmlNodePtr;
 begin
@@ -2891,7 +2976,7 @@ end;
 { TGDOMNameSpace }
 
 constructor TGDOMNameSpace.create(node:xmlNodePtr;
-  namespaceURI,qualifiedName: DOMString;OwnerDoc:IDOMDocument);
+  namespaceURI,qualifiedName: DOMString;OwnerDoc:IDomDocument);
 var
   name1,name3: TGdomString;
   prefix: string;
@@ -2912,14 +2997,14 @@ end;
 
 destructor TGDOMNameSpace.destroy;
 begin
-  //(FOwnerDoc as IDOMInternal).appendNs(Ns);
+  //(FOwnerDoc as IDomInternal).appendNs(Ns);
   FOwnerDoc:=nil;
   localName.free;
   FqualifiedName.Free;
   inherited destroy;
 end;
 
-function TGDOMNode.selectNode(const nodePath: WideString): IDOMNode;
+function TGDOMNode.selectNode(const nodePath: WideString): IDomNode;
 // todo: raise  exceptions
 //       a) if invalid nodePath expression
 //       b) if result type <> nodelist
@@ -2928,7 +3013,7 @@ begin
 	result:=selectNodes(nodePath)[0];
 end;
 
-function TGDOMNode.selectNodes(const nodePath: WideString): IDOMNodeList;
+function TGDOMNode.selectNodes(const nodePath: WideString): IDomNodeList;
 // todo: raise  exceptions
 //       a) if invalid nodePath expression
 //       b) if result type <> nodelist
@@ -3007,8 +3092,8 @@ end;
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
 begin
   result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
-  (result as IDOMParseOptions).resolveExternals:=true;
-  (result as IDOMPersist).loadxml(xml);
+  (result as IDomParseOptions).resolveExternals:=true;
+  (result as IDomPersist).loadxml(xml);
 end;
 
 procedure TGDOMNode.RegisterNS(const prefix, URI: DomString);
@@ -3036,7 +3121,7 @@ begin
   result:=false;
 end;
 
-constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
+constructor TGDOMDocument.Create(GDOMImpl: IDomImplementation);
 var
   root:xmlNodePtr;
 begin
@@ -3051,7 +3136,7 @@ begin
   inc(doccount);
 end;
 
-constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
+constructor TGDOMDocument.Create(GDOMImpl: IDomImplementation; aUrl: DomString);
 var
   fn: string;
   ctxt: xmlParserCtxtPtr;
@@ -3069,20 +3154,17 @@ begin
   ctxt := xmlCreateFileParserCtxt(PChar(fn));
   if (ctxt <> nil) then begin
     // validation
-    if Fvalidate then begin
-      ctxt.validate := -1;
-    end else begin
-      ctxt.validate := 0;
-    end;
+    ctxt.validate := -1;
     //todo: async (separate thread)
     //todo: resolveExternals
     xmlParseDocument(ctxt);
-    if (ctxt.wellFormed<>0) then begin
-      FPGdomeDoc := ctxt.myDoc;
-    end else begin
-      xmlFreeDoc(ctxt.myDoc);
-      ctxt.myDoc := nil;
-    end;
+    if (ctxt.wellFormed<>0) then
+      if not Fvalidate or (ctxt.valid<>0) then begin
+          FPGdomeDoc := ctxt.myDoc;
+        end else begin
+          xmlFreeDoc(ctxt.myDoc);
+          ctxt.myDoc := nil;
+        end;
     xmlFreeParserCtxt(ctxt);
   end;
   if (FPGdomeDoc<>nil) then begin
@@ -3306,7 +3388,7 @@ begin
     then FNodeList.Remove(node);
 end;
 
-procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
+procedure TGDOMNode.transformNode(const stylesheet: IDomNode;
   var output: DomString);
 var
   doc:       xmlDocPtr;
@@ -3314,11 +3396,13 @@ var
   outputDoc: xmlDocPtr;
   styleNode: xmlNodePtr;
   tempXSL:   xsltStylesheetPtr;
-  encoding:  pchar;
+  encoding:  widestring;
   length1:    longInt;
   CString:   pchar;
   len: integer;
   meta: widestring;
+  doctype: integer;
+  element: xmlNodePtr;
 begin
   doc:=FGNode.doc;
   styleNode:=GetGNode(stylesheet);
@@ -3329,16 +3413,23 @@ begin
   // mark the document as stylesheetdocument;
   // it holds additional information, so a different free method must
   // be used
-  (stylesheet.ownerDocument as IDOMInternal).set_FtempXSL(tempXSL);
+  (stylesheet.ownerDocument as IDomInternal).set_FtempXSL(tempXSL);
   outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
   if outputDoc=nil then exit;
+  doctype:=outputDoc.type_;
+  element:=xmlDocGetRootElement(outputDoc);
   encoding:=outputDoc.encoding;
-  xmlDocDumpMemoryEnc(outputDoc,CString,@length1,encoding);
+  xmlDocDumpMemoryEnc(outputDoc,CString,@length1,outputDoc.encoding);
   output:=CString;
-  //Cut the leading <xml... > header
-  len:=pos('>',output)+2;
-  output:=copy(output,len,length1-len);
-  if leftstr(output,14)='<!DOCTYPE HTML'
+  // free the document as a string is returned, and not the document
+  xmlFreeDoc(outputDoc);
+  // if the document is of type plain-text or html
+  if (element=nil) or (doctype=13) then begin
+    //cut the leading xml header
+    len:=pos('>',output)+2;
+    output:=copy(output,len,length1-len);
+  end;
+  if doctype=13 //html-document
     then begin
       //insert the meta tag for html output after the head tag
       meta:='<META http-equiv="Content-Type" content="text/html; charset='+encoding+'">';
@@ -3348,8 +3439,8 @@ begin
   xmlFree(CString);
 end;
 
-procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
-  var output: IDOMDocument);
+procedure TGDOMNode.transformNode(const stylesheet: IDomNode;
+  var output: IDomDocument);
 var
   doc:       xmlDocPtr;
   styleDoc:  xmlDocPtr;
@@ -3357,6 +3448,7 @@ var
   styleNode: xmlNodePtr;
   tempXSL:   xsltStylesheetPtr;
 begin
+  output:=nil;
   doc:=FGNode.doc;
   styleNode:=GetGNode(stylesheet);
   styleDoc:=styleNode.doc;
@@ -3366,19 +3458,20 @@ begin
   // mark the document as stylesheetdocument;
   // it holds additional information, so a different free method must
   // be used
-  (stylesheet.ownerDocument as IDOMInternal).set_FtempXSL(tempXSL);
+  (stylesheet.ownerDocument as IDomInternal).set_FtempXSL(tempXSL);
   outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
   if outputDoc=nil then exit;
+
 //  if outputDoc.type_=13 then begin
 //    xmlFreeDoc(outputDoc);
 //    output:=nil;
 //    exit; //html
 //  end;
   output:=TGDOMDocument.Create(nil,xmlNodePtr(outputDoc))
-    as IDOMDocument;
+    as IDomDocument;
 end;
 
-function TGDOMNode.IsSameNode(node: IDOMNode): boolean;
+function TGDOMNode.IsSameNode(node: IDomNode): boolean;
 var
   xnode1,xnode2: xmlNodePtr;
 begin
@@ -3400,11 +3493,12 @@ begin
   FtempXSL:=tempXSL;
 end;
 
-constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation;
+constructor TGDOMDocument.Create(GDOMImpl: IDomImplementation;
   docnode: xmlNodePtr);
 begin
   FGdomimpl:=GDOMImpl;
   FPGdomeDoc:=xmlDocPtr(docnode);
+  FtempXSL:=nil;
   FAttrList:=TList.Create;
   FNodeList:=TList.Create;
   //Create root-node as pascal object
@@ -3412,8 +3506,82 @@ begin
   inc(doccount);
 end;
 
+function TGDOMNode.get_xml: DOMString;
+var
+  CString:pchar;
+  buffer:xmlBufferPtr;
+begin
+  buffer:=xmlBufferCreate;
+  xmlNodeDump(buffer,FGNode.doc,FGNode,0,0);
+  CString:=xmlBufferContent(buffer);
+  result:=CString;
+  xmlFree(CString);
+end;
+
+function TGDOMDocument.get_compressionLevel: Integer;
+begin
+  result:=FcompressionLevel;
+end;
+
+function TGDOMDocument.get_encoding: DomString;
+begin
+  result:=Fencoding;
+end;
+
+function TGDOMDocument.get_prettyPrint: Boolean;
+begin
+  result:=FprettyPrint;
+end;
+
+procedure TGDOMDocument.set_compressionLevel(compressionLevel: Integer);
+begin
+  FcompressionLevel:=compressionLevel;
+end;
+
+procedure TGDOMDocument.set_encoding(encoding: DomString);
+begin
+  Fencoding:=encoding;
+end;
+
+procedure TGDOMDocument.set_prettyPrint(prettyPrint: boolean);
+begin
+  FprettyPrint:=prettyPrint;
+end;
+
+function TGDOMDocument.get_parsedEncoding: DomString;
+var
+  encoding: WideString;
+begin
+  encoding:=FPGdomeDoc.encoding;
+  result:=encoding;
+end;
+
+procedure InitExportedVar;
+{$ifdef WIN32}
+begin
+  xmlIndentTreeOutputPtr := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)),
+   'xmlIndentTreeOutput');
+end;
+{$else}
+begin
+// to do:
+// implement a working solution for linux
+{xmlDoValidityCheckingDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)),
+    'xmlDoValidityCheckingDefaultValue');
+  Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
+  xmlSubstituteEntitiesDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)),
+    'xmlSubstituteEntitiesDefaultValue');
+  Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);}
+end;
+{$endif}
+
 initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
+  InitExportedVar;
 finalization
 end.
+
+
+
+
 
