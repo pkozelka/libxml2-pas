@@ -49,10 +49,17 @@ type
 	{
 	 The XML memory wrapper support 4 basic overloadable functions
 	}
-	xmlFreeFunc = function(ptr: pointer): pointer;
-	xmlMallocFunc = function (size:size_t):pointer;cdecl;
-	xmlReallocFunc = function (ptr:pointer; size:size_t):pointer;cdecl;
-	xmlStrdupFunc = function (str:PChar):Pchar;cdecl;
+	xmlFreeFunc = procedure(ptr: pointer); cdecl;
+	xmlFreeFunc_PTR = ^xmlFreeFunc;
+
+	xmlMallocFunc = function (size:size_t):pointer; cdecl;
+	xmlMallocFunc_PTR = ^xmlMallocFunc;
+
+	xmlReallocFunc = function (ptr:pointer; size:size_t):pointer; cdecl;
+	xmlReallocFunc_PTR = ^xmlReallocFunc;
+
+	xmlStrdupFunc = function (str:PChar):PChar; cdecl;
+	xmlStrdupFunc_PTR = ^xmlStrdupFunc;
 
 	{
 		The 4 interfaces used for all memory handling within libxml
@@ -67,8 +74,8 @@ LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
 {
 	The way to overload the existing functions
 }
-function  xmlMemSetup(var freeFunc: xmlFreeFunc; var mallocFunc: xmlMallocFunc; var reallocFunc: xmlReallocFunc; var strdupFunc: xmlStrdupFunc):longint;cdecl;external LIBXML2_SO;
-function  xmlMemGet(var freeFunc: xmlFreeFunc; var mallocFunc: xmlMallocFunc; var reallocFunc: xmlReallocFunc; var strdupFunc: xmlStrdupFunc):longint;cdecl;external LIBXML2_SO;
+function  xmlMemSetup(freeFunc: xmlFreeFunc_PTR; mallocFunc: xmlMallocFunc_PTR; reallocFunc: xmlReallocFunc_PTR; strdupFunc: xmlStrdupFunc_PTR):longint;cdecl;external LIBXML2_SO;
+function  xmlMemGet(var freeFunc: xmlFreeFunc_PTR; var mallocFunc: xmlMallocFunc_PTR; var reallocFunc: xmlReallocFunc_PTR; var strdupFunc: xmlStrdupFunc_PTR):longint;cdecl;external LIBXML2_SO;
 
 {
 	Initialization of the memory layer
