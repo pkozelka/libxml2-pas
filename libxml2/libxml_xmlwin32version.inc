@@ -6,30 +6,27 @@
 }
 
 {
-   xmlwin32version.h : compile-time version informations for the XML parser
-                       when compiled on the Windows platform
-  
-   See Copyright for the status of this software.
-  
-   daniel@veillard.com
-  }
-{$ifndef __XML_VERSION_H__}
-{$define __XML_VERSION_H__}
-{ C++ extern C conditionnal removed }
+	 xmlwin32version.h : compile-time version informations for the XML parser
+											 when compiled on the Windows platform
+
+	 See Copyright for the status of this software.
+
+	 daniel@veillard.com
+	}
 {
-   use those to be sure nothing nasty will happen if
-   your library and includes mismatch
-  }
+	 use those to be sure nothing nasty will happen if
+	 your library and includes mismatch
+	}
 {$ifndef LIBXML2_COMPILING_MSCCDEF}
 
-procedure xmlCheckVersion(version:longint);cdecl;external;
+procedure xmlCheckVersion(version:longint);cdecl;external LIBXML2_SO;
 {$endif}
 { LIBXML2_COMPILING_MSCCDEF  }
-{ 
-   LIBXML_DOTTED_VERSION:
-  
-   the version string like "1.2.3"
-  }
+{
+	 LIBXML_DOTTED_VERSION:
+
+	 the version string like "1.2.3"
+	}
 
 const
    LIBXML_DOTTED_VERSION = '2.4.12';
@@ -186,7 +183,7 @@ in declaration at line 52 *)
        ATTRIBUTE_UNUSED:
       
        Macro used to signal to GCC unused function parameters
-      }
+			}
 {$ifdef __GNUC__}
 {$ifdef HAVE_ANSIDECL_H}
 {$include <ansidecl.h>}
@@ -207,15 +204,4 @@ in declaration at line 52 *)
 {$if defined LIBXML_ICONV_ENABLED && !defined LIBXML2_COMPILING_MSCCDEF}
 (** unsupported pragma#pragma comment(lib, "iconv.lib")*)
 {$endif}
-{$endif}
-{ C++ end of extern C conditionnal removed }
-    { __cplusplus  }
-{$endif}
-    { was #define dname def_expr }
-    function LIBXML_DLL_IMPORT : longint;
-        { return type might be wrong }
-      begin
-         LIBXML_DLL_IMPORT:=__declspec(dllimport);
-      end;
-
 

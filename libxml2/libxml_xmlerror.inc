@@ -131,5 +131,5 @@ procedure xmlParserWarning(ctx:pointer; msg:Pchar);cdecl; {$ifdef VER140} vararg
 procedure xmlParserValidityError(ctx:pointer; msg:Pchar);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
 procedure xmlParserValidityWarning(ctx:pointer; msg:Pchar);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
 procedure xmlParserPrintFileInfo(input:xmlParserInputPtr);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
-procedure xmlParserPrintFileContext(input:xmlParserInputPtr);cdecl; {$ifdef VER140} varargs; {$endif} external  LIBXML2_SO;
+procedure xmlParserPrintFileContext(input:xmlParserInputPtr);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
 

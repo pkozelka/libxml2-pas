@@ -478,7 +478,7 @@ function  xmlXPathNextPrecedingSibling(ctxt:xmlXPathParserContextPtr; cur:xmlNod
 	The official core of XPath functions
 }
 //[pk] see "xpath": procedure xmlXPathRoot(ctxt:xmlXPathParserContextPtr);cdecl;external LIBXML2_SO;
-//[pk] see "xpath": procedure xmlXPathLastFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
+procedure xmlXPathLastFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathPositionFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 procedure xmlXPathCountFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
 //[pk] see "xpath": procedure xmlXPathIdFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
