@@ -4,7 +4,7 @@ interface
 
 uses
   TestFrameWork,
-  //libxmldom,
+  libxmldom,
   idom2,
   domSetup,
   SysUtils,
@@ -134,6 +134,7 @@ end;
 procedure TTestDomExceptions.TearDown;
 begin
   elem := nil;
+  nnmap := nil;
   attr := nil;
   node := nil;
   select := nil;
@@ -145,6 +146,7 @@ begin
   doc := nil;
   doc1 := nil;
   impl := nil;
+  check(doccount = 0,'doccount<>0');
   inherited;
 end;
 
@@ -994,7 +996,8 @@ end;
 procedure TTestDomExceptions.setNamedItem4;
 begin
   // entities are read only in DOM Level 2 !!!
-  nnmap := doc.docType.entities;
+  if doc.docType<>nil
+    then nnmap := doc.docType.entities;
   {
   elem := doc.createElement(Name);
   // HIERARCHY_REQUEST_ERR: Raised if an attempt is made to add a node doesn't
@@ -1056,7 +1059,7 @@ begin
   except
     on E: Exception do begin
       if E is EDomException then begin
-        check((E as EDomException).code = WRONG_DOCUMENT_ERR, getErrStr(E,WRONG_DOCUMENT_ERR));
+        check((E as EDomException).code =  INUSE_ATTRIBUTE_ERR, getErrStr(E,WRONG_DOCUMENT_ERR));
       end else begin
         fail(getErrStr(E));
       end;
@@ -1092,7 +1095,8 @@ end;
 procedure TTestDomExceptions.setNamedItemNS4;
 begin
   // entities are read only in DOM Level 2 !!!
-  nnmap := doc.docType.entities;
+  if doc.docType<>nil
+    then nnmap := doc.docType.entities;
   {
   elem := doc.createElementNS(nsuri,fqname);
   // HIERARCHY_REQUEST_ERR: Raised if an attempt is made to add a node doesn't

@@ -255,7 +255,12 @@ begin
     '</xsl:stylesheet>';
   (xsl as IDomPersist).loadxml(Text);
   snode := xsl.documentElement as IDomNode;
-  (xnode as IDomNodeExt).transformNode(snode, result1);
+  try
+    (xnode as IDomNodeExt).transformNode(snode, result1);
+    fail('There should have been an EDomException');
+  except
+    //on E: Exception do Check(E is EDomException, 'Warning: Wrong exception type!');
+  end;
 end;
 
 procedure TTestXSLT.getXml;
