@@ -540,10 +540,18 @@ begin
     test('notation.systemId',((namednodemap[0] as IDOMNotation).systemId = 'program2'));
     namednodemap := nil;
     documenttype:=nil;
+  end
+  else begin
+    OutLog('___documentType.entities not tested!');
+    OutLog('___entity.length not tested!');
+    OutLog('___entity.notationName not tested!');
+    OutLog('___entity.systemID not tested!');
+    OutLog('___entity.publicID not tested!');
+    OutLog('___documentType.notations not tested!');
+    OutLog('___notation.publicId not tested!');
+    OutLog('___notation.systemId not tested!');
   end;
-  // end
   document:=nil;
-
   // testing documenttype, part II
   document := getDoc(filename,vendorstr);
   try
@@ -892,7 +900,7 @@ begin
       then testCount:=testCount+25+6
       else testCount:=testCount+25;
   if (TestSet and 16) = 16
-    then testCount:=testCount+5;
+    then testCount:=testCount+5+8;
   if (TestSet and 32) = 32
     then testCount:=testCount+3;
   if (TestSet and 64) = 64
@@ -905,9 +913,6 @@ begin
     then testCount:=testCount+1;
 
   outLog('Number of tests total:    '+inttostr(TestCount));
-  //outLog('doccount='+inttostr(doccount));
-  //outLog('nodecount='+inttostr(nodecount));
-  //outLog('elementcount='+inttostr(elementcount));
 end;
 
 end.
