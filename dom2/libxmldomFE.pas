@@ -356,7 +356,6 @@ type
     Fvalidate: boolean;           //check if default is ok
     FAttrList:TList; //keeps a list of attributes, created on this document                                    this document
     FNodeList:TList; //keeps a list of nodes, created on this document
-    FNsList:TList;   //keeps a list of namespaces, created on this document
   protected
     // IDOMDocument
     function get_doctype: IDOMDocumentType;
@@ -1800,7 +1799,7 @@ begin
 
   FAttrList:=TList.Create;
   FNodeList:=TList.Create;
-  FNsList:=TList.Create;
+  //FNsList:=TList.Create;
  //Create root-node as pascal object
   inherited create(root,nil);
   inc(doccount);
@@ -1847,7 +1846,7 @@ begin
 
     FAttrList.Free;
     FNodeList.Free;
-    FNsList.Free;
+    //FNsList.Free;
   end;
   inherited Destroy;
 end;
@@ -2227,14 +2226,17 @@ end;
 
 function TGDOMDocument.load(source: OleVariant): WordBool;
 // Load dom from file
-var filename: string;
+var fn: string;
     root: xmlNodePtr;
 begin
-//  filename:=StringReplace(source, '\', '/', [rfReplaceAll]);
-  filename:=source;
+  fn:=source;
+  {$ifdef WIN32}
+    fn := UTF8Encode(StringReplace(source, '\', '\\', [rfReplaceAll]));
+  {$else}
+    fn := aUrl;
+  {$endif}
   xmlFreeDoc(FPGdomeDoc);
-//	inherited Destroy;
-  FPGdomeDoc:=xmlParseFile(pchar(filename));
+  FPGdomeDoc:=xmlParseFile(pchar(fn));
   if FPGdomeDoc<>nil
     then
       begin
@@ -2739,7 +2741,7 @@ end;
 
 function TGDOMDocumentBuilder.load(const url: DomString): IDomDocument;
 begin
-  result:=TGDOMDocument.Create(Get_DomImplementation, url);
+  result:=(TGDOMDocument.Create(Get_DomImplementation, url)) as IDomDocument;
 end;
 
 function TGDOMDocumentBuilder.newDocument: IDomDocument;
@@ -2750,6 +2752,7 @@ end;
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
 begin
   result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
+  (result as IDOMParseOptions).validate:=true;
   (result as IDOMPersist).loadxml(xml);
 end;
 
@@ -2788,7 +2791,6 @@ begin
   root:= xmlNodePtr(FPGdomeDoc);
   FAttrList:=TList.Create;
   FNodeList:=TList.Create;
-  FNsList:=TList.Create;
   //Create root-node as pascal object
   inherited create(root,nil);
   inc(doccount);
@@ -2797,25 +2799,22 @@ end;
 constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
 var
   root:xmlNodePtr;
+  tmp: xmlNodePtr;
   fn: string;
 begin
   FGdomimpl:=GDOMImpl;
-  FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
-  //Get root-node
   {$ifdef WIN32}
     fn := UTF8Encode(StringReplace(aUrl, '\', '\\', [rfReplaceAll]));
   {$else}
     fn := aUrl;
   {$endif}
-  root:= xmlNodePtr(xmlParseFile(PChar(fn)));
-  if (root=nil) then begin
+  FPGdomeDoc:=(xmlParseFile(PChar(fn)));
+  if (FPGdomeDoc=nil) then begin
     checkError(102);
   end;
   FAttrList:=TList.Create;
   FNodeList:=TList.Create;
-  FNsList:=TList.Create;
-  //Create root-node as pascal object
-  inherited create(root,nil);
+  inherited create(xmlNodePtr(FPGdomeDoc),nil);
   inc(doccount);
 end;
 
@@ -2847,8 +2846,8 @@ end;
 
 procedure TGDOMDocument.appendNs(ns: xmlNsPtr);
 begin
-  if ns<>nil
-    then FNsList.add(ns);
+//  if ns<>nil
+//    then FNsList.add(ns);
 end;
 
 {function IsXmlNCName(const S: wideString): boolean;
