@@ -93,7 +93,7 @@ function xmlDeregisterNodeDefault(func: xmlDeregisterNodeFunc): xmlDeregisterNod
 {$IFDEF LIBXML_THREAD_ENABLED}
 //[pk] function __xmlRealloc:^xmlReallocFunc;cdecl;external LIBXML2_SO;
 //// extern xmlReallocFunc *__xmlRealloc(void);
-#define xmlRealloc ( *(__xmlRealloc()))
+//// #define xmlRealloc ( *(__xmlRealloc()))
 {$ELSE}
 LIBXML_DLL_IMPORT extern xmlReallocFunc xmlRealloc;
 {$ENDIF}
