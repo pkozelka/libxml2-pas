@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.95 2002-01-29 17:55:01 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.96 2002-01-30 00:03:48 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -43,7 +43,7 @@ uses
     unicode,
   {$endif}
   classes,
-  xdom2,
+  idom2,
   libxml2,
   sysutils;
 
@@ -53,6 +53,13 @@ const
 type
   TGDOMChildNodeList = class;
   TGDOMElement = class;
+
+  (**
+   * Experimental: interface providing access to serialized form of a node.
+   *)
+  IDomOutput = interface ['{A372B60C-C953-4D93-8DAD-ACEB76A8D3F9}']
+    function  get_xml: DomString;
+  end;
 
   { TGDOMObject }
 
@@ -78,7 +85,7 @@ type
   { TGDOMNode }
 
   TGDOMNodeClass = class of TGDOMNode;
-  TGDOMNode = class(TGDOMObject, IDomNode, ILibXml2Node, IDomNodeSelect)
+  TGDOMNode = class(TGDOMObject, IDomNode, ILibXml2Node, IDomNodeSelect, IDomOutput)
   private
     FGNode: xmlNodePtr;
     FChildNodes: TGDOMChildNodeList; // non-counted reference
@@ -116,6 +123,8 @@ type
     function  selectNode(const nodePath: DomString): IDomNode;
     function  selectNodes(const nodePath: DomString): IDomNodeList;
     procedure RegisterNS(const prefix,URI: DomString);
+  protected //IDomOutput
+    function  get_xml: DomString;
   protected //ready for IDomElement, IDomDocument
     function  getElementsByTagName(const name: DomString): IDomNodeList;
     function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
@@ -341,7 +350,7 @@ type
 
   { TGDOMDocument }
 
-  TGDOMDocument = class(TGDOMNode, IDomDocument, IDomParseOptions, IDomPersist, IDomNode)
+  TGDOMDocument = class(TGDOMNode, IDomDocument, IDomParseOptions, IDomPersist, IDomNode, IDomOutput)
   private
     FGDOMImpl: IDomImplementation;
     FAsync: boolean;              //for compatibility, not really supported
@@ -396,7 +405,6 @@ type
     procedure set_resolveExternals(aValue: Boolean);
     procedure set_validate(aValue: Boolean);
   protected //IDomPersist
-    function  get_xml: DomString;
     function  asyncLoadState: Integer;
     function  load(source: OleVariant): Boolean;
     function  loadFromStream(const stream: TStream): Boolean;
@@ -404,6 +412,8 @@ type
     procedure save(destination: OleVariant);
     procedure saveToStream(const stream: TStream);
     procedure set_OnAsyncLoad(const Sender: TObject; EventHandler: TAsyncEventHandler);
+  protected //IDomOutput
+    function  get_xml: DomString;
   protected //
     constructor Create(aLibXml2Node: pointer); override;
     function  requestDocPtr: xmlDocPtr;
@@ -1149,6 +1159,16 @@ begin
       Result := UTF8Decode(FGNode.name);
     end;
   end;
+end;
+
+function TGDOMNode.get_xml: DomString;
+var
+  buf: xmlBufferPtr;
+begin
+  buf := xmlBufferCreate;
+  xmlNodeDump(buf, requestNodePtr.doc, FGNode, 0, 1);
+  Result := UTF8Decode(buf.content);
+  xmlBufferFree(buf);
 end;
 
 procedure TGDOMNode.RegisterNS(const prefix, URI: DomString);
@@ -1991,17 +2011,6 @@ begin
   Fvalidate := aValue;
 end;
 
-function TGDOMDocument.get_xml: DomString;
-var
-  CString,encoding:pchar;
-  length:LongInt;
-begin
-  CString:='';
-  encoding:=GDoc.encoding;
-  xmlDocDumpMemoryEnc(GDoc,CString,@length,encoding);
-  Result:=CString;
-end;
-
 function TGDOMDocument.asyncLoadState: Integer;
 begin
   Result:=0;
@@ -2202,6 +2211,16 @@ end;
 procedure TGDOMDocument.set_nodeValue(const value: DomString);
 begin
   DomAssert(False, NO_MODIFICATION_ALLOWED_ERR);
+end;
+
+function TGDOMDocument.get_xml: DomString;
+var
+	p: PxmlChar;
+	sz: integer;
+begin
+  xmlDocDumpMemory(requestDocPtr, p, @sz);
+  Result := UTF8Decode(p);
+  xmlFree(p);
 end;
 
 { TGDOMCharacterData }
