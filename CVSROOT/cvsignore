@@ -1,2 +1,5 @@
 *.dcu
 *.exe
+*.res
+*.cfg
+*.dsk
