@@ -10,7 +10,7 @@
  * encoding.h : interface for the encoding conversion functions needed for
  *              XML
  *
- * Related specs: 
+ * Related specs:
  * rfc2044        (UTF-8 and UTF-16) F. Yergeau Alis Technologies
  * [ISO-10646]    UTF-8 and UTF-16 in Annexes
  * [ISO-8859-1]   ISO Latin-1 characters codes.
@@ -27,7 +27,7 @@
  *)
 
 type
-  xmlCharEncoding =  Longint;
+  xmlCharEncoding = Longint;
 const
   (**
    * xmlCharEncoding:
@@ -47,30 +47,30 @@ const
    * to be sure to enable icon and to provide iconv libs for the encoding
    * support needed.
    *)
-  XML_CHAR_ENCODING_ERROR = -(1);   { No char encoding detected  }
-  XML_CHAR_ENCODING_NONE = 0;       { No char encoding detected  }
-  XML_CHAR_ENCODING_UTF8 = 1;       { UTF-8  }
-  XML_CHAR_ENCODING_UTF16LE = 2;    { UTF-16 little endian  }
-  XML_CHAR_ENCODING_UTF16BE = 3;    { UTF-16 big endian  }
-  XML_CHAR_ENCODING_UCS4LE = 4;     { UCS-4 little endian  }
-  XML_CHAR_ENCODING_UCS4BE = 5;     { UCS-4 big endian  }
-  XML_CHAR_ENCODING_EBCDIC = 6;     { EBCDIC uh!  }
-  XML_CHAR_ENCODING_UCS4_2143 = 7;  { UCS-4 unusual ordering  }
-  XML_CHAR_ENCODING_UCS4_3412 = 8;  { UCS-4 unusual ordering  }
-  XML_CHAR_ENCODING_UCS2 = 9;       { UCS-2  }
-  XML_CHAR_ENCODING_8859_1 = 10;    { ISO-8859-1 ISO Latin 1  }
-  XML_CHAR_ENCODING_8859_2 = 11;    { ISO-8859-2 ISO Latin 2  }
-  XML_CHAR_ENCODING_8859_3 = 12;    { ISO-8859-3  }
-  XML_CHAR_ENCODING_8859_4 = 13;    { ISO-8859-4  }
-  XML_CHAR_ENCODING_8859_5 = 14;    { ISO-8859-5  }
-  XML_CHAR_ENCODING_8859_6 = 15;    { ISO-8859-6  }
-  XML_CHAR_ENCODING_8859_7 = 16;    { ISO-8859-7  }
-  XML_CHAR_ENCODING_8859_8 = 17;    { ISO-8859-8  }
-  XML_CHAR_ENCODING_8859_9 = 18;    { ISO-8859-9  }
-  XML_CHAR_ENCODING_2022_JP = 19;   { ISO-2022-JP  }
+  XML_CHAR_ENCODING_ERROR     = -1; { No char encoding detected  }
+  XML_CHAR_ENCODING_NONE      =  0; { No char encoding detected  }
+  XML_CHAR_ENCODING_UTF8      =  1; { UTF-8  }
+  XML_CHAR_ENCODING_UTF16LE   =  2; { UTF-16 little endian  }
+  XML_CHAR_ENCODING_UTF16BE   =  3; { UTF-16 big endian  }
+  XML_CHAR_ENCODING_UCS4LE    =  4; { UCS-4 little endian  }
+  XML_CHAR_ENCODING_UCS4BE    =  5; { UCS-4 big endian  }
+  XML_CHAR_ENCODING_EBCDIC    =  6; { EBCDIC uh!  }
+  XML_CHAR_ENCODING_UCS4_2143 =  7; { UCS-4 unusual ordering  }
+  XML_CHAR_ENCODING_UCS4_3412 =  8; { UCS-4 unusual ordering  }
+  XML_CHAR_ENCODING_UCS2      =  9; { UCS-2  }
+  XML_CHAR_ENCODING_8859_1    = 10; { ISO-8859-1 ISO Latin 1  }
+  XML_CHAR_ENCODING_8859_2    = 11; { ISO-8859-2 ISO Latin 2  }
+  XML_CHAR_ENCODING_8859_3    = 12; { ISO-8859-3  }
+  XML_CHAR_ENCODING_8859_4    = 13; { ISO-8859-4  }
+  XML_CHAR_ENCODING_8859_5    = 14; { ISO-8859-5  }
+  XML_CHAR_ENCODING_8859_6    = 15; { ISO-8859-6  }
+  XML_CHAR_ENCODING_8859_7    = 16; { ISO-8859-7  }
+  XML_CHAR_ENCODING_8859_8    = 17; { ISO-8859-8  }
+  XML_CHAR_ENCODING_8859_9    = 18; { ISO-8859-9  }
+  XML_CHAR_ENCODING_2022_JP   = 19; { ISO-2022-JP  }
   XML_CHAR_ENCODING_SHIFT_JIS = 20; { Shift_JIS  }
-  XML_CHAR_ENCODING_EUC_JP = 21;    { EUC-JP  }
-  XML_CHAR_ENCODING_ASCII = 22;     { pure ASCII  }
+  XML_CHAR_ENCODING_EUC_JP    = 21; { EUC-JP  }
+  XML_CHAR_ENCODING_ASCII     = 22; { pure ASCII  }
 
 type
   (**
@@ -89,7 +89,7 @@ type
    *     as the return value is positive, else unpredictiable.
    * The value of @outlen after return is the number of octets consumed.
    *)
-  xmlCharEncodingInputFunc = function (aOut: PByte; outlen: integer; aIn: PByte; inlen: integer): integer; cdecl;
+  xmlCharEncodingInputFunc = function(aOut: PByte; outlen: Integer; aIn: PByte; inlen: Integer): Integer; cdecl;
 
   (**
    * xmlCharEncodingOutputFunc:
@@ -109,7 +109,7 @@ type
    *     as the return value is positive, else unpredictiable.
    * The value of @outlen after return is the number of ocetes consumed.
    *)
-  xmlCharEncodingOutputFunc = function (aOut: PByte; outlen: integer; aIn: PByte; inlen: integer): integer; cdecl;
+  xmlCharEncodingOutputFunc = function(aOut: PByte; outlen: Integer; aIn: PByte; inlen: Integer): Integer; cdecl;
 
   (*
    * Block defining the handlers for non UTF-8 encodings.
@@ -117,57 +117,57 @@ type
    *)
   xmlCharEncodingHandlerPtr = ^xmlCharEncodingHandler;
   xmlCharEncodingHandler = record
-    name : Pchar;
-    input : xmlCharEncodingInputFunc;
-    output : xmlCharEncodingOutputFunc;
-{$ifdef LIBXML_ICONV_ENABLED}
-    iconv_in : iconv_t;
-    iconv_out : iconv_t;
-{$endif} //LIBXML_ICONV_ENABLED
+    name: PChar;
+    input: xmlCharEncodingInputFunc;
+    output: xmlCharEncodingOutputFunc;
+{$IFDEF LIBXML_ICONV_ENABLED}
+    iconv_in: iconv_t;
+    iconv_out: iconv_t;
+{$ENDIF} //LIBXML_ICONV_ENABLED
   end;
 
 (*
  * Interfaces for encoding handlers
  *)
-procedure xmlInitCharEncodingHandlers;cdecl;external LIBXML2_SO;
-procedure xmlCleanupCharEncodingHandlers;cdecl;external LIBXML2_SO;
-procedure xmlRegisterCharEncodingHandler(handler:xmlCharEncodingHandlerPtr);cdecl;external LIBXML2_SO;
-function  xmlGetCharEncodingHandler(enc:xmlCharEncoding):xmlCharEncodingHandlerPtr;cdecl;external LIBXML2_SO;
-function  xmlFindCharEncodingHandler(name:Pchar):xmlCharEncodingHandlerPtr;cdecl;external LIBXML2_SO;
+procedure xmlInitCharEncodingHandlers; cdecl; external LIBXML2_SO;
+procedure xmlCleanupCharEncodingHandlers; cdecl; external LIBXML2_SO;
+procedure xmlRegisterCharEncodingHandler(handler: xmlCharEncodingHandlerPtr); cdecl; external LIBXML2_SO;
+function  xmlGetCharEncodingHandler(enc: xmlCharEncoding): xmlCharEncodingHandlerPtr; cdecl; external LIBXML2_SO;
+function  xmlFindCharEncodingHandler(name: PChar): xmlCharEncodingHandlerPtr; cdecl; external LIBXML2_SO;
 
 (*
  * Interfaces for encoding names and aliases
  *)
-function  xmlAddEncodingAlias(name:Pchar; alias:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlDelEncodingAlias(alias:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlGetEncodingAlias(alias:Pchar):Pchar;cdecl;external LIBXML2_SO;
-procedure xmlCleanupEncodingAliases;cdecl;external LIBXML2_SO;
-function  xmlParseCharEncoding(name:Pchar):xmlCharEncoding;cdecl;external LIBXML2_SO;
-function  xmlGetCharEncodingName(enc:xmlCharEncoding):Pchar;cdecl;external LIBXML2_SO;
+function  xmlAddEncodingAlias(name: PChar; alias: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlDelEncodingAlias(alias: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlGetEncodingAlias(alias: PChar): PChar; cdecl; external LIBXML2_SO;
+procedure xmlCleanupEncodingAliases; cdecl; external LIBXML2_SO;
+function  xmlParseCharEncoding(name: PChar): xmlCharEncoding; cdecl; external LIBXML2_SO;
+function  xmlGetCharEncodingName(enc: xmlCharEncoding): PChar; cdecl; external LIBXML2_SO;
 
 (*
  * Interfaces directly used by the parsers.
  *)
-function  xmlDetectCharEncoding(aIn:Pbyte; len:longint):xmlCharEncoding;cdecl;external LIBXML2_SO;
-function  xmlCharEncOutFunc(handler:xmlCharEncodingHandlerPtr; aOut:xmlBufferPtr; aIn:xmlBufferPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlCharEncInFunc(handler:xmlCharEncodingHandlerPtr; aOut:xmlBufferPtr; aIn:xmlBufferPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlCharEncFirstLine(handler:xmlCharEncodingHandlerPtr; aOut:xmlBufferPtr; aIn:xmlBufferPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlCharEncCloseFunc(handler:xmlCharEncodingHandlerPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlDetectCharEncoding(aIn: PByte; len: Longint): xmlCharEncoding; cdecl; external LIBXML2_SO;
+function  xmlCharEncOutFunc(handler: xmlCharEncodingHandlerPtr; aOut: xmlBufferPtr; aIn: xmlBufferPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlCharEncInFunc(handler: xmlCharEncodingHandlerPtr; aOut: xmlBufferPtr; aIn: xmlBufferPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlCharEncFirstLine(handler: xmlCharEncodingHandlerPtr; aOut: xmlBufferPtr; aIn: xmlBufferPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlCharEncCloseFunc(handler: xmlCharEncodingHandlerPtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Export a few useful functions
  *)
-function  UTF8Toisolat1(aOut:Pbyte; outlen:Plongint; aIn:Pbyte; inlen:Plongint):longint;cdecl;external LIBXML2_SO;
-function  isolat1ToUTF8(aOut:Pbyte; outlen:Plongint; aIn:Pbyte; inlen:Plongint):longint;cdecl;external LIBXML2_SO;
+function  UTF8Toisolat1(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Longint; cdecl; external LIBXML2_SO;
+function  isolat1ToUTF8(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * exports additional "UTF-8 aware" string routines which are
  *)
-function  xmlCheckUTF8(utf:Pbyte):longint;cdecl;external LIBXML2_SO;
-function  xmlUTF8Strsize(utf:PxmlChar; len:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlUTF8Strndup(utf:PxmlChar; len:longint):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlUTF8Strpos(utf:PxmlChar; pos:longint):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlUTF8Strloc(utf:PxmlChar; utfchar:PxmlChar):longint;cdecl;external LIBXML2_SO;
-function  xmlUTF8Strsub(utf:PxmlChar; start:longint; len:longint):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlUTF8Strlen(utf:PxmlChar):longint;cdecl;external LIBXML2_SO;
+function  xmlCheckUTF8(utf: PByte): Longint; cdecl; external LIBXML2_SO;
+function  xmlUTF8Strsize(utf: PxmlChar; len: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlUTF8Strndup(utf: PxmlChar; len: Longint): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlUTF8Strpos(utf: PxmlChar; pos: Longint): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlUTF8Strloc(utf: PxmlChar; utfchar: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlUTF8Strsub(utf: PxmlChar; start: Longint; len: Longint): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlUTF8Strlen(utf: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 

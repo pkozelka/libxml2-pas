@@ -115,7 +115,7 @@ type
    * Signature of the function to use when there is an error and
    * no parsing or validity context available
    *)
-  xmlGenericErrorFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} {varargs;} {$ENDIF}
+  xmlGenericErrorFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} {[pk] varargs;} {$ENDIF}
   // note: the above modifier is commented because this syntax is not supported.
   //TODO: report it to Borland!
 (*

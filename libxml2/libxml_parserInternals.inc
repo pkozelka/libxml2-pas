@@ -49,7 +49,7 @@ const
  *                  | [#x10000-#x10FFFF]
  * any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
  *)
-function  IS_CHAR(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsChar';
+function  IS_CHAR(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsChar';
 
 (**
  * IS_BLANK:
@@ -59,7 +59,7 @@ function  IS_CHAR(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsCha
  *
  * [3] S ::= (#x20 | #x9 | #xD | #xA)+
  *)
-function  IS_BLANK(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsBlank';
+function  IS_BLANK(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsBlank';
 
 (**
  * IS_BASECHAR:
@@ -69,7 +69,7 @@ function  IS_BLANK(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsBl
  *
  * [85] BaseChar ::= ... long list see REC ...
  *)
-function  IS_BASECHAR(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsBaseChar';
+function  IS_BASECHAR(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsBaseChar';
 
 (**
  * IS_DIGIT:
@@ -79,7 +79,7 @@ function  IS_BASECHAR(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlI
  *
  * [88] Digit ::= ... long list see REC ...
  *)
-function  IS_DIGIT(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsDigit';
+function  IS_DIGIT(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsDigit';
 
 (**
  * IS_COMBINING:
@@ -89,7 +89,7 @@ function  IS_DIGIT(c:longint): LongBool; cdecl;external LIBXML2_SO name 'xmlIsDi
  *
  * [87] CombiningChar ::= ... long list see REC ...
  *)
-function IS_COMBINING(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsCombining';
+function  IS_COMBINING(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsCombining';
 
 (**
  * IS_EXTENDER:
@@ -102,7 +102,7 @@ function IS_COMBINING(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'x
  *                   #x0E46 | #x0EC6 | #x3005 | [#x3031-#x3035] |
  *                   [#x309D-#x309E] | [#x30FC-#x30FE]
  *)
-function IS_EXTENDER(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsExtender';
+function  IS_EXTENDER(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsExtender';
 
 (**
  * IS_IDEOGRAPHIC:
@@ -113,7 +113,7 @@ function IS_EXTENDER(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xm
  *
  * [86] Ideographic ::= [#x4E00-#x9FA5] | #x3007 | [#x3021-#x3029]
  *)
-function IS_IDEOGRAPHIC(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsIdeographic';
+function  IS_IDEOGRAPHIC(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsIdeographic';
 
 (**
  * IS_LETTER:
@@ -124,7 +124,7 @@ function IS_IDEOGRAPHIC(c : longint) : LongBool; cdecl;external LIBXML2_SO name 
  *
  * [84] Letter ::= BaseChar | Ideographic
  *)
-function IS_LETTER(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsLetter';
+function  IS_LETTER(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsLetter';
 
 (**
  * IS_PUBIDCHAR:
@@ -135,7 +135,7 @@ function IS_LETTER(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlI
  *
  * [13] PubidChar ::= #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;!*#@$_%]
  *)
-function IS_PUBIDCHAR(c : longint) : LongBool; cdecl;external LIBXML2_SO name 'xmlIsPubidChar';
+function  IS_PUBIDCHAR(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsPubidChar';
 
 (**
  * SKIP_EOL:
@@ -173,107 +173,106 @@ LIBXML_DLL_IMPORT extern const xmlChar xmlStringComment[];
 (*
  * Function to finish the work of the macros where needed
  *)
-function  xmlIsBaseChar(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsBlank(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsPubidChar(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsLetter(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsDigit(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsIdeographic(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsCombining(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsExtender(c:longint): LongBool; cdecl;external LIBXML2_SO;
-function  xmlIsChar(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsBaseChar(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsBlank(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsPubidChar(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsLetter(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsDigit(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsIdeographic(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsCombining(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsExtender(c: Longint): LongBool; cdecl; external LIBXML2_SO;
+function  xmlIsChar(c: Longint): LongBool; cdecl; external LIBXML2_SO;
 
 (**
  * Parser context
  *)
-function  xmlCreateFileParserCtxt(filename:Pchar):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
-function  xmlCreateMemoryParserCtxt(buffer:Pchar; size:longint):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
-function  xmlNewParserCtxt:xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
-function  xmlCreateEntityParserCtxt(URL:PxmlChar; ID:PxmlChar; base:PxmlChar):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
-function  xmlSwitchEncoding(ctxt:xmlParserCtxtPtr; enc:xmlCharEncoding):longint;cdecl;external LIBXML2_SO;
-function  xmlSwitchToEncoding(ctxt:xmlParserCtxtPtr; handler:xmlCharEncodingHandlerPtr):longint;cdecl;external LIBXML2_SO;
+function  xmlCreateFileParserCtxt(filename: PChar): xmlParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  xmlCreateMemoryParserCtxt(buffer: PChar; size: Longint): xmlParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  xmlNewParserCtxt: xmlParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  xmlCreateEntityParserCtxt(URL: PxmlChar; ID: PxmlChar; base: PxmlChar): xmlParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  xmlSwitchEncoding(ctxt: xmlParserCtxtPtr; enc: xmlCharEncoding): Longint; cdecl; external LIBXML2_SO;
+function  xmlSwitchToEncoding(ctxt: xmlParserCtxtPtr; handler: xmlCharEncodingHandlerPtr): Longint; cdecl; external LIBXML2_SO;
 
 (**
  * Entities
  *)
-procedure xmlHandleEntity(ctxt:xmlParserCtxtPtr; entity:xmlEntityPtr);cdecl;external LIBXML2_SO;
+procedure xmlHandleEntity(ctxt: xmlParserCtxtPtr; entity: xmlEntityPtr); cdecl; external LIBXML2_SO;
 
 (**
  * Input Streams
  *)
-function  xmlNewStringInputStream(ctxt:xmlParserCtxtPtr; buffer:PxmlChar):xmlParserInputPtr;cdecl;external LIBXML2_SO;
-function  xmlNewEntityInputStream(ctxt:xmlParserCtxtPtr; entity:xmlEntityPtr):xmlParserInputPtr;cdecl;external LIBXML2_SO;
-procedure xmlPushInput(ctxt:xmlParserCtxtPtr; input:xmlParserInputPtr);cdecl;external LIBXML2_SO;
-function  xmlPopInput(ctxt:xmlParserCtxtPtr):xmlChar;cdecl;external LIBXML2_SO;
-procedure xmlFreeInputStream(input:xmlParserInputPtr);cdecl;external LIBXML2_SO;
-function  xmlNewInputFromFile(ctxt:xmlParserCtxtPtr; filename:Pchar):xmlParserInputPtr;cdecl;external LIBXML2_SO;
-function  xmlNewInputStream(ctxt:xmlParserCtxtPtr):xmlParserInputPtr;cdecl;external LIBXML2_SO;
+function  xmlNewStringInputStream(ctxt: xmlParserCtxtPtr; buffer: PxmlChar): xmlParserInputPtr; cdecl; external LIBXML2_SO;
+function  xmlNewEntityInputStream(ctxt: xmlParserCtxtPtr; entity: xmlEntityPtr): xmlParserInputPtr; cdecl; external LIBXML2_SO;
+procedure xmlPushInput(ctxt: xmlParserCtxtPtr; input: xmlParserInputPtr); cdecl; external LIBXML2_SO;
+function  xmlPopInput(ctxt: xmlParserCtxtPtr): xmlChar; cdecl; external LIBXML2_SO;
+procedure xmlFreeInputStream(input: xmlParserInputPtr); cdecl; external LIBXML2_SO;
+function  xmlNewInputFromFile(ctxt: xmlParserCtxtPtr; filename: PChar): xmlParserInputPtr; cdecl; external LIBXML2_SO;
+function  xmlNewInputStream(ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl; external LIBXML2_SO;
 
 (**
  * Namespaces.
  *)
-function  xmlSplitQName(ctxt:xmlParserCtxtPtr; name:PxmlChar; prefix:PPxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlNamespaceParseNCName(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlNamespaceParseQName(ctxt:xmlParserCtxtPtr; prefix:PPxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlNamespaceParseNSDef(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseQuotedString(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-procedure xmlParseNamespace(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
+function  xmlSplitQName(ctxt: xmlParserCtxtPtr; name: PxmlChar; prefix: PPxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlNamespaceParseNCName(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlNamespaceParseQName(ctxt: xmlParserCtxtPtr; prefix: PPxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlNamespaceParseNSDef(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseQuotedString(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlParseNamespace(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
 
 (**
  * Generic production rules
  *)
-function  xmlScanName(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseName(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseNmtoken(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseEntityValue(ctxt:xmlParserCtxtPtr; orig:PPxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseAttValue(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseSystemLiteral(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParsePubidLiteral(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-procedure xmlParseCharData(ctxt:xmlParserCtxtPtr; cdata:longint);cdecl;external LIBXML2_SO;
-function  xmlParseExternalID(ctxt:xmlParserCtxtPtr; publicID:PPxmlChar; strict:longint):PxmlChar;cdecl;external LIBXML2_SO;
-procedure xmlParseComment(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  xmlParsePITarget(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-procedure xmlParsePI(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseNotationDecl(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseEntityDecl(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  xmlParseDefaultDecl(ctxt:xmlParserCtxtPtr; value:PPxmlChar):longint;cdecl;external LIBXML2_SO;
-function  xmlParseNotationType(ctxt:xmlParserCtxtPtr):xmlEnumerationPtr;cdecl;external LIBXML2_SO;
-function  xmlParseEnumerationType(ctxt:xmlParserCtxtPtr):xmlEnumerationPtr;cdecl;external LIBXML2_SO;
-function  xmlParseEnumeratedType(ctxt:xmlParserCtxtPtr; var tree:xmlEnumerationPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlParseAttributeType(ctxt:xmlParserCtxtPtr; var tree:xmlEnumerationPtr):longint;cdecl;external LIBXML2_SO;
-procedure xmlParseAttributeListDecl(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  xmlParseElementMixedContentDecl(ctxt:xmlParserCtxtPtr):xmlElementContentPtr;cdecl;external LIBXML2_SO;
-{$ifdef VMS}
-function  xmlParseElementChildrenContentD(ctxt:xmlParserCtxtPtr):xmlElementContentPtr;cdecl;external LIBXML2_SO;
+function  xmlScanName(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseName(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseNmtoken(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseEntityValue(ctxt: xmlParserCtxtPtr; orig: PPxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseAttValue(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseSystemLiteral(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParsePubidLiteral(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlParseCharData(ctxt: xmlParserCtxtPtr; cdata: Longint); cdecl; external LIBXML2_SO;
+function  xmlParseExternalID(ctxt: xmlParserCtxtPtr; publicID: PPxmlChar; strict: Longint): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlParseComment(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlParsePITarget(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlParsePI(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseNotationDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseEntityDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlParseDefaultDecl(ctxt: xmlParserCtxtPtr; value: PPxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlParseNotationType(ctxt: xmlParserCtxtPtr): xmlEnumerationPtr; cdecl; external LIBXML2_SO;
+function  xmlParseEnumerationType(ctxt: xmlParserCtxtPtr): xmlEnumerationPtr; cdecl; external LIBXML2_SO;
+function  xmlParseEnumeratedType(ctxt: xmlParserCtxtPtr; var tree: xmlEnumerationPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlParseAttributeType(ctxt: xmlParserCtxtPtr; var tree: xmlEnumerationPtr): Longint; cdecl; external LIBXML2_SO;
+procedure xmlParseAttributeListDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlParseElementMixedContentDecl(ctxt: xmlParserCtxtPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
+{$IFDEF VMS}
+function  xmlParseElementChildrenContentD(ctxt: xmlParserCtxtPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
 const
   xmlParseElementChildrenContentDecl = xmlParseElementChildrenContentD;
-{$else}
-function  xmlParseElementChildrenContentDecl(ctxt:xmlParserCtxtPtr):xmlElementContentPtr;cdecl;external LIBXML2_SO;
-{$endif}
-function  xmlParseElementContentDecl(ctxt:xmlParserCtxtPtr; name:PxmlChar; var result:xmlElementContentPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlParseElementDecl(ctxt:xmlParserCtxtPtr):longint;cdecl;external LIBXML2_SO;
-procedure xmlParseMarkupDecl(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  xmlParseCharRef(ctxt:xmlParserCtxtPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlParseEntityRef(ctxt:xmlParserCtxtPtr):xmlEntityPtr;cdecl;external LIBXML2_SO;
-procedure xmlParseReference(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParsePEReference(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseDocTypeDecl(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  xmlParseAttribute(ctxt:xmlParserCtxtPtr; value:PPxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseStartTag(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-procedure xmlParseEndTag(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseCDSect(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseContent(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseElement(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  xmlParseVersionNum(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseVersionInfo(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseEncName(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseEncodingDecl(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseSDDecl(ctxt:xmlParserCtxtPtr):longint;cdecl;external LIBXML2_SO;
-procedure xmlParseXMLDecl(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseTextDecl(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParseMisc(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-
-procedure xmlParseExternalSubset(ctxt:xmlParserCtxtPtr; ExternalID:PxmlChar; SystemID:PxmlChar);cdecl;external LIBXML2_SO;
+{$ELSE}
+function  xmlParseElementChildrenContentDecl(ctxt: xmlParserCtxtPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
+{$ENDIF}
+function  xmlParseElementContentDecl(ctxt: xmlParserCtxtPtr; name: PxmlChar; var result: xmlElementContentPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlParseElementDecl(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
+procedure xmlParseMarkupDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlParseCharRef(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlParseEntityRef(ctxt: xmlParserCtxtPtr): xmlEntityPtr; cdecl; external LIBXML2_SO;
+procedure xmlParseReference(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParsePEReference(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseDocTypeDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlParseAttribute(ctxt: xmlParserCtxtPtr; value: PPxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseStartTag(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlParseEndTag(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseCDSect(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseContent(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseElement(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlParseVersionNum(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseVersionInfo(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseEncName(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseEncodingDecl(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseSDDecl(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
+procedure xmlParseXMLDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseTextDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseMisc(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParseExternalSubset(ctxt: xmlParserCtxtPtr; ExternalID: PxmlChar; SystemID: PxmlChar); cdecl; external LIBXML2_SO;
 
 const
 (**
@@ -301,43 +300,43 @@ const
  *)
   XML_SUBSTITUTE_BOTH = 3;
 
-function  xmlDecodeEntities(ctxt:xmlParserCtxtPtr; len:longint; what:longint; end1,end2,end3:xmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlStringDecodeEntities(ctxt:xmlParserCtxtPtr; str:PxmlChar; what:longint; end1,end2,end3:xmlChar):PxmlChar;cdecl;external LIBXML2_SO;
+function  xmlDecodeEntities(ctxt: xmlParserCtxtPtr; len: Longint; what: Longint; end1, end2, end3: xmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlStringDecodeEntities(ctxt: xmlParserCtxtPtr; str: PxmlChar; what: Longint; end1, end2, end3: xmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 
 (*
  * Generated by MACROS on top of parser.c c.f. PUSH_AND_POP
  *)
-function  nodePush(ctxt:xmlParserCtxtPtr; value:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
-function  nodePop(ctxt:xmlParserCtxtPtr):xmlNodePtr;cdecl;external LIBXML2_SO;
-function  inputPush(ctxt:xmlParserCtxtPtr; value:xmlParserInputPtr):longint;cdecl;external LIBXML2_SO;
-function  inputPop(ctxt:xmlParserCtxtPtr):xmlParserInputPtr;cdecl;external LIBXML2_SO;
-function  namePop(ctxt:xmlParserCtxtPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  namePush(ctxt:xmlParserCtxtPtr; value:PxmlChar):longint;cdecl;external LIBXML2_SO;
+function  nodePush(ctxt: xmlParserCtxtPtr; value: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  nodePop(ctxt: xmlParserCtxtPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
+function  inputPush(ctxt: xmlParserCtxtPtr; value: xmlParserInputPtr): Longint; cdecl; external LIBXML2_SO;
+function  inputPop(ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl; external LIBXML2_SO;
+function  namePop(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  namePush(ctxt: xmlParserCtxtPtr; value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * other commodities shared between parser.c and parserInternals
  *)
-function  xmlSkipBlankChars(ctxt:xmlParserCtxtPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlStringCurrentChar(ctxt:xmlParserCtxtPtr; cur:PxmlChar; len:Plongint):longint;cdecl;external LIBXML2_SO;
-procedure xmlParserHandlePEReference(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParserHandleReference(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-function  xmlCheckLanguageID(lang:PxmlChar):longint;cdecl;external LIBXML2_SO;
+function  xmlSkipBlankChars(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlStringCurrentChar(ctxt: xmlParserCtxtPtr; cur: PxmlChar; len: PLongint): Longint; cdecl; external LIBXML2_SO;
+procedure xmlParserHandlePEReference(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParserHandleReference(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlCheckLanguageID(lang: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Really core function shared with HTML parser
  *)
-function  xmlCurrentChar(ctxt:xmlParserCtxtPtr; len:Plongint):longint;cdecl;external LIBXML2_SO;
-function  xmlCopyCharMultiByte(out:PxmlChar; val:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlCopyChar(len:longint; out:PxmlChar; val:longint):longint;cdecl;external LIBXML2_SO;
-procedure xmlNextChar(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
-procedure xmlParserInputShrink(inp:xmlParserInputPtr);cdecl;external LIBXML2_SO;
+function  xmlCurrentChar(ctxt: xmlParserCtxtPtr; len: PLongint): Longint; cdecl; external LIBXML2_SO;
+function  xmlCopyCharMultiByte(out: PxmlChar; val: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlCopyChar(len: Longint; out: PxmlChar; val: Longint): Longint; cdecl; external LIBXML2_SO;
+procedure xmlNextChar(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+procedure xmlParserInputShrink(inp: xmlParserInputPtr); cdecl; external LIBXML2_SO;
 
-{$ifdef LIBXML_HTML_ENABLED}
+{$IFDEF LIBXML_HTML_ENABLED}
 (*
  * Actually comes from the HTML parser but launched from the init stuff
  *)
-procedure htmlInitAutoClose;cdecl;external LIBXML2_SO;
-function  htmlCreateFileParserCtxt(filename:Pchar; encoding:Pchar):htmlParserCtxtPtr;cdecl;external LIBXML2_SO;
+procedure htmlInitAutoClose; cdecl; external LIBXML2_SO;
+function  htmlCreateFileParserCtxt(filename: PChar; encoding: PChar): htmlParserCtxtPtr; cdecl; external LIBXML2_SO;
 (**
  * xmlEntityReferenceFunc:
  * @ent: the entity
@@ -348,13 +347,12 @@ function  htmlCreateFileParserCtxt(filename:Pchar; encoding:Pchar):htmlParserCtx
  * provenance of a chunk of nodes inherited from an entity replacement
  *)
 type
-  xmlEntityReferenceFunc = procedure (ent: xmlEntityPtr; firstNode, lastNode: xmlNodePtr); cdecl; 
+  xmlEntityReferenceFunc = procedure(ent: xmlEntityPtr; firstNode, lastNode: xmlNodePtr); cdecl;
 
 (*
  * Specific function to keep track of entities references
  * and used by the XSLT debugger
  *)
 procedure xmlSetEntityReferenceFunc(func: xmlEntityReferenceFunc); cdecl; external LIBXML2_SO;
-
-{$endif}
+{$ENDIF}
 

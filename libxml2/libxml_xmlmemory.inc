@@ -23,11 +23,11 @@
 {-$define DEBUG_MEMORY_FREED}
 {-$define DEBUG_MEMORY_LOCATION}
 
-{$ifdef DEBUG}
-{$ifndef DEBUG_MEMORY}
-{$define DEBUG_MEMORY}
-{$endif}
-{$endif}
+{$IFDEF DEBUG}
+{$IFNDEF DEBUG_MEMORY}
+{$DEFINE DEBUG_MEMORY}
+{$ENDIF}
+{$ENDIF}
 
 (**
  * DEBUG_MEMORY_LOCATION:
@@ -36,8 +36,8 @@
  * libxml i.e. if libxml has been configured with --with-debug-mem too
  *)
 
-{$ifdef DEBUG}
-{$endif}
+{$IFDEF DEBUG}
+{$ENDIF}
 
 type
   (*
@@ -50,7 +50,7 @@ type
    *
    * Signature for a free() implementation
    *)
-  xmlFreeFunc = procedure(ptr: pointer); cdecl;
+  xmlFreeFunc = procedure(ptr: Pointer); cdecl;
   PxmlFreeFunc = ^xmlFreeFunc;
 
   (**
@@ -61,7 +61,7 @@ type
    *
    * Returns a pointer to the newly allocated block or NULL in case of error
    *)
-  xmlMallocFunc = function (size:size_t):pointer; cdecl;
+  xmlMallocFunc = function(size: size_t): Pointer; cdecl;
   PxmlMallocFunc = ^xmlMallocFunc;
 
   (**
@@ -73,7 +73,7 @@ type
    *
    * Returns a pointer to the newly reallocated block or NULL in case of error
    *)
-  xmlReallocFunc = function (ptr:pointer; size:size_t):pointer; cdecl;
+  xmlReallocFunc = function(ptr: Pointer; size: size_t): Pointer; cdecl;
   PxmlReallocFunc = ^xmlReallocFunc;
 
   (**
@@ -84,7 +84,7 @@ type
    *
    * Returns the copy of the string or NULL in case of error
    *)
-  xmlStrdupFunc = function (str:PChar):PChar; cdecl;
+  xmlStrdupFunc = function(str: PChar): PChar; cdecl;
   PxmlStrdupFunc = ^xmlStrdupFunc;
 
 (*
@@ -98,23 +98,23 @@ LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
 (*
  * The way to overload the existing functions
  *)
-function  xmlMemSetup(freeFunc: PxmlFreeFunc; mallocFunc: PxmlMallocFunc; reallocFunc: PxmlReallocFunc; strdupFunc: PxmlStrdupFunc):longint;cdecl;external LIBXML2_SO;
-function  xmlMemGet(var freeFunc: PxmlFreeFunc; var mallocFunc: PxmlMallocFunc; var reallocFunc: PxmlReallocFunc; var strdupFunc: PxmlStrdupFunc):longint;cdecl;external LIBXML2_SO;
+function  xmlMemSetup(freeFunc: PxmlFreeFunc; mallocFunc: PxmlMallocFunc; reallocFunc: PxmlReallocFunc; strdupFunc: PxmlStrdupFunc): Longint; cdecl; external LIBXML2_SO;
+function  xmlMemGet(var freeFunc: PxmlFreeFunc; var mallocFunc: PxmlMallocFunc; var reallocFunc: PxmlReallocFunc; var strdupFunc: PxmlStrdupFunc): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Initialization of the memory layer
  *)
-function  xmlInitMemory:longint;cdecl;external LIBXML2_SO;
+function  xmlInitMemory: Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Those are specific to the XML debug memory wrapper
  *)
-function  xmlMemUsed:longint;cdecl;external LIBXML2_SO;
-procedure xmlMemDisplay(var fp:TextFile);cdecl;external LIBXML2_SO;
-procedure xmlMemShow(var fp:TextFile; nr:longint);cdecl;external LIBXML2_SO;
-procedure xmlMemoryDump;cdecl;external LIBXML2_SO;
+function  xmlMemUsed: Longint; cdecl; external LIBXML2_SO;
+procedure xmlMemDisplay(var fp: TextFile); cdecl; external LIBXML2_SO;
+procedure xmlMemShow(var fp: TextFile; nr: Longint); cdecl; external LIBXML2_SO;
+procedure xmlMemoryDump; cdecl; external LIBXML2_SO;
 
-{$ifdef XML_DEBUG_MEMORY_LOCATION}
+{$IFDEF XML_DEBUG_MEMORY_LOCATION}
 (**
  * xmlMalloc:
  * @size:  number of bytes to allocate
@@ -144,9 +144,9 @@ procedure xmlMemoryDump;cdecl;external LIBXML2_SO;
  *)
 //TODO: #define xmlMemStrdup(str) xmlMemStrdupLoc((str), __FILE__, __LINE__)
 
-procedure xmlMallocLoc(size: size_t; filename: PChar; line: longint);
-procedure xmlReallocLoc(ptr: pointer; size: size_t; filename: PChar; line: longint);
-function  xmlMemStrdupLoc(str: PChar; filename: PChar; line: longint): PChar;
+procedure xmlMallocLoc(size: size_t; filename: PChar; line: Longint);
+procedure xmlReallocLoc(ptr: Pointer; size: size_t; filename: PChar; line: Longint);
+function  xmlMemStrdupLoc(str: PChar; filename: PChar; line: Longint): PChar;
 
-{$endif} // XML_DEBUG_MEMORY_LOCATION
+{$ENDIF} // XML_DEBUG_MEMORY_LOCATION
 

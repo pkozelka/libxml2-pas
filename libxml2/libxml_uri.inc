@@ -24,16 +24,16 @@ type
    *)
   xmlURIPtr = ^xmlURI;
   xmlURI = record
-    scheme : Pchar;                 { the URI scheme  }
-    opaque : Pchar;                 { opaque part  }
-    authority : Pchar;              { the authority part  }
-    server : Pchar;                 { the server part  }
-    user : Pchar;                   { the user part  }
-    port : longint;                 { the port number  }
-    path : Pchar;                   { the path string  }
-    query : Pchar;                  { the query string  }
-    fragment : Pchar;               { the fragment identifier  }
-    cleanup : longint;              { parsing potentially unclean URI }
+    scheme: PChar;                  { the URI scheme  }
+    opaque: PChar;                  { opaque part  }
+    authority: PChar;               { the authority part  }
+    server: PChar;                  { the server part  }
+    user: PChar;                    { the user part  }
+    port: Longint;                  { the port number  }
+    path: PChar;                    { the path string  }
+    query: PChar;                   { the query string  }
+    fragment: PChar;                { the fragment identifier  }
+    cleanup: Longint;               { parsing potentially unclean URI }
   end;
 
 (*
@@ -42,15 +42,15 @@ type
  *                            xmlNodePtr cur);
  *)
 
-function  xmlCreateURI:xmlURIPtr;cdecl;external LIBXML2_SO;
-function  xmlBuildURI(URI:PxmlChar; base:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseURI(str:PChar):xmlURIPtr;cdecl;external LIBXML2_SO;
-function  xmlParseURIReference(uri:xmlURIPtr; str:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlSaveUri(uri:xmlURIPtr):PxmlChar;cdecl;external LIBXML2_SO;
-procedure xmlPrintURI(var stream:TextFile; uri:xmlURIPtr);cdecl;external LIBXML2_SO;
-function  xmlURIEscapeStr(str:PxmlChar; list:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlURIUnescapeString(str:Pchar; len:longint; target:Pchar):Pchar;cdecl;external LIBXML2_SO;
-function  xmlNormalizeURIPath(path:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlURIEscape(str:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-procedure xmlFreeURI(uri:xmlURIPtr);cdecl;external LIBXML2_SO;
+function  xmlCreateURI: xmlURIPtr; cdecl; external LIBXML2_SO;
+function  xmlBuildURI(URI: PxmlChar; base: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlParseURI(str: PChar): xmlURIPtr; cdecl; external LIBXML2_SO;
+function  xmlParseURIReference(uri: xmlURIPtr; str: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlSaveUri(uri: xmlURIPtr): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlPrintURI(var stream: TextFile; uri: xmlURIPtr); cdecl; external LIBXML2_SO;
+function  xmlURIEscapeStr(str: PxmlChar; list: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlURIUnescapeString(str: PChar; len: Longint; target: PChar): PChar; cdecl; external LIBXML2_SO;
+function  xmlNormalizeURIPath(path: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlURIEscape(str: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlFreeURI(uri: xmlURIPtr); cdecl; external LIBXML2_SO;
 

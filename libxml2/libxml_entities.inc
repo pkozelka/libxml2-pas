@@ -14,17 +14,17 @@
  *)
 
 type
-  xmlEntityType =  Longint;
+  xmlEntityType = Longint;
 const
   (*
    * The different valid entity types
    *)
-  XML_INTERNAL_GENERAL_ENTITY = 1;
-  XML_EXTERNAL_GENERAL_PARSED_ENTITY = 2;
+  XML_INTERNAL_GENERAL_ENTITY          = 1;
+  XML_EXTERNAL_GENERAL_PARSED_ENTITY   = 2;
   XML_EXTERNAL_GENERAL_UNPARSED_ENTITY = 3;
-  XML_INTERNAL_PARAMETER_ENTITY = 4;
-  XML_EXTERNAL_PARAMETER_ENTITY = 5;
-  XML_INTERNAL_PREDEFINED_ENTITY = 6;
+  XML_INTERNAL_PARAMETER_ENTITY        = 4;
+  XML_EXTERNAL_PARAMETER_ENTITY        = 5;
+  XML_INTERNAL_PREDEFINED_ENTITY       = 6;
 
 type
   (*
@@ -62,23 +62,20 @@ type
 (*
  * External functions :
  *)
-procedure xmlInitializePredefinedEntities;cdecl;external LIBXML2_SO;
-function  xmlAddDocEntity(doc:xmlDocPtr; name:PxmlChar; aType:longint; ExternalID:PxmlChar; SystemID:PxmlChar; content:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;
-function  xmlAddDtdEntity(doc:xmlDocPtr; name:PxmlChar; aType:longint; ExternalID:PxmlChar; SystemID:PxmlChar; content:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;
-function  xmlGetPredefinedEntity(name:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;
-function  xmlGetDocEntity(doc:xmlDocPtr; name:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;
-function  xmlGetDtdEntity(doc:xmlDocPtr; name:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;
-function  xmlGetParameterEntity(doc:xmlDocPtr; name:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;
-function  xmlEncodeEntities(doc:xmlDocPtr; input:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlEncodeEntitiesReentrant(doc:xmlDocPtr; input:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlEncodeSpecialChars(doc:xmlDocPtr; input:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlCreateEntitiesTable:xmlEntitiesTablePtr;cdecl;external LIBXML2_SO;
-function  xmlCopyEntitiesTable(table:xmlEntitiesTablePtr):xmlEntitiesTablePtr;cdecl;external LIBXML2_SO;
-procedure xmlFreeEntitiesTable(table:xmlEntitiesTablePtr);cdecl;external LIBXML2_SO;
-procedure xmlDumpEntitiesTable(buf:xmlBufferPtr; table:xmlEntitiesTablePtr);cdecl;external LIBXML2_SO;
-procedure xmlDumpEntityDecl(buf:xmlBufferPtr; ent:xmlEntityPtr);cdecl;external LIBXML2_SO;
-procedure xmlCleanupPredefinedEntities;cdecl;external LIBXML2_SO;
-
-
-
+procedure xmlInitializePredefinedEntities; cdecl; external LIBXML2_SO;
+function  xmlAddDocEntity(doc: xmlDocPtr; name: PxmlChar; aType: Longint; ExternalID: PxmlChar; SystemID: PxmlChar; content: PxmlChar): xmlEntityPtr; cdecl; external LIBXML2_SO;
+function  xmlAddDtdEntity(doc: xmlDocPtr; name: PxmlChar; aType: Longint; ExternalID: PxmlChar; SystemID: PxmlChar; content: PxmlChar): xmlEntityPtr; cdecl; external LIBXML2_SO;
+function  xmlGetPredefinedEntity(name: PxmlChar): xmlEntityPtr; cdecl; external LIBXML2_SO;
+function  xmlGetDocEntity(doc: xmlDocPtr; name: PxmlChar): xmlEntityPtr; cdecl; external LIBXML2_SO;
+function  xmlGetDtdEntity(doc: xmlDocPtr; name: PxmlChar): xmlEntityPtr; cdecl; external LIBXML2_SO;
+function  xmlGetParameterEntity(doc: xmlDocPtr; name: PxmlChar): xmlEntityPtr; cdecl; external LIBXML2_SO;
+function  xmlEncodeEntities(doc: xmlDocPtr; input: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlEncodeEntitiesReentrant(doc: xmlDocPtr; input: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlEncodeSpecialChars(doc: xmlDocPtr; input: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlCreateEntitiesTable: xmlEntitiesTablePtr; cdecl; external LIBXML2_SO;
+function  xmlCopyEntitiesTable(table: xmlEntitiesTablePtr): xmlEntitiesTablePtr; cdecl; external LIBXML2_SO;
+procedure xmlFreeEntitiesTable(table: xmlEntitiesTablePtr); cdecl; external LIBXML2_SO;
+procedure xmlDumpEntitiesTable(buf: xmlBufferPtr; table: xmlEntitiesTablePtr); cdecl; external LIBXML2_SO;
+procedure xmlDumpEntityDecl(buf: xmlBufferPtr; ent: xmlEntityPtr); cdecl; external LIBXML2_SO;
+procedure xmlCleanupPredefinedEntities; cdecl; external LIBXML2_SO;
 

@@ -54,19 +54,19 @@ const
    *)
   HTML_PI_NODE = XML_PI_NODE;
 
-function  htmlNewDoc(URI:PxmlChar; ExternalID:PxmlChar):htmlDocPtr;cdecl;external LIBXML2_SO;
-function  htmlNewDocNoDtD(URI:PxmlChar; ExternalID:PxmlChar):htmlDocPtr;cdecl;external LIBXML2_SO;
-function  htmlGetMetaEncoding(doc:htmlDocPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  htmlSetMetaEncoding(doc:htmlDocPtr; encoding:PxmlChar):longint;cdecl;external LIBXML2_SO;
-procedure htmlDocDumpMemory(cur:xmlDocPtr; mem:PPxmlChar; size:Plongint);cdecl;external LIBXML2_SO;
-function  htmlDocDump(var f:TextFile; cur:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
-function  htmlSaveFile(filename:Pchar; cur:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
-procedure htmlNodeDump(buf:xmlBufferPtr; doc:xmlDocPtr; cur:xmlNodePtr);cdecl;external LIBXML2_SO;
-procedure htmlNodeDumpFile(var aOut:TextFile; doc:xmlDocPtr; cur:xmlNodePtr);cdecl;external LIBXML2_SO;
-function  htmlNodeDumpFileFormat(var aOut:TextFile; doc:xmlDocPtr; cur:xmlNodePtr; encoding:Pchar; format:longint):longint;cdecl;external LIBXML2_SO;
-function  htmlSaveFileEnc(filename:Pchar; cur:xmlDocPtr; encoding:Pchar):longint;cdecl;external LIBXML2_SO;
-function  htmlSaveFileFormat(filename:Pchar; cur:xmlDocPtr; encoding:Pchar; format:longint):longint;cdecl;external LIBXML2_SO;
-procedure htmlNodeDumpFormatOutput(buf:xmlOutputBufferPtr; doc: xmlDocPtr; cur:xmlDocPtr; encoding:PChar; format: longint);cdecl;external LIBXML2_SO;
-procedure htmlDocContentDumpOutput(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:PChar);cdecl;external LIBXML2_SO;
-procedure htmlDocContentDumpFormatOutput(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:PChar; format: longint);cdecl;external LIBXML2_SO;
+function  htmlNewDoc(URI: PxmlChar; ExternalID: PxmlChar): htmlDocPtr; cdecl; external LIBXML2_SO;
+function  htmlNewDocNoDtD(URI: PxmlChar; ExternalID: PxmlChar): htmlDocPtr; cdecl; external LIBXML2_SO;
+function  htmlGetMetaEncoding(doc: htmlDocPtr): PxmlChar; cdecl; external LIBXML2_SO;
+function  htmlSetMetaEncoding(doc: htmlDocPtr; encoding: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+procedure htmlDocDumpMemory(cur: xmlDocPtr; mem: PPxmlChar; size: PLongint); cdecl; external LIBXML2_SO;
+function  htmlDocDump(var f: TextFile; cur: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
+function  htmlSaveFile(filename: PChar; cur: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
+procedure htmlNodeDump(buf: xmlBufferPtr; doc: xmlDocPtr; cur: xmlNodePtr); cdecl; external LIBXML2_SO;
+procedure htmlNodeDumpFile(var aOut: TextFile; doc: xmlDocPtr; cur: xmlNodePtr); cdecl; external LIBXML2_SO;
+function  htmlNodeDumpFileFormat(var aOut: TextFile; doc: xmlDocPtr; cur: xmlNodePtr; encoding: PChar; format: Longint): Longint; cdecl; external LIBXML2_SO;
+function  htmlSaveFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar): Longint; cdecl; external LIBXML2_SO;
+function  htmlSaveFileFormat(filename: PChar; cur: xmlDocPtr; encoding: PChar; format: Longint): Longint; cdecl; external LIBXML2_SO;
+procedure htmlNodeDumpFormatOutput(buf: xmlOutputBufferPtr; doc: xmlDocPtr; cur: xmlDocPtr; encoding: PChar; format: Longint); cdecl; external LIBXML2_SO;
+procedure htmlDocContentDumpOutput(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: PChar); cdecl; external LIBXML2_SO;
+procedure htmlDocContentDumpFormatOutput(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: PChar; format: Longint); cdecl; external LIBXML2_SO;
 

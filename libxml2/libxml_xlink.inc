@@ -12,7 +12,7 @@
  *
  * Related specification: http://www.w3.org/TR/xlink
  *                        http://www.w3.org/HTML/
- *     and XBase 
+ *     and XBase
  *
  * daniel@veillard.com
  *)
@@ -33,26 +33,26 @@ type
   xlinkRole = PxmlChar;
   xlinkTitle = PxmlChar;
 
-  xlinkType =  Longint;
+  xlinkType = Longint;
 const
-  XLINK_TYPE_NONE = 0;
-  XLINK_TYPE_SIMPLE = 1;
-  XLINK_TYPE_EXTENDED = 2;
+  XLINK_TYPE_NONE         = 0;
+  XLINK_TYPE_SIMPLE       = 1;
+  XLINK_TYPE_EXTENDED     = 2;
   XLINK_TYPE_EXTENDED_SET = 3;
 
 type
-  xlinkShow =  Longint;
+  xlinkShow = Longint;
 const
-  XLINK_SHOW_NONE = 0;
-  XLINK_SHOW_NEW = 1;
-  XLINK_SHOW_EMBED = 2;
+  XLINK_SHOW_NONE    = 0;
+  XLINK_SHOW_NEW     = 1;
+  XLINK_SHOW_EMBED   = 2;
   XLINK_SHOW_REPLACE = 3;
 
 type
-  xlinkActuate =  Longint;
+  xlinkActuate = Longint;
 const
-  XLINK_ACTUATE_NONE = 0;
-  XLINK_ACTUATE_AUTO = 1;
+  XLINK_ACTUATE_NONE      = 0;
+  XLINK_ACTUATE_AUTO      = 1;
   XLINK_ACTUATE_ONREQUEST = 2;
 
 type
@@ -64,7 +64,7 @@ type
    * This is the prototype for the link detection routine
    * It calls the default link detection callbacks upon link detection.
    *)
-  xlinkNodeDetectFunc = procedure (ctx: pointer; node: xmlNodePtr); stdcall;
+  xlinkNodeDetectFunc = procedure(ctx: Pointer; node: xmlNodePtr); stdcall;
 
   (**
    * The link detection module interact with the upper layers using
@@ -81,7 +81,7 @@ type
    *
    * This is the prototype for a simple link detection callback.
    *)
-  xlinkSimpleLinkFunk = procedure (ctx: pointer; node: xmlNodePtr; href: xlinkHRef; role: xlinkRole; title: xlinkTitle); stdcall;
+  xlinkSimpleLinkFunk = procedure(ctx: Pointer; node: xmlNodePtr; href: xlinkHRef; role: xlinkRole; title: xlinkTitle); stdcall;
   (**
    * xlinkExtendedLinkFunk:
    * @ctx:  user data pointer
@@ -100,10 +100,7 @@ type
    *
    * This is the prototype for a extended link detection callback.
    *)
-  xlinkExtendedLinkFunk = procedure (ctx: pointer; node: xmlNodePtr;
-    nbLocators: integer; var hrefs: xlinkHRef; var roles: xlinkRole;
-    nbArcs: integer; var aFrom, aTo: xlinkRole; var show: xlinkShow; var actuate: xlinkActuate;
-    nbTitles: integer; var titles: xlinkTitle; var langs: PxmlChar);
+  xlinkExtendedLinkFunk = procedure(ctx: Pointer; node: xmlNodePtr; nbLocators: Integer; var hrefs: xlinkHRef; var roles: xlinkRole; nbArcs: Integer; var aFrom, aTo: xlinkRole; var show: xlinkShow; var actuate: xlinkActuate; nbTitles: Integer; var titles: xlinkTitle; var langs: PxmlChar);
   (**
    * xlinkExtendedLinkSetFunk:
    * @ctx:  user data pointer
@@ -117,9 +114,7 @@ type
    *
    * This is the prototype for a extended link set detection callback.
    *)
-  xlinkExtendedLinkSetFunk = procedure (ctx: pointer; node: xmlNodePtr;
-    nbLocators: integer; var hrefs: xlinkHRef; var roles: xlinkRole;
-    nbTitles: integer; var titles: xlinkTitle; var langs: PxmlChar);
+  xlinkExtendedLinkSetFunk = procedure(ctx: Pointer; node: xmlNodePtr; nbLocators: Integer; var hrefs: xlinkHRef; var roles: xlinkRole; nbTitles: Integer; var titles: xlinkTitle; var langs: PxmlChar);
   (**
    * This is the structure containing a set of Links detection callbacks
    *
@@ -128,26 +123,26 @@ type
    *)
   xlinkHandlerPtr = ^xlinkHandler;
   xlinkHandler = record
-    simple : xlinkSimpleLinkFunk;
-    extended : xlinkExtendedLinkFunk;
-    set_ : xlinkExtendedLinkSetFunk;
+    simple: xlinkSimpleLinkFunk;
+    extended: xlinkExtendedLinkFunk;
+    set_: xlinkExtendedLinkSetFunk;
   end;
 
 (*
  * the default detection routine, can be overridden, they call the default
  * detection callbacks.
  *)
-function xlinkGetDefaultDetect:xlinkNodeDetectFunc;cdecl;external LIBXML2_SO;
-procedure xlinkSetDefaultDetect(func:xlinkNodeDetectFunc);cdecl;external LIBXML2_SO;
+function  xlinkGetDefaultDetect: xlinkNodeDetectFunc; cdecl; external LIBXML2_SO;
+procedure xlinkSetDefaultDetect(func: xlinkNodeDetectFunc); cdecl; external LIBXML2_SO;
 
 (*
  * Routines to set/get the default handlers.
  *)
-function xlinkGetDefaultHandler:xlinkHandlerPtr;cdecl;external LIBXML2_SO;
-procedure xlinkSetDefaultHandler(handler:xlinkHandlerPtr);cdecl;external LIBXML2_SO;
+function  xlinkGetDefaultHandler: xlinkHandlerPtr; cdecl; external LIBXML2_SO;
+procedure xlinkSetDefaultHandler(handler: xlinkHandlerPtr); cdecl; external LIBXML2_SO;
 
 (*
  * Link detection module itself.
  *)
-function xlinkIsLink(doc:xmlDocPtr; node:xmlNodePtr):xlinkType;cdecl;external LIBXML2_SO;
+function  xlinkIsLink(doc: xmlDocPtr; node: xmlNodePtr): xlinkType; cdecl; external LIBXML2_SO;
 
