@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.10 2002-02-11 20:41:34 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.11 2002-02-11 20:44:16 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -179,6 +179,17 @@ type
     function  IDomEntityReference.get_childNodes = returnChildNodes;
   end;
 
+  { TGDOMNotation class }
+
+  TLDOMNotation = class(TLDOMNode, IDomNode, IDomNotation)
+  protected //IDomNode
+    function  IDomNode.get_parentNode = returnNullDomNode;
+  protected //IDomNotation
+    function  IDomNotation.get_parentNode = returnNullDomNode;
+    function  get_publicId: DomString;
+    function  get_systemId: DomString;
+  end;
+
   { TLDOMProcessingInstruction class }
 
   TLDOMProcessingInstruction = class(TLDOMNode, IDomProcessingInstruction)
@@ -281,7 +292,7 @@ var
     nil, //TGDOMDocument,
     TLDOMDocumentType,
     TLDOMDocumentFragment,
-    nil, //TGDOMNotation,
+    TLDOMNotation,
     nil, //TGDOMDocument,
     TLDOMDocumentType,
     nil,
@@ -1303,6 +1314,18 @@ end;
 function TLDOMDocumentType.GetGDocumentType: xmlDtdPtr;
 begin
   Result := xmlDtdPtr(GNode);
+end;
+
+{ TLDOMNotation }
+
+function TLDOMNotation.get_publicId: DomString;
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+function TLDOMNotation.get_systemId: DomString;
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
 end.
