@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.20 2002-02-17 02:12:29 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.21 2002-02-17 02:37:46 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -140,7 +140,7 @@ type
     destructor Destroy; override;
   end;
 
-  { TGDOMCharacterData class }
+  { TLDomCharacterData class }
 
   TLDomCharacterData = class(TLDomNode, IDomCharacterData, IDomNode)
   private
@@ -156,7 +156,7 @@ type
   public
   end;
 
-  { TGDOMText class }
+  { TLDomText class }
 
   TLDomText = class(TLDomCharacterData, IDomText, IDomCharacterData, IDomNode)
   protected //IDomCharacterData
@@ -179,7 +179,7 @@ type
     procedure IDomCDataSection.set_data = set_nodeValue;
   end;
 
-  { TGDOMComment class }
+  { TLDomComment class }
 
   TLDomComment = class(TLDomCharacterData, IDomComment, IDomCharacterData, IDomNode)
   protected //IDomCharacterData
@@ -252,7 +252,7 @@ type
     function  IDomEntityReference.get_childNodes = returnChildNodes;
   end;
 
-  { TGDOMNotation class }
+  { TLDomNotation class }
 
   TLDomNotation = class(TLDomNode, IDomNode, IDomNotation)
   protected //IDomNode
@@ -492,7 +492,7 @@ end;
  * Registers a flying node in its document node's wrapper.
  * If the node is already registered, does nothing.
  * Nodes of type that cannot be registered are silently ignored.
- * This is called from TGDOMNode.Create when parent is nil.
+ * This is called from TLDomNode.Create when parent is nil.
  *)
 procedure RegisterFlyingNode(aNode: xmlNodePtr);
 var
@@ -607,11 +607,11 @@ begin
   FGNode := aLibXml2Node;
   if not (self is TLDomDocument) then begin
     // this node is not a document
-    DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
+    DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TLDomNode.Create: Cannot wrap null node');
     FGNode._private := self;
 
     if not (self is TLDomDocumentType) then begin
-      DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
+      DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TLDomNode.Create: Cannot wrap node not attached to any document');
     end;
     if (FGNode.doc<>nil) then begin
       // if the node is flying, register it in the owner document
@@ -842,17 +842,17 @@ const
     NOTATION_NODE
   ];
 begin
-  DomAssert(newChild<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.insertBefore: cannot append null');
-  DomAssert((newChild.nodeType in CHILD_TYPES), HIERARCHY_REQUEST_ERR, 'TGDOMNode.insertBefore: newChild cannot be inserted, nodetype = '+IntToStr(get_nodeType));
+  DomAssert(newChild<>nil, INVALID_ACCESS_ERR, 'insertBefore: cannot append null');
+  DomAssert((newChild.nodeType in CHILD_TYPES), HIERARCHY_REQUEST_ERR, 'insertBefore: newChild cannot be inserted, nodetype = '+IntToStr(get_nodeType));
   DomAssert(not IsReadOnlyNode(requestNodePtr), NO_MODIFICATION_ALLOWED_ERR);
   if (requestNodePtr.type_=XML_DOCUMENT_NODE) and (newChild.nodeType = ELEMENT_NODE) then begin
-    DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR, 'TGDOMNode.insertBefore: document already has a documentElement');
+    DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR, 'insertBefore: document already has a documentElement');
   end;
 
   child := GetGNode(newChild);
   DomAssert(not IsAncestorOrSelf(child), HIERARCHY_REQUEST_ERR);
-  DomAssert(child.doc=FGNode.doc, WRONG_DOCUMENT_ERR, 'TGDOMNode.insertBefore: cannot insert a node from other document');
-  DomAssert(not IsReadOnlyNode(child.parent), NO_MODIFICATION_ALLOWED_ERR, 'TGDOMNode.insertBefore: modification not allowed here');
+  DomAssert(child.doc=FGNode.doc, WRONG_DOCUMENT_ERR, 'insertBefore: cannot insert a node from other document');
+  DomAssert(not IsReadOnlyNode(child.parent), NO_MODIFICATION_ALLOWED_ERR, 'insertBefore: modification not allowed here');
 
   UnregisterFlyingNode(child);
   if (refChild=nil) then begin
@@ -920,7 +920,7 @@ function TLDomNode.removeChild(const childNode: IDomNode): IDomNode;
 var
   child: xmlNodePtr;
 begin
-  DomAssert(childNode<>nil, INVALID_CHARACTER_ERR, 'TGDOMNode.removeChild: childNode is null');
+  DomAssert(childNode<>nil, INVALID_CHARACTER_ERR, 'removeChild: childNode is null');
   child := GetGNode(childNode);
   xmlUnlinkNode(child);
   RegisterFlyingNode(child);
@@ -931,8 +931,8 @@ function TLDomNode.replaceChild(const newChild, oldChild: IDomNode): IDomNode;
 var
   old, cur, node: xmlNodePtr;
 begin
-  DomAssert(oldChild<>nil, INVALID_CHARACTER_ERR, 'TGDOMNode.replaceChild: oldChild is null');
-  DomAssert(newChild<>nil, INVALID_CHARACTER_ERR, 'TGDOMNode.replaceChild: newChild is null');
+  DomAssert(oldChild<>nil, INVALID_CHARACTER_ERR, 'replaceChild: oldChild is null');
+  DomAssert(newChild<>nil, INVALID_CHARACTER_ERR, 'replaceChild: newChild is null');
   old := GetGNode(oldChild);
   cur := GetGNode(newChild);
   node := xmlReplaceNode(old, cur);
@@ -1212,7 +1212,7 @@ end;
 function TLDomDocument.get_domImplementation: IDomImplementation;
 begin
   if FGDOMImpl=nil then begin
-//TODO!    FGDOMImpl := TGDOMImplementation.getInstance(DEFAULT_IMPL_FREE_THREADED);
+    FGDOMImpl := GlbClasses.DomImplementation.getInstance;
   end;
   Result := FGDOMImpl;
 end;
@@ -1693,7 +1693,7 @@ begin
   xmlSetNSProp(FGNode, ns, PChar(ulocal), PChar(UTF8Encode(value)));
 end;
 
-{ TGDOMImplementation }
+{ TLDomImplementation }
 
 function TLDomImplementation.createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
 var
