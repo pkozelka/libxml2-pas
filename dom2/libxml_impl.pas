@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.30 2002-03-03 23:32:48 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.31 2002-03-08 09:14:16 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -783,6 +783,7 @@ end;
 function TLDomNode.get_localName: DomString;
 begin
   Result := '';
+  if (fMyNode=nil) then Exit;
   case fMyNode.type_ of
   XML_ELEMENT_NODE,
   XML_ATTRIBUTE_NODE:
@@ -797,68 +798,88 @@ end;
 
 function TLDomNode.get_namespaceURI: DomString;
 begin
-  case fMyNode.type_ of
-  XML_ELEMENT_NODE,
-  XML_ATTRIBUTE_NODE:
-    begin
-      if fMyNode.ns=nil then exit;
-      Result := UTF8Decode(fMyNode.ns.href);
+  if (fMyNode=nil) then begin
+    Result := '(null)';
+  end else begin
+    case fMyNode.type_ of
+    XML_ELEMENT_NODE,
+    XML_ATTRIBUTE_NODE:
+      begin
+        if fMyNode.ns=nil then exit;
+        Result := UTF8Decode(fMyNode.ns.href);
+      end;
+    else
+      Result := '';
     end;
-  else
-    Result := '';
   end;
 end;
 
 function TLDomNode.get_nextSibling: IDomNode;
 begin
-  Result := GetDOMObject(fMyNode.next) as IDomNode;
+  if (fMyNode=nil) then begin
+    Result := nil;
+  end else begin
+    Result := GetDOMObject(fMyNode.next) as IDomNode;
+  end;
 end;
 
 function TLDomNode.get_nodeName: DomString;
 begin
-  case fMyNode.type_ of
-  XML_HTML_DOCUMENT_NODE,
-  XML_DOCB_DOCUMENT_NODE,
-  XML_DOCUMENT_NODE:
-    Result := '#document';
-  XML_CDATA_SECTION_NODE:
-    Result := '#cdata-section';
-  XML_DOCUMENT_FRAG_NODE:
-    Result := '#document-fragment';
-  XML_TEXT_NODE,
-  XML_COMMENT_NODE:
-    Result := '#'+UTF8Decode(fMyNode.name);
-  XML_ELEMENT_NODE,
-  XML_ATTRIBUTE_NODE:
-    begin
-      Result := UTF8Decode(fMyNode.name);
-      if (fMyNode.ns<>nil) and (fMyNode.ns.prefix<>nil) then begin
-        Result := UTF8Decode(fMyNode.ns.prefix)+':'+Result;
+  if (fMyNode=nil) then begin
+    Result := '(null)';
+  end else begin
+    case fMyNode.type_ of
+    XML_HTML_DOCUMENT_NODE,
+    XML_DOCB_DOCUMENT_NODE,
+    XML_DOCUMENT_NODE:
+      Result := '#document';
+    XML_CDATA_SECTION_NODE:
+      Result := '#cdata-section';
+    XML_DOCUMENT_FRAG_NODE:
+      Result := '#document-fragment';
+    XML_TEXT_NODE,
+    XML_COMMENT_NODE:
+      Result := '#'+UTF8Decode(fMyNode.name);
+    XML_ELEMENT_NODE,
+    XML_ATTRIBUTE_NODE:
+      begin
+        Result := UTF8Decode(fMyNode.name);
+        if (fMyNode.ns<>nil) and (fMyNode.ns.prefix<>nil) then begin
+          Result := UTF8Decode(fMyNode.ns.prefix)+':'+Result;
+        end;
       end;
+    else
+      Result := UTF8Decode(fMyNode.name);
     end;
-  else
-    Result := UTF8Decode(fMyNode.name);
   end;
 end;
 
 function TLDomNode.get_nodeType: DomNodeType;
 begin
-  Result := DomNodeType(fMyNode.type_);
+  if (fMyNode=nil) then begin
+    Result := 0; //UGLY
+  end else begin
+    Result := DomNodeType(fMyNode.type_);
+  end;
 end;
 
 function TLDomNode.get_nodeValue: DomString;
 var
   p: PxmlChar;
 begin
-  case fMyNode.type_ of
-  XML_ATTRIBUTE_NODE,
-  XML_TEXT_NODE,
-  XML_CDATA_SECTION_NODE,
-  XML_COMMENT_NODE,
-  XML_PI_NODE:
-    p := xmlNodeGetContent(fMyNode);
-  else
+  if (fMyNode=nil) then begin
     p := nil;
+  end else begin
+    case fMyNode.type_ of
+    XML_ATTRIBUTE_NODE,
+    XML_TEXT_NODE,
+    XML_CDATA_SECTION_NODE,
+    XML_COMMENT_NODE,
+    XML_PI_NODE:
+      p := xmlNodeGetContent(fMyNode);
+    else
+      p := nil;
+    end;
   end;
   if (p<>nil) then begin
     Result := UTF8Decode(p);
@@ -870,7 +891,7 @@ end;
 
 function TLDomNode.get_ownerDocument: IDomDocument;
 begin
-  if fMyNode=nil then begin
+  if (fMyNode=nil) then begin
     Result := nil;
   end else begin
     Result := GetDOMObject(fMyNode.doc) as IDomDocument;
@@ -879,24 +900,36 @@ end;
 
 function TLDomNode.get_parentNode: IDomNode;
 begin
-  Result := GetDOMObject(fMyNode.parent) as IDomNode
+  if (fMyNode=nil) then begin
+    Result := nil;
+  end else begin
+    Result := GetDOMObject(fMyNode.parent) as IDomNode;
+  end;
 end;
 
 function TLDomNode.get_prefix: DomString;
 begin
-  case fMyNode.type_ of
-  XML_ELEMENT_NODE,
-  XML_ATTRIBUTE_NODE:
-    begin
-      if fMyNode.ns=nil then exit;
-      Result := UTF8Decode(fMyNode.ns.prefix);
+  if (fMyNode=nil) then begin
+    Result := '';
+  end else begin
+    case fMyNode.type_ of
+    XML_ELEMENT_NODE,
+    XML_ATTRIBUTE_NODE:
+      begin
+        if fMyNode.ns=nil then exit;
+        Result := UTF8Decode(fMyNode.ns.prefix);
+      end;
     end;
   end;
 end;
 
 function TLDomNode.get_previousSibling: IDomNode;
 begin
-  Result := GetDOMObject(fMyNode.prev) as IDomNode;
+  if (fMyNode=nil) then begin
+    Result := nil;
+  end else begin
+    Result := GetDOMObject(fMyNode.prev) as IDomNode;
+  end
 end;
 
 function TLDomNode.hasAttributes: Boolean;
