@@ -134,8 +134,7 @@ type
   TMSXMLDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
     private
       fFreeThreading    : Boolean;
-      fDomImplementation: TMSXMLImplementation.create(nil);
-
+      fDomImplementation: IDOMImplementation;
     public
       constructor create(freeThreading : Boolean);
       destructor destroy; override;
@@ -230,7 +229,7 @@ type
               const version : DomString) : Boolean;
     function selectNode(const nodePath: WideString): IDOMNode;
     function selectNodes(const nodePath: WideString): IDOMNodeList;
-
+    procedure RegisterNS(const prefix,URI: DomString);
   end;
 
 
@@ -587,7 +586,7 @@ constructor TMSXMLDocumentBuilder.create(freeThreading : Boolean);
 begin
   inherited create;
   fFreeThreading := freeThreading;
-  fDomImplementation:=TMSXMLImplemetation.
+  fDomImplementation:=TMSXMLImplementation.create(nil);
 end;
 
 destructor TMSXMLDocumentBuilder.destroy;
@@ -603,10 +602,12 @@ end;
 
 function TMSXMLDocumentBuilder.NewDocument : IDomDocument;
 begin
+  //document:= CreateDOMDocument;
+  //Result := TMSXMLDocument.Create(document);
   if fFreeThreading then
     //result := TMSXMLDocument.create(CoDOMFreeThreadedDocument.create)
   else
-    result := TMSXMLDocument.create(CoDOMDocument.create);
+    result := TMSXMLDocument.create(CreateDOMDocument);
 end;
 
 function TMSXMLDocumentBuilder.Parse(const xml : DomString) : IDomDocument;
@@ -903,7 +904,7 @@ begin
   (fMSDomDocument as IXMLDomDocument2).setProperty('SelectionNamespaces',
     'xmlns:xyz4ct='''+namespaceURI+'''');
   temp:=fMSDomDocument.DocumentElement;
-  temp.selectNodes('xyz4ct:'+localName);
+  //temp.selectNodes('xyz4ct:'+localName);
   if temp<>nil
     then result:=TMSXMLNodeList.create(temp.selectNodes('xyz4ct:'+localName))
     else result:=nil;
@@ -1945,6 +1946,11 @@ begin
   if Assigned(NodeList)
     then Result :=  TMSXMLNodeList.Create(NodeList)
     else Result := nil;
+end;
+
+procedure TMSXMLNode.RegisterNS(const prefix, URI: DomString);
+begin
+
 end;
 
 initialization
