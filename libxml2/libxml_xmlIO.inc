@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.34] xmlIO.h
+// CVS-SIGN: [1.35] xmlIO.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,8 +1,8 @@
 [API]
 Name=libxml2-pas
-Version=2.4.17
-Date=15 Mar 2002
-Originated=libxml2-2.4.17
+Version=@VERSION@
+Date=@DATE@
+Originated=libxml2-@VERSION@
 URL=http://xmlsoft.org
 Description=The XML C library for Gnome
 
@@ -11,8 +11,8 @@ Number=2
 [CONVERSION1]
 FileName=libxml2.pas
 Status=READY-FOR-TESTING
-Version=2.4.17
-LastModify=15 Mar 2002
+Version=@VERSION@
+LastModify=@DATE@
 OriginalFile=libxml2.h
 
 [CONVERSION2]
@@ -31,7 +31,7 @@ Linux=YES
 Kylix=YES
 
 [Requirements]
-Req1=libxml2.dll version 2.4.17
+Req1=libxml2.dll version @VERSION@
 Req2=iconv.dll
 
 [Captain]

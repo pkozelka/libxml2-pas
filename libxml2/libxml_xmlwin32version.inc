@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.31] xmlwin32version.h
+// CVS-SIGN: [1.33] xmlwin32version.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,21 +30,21 @@ const
  *
  * the version string like "1.2.3"
  *)
-  LIBXML_DOTTED_VERSION = '2.4.19';
+  LIBXML_DOTTED_VERSION = '2.4.20';
 
 (**
  * LIBXML_VERSION:
  *
  * the version number: 1.2.3 value is 1002003
  *)
-  LIBXML_VERSION = 20419;
+  LIBXML_VERSION = 20420;
 
 (**
  * LIBXML_VERSION_STRING:
  *
  * the version number string, 1.2.3 value is "1002003"
  *)
-  LIBXML_VERSION_STRING = '20419';
+  LIBXML_VERSION_STRING = '20420';
 
 (**
  * LIBXML_TEST_VERSION:
@@ -72,7 +72,7 @@ const
 {$IFEND}
 
 (**
- * LIBXML_THREADS_ENABLED:
+ * LIBXML_THREAD_ENABLED:
  *
  * Whether the thread support is configured in
  *)

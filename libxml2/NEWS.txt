@@ -1,6 +1,11 @@
 libxml2-pas
 
 
+Version 2.4.20:
+---------------
+- API adjusted to match libxml2-2.4.20
+- minor fixes
+
 Version 2.4.17:
 ---------------
 - API adjusted to match libxml2-2.4.17
