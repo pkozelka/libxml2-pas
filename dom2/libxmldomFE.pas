@@ -494,6 +494,8 @@ function ErrorString(err:integer):string;
 
 implementation
 
+uses Dialogs;
+
 function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
 function IsXmlName(const S: wideString): boolean; forward;
 function appendNamespace(element:xmlNodePtr;ns: xmlNsPtr): boolean; forward;
@@ -2193,16 +2195,23 @@ var
   tmp,tmp1:IDOMNodeList;
   node:IDOMNode;
 begin
-  if namespaceURI='*' then begin
-    docElement:=self.get_documentElement;
-    tmp1:=(docElement as IDOMNodeSelect).selectNodes('//'+localName);
-    result:=tmp1;
-  end else begin;
-    docElement:=self.get_documentElement;
-    (docElement as IDOMNodeSelect).registerNs('xyz4ct',namespaceURI);
-    tmp1:=(docElement as IDOMNodeSelect).selectNodes('//xyz4ct:'+localName);
-    result:=tmp1;
-  end;
+  if (namespaceURI='*')
+    then if (localname<>'*')
+      then begin
+        docElement:=self.get_documentElement;
+        tmp1:=(docElement as IDOMNodeSelect).selectNodes('//*[local-name()="'+localname+'"]');
+        result:=tmp1;
+      end else begin
+        docElement:=self.get_documentElement;
+        tmp1:=(docElement as IDOMNodeSelect).selectNodes('//*');
+        result:=tmp1;
+      end
+    else begin
+        docElement:=self.get_documentElement;
+        (docElement as IDOMNodeSelect).registerNs('xyz4ct',namespaceURI);
+        tmp1:=(docElement as IDOMNodeSelect).selectNodes('//xyz4ct:'+localName);
+        result:=tmp1;
+    end;
 end;
 
 function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
