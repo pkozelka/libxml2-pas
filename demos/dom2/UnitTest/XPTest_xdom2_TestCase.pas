@@ -1635,19 +1635,19 @@ begin
 end;
 
 function TSimpleTests.myIsSameNode(node1, node2: IDOMNode): boolean;
-var
-  comp: IDomNodeCompare;
 begin
   Result := node1=node2; //quick check
   if (Result) then exit;
   if (node1=nil) then exit;
   if (node2=nil) then exit;
-  node1.QueryInterface(IDomNodeCompare, comp);
-  if (comp=nil) then begin
-    Result := (node1 as IUnknown) = (node2 as IUnknown);
-  end else begin
-    Result := comp.IsSameNode(node2);
+  Result := (node1 as IUnknown) = (node2 as IUnknown);
+{$if not(vendorID=SLIBXML)} //temporary condition, this line must be removed when libxmldomFE becomes separate vendor 
+  if (Result) then exit;
+  node1.QueryInterface(IDomNodeCompare, node1); //ugly trick to avoid having to declare an extra variable
+  if (node1<>nil) then begin
+    Result := IDomNodeCompare(node1).IsSameNode(node2);
   end;
+{$ifend}
 end;
 
 procedure TSimpleTests.namedNodeMap;
