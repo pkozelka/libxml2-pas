@@ -81,8 +81,6 @@ type
 { this function should release memory using the same mem.manager that libxml2
   uses for allocating it. Unfortunately it doesn't work...
 }
-procedure msvcrt_free(p:pointer); cdecl; external 'msvcrt.dll' name 'free';
-procedure xmlFreeStr(str: PxmlChar);cdecl;external LIBXML2_SO name 'xmlFreeStr'; overload;
 {$endif}
 
 // functions that reference symbols defined later - by header file:
@@ -95,6 +93,12 @@ procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePt
 // xmlIO.h
 function  xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
 
+// Delphi memory handling
+procedure DelphiFreeFunc(ptr: pointer); cdecl;
+function  DelphiMallocFunc(size:size_t):pointer; cdecl;
+function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer; cdecl;
+function  DelphiStrdupFunc(str:PChar):Pchar; cdecl;
+
 type
   (**
   * This interface is intended for libxml2 wrappers. It provides a way
@@ -106,16 +110,14 @@ type
 
 implementation
 
+uses
+  SysUtils;
+
 // functions from globals.h
 
 procedure xmlFree(str: PxmlChar);
 begin
-{$ifdef WIN32}
-//  msvcrt_free(pointer(str)); //todo: this does not work
-  xmlFreeStr(str);
-{$else}
   FreeMem(PChar(str)); //hopefully works under Kylix
-{$endif}
 end;
 
 // macros from xpath.h
@@ -171,6 +173,28 @@ begin
   while ((p^<>#0) and (p^<>'<')) do Inc(p);
 end;
 
+// Delphi memory handling
+procedure DelphiFreeFunc(ptr: pointer);
+begin
+  FreeMem(ptr);
+end;
+
+function  DelphiMallocFunc(size:size_t):pointer;
+begin
+  GetMem(Result, size);
+  FillChar(Result^, size+10, 0);
+end;
+
+function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer;
+begin
+  Result := ReallocMemory(ptr, size+10);
+end;
+
+function  DelphiStrdupFunc(str:PChar):Pchar;
+begin
+  Result := StrNew(str);
+end;
+
 //[pk] DEPRECATED, TEMPORARY:
 procedure InitExportedVar;
 {$ifdef WIN32}
@@ -186,7 +210,7 @@ end;
 begin
   // to do:
   // implement a working solution for linux
-  {xmlDoValidityCheckingDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)), 
+  {xmlDoValidityCheckingDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)),
     'xmlDoValidityCheckingDefaultValue');
   Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
   xmlSubstituteEntitiesDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)),
@@ -198,6 +222,8 @@ end;
 initialization
   InitExportedVar;
 //end of deprecated part
+  // setup Delphi memory handler
+  xmlMemSetup(@DelphiFreeFunc, @DelphiMallocFunc, @DelphiReallocFunc, @DelphiStrdupFunc);
 end.
 
 
