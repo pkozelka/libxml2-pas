@@ -85,6 +85,14 @@ type
       procedure getElementsByTagNameSpecifiedXMLNSTest;
       (* converted from: documentGetElementsByTagNameTotalLength.js *)
       procedure getElementsByTagNameTotalLengthTest;
+      (* converted from: documentGetElementsByTagNameValue.js *)
+      procedure getElementsByTagNameValueTest;
+      (* converted from: documentGetImplementation.js *)
+      procedure getImplementationTest;
+      (* converted from: documentGetRootNode.js *)
+      procedure getRootNodeTest;
+      (* converted from: documentHTMLNull.js *)
+      procedure docTypeHTMLNilTest;
 
   end;
 
@@ -809,6 +817,96 @@ begin
   check(nodeList.item[5].nodeName = 'info4', 'nodeName <> info4');
   check(nodeList.item[6].nodeName = 'info5', 'nodeName <> info5');
 end;
+
+
+(*
+ * checks if getElementsByTagName('info') returns all elements
+*)
+procedure TDomDocumentFundamentalTests.getElementsByTagNameValueTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <address>' +
+     '    <street>0</street>' +
+     '    <info>1</info>' +
+     '    <info>2</info>' +
+     '    <info>3</info>' +
+     '  </address>';
+var
+  document : IDomDocument;
+  nodeList : IDomNodeList;
+  element  : IDomElement;
+  textNode : IDomText;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  nodeList := document.getElementsByTagName('info');
+  element := nodeList.item[2] as IDomElement;
+  textNode := element.firstChild as IDomText;
+  check(textNode.nodeValue = '3', 'textNode.nodeValue <> ''3''');
+end;
+
+
+(*
+ * checks the domImplementation from document
+*)
+procedure TDomDocumentFundamentalTests.getImplementationTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <address>' +
+     '  </address>';
+var
+  document          : IDomDocument;
+  domImplementation : IDomImplementation;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  domImplementation := document.domImplementation;
+  check(domImplementation.hasFeature('xml', '1.0'),
+          'hasFeature(''xml'', ''1.0'' = false')
+end;
+
+
+(* checks the root node *)
+procedure TDomDocumentFundamentalTests.getRootNodeTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <address>' +
+     '  </address>';
+var
+  document : IDomDocument;
+  element  : IDomElement;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  element := document.documentElement;
+  check(element.nodeName = 'address', 'root name <> ''address''');
+end;
+
+
+
+(* checks if docType is nil *)
+procedure TDomDocumentFundamentalTests.docTypeHTMLNilTest;
+const
+  HTML_VALID_DOC =
+         '<HTML>' +
+         '<HEAD>' +
+         '<TITLE>Some Title</TITLE>' +
+         '</HEAD>' +
+         '<BODY>' +
+         'Some Body' +
+         '</BODY>' +
+         '</HTML>';
+var
+  document : IDomDocument;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(HTML_VALID_DOC);
+  check(document.docType = nil, 'document.docType <> nil');
+end;
+
 
 
 (******************************************************************************)
