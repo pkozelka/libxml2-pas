@@ -4,7 +4,7 @@ interface
 
 uses
   TestFramework,
-  xDom2;
+  idom2;
 
 const
   illegalChars : array[0..25] of WideChar =
