@@ -86,6 +86,7 @@ in declaration at line 116 *)
 {$ifdef LIBXML_THREAD_ENABLED}
 
 procedure xmlFree(str: PxmlChar); overload; //[pk] implemented in libxml2.pas
+//procedure xmlFree(str: PxmlChar);cdecl;external LIBXML2_SO name 'xmlFree'; overload;
 procedure xmlFree(cur: xmlNodePtr);cdecl;external LIBXML2_SO name 'xmlFreeNode'; overload;
 procedure xmlFree(cur: xmlDocPtr);cdecl;external LIBXML2_SO name 'xmlFreeDoc'; overload;
 procedure xmlFree(cur: xmlDtdPtr);cdecl;external LIBXML2_SO name 'xmlFreeDtd'; overload;

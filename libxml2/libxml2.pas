@@ -74,6 +74,13 @@ type
 {$I libxml_globals.inc}
 {$I libxml_threads.inc}
 
+{$ifdef WIN32}
+{ this function should release memory using the same mem.manager that libxml2
+  uses for allocating it. Unfortunately it doesn't work...
+}
+procedure msvcrt_free(p:pointer); cdecl; external 'msvcrt.dll' name 'free';
+{$endif}
+
 // functions that reference symbols defined later - by header file:
 
 // tree.h
@@ -99,8 +106,11 @@ implementation
 
 procedure xmlFree(str: PxmlChar);
 begin
-//NOT WORKING:  FreeMem(PChar(str));
-//TODO: find correct way of releasing the memory
+{$ifdef WIN32}
+//  msvcrt_free(pointer(str)); //todo: this does not work yet
+{$else}
+  FreeMem(PChar(str)); //hopefully works under Kylix
+{$endif}
 end;
 
 // macros from xpath.h
