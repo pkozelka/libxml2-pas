@@ -67,7 +67,7 @@ begin
     outLog('Parse error!');
   end;
   // Erster Test
-  outLog('doccount='+inttostr(doccount));
+  //outLog('doccount='+inttostr(doccount));
   root:=doc.documentElement;
   if root<>nil then outLog('Name of root element: '+root.nodeName);
   outlog(root.firstchild.nodeName);
@@ -183,8 +183,8 @@ begin
     begin
       outLog('Parsed file ok!');
     end;
-  if vendor='LIBXML_4CT'
-    then (doc as IDomOutputOptions).prettyPrint:=false;
+  //if vendor='LIBXML_4CT'
+    //then (doc as IDomOutputOptions).prettyPrint:=false;
   temp:=(doc as IDOMPersist).xml;
   // MSXML uses tabs for indentation,
   // LIBXML uses two spaces

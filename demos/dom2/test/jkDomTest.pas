@@ -26,7 +26,7 @@ unit jkDomTest;
 interface
 {$DEFINE NodeTypeInteger}
 
-uses idom2,libxmldom{,msxml_impl}; // IDOMIMplementation, IDOMDocument
+uses idom2,idom2_ext,libxmldomFE; // IDOMIMplementation, IDOMDocument
 
 const datapath='../../data';
 
@@ -44,7 +44,6 @@ implementation
 
 uses conapp,   // outLog
      SysUtils, // Format
-     ComObj,   // EOleException
      classes,  // TStringList
      Dialogs,  // ShowMessage;
      unit1,    // Form1
@@ -752,14 +751,14 @@ begin
 
   test('namedNodeMap',(attlist <> nil)) ;
   if dom2
+    //it must have three normal attributes now
     then test('namedNodeMap.length',(attlist.length = 3))
     else test('namedNodeMap.length',(attlist.length = 2)) ;
-  test('namedNodeMap.item[i]',(attlist.item[0].nodeName = 'name')) ;
   attlist := document.documentElement.firstChild.attributes;
-  node := attlist.item[0];
+  node := attlist.namedItem['name'];
   attlist := nil;
-  
-  test('namedNodeMap.item[i].nodeType = ATTRIBUTE_NODE (attributes)',(node.nodeType = ATTRIBUTE_NODE)) ;
+
+  test('namedNodeMap.namedItem[''name''].nodeType = ATTRIBUTE_NODE (attributes)',(node.nodeType = ATTRIBUTE_NODE)) ;
   attr := node as IDOMAttr;
   node := nil;
   test('attribute-interface of node',(attr <> nil)) ;
@@ -917,8 +916,8 @@ begin
       else testCount:=testCount+16;
   if (TestSet and 4) = 4
     then if dom2
-      then testCount:=testCount+13+16
-      else testCount:=testCount+13+16-6;
+      then testCount:=testCount+13+15
+      else testCount:=testCount+13+15-6;
   if (TestSet and 8) = 8
     then if dom2
       then testCount:=testCount+25+6
