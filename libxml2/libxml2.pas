@@ -16,7 +16,8 @@ const
 	LIBXML2_SO = 'libxml2.dll';
 {$endif}
 {$ifdef LINUX}
-	LIBXML2_SO = 'libxml2.so';
+	LIBXML2_SO = 'libxml2.so.2';  //on debian linux this is correct
+                                      //on other linux perhaps libxml2.so
 {$endif}
 
 {$WEAKPACKAGEUNIT}
