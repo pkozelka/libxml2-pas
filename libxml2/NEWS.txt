@@ -1,7 +1,12 @@
 libxml2-pas
 
 
-not released yet:
+Version 2.4.17:
+---------------
+- API adjusted to match libxml2-2.4.17
+- added translation of c14n.h (see libxml_c14n.inc)
+
+Version 2.4.16:
 ---------------
 - API adjusted to match libxml2-2.4.16
 - replaced incorrect translation of FILE* arguments by PLibXml2File generic pointer

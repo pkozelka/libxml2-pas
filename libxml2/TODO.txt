@@ -1,4 +1,4 @@
-$Id: TODO.txt,v 1.4 2002-02-27 19:16:48 pkozelka Exp $
+$Id: TODO.txt,v 1.5 2002-03-15 09:27:40 pkozelka Exp $
 libxml2-pas: libxml2 header header translation for Pascal
 
 TODO
@@ -8,11 +8,12 @@ TODO
 - complete translation of iconv.pas
 - more examples
 - complete testsuite for DUnit (skeleton should be generated from libxml2-api.xml
+- the INFO.txt file should be generated
 - error api: add a unit to make it easy to check&throw exceptions
 - translate remaining macros in all units (e.g. xpathInternals)
 - use libxml2-api.xml to check completeness of translation
 - automate updates of inline doc (comments) - create a script
-- generate actually defined(==turnned on) DEFINE switches from the source
+- generate actually defined(==turned on) DEFINE switches from the source
 
 DONE
 ====
