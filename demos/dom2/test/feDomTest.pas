@@ -108,7 +108,7 @@ function TestDom2b(name,vendor:string;ignore: boolean):double;
 var node: IDomNode;
     filename: string;
     doc: IDomDocument;
-    //dom: IDomImplementation;
+    dom: IDomImplementation;
     FDomPersist: IDomPersist;
     ok: boolean;
     i: integer;
@@ -116,7 +116,8 @@ begin
   result:=0;
   filename:='..\data\'+name;
   StartTimer;
-  doc:=GetEmptyDoc(vendor);
+  dom:=getDom(vendor);
+  doc:=dom.createDocument('','',nil);
   (doc as IDomParseOptions).preserveWhiteSpace:=not(ignore);
   FDomPersist:=doc as IDomPersist;
   ok:=FDomPersist.load(filename);

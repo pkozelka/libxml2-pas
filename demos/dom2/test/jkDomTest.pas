@@ -26,7 +26,7 @@ unit jkDomTest;
 interface
 {$DEFINE NodeTypeInteger}
 
-uses xdom2,libxmldom,msxml_impl; // IDOMIMplementation, IDOMDocument
+uses xdom2,libxmldom{,msxml_impl}; // IDOMIMplementation, IDOMDocument
 
 function TestGDom3(name,vendorstr:string;TestSet:integer):double;
 function getDoc(filename,vendorstr: string;TestSet:integer=0): IDOMDocument;
@@ -223,14 +223,10 @@ begin
   test('document.createDocumentFragment',(documentfragment <> nil));
   documentfragment := nil;
 
-  if vendorstr<>'LIBXML' then begin
-    //p=3
-    entityreference := document.createEntityReference('iii');
-    test('document.createEntityReference',(entityreference <> nil));
-    entityreference := nil;
-  end else begin
-    outLog('__document.createEntityReference doesn''t work!');
-  end;
+  //p=3
+  entityreference := document.createEntityReference('iii');
+  test('document.createEntityReference',(entityreference <> nil));
+  entityreference := nil;
 
 end;
 
@@ -524,9 +520,9 @@ begin
     outLog('__documentType.internalSubset doesn''t work!');
   end;
   test('documentType.name',(documenttype.name = 'test'));
+  namednodemap := documenttype.entities;
+  test('documentType.entities',(namednodemap <> nil));
   if vendorstr<>'LIBXML' then begin
-    namednodemap := documenttype.entities;
-    test('documentType.entities',(namednodemap <> nil));
     test('entity.length',(namednodemap.length = 2));
     test('entity.notationName',((namednodemap[0] as IDOMEntity).notationName = 'type2'));
     temp:=((namednodemap[0] as IDOMEntity).systemId);
@@ -542,7 +538,6 @@ begin
     documenttype:=nil;
   end
   else begin
-    OutLog('___documentType.entities not tested!');
     OutLog('___entity.length not tested!');
     OutLog('___entity.notationName not tested!');
     OutLog('___entity.systemID not tested!');
@@ -555,9 +550,12 @@ begin
   // testing documenttype, part II
   document := getDoc(filename,vendorstr);
   try
-    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','a','test');
-    test('documentType.name',(documenttype.name = 'http://xmlns.4commerce.de/eva'));
-
+    documenttype := document.domImplementation.createDocumentType('eva:special','a','test');
+    test('createdocumentType.name',(documenttype.name = 'eva:special'));
+  except
+    outLog('__creatDocumentType.name doesn''t work!');
+  end;
+  try
     //outLog('___'+documenttype.internalSubset);
 
     test('documentType.systemId',(documenttype.systemId = 'test'));
@@ -903,7 +901,7 @@ begin
       then testCount:=testCount+25+6
       else testCount:=testCount+25;
   if (TestSet and 16) = 16
-    then testCount:=testCount+5+8;
+    then testCount:=testCount+5+8+1;
   if (TestSet and 32) = 32
     then testCount:=testCount+3;
   if (TestSet and 64) = 64

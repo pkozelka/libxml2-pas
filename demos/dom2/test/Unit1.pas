@@ -29,8 +29,6 @@ type
     TestDocument5000: TButton;
     Button3: TButton;
     Button5: TButton;
-    Ignore: TCheckBox;
-    GroupBox1: TGroupBox;
     Test9: TCheckBox;
     Test8: TCheckBox;
     Test7: TCheckBox;
@@ -44,6 +42,7 @@ type
     Button10: TButton;
     Button11: TButton;
     Button13: TButton;
+    Ignore1: TCheckBox;
     procedure Button2Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -125,8 +124,8 @@ var
 begin
   Memo1.lines.Clear;
   if not EnableOutput.Checked then OutDebugLog('Start!');
-  TestDom2(Combobox1.Text,GetVendorStr,Ignore.checked);
-  time:=TestDom2(Combobox1.Text,GetVendorStr,ignore.Checked);
+  //TestDom2(Combobox1.Text,GetVendorStr,Ignore.checked);
+  time:=TestDom2(Combobox1.Text,GetVendorStr,ignore1.Checked);
    if not EnableOutput.Checked
      then outDebugLog('Everage time: '+format('%8.1f',[time*1000])+' ms');
 end;
@@ -223,7 +222,7 @@ begin
   time:=0;
   OutDebugLog('Start!');
   for i:=1 to 100 do
-    time:=time+TestDom2(Combobox1.Text,GetVendorStr,ignore.Checked);
+    time:=time+TestDom2(Combobox1.Text,GetVendorStr,ignore1.Checked);
   outDebugLog('Everage time: '+format('%8.1f',[time*1000/100])+' ms');
 end;
 
