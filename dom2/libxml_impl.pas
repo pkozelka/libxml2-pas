@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.15 2002-02-12 00:21:22 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.16 2002-02-12 08:55:11 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -22,39 +22,39 @@ uses
   libxml2;
 
 type
-  TLDOMChildNodeList = class;
-  TLDOMElement = class;
+  TLDomChildNodeList = class;
+  TLDomElement = class;
 
-  { TLDOMObject class }
+  { TLDomObject class }
 
-  TLDOMObject = class(TInterfacedObject)
+  TLDomObject = class(TInterfacedObject)
   protected
     function  returnNullDomNode: IDomNode;
     function  returnEmptyString: DomString;
-    procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: WideString='');
+    procedure DomAssert(aCondition: Boolean; aErrorCode:integer; aMsg: WideString='');
     procedure checkName(aPrefix, aLocalName: String);
     procedure checkNsName(aPrefix, aLocalName, aNamespaceURI: String);
   public
     function SafeCallException(aExceptObject: TObject; aExceptAddr: Pointer): HRESULT; override;
   end;
 
-  { TLDOMNode class }
+  { TLDomNode class }
 
-  TLDOMNodeClass = class of TLDOMNode;
-  TLDOMNode = class(TLDOMObject, IDomNode, ILibXml2Node)
+  TLDomNodeClass = class of TLDomNode;
+  TLDomNode = class(TLDomObject, IDomNode, ILibXml2Node)
   protected //temporary!
     FGNode: xmlNodePtr;
     function  returnChildNodes: IDomNodeList;
   private
-    FChildNodes: TLDOMChildNodeList; // non-counted reference
-    function  isAncestorOrSelf(aNode:xmlNodePtr): boolean; //new
+    FChildNodes: TLDomChildNodeList; // non-counted reference
+    function  isAncestorOrSelf(aNode:xmlNodePtr): Boolean; //new
   protected //ILibXml2Node
     function  LibXml2NodePtr: xmlNodePtr;
   protected //IDomNode
     function  get_nodeName: DomString;
     function  get_nodeValue: DomString;
     procedure set_nodeValue(const value: DomString);
-    function  get_nodeType: DOMNodeType;
+    function  get_nodeType: DomNodeType;
     function  get_parentNode: IDomNode;
     function  get_childNodes: IDomNodeList;
     function  get_firstChild: IDomNode;
@@ -84,9 +84,9 @@ type
     destructor Destroy; override;
   end;
 
-  { TLDOMAttr class }
+  { TLDomAttr class }
 
-  TLDOMAttr = class(TLDOMNode, IDomNode, IDomAttr)
+  TLDomAttr = class(TLDomNode, IDomNode, IDomAttr)
   protected //IDomNode
     function  IDomNode.get_childNodes = returnChildNodes;
     function  IDomNode.get_parentNode = returnNullDomNode;
@@ -103,11 +103,11 @@ type
     function  get_ownerElement: IDomElement;
   end;
 
-  { TLDOMAttributeMap }
+  { TLDomAttributeMap }
 
-  TLDOMAttributeMap = class(TLDOMObject, IDomNamedNodeMap)
+  TLDomAttributeMap = class(TLDomObject, IDomNamedNodeMap)
   private
-    FOwnerElement: TLDOMElement; // non-counted reference
+    FOwnerElement: TLDomElement; // non-counted reference
   protected //IDomNamedNodeMap
     function get_item(index: Integer): IDomNode;
     function get_length: Integer;
@@ -118,28 +118,28 @@ type
     function setNamedItemNS(const newItem: IDomNode): IDomNode;
     function removeNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
   protected
-    constructor Create(aOwnerElement: TLDOMElement);
+    constructor Create(aOwnerElement: TLDomElement);
   public
     destructor Destroy; override;
   end;
 
-  { TLDOMChildNodeList class }
+  { TLDomChildNodeList class }
 
-  TLDOMChildNodeList = class(TLDOMObject, IDomNodeList)
+  TLDomChildNodeList = class(TLDomObject, IDomNodeList)
   private
-    FOwnerNode: TLDOMNode; // non-counted reference
+    FOwnerNode: TLDomNode; // non-counted reference
   protected //IDomNodeList
     function get_item(index: Integer): IDomNode;
     function get_length: Integer;
   protected
-    constructor Create(aOwnerNode: TLDOMNode);
+    constructor Create(aOwnerNode: TLDomNode);
   public
     destructor Destroy; override;
   end;
 
   { TGDOMCharacterData class }
 
-  TLDOMCharacterData = class(TLDOMNode, IDomCharacterData, IDomNode)
+  TLDomCharacterData = class(TLDomNode, IDomCharacterData, IDomNode)
   private
   protected // IDomCharacterData
     function  IDomCharacterData.get_data = get_nodeValue;
@@ -155,7 +155,7 @@ type
 
   { TGDOMText class }
 
-  TLDOMText = class(TLDOMCharacterData, IDomText, IDomCharacterData, IDomNode)
+  TLDomText = class(TLDomCharacterData, IDomText, IDomCharacterData, IDomNode)
   protected //IDomCharacterData
     function  IDomCharacterData.get_data = get_nodeValue;
     procedure IDomCharacterData.set_data = set_nodeValue;
@@ -165,9 +165,9 @@ type
     function  splitText(offset: Integer): IDomText;
   end;
 
-  { TLDOMCDATASection class }
+  { TLDomCDATASection class }
 
-  TLDOMCDATASection = class(TLDOMText, IDomCDataSection, IDomCharacterData, IDomNode)
+  TLDomCDataSection = class(TLDomText, IDomCDataSection, IDomCharacterData, IDomNode)
   protected //IDomCharacterData
     function  IDomCharacterData.get_data = get_nodeValue;
     procedure IDomCharacterData.set_data = set_nodeValue;
@@ -178,7 +178,7 @@ type
 
   { TGDOMComment class }
 
-  TLDOMComment = class(TLDOMCharacterData, IDomComment, IDomCharacterData, IDomNode)
+  TLDomComment = class(TLDomCharacterData, IDomComment, IDomCharacterData, IDomNode)
   protected //IDomCharacterData
     function  IDomCharacterData.get_data = get_nodeValue;
     procedure IDomCharacterData.set_data = set_nodeValue;
@@ -187,9 +187,9 @@ type
     procedure IDomComment.set_data = set_nodeValue;
   end;
 
-  { TLDOMDocumentFragment class }
+  { TLDomDocumentFragment class }
 
-  TLDOMDocumentFragment = class(TLDOMNode, IDomDocumentFragment, IDomNode)
+  TLDomDocumentFragment = class(TLDomNode, IDomDocumentFragment, IDomNode)
   protected //IDomNode
     function  IDomNode.get_childNodes = returnChildNodes;
     function  IDomNode.get_parentNode = returnNullDomNode;
@@ -198,11 +198,11 @@ type
     function  IDomDocumentFragment.get_parentNode = returnNullDomNode;
   end;
 
-  { TLDOMElement class }
+  { TLDomElement class }
 
-  TLDOMElement = class(TLDOMNode, IDomElement, IDomNode)
+  TLDomElement = class(TLDomNode, IDomElement, IDomNode)
   private
-    FAttributes: TLDOMAttributeMap; // non-counted reference
+    FAttributes: TLDomAttributeMap; // non-counted reference
   protected //IDomNode
     function  IDomNode.get_childNodes = returnChildNodes;
     function  get_attributes: IDomNamedNodeMap;
@@ -230,9 +230,9 @@ type
     destructor Destroy; override;
   end;
 
-  { TLDOMEntity class }
+  { TLDomEntity class }
 
-  TLDOMEntity = class(TLDOMNode, IDomNode, IDomEntity)
+  TLDomEntity = class(TLDomNode, IDomNode, IDomEntity)
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomEntity
@@ -242,9 +242,9 @@ type
     function  get_notationName: DomString;
   end;
 
-  { TLDOMEntityReference  class }
+  { TLDomEntityReference  class }
 
-  TLDOMEntityReference = class(TLDOMNode, IDomEntityReference, IDomNode)
+  TLDomEntityReference = class(TLDomNode, IDomEntityReference, IDomNode)
   protected //IDomNode
     function  IDomNode.get_childNodes = returnChildNodes;
   protected //IDomEntityReference
@@ -253,7 +253,7 @@ type
 
   { TGDOMNotation class }
 
-  TLDOMNotation = class(TLDOMNode, IDomNode, IDomNotation)
+  TLDomNotation = class(TLDomNode, IDomNode, IDomNotation)
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomNotation
@@ -262,9 +262,9 @@ type
     function  get_systemId: DomString;
   end;
 
-  { TLDOMProcessingInstruction class }
+  { TLDomProcessingInstruction class }
 
-  TLDOMProcessingInstruction = class(TLDOMNode, IDomProcessingInstruction)
+  TLDomProcessingInstruction = class(TLDomNode, IDomProcessingInstruction)
   private
   protected //IDomProcessingInstruction
     function  IDomProcessingInstruction.get_target = get_nodeName;
@@ -273,9 +273,9 @@ type
   public
   end;
 
-  { TLDOMDocument class }
+  { TLDomDocument class }
 
-  TLDOMDocument = class(TLDOMNode, IDomDocument, IDomNode)
+  TLDomDocument = class(TLDomNode, IDomDocument, IDomNode)
   protected //tmp
     FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
   private
@@ -285,7 +285,7 @@ type
     function  get_nodeName: DomString;
     function  IDomNode.get_nodeValue = returnEmptyString;
     procedure set_nodeValue(const value: DomString);
-    function  get_nodeType: DOMNodeType;
+    function  get_nodeType: DomNodeType;
     function  IDomNode.get_childNodes = returnChildNodes;
     function  IDomNode.get_parentNode = returnNullDomNode;
     function  IDomNode.get_previousSibling = returnNullDomNode;
@@ -336,9 +336,9 @@ type
     property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
   end;
 
-  { TLDOMDocumentType class }
+  { TLDomDocumentType class }
 
-  TLDOMDocumentType = class(TLDOMNode, IDomDocumentType, IDomNode)
+  TLDomDocumentType = class(TLDomNode, IDomDocumentType, IDomNode)
   private
     function GetGDocumentType: xmlDtdPtr;
   protected //IDomDocumentType
@@ -352,24 +352,24 @@ type
 
 //overridable implementations
 var
-  GlbNodeClasses: array[XML_ELEMENT_NODE..XML_DOCB_DOCUMENT_NODE] of TLDOMNodeClass = (
-    TLDOMElement, //XML_ELEMENT_NODE
-    TLDOMAttr, //XML_ATTRIBUTE_NODE
-    TLDOMText, //XML_TEXT_NODE
-    TLDOMCDataSection, //XML_CDATA_SECTION_NODE
-    TLDOMEntityReference, //XML_ENTITY_REF_NODE
-    TLDOMEntity, //XML_ENTITY_NODE
-    TLDOMProcessingInstruction, //XML_PI_NODE
-    TLDOMComment, //XML_COMMENT_NODE
+  GlbNodeClasses: array[XML_ELEMENT_NODE..XML_DOCB_DOCUMENT_NODE] of TLDomNodeClass = (
+    TLDomElement, //XML_ELEMENT_NODE
+    TLDomAttr, //XML_ATTRIBUTE_NODE
+    TLDomText, //XML_TEXT_NODE
+    TLDomCDataSection, //XML_CDATA_SECTION_NODE
+    TLDomEntityReference, //XML_ENTITY_REF_NODE
+    TLDomEntity, //XML_ENTITY_NODE
+    TLDomProcessingInstruction, //XML_PI_NODE
+    TLDomComment, //XML_COMMENT_NODE
     nil, //TGDOMDocument, //XML_DOCUMENT_NODE
-    TLDOMDocumentType, //XML_DOCUMENT_TYPE_NODE
-    TLDOMDocumentFragment, //XML_DOCUMENT_FRAG_NODE
-    TLDOMNotation, //XML_NOTATION_NODE
+    TLDomDocumentType, //XML_DOCUMENT_TYPE_NODE
+    TLDomDocumentFragment, //XML_DOCUMENT_FRAG_NODE
+    TLDomNotation, //XML_NOTATION_NODE
     nil, //TGDOMDocument, //XML_HTML_DOCUMENT_NODE
-    TLDOMDocumentType, //XML_DTD_NODE
+    TLDomDocumentType, //XML_DTD_NODE
     nil, //XML_ELEMENT_DECL
     nil, //XML_ATTRIBUTE_DECL
-    TLDOMEntity, //XML_ENTITY_DECL
+    TLDomEntity, //XML_ENTITY_DECL
     nil, //XML_NAMESPACE_DECL,
     nil, //XML_XINCLUDE_START,
     nil, //XML_XINCLUDE_END,
@@ -392,13 +392,13 @@ const
 const
   DEFAULT_IMPL_FREE_THREADED = false;
 var
-  LDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
+  LDOMImplementation: array[Boolean] of IDomImplementation = (nil, nil);
 
 function GetDomObject(aNode: pointer): IUnknown;
 var
-  obj: TLDOMNode;
+  obj: TLDomNode;
   node: xmlNodePtr;
-  ok: boolean;
+  ok: Boolean;
 begin
   if aNode <> nil then begin
     node := xmlNodePtr(aNode);
@@ -438,7 +438,7 @@ end;
  *)
 procedure RegisterFlyingNode(aNode: xmlNodePtr);
 var
-  doc: TLDOMDocument;
+  doc: TLDomDocument;
 begin
   DomAssert1(aNode<>nil, INVALID_ACCESS_ERR, '', 'RegisterFlyingNode()');
   DomAssert1(aNode.parent=nil, INVALID_STATE_ERR, 'Node has a parent, cannot be registered as flying', 'RegisterFlyingNode()');
@@ -463,7 +463,7 @@ end;
  *)
 procedure UnregisterFlyingNode(aNode: xmlNodePtr);
 var
-  doc: TLDOMDocument;
+  doc: TLDomDocument;
   idx: integer;
 begin
   GetDOMObject(aNode.doc);  //temporary - ensure that the document's wrapper exists (though it should be almost unneccessary)
@@ -474,14 +474,14 @@ begin
   end;
 end;
 
-{ TLDOMObject }
+{ TLDomObject }
 
-procedure TLDOMObject.DomAssert(aCondition: boolean; aErrorCode: integer; aMsg: WideString);
+procedure TLDomObject.DomAssert(aCondition: Boolean; aErrorCode: integer; aMsg: WideString);
 begin
   DomAssert1(aCondition, aErrorCode, aMsg, ClassName);
 end;
 
-procedure TLDOMObject.checkName(aPrefix, aLocalName: String);
+procedure TLDomObject.checkName(aPrefix, aLocalName: String);
 begin
   if (aPrefix<>'') then begin
     DomAssert(isNCName(aPrefix), INVALID_CHARACTER_ERR, 'Invalid character in prefix: "'+aPrefix+'"');
@@ -489,7 +489,7 @@ begin
   DomAssert(isNCName(aLocalName), INVALID_CHARACTER_ERR, 'Invalid character in local name: "'+aLocalName+'"');
 end;
 
-procedure TLDOMObject.checkNsName(aPrefix, aLocalName, aNamespaceURI: String);
+procedure TLDomObject.checkNsName(aPrefix, aLocalName, aNamespaceURI: String);
 begin
   if (aPrefix='') then begin
   end else if (aPrefix='xml') then begin
@@ -503,22 +503,22 @@ begin
   DomAssert(isNCName(aLocalName), INVALID_CHARACTER_ERR, 'Invalid character in local name: "'+aLocalName+'"');
 end;
 
-function TLDOMObject.returnEmptyString: DomString;
+function TLDomObject.returnEmptyString: DomString;
 begin
   Result := '';
 end;
 
-function TLDOMObject.returnNullDomNode: IDomNode;
+function TLDomObject.returnNullDomNode: IDomNode;
 begin
   Result := nil;
 end;
 
-function TLDOMObject.SafeCallException(aExceptObject: TObject; aExceptAddr: Pointer): HRESULT;
+function TLDomObject.SafeCallException(aExceptObject: TObject; aExceptAddr: Pointer): HRESULT;
 begin
   Result := 0; //todo
 end;
 
-{ TLDOMNode }
+{ TLDomNode }
 
 (**
  * Appends a node at the end of childlist.
@@ -526,12 +526,12 @@ end;
  *
  * @return  the node added.
  *)
-function TLDOMNode.appendChild(const newChild: IDomNode): IDomNode;
+function TLDomNode.appendChild(const newChild: IDomNode): IDomNode;
 begin
   Result := insertBefore(newChild, nil);
 end;
 
-function TLDOMNode.cloneNode(deep: Boolean): IDomNode;
+function TLDomNode.cloneNode(deep: Boolean): IDomNode;
 var
   node: xmlNodePtr;
   recursive: Integer;
@@ -543,16 +543,16 @@ begin
   Result := GetDOMObject(node) as IDomNode;
 end;
 
-constructor TLDOMNode.Create(aLibXml2Node: pointer);
+constructor TLDomNode.Create(aLibXml2Node: pointer);
 begin
   inherited Create;
   FGNode := aLibXml2Node;
-  if not (self is TLDOMDocument) then begin
+  if not (self is TLDomDocument) then begin
     // this node is not a document
     DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
     FGNode._private := self;
 
-    if not (self is TLDOMDocumentType) then begin
+    if not (self is TLDomDocumentType) then begin
       DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
     end;
     if (FGNode.doc<>nil) then begin
@@ -568,9 +568,9 @@ begin
   Inc(GlbNodeCount);
 end;
 
-destructor TLDOMNode.Destroy;
+destructor TLDomNode.Destroy;
 begin
-  if not (self is TLDOMDocument) then begin
+  if not (self is TLDomDocument) then begin
     if (FGNode.doc<>nil) then begin
       // if this is not the document itself, release the pretended reference to the owner document:
       // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
@@ -585,12 +585,12 @@ begin
   inherited Destroy;
 end;
 
-function TLDOMNode.get_attributes: IDomNamedNodeMap;
+function TLDomNode.get_attributes: IDomNamedNodeMap;
 begin
   Result := nil;
 end;
 
-function TLDOMNode.get_firstChild: IDomNode;
+function TLDomNode.get_firstChild: IDomNode;
 begin
   if FGNode=nil then begin
     Result := nil;
@@ -599,14 +599,14 @@ begin
   end;
 end;
 
-function TLDOMNode.get_childNodes: IDomNodeList;
+function TLDomNode.get_childNodes: IDomNodeList;
 begin
   // classes that need to support childNodes
   // must redirect this VMT record to returnChildNodes
   Result := nil;
 end;
 
-function TLDOMNode.get_lastChild: IDomNode;
+function TLDomNode.get_lastChild: IDomNode;
 begin
   if FGNode=nil then begin
     Result := nil;
@@ -615,7 +615,7 @@ begin
   end;
 end;
 
-function TLDOMNode.get_localName: DomString;
+function TLDomNode.get_localName: DomString;
 begin
   Result := '';
   case FGNode.type_ of
@@ -630,7 +630,7 @@ begin
   end;
 end;
 
-function TLDOMNode.get_namespaceURI: DomString;
+function TLDomNode.get_namespaceURI: DomString;
 begin
   case FGNode.type_ of
   XML_ELEMENT_NODE,
@@ -644,12 +644,12 @@ begin
   end;
 end;
 
-function TLDOMNode.get_nextSibling: IDomNode;
+function TLDomNode.get_nextSibling: IDomNode;
 begin
   Result := GetDOMObject(FGNode.next) as IDomNode;
 end;
 
-function TLDOMNode.get_nodeName: DomString;
+function TLDomNode.get_nodeName: DomString;
 begin
   case FGNode.type_ of
   XML_HTML_DOCUMENT_NODE,
@@ -671,12 +671,12 @@ begin
   end;
 end;
 
-function TLDOMNode.get_nodeType: DOMNodeType;
+function TLDomNode.get_nodeType: DomNodeType;
 begin
-  Result := domNodeType(FGNode.type_);
+  Result := DomNodeType(FGNode.type_);
 end;
 
-function TLDOMNode.get_nodeValue: DomString;
+function TLDomNode.get_nodeValue: DomString;
 var
   p: PxmlChar;
 begin
@@ -699,7 +699,7 @@ begin
   end;
 end;
 
-function TLDOMNode.get_ownerDocument: IDomDocument;
+function TLDomNode.get_ownerDocument: IDomDocument;
 begin
   if FGNode=nil then begin
     Result := nil;
@@ -708,12 +708,12 @@ begin
   end;
 end;
 
-function TLDOMNode.get_parentNode: IDomNode;
+function TLDomNode.get_parentNode: IDomNode;
 begin
   Result := GetDOMObject(FGNode.parent) as IDomNode
 end;
 
-function TLDOMNode.get_prefix: DomString;
+function TLDomNode.get_prefix: DomString;
 begin
   case FGNode.type_ of
   XML_ELEMENT_NODE,
@@ -725,17 +725,17 @@ begin
   end;
 end;
 
-function TLDOMNode.get_previousSibling: IDomNode;
+function TLDomNode.get_previousSibling: IDomNode;
 begin
   Result := GetDOMObject(FGNode.prev) as IDomNode;
 end;
 
-function TLDOMNode.hasAttributes: Boolean;
+function TLDomNode.hasAttributes: Boolean;
 begin
   Result := False;
 end;
 
-function TLDOMNode.hasChildNodes: Boolean;
+function TLDomNode.hasChildNodes: Boolean;
 begin
   Result := False;
   if FGNode=nil then exit;
@@ -743,7 +743,7 @@ begin
   Result := True;
 end;
 
-function TLDOMNode.insertBefore(const newChild, refChild: IDomNode): IDomNode;
+function TLDomNode.insertBefore(const newChild, refChild: IDomNode): IDomNode;
 var
   node: xmlNodePtr;
   child: xmlNodePtr;
@@ -782,7 +782,7 @@ begin
   Result := GetDOMObject(node) as IDomNode;
 end;
 
-function TLDOMNode.isAncestorOrSelf(aNode: xmlNodePtr): boolean;
+function TLDomNode.isAncestorOrSelf(aNode: xmlNodePtr): Boolean;
 var
   node: xmlNodePtr;
 begin
@@ -795,12 +795,12 @@ begin
   Result := False;
 end;
 
-function TLDOMNode.isSupported(const feature, version: DomString): Boolean;
+function TLDomNode.isSupported(const feature, version: DomString): Boolean;
 begin
-//TODO!  Result := TLDOMImplementation.featureIsSupported(feature, version, IMPLEMENTATION_FEATURES);
+//TODO!  Result := TLDomImplementation.featureIsSupported(feature, version, IMPLEMENTATION_FEATURES);
 end;
 
-function TLDOMNode.LibXml2NodePtr: xmlNodePtr;
+function TLDomNode.LibXml2NodePtr: xmlNodePtr;
 begin
   Result := FGNode;
 end;
@@ -808,7 +808,7 @@ end;
 (**
  * @todo check carefully
  *)
-procedure TLDOMNode.normalize;
+procedure TLDomNode.normalize;
 var
   node,next,new_next: xmlNodePtr;
   nodeType: integer;
@@ -834,7 +834,7 @@ begin
   end;
 end;
 
-function TLDOMNode.removeChild(const childNode: IDomNode): IDomNode;
+function TLDomNode.removeChild(const childNode: IDomNode): IDomNode;
 var
   child: xmlNodePtr;
 begin
@@ -845,7 +845,7 @@ begin
   Result := childNode;
 end;
 
-function TLDOMNode.replaceChild(const newChild, oldChild: IDomNode): IDomNode;
+function TLDomNode.replaceChild(const newChild, oldChild: IDomNode): IDomNode;
 var
   old, cur, node: xmlNodePtr;
 begin
@@ -859,21 +859,21 @@ begin
   Result := GetDOMObject(node) as IDomNode
 end;
 
-function TLDOMNode.requestNodePtr: xmlNodePtr;
+function TLDomNode.requestNodePtr: xmlNodePtr;
 begin
   DomAssert(FGNode<>nil, INVALID_ACCESS_ERR, ClassName+'.requestNodePtr: wrapping null node');
   Result := FGNode;
 end;
 
-function TLDOMNode.returnChildNodes: IDomNodeList;
+function TLDomNode.returnChildNodes: IDomNodeList;
 begin
   if (FChildNodes=nil) then begin
-    TLDOMChildNodeList.Create(self); // assigns FChildNodes
+    TLDomChildNodeList.Create(self); // assigns FChildNodes
   end;
   Result := FChildNodes;
 end;
 
-procedure TLDOMNode.set_nodeValue(const value: DomString);
+procedure TLDomNode.set_nodeValue(const value: DomString);
 begin
   case FGNode.type_ of
   XML_ATTRIBUTE_NODE,
@@ -890,14 +890,14 @@ begin
   end;
 end;
 
-procedure TLDOMNode.set_Prefix(const prefix: DomString);
+procedure TLDomNode.set_Prefix(const prefix: DomString);
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-{ TLDOMChildNodeList }
+{ TLDomChildNodeList }
 
-constructor TLDOMChildNodeList.Create(aOwnerNode: TLDOMNode);
+constructor TLDomChildNodeList.Create(aOwnerNode: TLDomNode);
 begin
   inherited Create;
   DomAssert(aOwnerNode<>nil, HIERARCHY_REQUEST_ERR, 'Child list must have a parent');
@@ -906,7 +906,7 @@ begin
   FOwnerNode._AddRef; //as long as the list exists, its owner must exist too
 end;
 
-destructor TLDOMChildNodeList.Destroy;
+destructor TLDomChildNodeList.Destroy;
 begin
   FOwnerNode.FChildNodes := nil;
   FOwnerNode._Release;
@@ -914,7 +914,7 @@ begin
   inherited Destroy;
 end;
 
-function TLDOMChildNodeList.get_item(index: Integer): IDomNode;
+function TLDomChildNodeList.get_item(index: Integer): IDomNode;
 var
   node: xmlNodePtr;
   cnt: integer;
@@ -932,7 +932,7 @@ begin
   Result := GetDOMObject(node) as IDomNode;
 end;
 
-function TLDOMChildNodeList.get_length: Integer;
+function TLDomChildNodeList.get_length: Integer;
 var
   node: xmlNodePtr;
 begin
@@ -944,15 +944,15 @@ begin
   end;
 end;
 
-{ TLDOMDocument }
+{ TLDomDocument }
 
-constructor TLDOMDocument.Create(aLibXml2Node: pointer);
+constructor TLDomDocument.Create(aLibXml2Node: pointer);
 begin
   inherited Create(aLibXml2Node);
   Inc(GlbDocCount);
 end;
 
-function TLDOMDocument.createAttribute(const name: DomString): IDomAttr;
+function TLDomDocument.createAttribute(const name: DomString): IDomAttr;
 var
   attr: xmlAttrPtr;
   uprefix, ulocal: String;
@@ -963,7 +963,7 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
-function TLDOMDocument.createAttributeNS(const namespaceURI, qualifiedName: DomString): IDomAttr;
+function TLDomDocument.createAttributeNS(const namespaceURI, qualifiedName: DomString): IDomAttr;
 var
   attr: xmlAttrPtr;
   ns: xmlNsPtr;
@@ -987,7 +987,7 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
-function TLDOMDocument.createCDATASection(const data: DomString): IDomCDataSection;
+function TLDomDocument.createCDATASection(const data: DomString): IDomCDataSection;
 var
   node: xmlNodePtr;
   udata: String;
@@ -998,7 +998,7 @@ begin
   Result := GetDOMObject(node) as IDomCDataSection;
 end;
 
-function TLDOMDocument.createComment(const data: DomString): IDomComment;
+function TLDomDocument.createComment(const data: DomString): IDomComment;
 var
   node: xmlNodePtr;
   udata: String;
@@ -1009,7 +1009,7 @@ begin
   Result := GetDOMObject(node) as IDomComment;
 end;
 
-function TLDOMDocument.createDocumentFragment: IDomDocumentFragment;
+function TLDomDocument.createDocumentFragment: IDomDocumentFragment;
 var
   node: xmlNodePtr;
 begin
@@ -1017,7 +1017,7 @@ begin
   Result := GetDOMObject(node) as IDomDocumentFragment;
 end;
 
-function TLDOMDocument.createElement(const tagName: DomString): IDomElement;
+function TLDomDocument.createElement(const tagName: DomString): IDomElement;
 var
   node: xmlNodePtr;
   uprefix, ulocal: String;
@@ -1028,7 +1028,7 @@ begin
   Result := GetDOMObject(node) as IDomElement;
 end;
 
-function TLDOMDocument.createElementNS(const namespaceURI, qualifiedName: DomString): IDomElement;
+function TLDomDocument.createElementNS(const namespaceURI, qualifiedName: DomString): IDomElement;
 var
   node: xmlNodePtr;
   ns: xmlNsPtr;
@@ -1045,7 +1045,7 @@ begin
   Result := GetDOMObject(node) as IDomElement;
 end;
 
-function TLDOMDocument.createEntityReference(const name: DomString): IDomEntityReference;
+function TLDomDocument.createEntityReference(const name: DomString): IDomEntityReference;
 var
   node: xmlNodePtr;
   uname: String;
@@ -1056,7 +1056,7 @@ begin
   Result := GetDOMObject(node) as IDomEntityReference;
 end;
 
-function TLDOMDocument.createProcessingInstruction(const target, data: DomString): IDomProcessingInstruction;
+function TLDomDocument.createProcessingInstruction(const target, data: DomString): IDomProcessingInstruction;
 var
   pi: xmlNodePtr;
   utarget: String;
@@ -1068,7 +1068,7 @@ begin
   Result := GetDOMObject(pi) as IDomProcessingInstruction;
 end;
 
-function TLDOMDocument.createTextNode(const data: DomString): IDomText;
+function TLDomDocument.createTextNode(const data: DomString): IDomText;
 var
   node: xmlNodePtr;
 begin
@@ -1076,7 +1076,7 @@ begin
   Result := GetDOMObject(node) as IDomText;
 end;
 
-destructor TLDOMDocument.Destroy;
+destructor TLDomDocument.Destroy;
 begin
   GDoc := nil;
   //
@@ -1086,7 +1086,7 @@ begin
   inherited Destroy;
 end;
 
-function TLDOMDocument.getElementById(const elementId: DomString): IDomElement;
+function TLDomDocument.getElementById(const elementId: DomString): IDomElement;
 var
   attr: xmlAttrPtr;
 begin
@@ -1098,17 +1098,17 @@ begin
   end;
 end;
 
-function TLDOMDocument.getElementsByTagName(const name: DomString): IDomNodeList;
+function TLDomDocument.getElementsByTagName(const name: DomString): IDomNodeList;
 begin
   //TODO!
 end;
 
-function TLDOMDocument.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
+function TLDomDocument.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
 begin
   //TODO!
 end;
 
-function TLDOMDocument.GetFlyingNodes: TList;
+function TLDomDocument.GetFlyingNodes: TList;
 begin
   if FFlyingNodes=nil then begin
     FFlyingNodes := TList.Create;
@@ -1116,12 +1116,12 @@ begin
   Result := FFlyingNodes;
 end;
 
-function TLDOMDocument.GetGDoc: xmlDocPtr;
+function TLDomDocument.GetGDoc: xmlDocPtr;
 begin
   Result := xmlDocPtr(FGNode);
 end;
 
-function TLDOMDocument.get_doctype: IDomDocumentType;
+function TLDomDocument.get_doctype: IDomDocumentType;
 var
   dtd: xmlDtdPtr;
 begin
@@ -1132,12 +1132,12 @@ begin
   Result := GetDomObject(dtd) as IDomDocumentType;
 end;
 
-function TLDOMDocument.get_documentElement: IDomElement;
+function TLDomDocument.get_documentElement: IDomElement;
 begin
   Result := GetDOMObject(xmlDocGetRootElement(GDoc)) as IDomElement;
 end;
 
-function TLDOMDocument.get_domImplementation: IDomImplementation;
+function TLDomDocument.get_domImplementation: IDomImplementation;
 begin
   if FGDOMImpl=nil then begin
 //TODO!    FGDOMImpl := TGDOMImplementation.getInstance(DEFAULT_IMPL_FREE_THREADED);
@@ -1145,22 +1145,22 @@ begin
   Result := FGDOMImpl;
 end;
 
-function TLDOMDocument.get_nodeName: DomString;
+function TLDomDocument.get_nodeName: DomString;
 begin
   Result := '#document';
 end;
 
-function TLDOMDocument.get_nodeType: DOMNodeType;
+function TLDomDocument.get_nodeType: DomNodeType;
 begin
   Result := DOCUMENT_NODE;
 end;
 
-function TLDOMDocument.get_ownerDocument: IDomDocument;
+function TLDomDocument.get_ownerDocument: IDomDocument;
 begin
   Result := nil; // required by DOM spec.
 end;
 
-function TLDOMDocument.importNode(importedNode: IDomNode; deep: Boolean): IDomNode;
+function TLDomDocument.importNode(importedNode: IDomNode; deep: Boolean): IDomNode;
 var
   recurse: integer;
   node: xmlNodePtr;
@@ -1184,7 +1184,7 @@ begin
   end;
 end;
 
-function TLDOMDocument.requestDocPtr: xmlDocPtr;
+function TLDomDocument.requestDocPtr: xmlDocPtr;
 begin
   Result := GetGDoc;
   if Result<>nil then exit; //the document is already created so we have to use it
@@ -1195,13 +1195,13 @@ begin
   SetGDoc(Result);
 end;
 
-function TLDOMDocument.requestNodePtr: xmlNodePtr;
+function TLDomDocument.requestNodePtr: xmlNodePtr;
 begin
   requestDocPtr;
   Result := FGNode;
 end;
 
-procedure TLDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
+procedure TLDomDocument.SetGDoc(aNewDoc: xmlDocPtr);
   procedure _DestroyFlyingNodes;
   var
     i: integer;
@@ -1213,7 +1213,7 @@ procedure TLDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
       p := FFlyingNodes[i];
       node := p;
       if (node._private<>nil) then begin
-        TLDOMNode(node._private).FGNode := nil;
+        TLDomNode(node._private).FGNode := nil;
         node._private := nil;
       end;
       case node.type_ of
@@ -1275,34 +1275,34 @@ begin
   end;
 end;
 
-procedure TLDOMDocument.set_nodeValue(const value: DomString);
+procedure TLDomDocument.set_nodeValue(const value: DomString);
 begin
   DomAssert(False, NO_MODIFICATION_ALLOWED_ERR);
 end;
 
-{ TLDOMCharacterData }
+{ TLDomCharacterData }
 
-procedure TLDOMCharacterData.appendData(const data: DomString);
+procedure TLDomCharacterData.appendData(const data: DomString);
 begin
   xmlNodeAddContent(FGNode, PChar(UTF8Encode(data)));
 end;
 
-procedure TLDOMCharacterData.deleteData(offset, count: Integer);
+procedure TLDomCharacterData.deleteData(offset, count: Integer);
 begin
   replaceData(offset, count, '');
 end;
 
-function TLDOMCharacterData.get_length: Integer;
+function TLDomCharacterData.get_length: Integer;
 begin
   Result := Length(get_nodeValue);
 end;
 
-procedure TLDOMCharacterData.insertData(offset: Integer; const data: DomString);
+procedure TLDomCharacterData.insertData(offset: Integer; const data: DomString);
 begin
   replaceData(offset, 0, PChar(UTF8Encode(data)));
 end;
 
-procedure TLDOMCharacterData.replaceData(offset, count: Integer; const data: DomString);
+procedure TLDomCharacterData.replaceData(offset, count: Integer; const data: DomString);
 var
   s1,s2,s: WideString;
 begin
@@ -1312,14 +1312,14 @@ begin
   set_nodeValue(s1 + data + s2);
 end;
 
-function TLDOMCharacterData.substringData(offset, count: Integer): DomString;
+function TLDomCharacterData.substringData(offset, count: Integer): DomString;
 begin
   Result := Copy(get_nodeValue, offset, count);
 end;
 
-{ TLDOMText }
+{ TLDomText }
 
-function TLDOMText.splitText(offset: Integer): IDomText;
+function TLDomText.splitText(offset: Integer): IDomText;
 var
   v: DomString;
   rest: DomString;
@@ -1335,31 +1335,31 @@ begin
   Result := p.insertBefore(Result, get_nextSibling) as IDomText;
 end;
 
-{ TLDOMEntity }
+{ TLDomEntity }
 
-function TLDOMEntity.get_notationName: DomString;
+function TLDomEntity.get_notationName: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-function TLDOMEntity.get_publicId: DomString;
+function TLDomEntity.get_publicId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-function TLDOMEntity.get_systemId: DomString;
+function TLDomEntity.get_systemId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-{ TLDOMDocumentType }
+{ TLDomDocumentType }
 
-function TLDOMDocumentType.get_entities: IDomNamedNodeMap;
+function TLDomDocumentType.get_entities: IDomNamedNodeMap;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-function TLDOMDocumentType.get_internalSubset: DomString;
+function TLDomDocumentType.get_internalSubset: DomString;
 var
   buff: xmlBufferPtr;
 begin
@@ -1369,55 +1369,55 @@ begin
   xmlBufferFree(buff);
 end;
 
-function TLDOMDocumentType.get_notations: IDomNamedNodeMap;
+function TLDomDocumentType.get_notations: IDomNamedNodeMap;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-function TLDOMDocumentType.get_publicId: DomString;
+function TLDomDocumentType.get_publicId: DomString;
 begin
   Result := UTF8Decode(GetGDocumentType.ExternalID);
 end;
 
-function TLDOMDocumentType.get_systemId: DomString;
+function TLDomDocumentType.get_systemId: DomString;
 begin
   Result := UTF8Decode(GetGDocumentType.SystemID);
 end;
 
-function TLDOMDocumentType.GetGDocumentType: xmlDtdPtr;
+function TLDomDocumentType.GetGDocumentType: xmlDtdPtr;
 begin
   Result := xmlDtdPtr(GNode);
 end;
 
-{ TLDOMNotation }
+{ TLDomNotation }
 
-function TLDOMNotation.get_publicId: DomString;
+function TLDomNotation.get_publicId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-function TLDOMNotation.get_systemId: DomString;
+function TLDomNotation.get_systemId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-{ TLDOMAttr }
+{ TLDomAttr }
 
-function TLDOMAttr.get_ownerElement: IDomElement;
+function TLDomAttr.get_ownerElement: IDomElement;
 begin
   Result := GetDOMObject(FGNode.parent) as IDomElement;
 end;
 
-function TLDOMAttr.get_specified: Boolean;
+function TLDomAttr.get_specified: Boolean;
 begin
   //todo: implement it correctly
   Result := true;
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-{ TLDOMAttributeMap }
+{ TLDomAttributeMap }
 
-constructor TLDOMAttributeMap.Create(aOwnerElement: TLDOMElement);
+constructor TLDomAttributeMap.Create(aOwnerElement: TLDomElement);
 begin
   inherited Create;
   DomAssert(aOwnerElement<>nil, HIERARCHY_REQUEST_ERR, 'Attribute list must have an owner element');
@@ -1426,7 +1426,7 @@ begin
   FOwnerElement._AddRef; //as long as the map exists, its owner must exist too
 end;
 
-destructor TLDOMAttributeMap.Destroy;
+destructor TLDomAttributeMap.Destroy;
 begin
   FOwnerElement.FAttributes := nil;
   FOwnerElement._Release;
@@ -1434,7 +1434,7 @@ begin
   inherited destroy;
 end;
 
-function TLDOMAttributeMap.get_item(index: Integer): IDomNode;
+function TLDomAttributeMap.get_item(index: Integer): IDomNode;
 var
   node: xmlAttrPtr;
   cnt: integer;
@@ -1452,7 +1452,7 @@ begin
   Result := GetDOMObject(node) as IDomNode;
 end;
 
-function TLDOMAttributeMap.get_length: Integer;
+function TLDomAttributeMap.get_length: Integer;
 var
   node: xmlAttrPtr;
 begin
@@ -1464,59 +1464,59 @@ begin
   end;
 end;
 
-function TLDOMAttributeMap.getNamedItem(const name: DomString): IDomNode;
+function TLDomAttributeMap.getNamedItem(const name: DomString): IDomNode;
 begin
   Result := FOwnerElement.getAttributeNode(name);
 end;
 
-function TLDOMAttributeMap.getNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
+function TLDomAttributeMap.getNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
 begin
   Result := FOwnerElement.getAttributeNodeNS(namespaceURI, localName);
 end;
 
-function TLDOMAttributeMap.removeNamedItem(const name: DomString): IDomNode;
+function TLDomAttributeMap.removeNamedItem(const name: DomString): IDomNode;
 begin
   Result := FOwnerElement.removeAttributeNode(FOwnerElement.getAttributeNode(name) as IDomAttr);
 end;
 
-function TLDOMAttributeMap.removeNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
+function TLDomAttributeMap.removeNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
 begin
   Result := FOwnerElement.removeAttributeNode(FOwnerElement.getAttributeNodeNS(namespaceURI, localName) as IDomAttr);
 end;
 
-function TLDOMAttributeMap.setNamedItem(const newItem: IDomNode): IDomNode;
+function TLDomAttributeMap.setNamedItem(const newItem: IDomNode): IDomNode;
 begin
   Result := FOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
 end;
 
-function TLDOMAttributeMap.setNamedItemNS(const newItem: IDomNode): IDomNode;
+function TLDomAttributeMap.setNamedItemNS(const newItem: IDomNode): IDomNode;
 begin
   Result := FOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
 end;
 
-{ TLDOMElement }
+{ TLDomElement }
 
-constructor TLDOMElement.Create(aLibXml2Node: pointer);
+constructor TLDomElement.Create(aLibXml2Node: pointer);
 begin
   inherited Create(aLibXml2Node);
   Inc(GlbElementCount);
 end;
 
-destructor TLDOMElement.Destroy;
+destructor TLDomElement.Destroy;
 begin
   Dec(GlbElementCount);
   inherited Destroy;
 end;
 
-function TLDOMElement.get_attributes: IDomNamedNodeMap;
+function TLDomElement.get_attributes: IDomNamedNodeMap;
 begin
   if (FAttributes=nil) then begin
-    TLDOMAttributeMap.Create(self); // assigns FAttributes
+    TLDomAttributeMap.Create(self); // assigns FAttributes
   end;
   Result := FAttributes;
 end;
 
-function TLDOMElement.getAttribute(const name: DomString): DomString;
+function TLDomElement.getAttribute(const name: DomString): DomString;
 var
   p: PxmlChar;
 begin
@@ -1526,7 +1526,7 @@ begin
   xmlFree(p);
 end;
 
-function TLDOMElement.getAttributeNode(const name: DomString): IDomAttr;
+function TLDomElement.getAttributeNode(const name: DomString): IDomAttr;
 var
   attr: xmlAttrPtr;
 begin
@@ -1534,7 +1534,7 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
-function TLDOMElement.getAttributeNodeNS(const namespaceURI, localName: DomString): IDomAttr;
+function TLDomElement.getAttributeNodeNS(const namespaceURI, localName: DomString): IDomAttr;
 var
   attr: xmlAttrPtr;
 begin
@@ -1542,7 +1542,7 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
-function TLDOMElement.getAttributeNS(const namespaceURI, localName: DomString): DomString;
+function TLDomElement.getAttributeNS(const namespaceURI, localName: DomString): DomString;
 var
   p: PxmlChar;
 begin
@@ -1551,27 +1551,27 @@ begin
   xmlFree(p);
 end;
 
-function TLDOMElement.getElementsByTagName(const name: DomString): IDomNodeList;
+function TLDomElement.getElementsByTagName(const name: DomString): IDomNodeList;
 begin
   //TODO!
 end;
 
-function TLDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
+function TLDomElement.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
 begin
   //TODO!                                      
 end;
 
-function TLDOMElement.hasAttribute(const name: DomString): Boolean;
+function TLDomElement.hasAttribute(const name: DomString): Boolean;
 begin
   Result := xmlHasProp(FGNode, PChar(UTF8Encode(name)))<>nil;
 end;
 
-function TLDOMElement.hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
+function TLDomElement.hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
 begin
   Result := (nil<>xmlHasNsProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI))));
 end;
 
-procedure TLDOMElement.removeAttribute(const name: DomString);
+procedure TLDomElement.removeAttribute(const name: DomString);
 var
   attr: xmlAttrPtr;
 begin
@@ -1582,7 +1582,7 @@ begin
   end;
 end;
 
-function TLDOMElement.removeAttributeNode(const oldAttr: IDomAttr): IDomAttr;
+function TLDomElement.removeAttributeNode(const oldAttr: IDomAttr): IDomAttr;
 var
   attr: xmlAttrPtr;
 begin
@@ -1593,7 +1593,7 @@ begin
   RegisterFlyingNode(xmlNodePtr(attr));
 end;
 
-procedure TLDOMElement.removeAttributeNS(const namespaceURI, localName: DomString);
+procedure TLDomElement.removeAttributeNS(const namespaceURI, localName: DomString);
 var
   attr: xmlAttrPtr;
   uns, ulocal: String;
@@ -1607,12 +1607,12 @@ begin
   end;
 end;
 
-procedure TLDOMElement.setAttribute(const name, value: DomString);
+procedure TLDomElement.setAttribute(const name, value: DomString);
 begin
   xmlSetProp(FGNode, PChar(UTF8Encode(name)), PChar(UTF8Encode(value)));
 end;
 
-function TLDOMElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
+function TLDomElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
 begin
   if newAttr<>nil then begin
     Result := GetDomObject(xmlSetPropNode(FGNode, xmlAttrPtr(GetGNode(newAttr)))) as IDomAttr;
@@ -1621,7 +1621,7 @@ begin
   end;
 end;
 
-procedure TLDOMElement.setAttributeNS(const namespaceURI, qualifiedName, value: DomString);
+procedure TLDomElement.setAttributeNS(const namespaceURI, qualifiedName, value: DomString);
 var
   uprefix, ulocal: String;
   ns: xmlNsPtr;
