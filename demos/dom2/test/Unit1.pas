@@ -142,7 +142,7 @@ end;
 
 procedure TForm1.Button8Click(Sender: TObject);
 begin
-  test1.Checked:=true;
+  //test1.Checked:=true;
   test2.Checked:=true;
   test3.Checked:=true;
   test4.Checked:=true;
@@ -151,6 +151,7 @@ begin
   test7.Checked:=true;
   test8.Checked:=true;
   test9.Checked:=true;
+  dom2.Checked:=true;
 end;
 
 function GetVendorStr: string;
@@ -265,7 +266,7 @@ end;
 
 procedure TForm1.Button10Click(Sender: TObject);
 begin
-  test1.Checked:=false;
+  //test1.Checked:=false;
   test2.Checked:=false;
   test3.Checked:=false;
   test4.Checked:=false;
@@ -274,6 +275,7 @@ begin
   test7.Checked:=false;
   test8.Checked:=false;
   test9.Checked:=false;
+  dom2.Checked:=false;
 end;
 
 end.
