@@ -38,6 +38,8 @@ implementation
 uses MicroTime, conapp, sysutils, Dialogs, idom2, libxml2,libxmldom,
   jkDomTest;
 
+const datapath='../../data';
+
 function TestDom1b(name,vendor:string):double;
 var
   //dom: IDomImplementation;
@@ -47,7 +49,7 @@ var
   ok: boolean;
   root:IDomElement;
 begin
-  filename:='..\data\'+name;
+  filename:=datapath+'/'+name;
   StartTimer;
   doc:=GetEmptyDoc(vendor);
 
@@ -173,7 +175,7 @@ var
   doc: IDomDocument;
   temp: string;
 begin
-  doc:=getDoc('..\data\'+name,vendor);
+  doc:=getDoc(datapath+'/'+name,vendor);
   if doc<>nil then
     begin
       outLog('Parsed file ok!');

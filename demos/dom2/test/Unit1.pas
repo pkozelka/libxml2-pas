@@ -183,7 +183,7 @@ function GetVendorStr: string;
 begin
   if Form1.RbMSXML.Checked
     then result := 'MSXML2_RENTAL_MODEL'
-    else result := 'LIBXML';
+    else result := SLIBXML;
 end;
 
 procedure TForm1.Button9Click(Sender: TObject);

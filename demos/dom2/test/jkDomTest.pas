@@ -28,6 +28,8 @@ interface
 
 uses idom2,libxmldom{,msxml_impl}; // IDOMIMplementation, IDOMDocument
 
+const datapath='../../data';
+
 function TestGDom3(name,vendorstr:string;TestSet:integer):double;
 function getDoc(filename,vendorstr: string;TestSet:integer=0): IDOMDocument;
 function getEmptyDoc(vendorstr: string): IDomDocument;
@@ -802,7 +804,7 @@ begin
   Form1.Memo1.Lines.Clear;
   TestsOK:=0; //Number of passed Tests
   stringlist := TStringList.Create;
-  filename := '..\data\'+name;
+  filename := datapath+'/'+name;
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
 
   // testing IDOMDocumentBuilder
@@ -852,7 +854,7 @@ begin
     document := getDoc(filename,vendorstr);
     if document=nil then exit;
     FDomPersist := document as IDomPersist;
-    FDomPersist.save('..\data\saved.xml');
+    FDomPersist.save(datapath+'/saved.xml');
     //todo: test .xml with large xml-file
     //outLog(FDomPersist.xml);
     FDomPersist:=nil;
