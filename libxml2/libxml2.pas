@@ -190,8 +190,12 @@ begin
 end;
 
 function  DelphiStrdupFunc(str:PChar):Pchar;
+var
+  sz: integer;
 begin
-  Result := StrNew(str);
+  sz := StrLen(str);
+  Result := AllocMem(sz+1);
+  Move(str^, Result^, sz);
 end;
 
 //[pk] DEPRECATED, TEMPORARY:
@@ -224,7 +228,4 @@ initialization
   // setup Delphi memory handler
   xmlMemSetup(@DelphiFreeFunc, @DelphiMallocFunc, @DelphiReallocFunc, @DelphiStrdupFunc);
 end.
-
-
-
 
