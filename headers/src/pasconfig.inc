@@ -10,7 +10,9 @@
 {$UNDEF ALWAYS_FALSE}
 
 // Memory alignment
-{$IFDEF VER140} {$ALIGN 4} {$ELSE} {$ALIGN ON} {$ENDIF}
+{$IFDEF VER130} {$ALIGN ON} {$ENDIF}
+{$IFDEF VER140} {$ALIGN 4} {$ENDIF}
+{$IFDEF FPC} {+$A} {$ENDIF}
 
 // Do we have deprecation directive ?
 {$IFDEF VER140} {$DEFINE HAS_DEPR} {$ENDIF}
