@@ -184,6 +184,7 @@ type
 		IXMLDOMDocument)
 	private
 		function  requestDocPtr: xmlDocPtr;
+		procedure releaseDocPtr;
 	protected //ILibXml2Node
 		function  NodePtr: xmlNodePtr; override;
 	protected //IXMLDOMDocument
@@ -479,7 +480,7 @@ end;
 
 function TXMLDOMNode.Get_nodeTypedValue: OleVariant;
 begin
-	ENotImpl('');
+	ENotImpl('TXMLDOMNode.Get_nodeTypedValue');
 end;
 
 function TXMLDOMNode.Get_nodeTypeString: WideString;
@@ -573,8 +574,24 @@ begin
 end;
 
 function TXMLDOMNode.Get_xml: WideString;
+var
+	buf: xmlOutputBufferPtr;
+	p: PxmlChar;
+	sz: integer;
+	s: string;
 begin
-	ENotImpl('TXMLDOMNode.Get_xml');
+	if (FPtr.node^.type_=XML_DOCUMENT_NODE) then begin
+		xmlDocDumpMemory(FPtr.doc, p, @sz);
+		s := p;
+		xmlFree(p);
+	end else begin
+		buf := xmlAllocOutputBuffer(nil);
+		xmlNodeDump(buf.buffer, FPtr.node^.doc, FPtr.node, 0, 1);
+		s := buf.buffer.content;
+		xmlOutputBufferFlush(buf);
+		xmlOutputBufferClose(buf);
+	end;
+	Result := s;
 end;
 
 function TXMLDOMNode.hasChildNodes: WordBool;
@@ -661,12 +678,12 @@ end;
 
 procedure TXMLDOMNode.Set_dataType(const dataTypeName: WideString);
 begin
-	ENotImpl('Set_dataType');
+	ENotImpl('TXMLDOMNode.Set_dataType');
 end;
 
 procedure TXMLDOMNode.Set_nodeTypedValue(typedValue: OleVariant);
 begin
-	ENotImpl('Set_nodeTypedValue');
+	ENotImpl('TXMLDOMNode.Set_nodeTypedValue');
 end;
 
 procedure TXMLDOMNode.Set_nodeValue(value: OleVariant);
@@ -689,12 +706,12 @@ end;
 
 function TXMLDOMNode.transformNode(const stylesheet: IXMLDOMNode): WideString;
 begin
-	ENotImpl('transformNode');
+	ENotImpl('TXMLDOMNode.transformNode');
 end;
 
 procedure TXMLDOMNode.transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant);
 begin
-	ENotImpl('transformNodeToObject');
+	ENotImpl('TXMLDOMNode.transformNodeToObject');
 end;
 
 function TXMLDOMNode.Get_data: WideString;
@@ -1114,17 +1131,19 @@ var
 	fn: string;
 begin
 	fn := xmlSource;
-	if (FPtr.doc <>nil) then begin
-		xmlFreeDoc(FPtr.doc);
-		FPtr.doc := nil;
-	end;
+	releaseDocPtr;
 	FPtr.doc := xmlParseFile(PChar(fn));
 	//todo: update the ParseError object
 end;
 
 function TXMLDOMDocument.loadXML(const bstrXML: WideString): WordBool;
+var
+	s: string;
 begin
-	ENotImpl('TXMLDOMDocument.loadXML');
+	s := bstrXML;
+	releaseDocPtr;
+	FPtr.doc := xmlParseMemory(PChar(s), Length(s));
+	//todo: update the ParseError object
 end;
 
 function TXMLDOMDocument.nodeFromID(const idString: WideString): IXMLDOMNode;
@@ -1201,6 +1220,14 @@ end;
 procedure TXMLDOMDocument.Set_validateOnParse(isValidating: WordBool);
 begin
 	ENotImpl('TXMLDOMDocument.Set_validateOnParse');
+end;
+
+procedure TXMLDOMDocument.releaseDocPtr;
+begin
+	if (FPtr.doc <> nil) then begin
+		xmlFreeDoc(FPtr.doc);
+		FPtr.doc := nil;
+	end;
 end;
 
 function TXMLDOMDocument.requestDocPtr: xmlDocPtr;
