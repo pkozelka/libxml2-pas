@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.78 2002-01-21 21:46:06 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.79 2002-01-21 22:15:37 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -182,18 +182,17 @@ type
 
   TGDOMAttr = class(TGDOMNode, IDomNode, IDomAttr)
   protected //IDomNode
-    function  IDomNode.get_nodeValue = get_value;
-    procedure IDomNode.set_nodeValue = set_value;
+//    procedure set_nodeValue(const value: DomString);
     function  IDomNode.get_parentNode = returnNullDomNode;
     function  IDomNode.get_firstChild = returnNullDomNode;
     function  IDomNode.get_lastChild = returnNullDomNode;
     function  IDomNode.get_previousSibling = returnNullDomNode;
     function  IDomNode.get_nextSibling = returnNullDomNode;
   protected //IDomAttr
-    function  get_name: DomString;
+    function  IDomAttr.get_name = get_nodeName;
     function  get_specified: Boolean;
-    function  get_value: DomString;
-    procedure set_value(const attributeValue: DomString);
+    function  IDomAttr.get_value = get_nodeValue;
+    procedure IDomAttr.set_value = set_nodeValue;
     function  get_ownerElement: IDomElement;
   end;
 
@@ -854,7 +853,7 @@ end;
 function TGDOMNode.get_nodeValue: DomString;
 begin
   case FGNode.type_ of
-//note:	XML_ATTRIBUTE_NODE is handled in TGDOMAttr
+  XML_ATTRIBUTE_NODE,
   XML_TEXT_NODE,
   XML_CDATA_SECTION_NODE,
   XML_ENTITY_REF_NODE,
@@ -871,7 +870,7 @@ end;
 procedure TGDOMNode.set_nodeValue(const value: DomString);
 begin
   case FGNode.type_ of
-//note:	XML_ATTRIBUTE_NODE is handled in TGDOMAttr
+  XML_ATTRIBUTE_NODE,
   XML_TEXT_NODE,
   XML_CDATA_SECTION_NODE,
   XML_ENTITY_REF_NODE,
@@ -1366,15 +1365,6 @@ end;
 
 { TGDOMAttr }
 
-function TGDOMAttr.get_name: DomString;
-var
-  temp: String;
-begin
-  //temp:=libxmlStringToString(GAttribute.name);
-  temp:=inherited get_nodeName;
-  Result:=temp;
-end;
-
 function TGDOMAttr.get_ownerElement: IDomElement;
 begin
   Result := GetDOMObject(FGNode.parent) as IDomElement;
@@ -1386,18 +1376,14 @@ begin
   Result:=true;
 end;
 
-function TGDOMAttr.get_value: DomString;
-begin
-  Result := UTF8Decode(xmlNodeListGetString(FGNode.doc, FGNode.children, 1));
-end;
-
-procedure TGDOMAttr.set_value(const attributeValue: DomString);
+{
+procedure TGDOMAttr.set_nodeValue(const value: DomString);
 var
   attr: xmlAttrPtr;
   tmp: xmlNodePtr;
   v: String;
 begin
-  v := UTF8Encode(attributeValue);
+  v := UTF8Encode(value);
   attr := xmlAttrPtr(FGNode);
   if attr.children<>nil then begin
     xmlFreeNodeList(attr.children);
@@ -1415,6 +1401,7 @@ begin
     tmp := tmp.next;
   end;
 end;
+}
 
 { TGDOMElement }
 
@@ -1438,9 +1425,7 @@ end;
 
 procedure TGDOMElement.setAttribute(const name, value: DomString);
 begin
-  xmlSetProp(FGNode,
-    PChar(UTF8Encode(name)),
-    PChar(UTF8Encode(value)));
+  xmlSetProp(FGNode, PChar(UTF8Encode(name)), PChar(UTF8Encode(value)));
 end;
 
 procedure TGDOMElement.removeAttribute(const name: DomString);
@@ -2019,6 +2004,7 @@ begin
     _ReallocateFlyingNodes;
     aNewDoc._private := self;
   end else begin
+// for some strange reason, the following line makes troubles
 //		_DestroyFlyingNodes;
   end;
   FGNode := xmlNodePtr(aNewDoc);
