@@ -43,6 +43,7 @@ uses
   classes;
 
 const
+// remove the following line, if you want to work with  enums for nodeTypes
 {$DEFINE NodeTypeInteger}
 
   (*
