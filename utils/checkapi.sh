@@ -17,6 +17,11 @@ TMP=CHECKAPI.TMP
 RESULTFILE=checkapi-results.zip
 
 CHGCOUNT=0
+H2PAS=`which h2pas`
+if [ "x$H2PAS" = "x" ] ; then
+	echo "h2pas not found, Pascal conversion will not take place"
+fi
+
 
 rm -rf $TMP $RESULTFILE
 
@@ -62,16 +67,18 @@ for fn in $FILELIST ; do
 	cp $LOCALROOT/$ORIGFILE $TARGETFILE
 
 	# translate it into pascal and apply known conversions
-	if [ -x "h2pas" ]; then
-
+	if [ "x$H2PAS" != "x" ] ; then
+		echo "---------------- [$fn] -----------------" >>$TMP/h2pas.log
 		# translate
-		h2pas -d -e -c -i $TARGETFILE -o $TARGETFILE.1.pas
+		echo "Translating $TARGETFILE to $TARGETFILE.1.pas"
+		h2pas -d -e -c -i $TARGETFILE -o $TARGETFILE.1.pas 1>&2 >>$TMP/h2pas.log
 
 		# apply known replacements
-		sed -f $LIBXML2_PAS/utils/afterconv.sed $TARGETFILE.1.pas >$TARGETFILE.2.pas
+		echo "Applying additional conversions --> $TARGETFILE.2.pas"
+		sed -f "$LIBXML2_PAS/utils/afterconv.sed" $TARGETFILE.1.pas > $TARGETFILE.2.pas
 
 		# compare original translation and the one with replacements
-		diff $TARGETFILE.h2pas.pas $TARGETFILE.sed.pas >$TARGETFILE.pas.diff12
+		diff $TARGETFILE.1.pas $TARGETFILE.2.pas >$TARGETFILE.pas.diff12
 	fi
 
 	# find the CVSROOT for this file - it is stored with the CVS local copy
@@ -101,4 +108,5 @@ if [ $CHGCOUNT -gt 0 ]; then
 fi
 rm -rf $TMP
 
+echo "----------------------------"
 echo "Total: $CHGCOUNT files changed"
