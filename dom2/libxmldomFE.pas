@@ -633,7 +633,10 @@ function getEncoding(PI:string):string;
 var
   pos1: integer;
 begin
-  pos1:=pos('encoding',PI)+length('encoding')+2;
+  result:='';
+  pos1:=pos('encoding',PI);
+  if pos1=0 then exit;
+  pos1:=pos1+length('encoding')+2;
   result:=trim(copy(PI,pos1,length(PI)-pos1-2));
 end;
 
@@ -1980,6 +1983,7 @@ begin
     tmp := tmp.Next;
   end;
 end;
+
 function xmlRemoveChild(element: xmlNodePtr; node: xmlNodePtr): xmlNodePtr;
 begin
   xmlunlinknode(node);
