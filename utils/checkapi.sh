@@ -71,7 +71,7 @@ for fn in $FILELIST ; do
 		echo "---------------- [$fn] -----------------" >>$TMP/h2pas.log
 		# translate
 		echo "Translating $TARGETFILE to $TARGETFILE.1.pas"
-		h2pas -d -e -c -i $TARGETFILE -o $TARGETFILE.1.pas 1>&2 >>$TMP/h2pas.log
+		h2pas -d -c -i $TARGETFILE -o $TARGETFILE.1.pas 1>&2 >>$TMP/h2pas.log
 
 		# apply known replacements
 		echo "Applying additional conversions --> $TARGETFILE.2.pas"
