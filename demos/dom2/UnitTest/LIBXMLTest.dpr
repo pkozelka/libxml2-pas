@@ -3,10 +3,7 @@ program LIBXMLTest;
 uses
   TestFramework,
   GUITestRunner,
-  LIBXMLTestCase in 'LIBXMLTestCase.pas',
-  libxmldom in 'L:\open\dom2\libxmldom.pas';
-
-{$R *.res}
+  LIBXMLTestCase in 'LIBXMLTestCase.pas';
 
 begin
   GUITestRunner.runRegisteredTests;
