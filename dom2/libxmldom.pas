@@ -362,7 +362,7 @@ type
     function createCDATASection(const data: DOMString): IDOMCDATASection; 
     function createProcessingInstruction(const target,
       data: DOMString): IDOMProcessingInstruction; 
-    function createAttribute(const name: DOMString): IDOMAttr; 
+		function createAttribute(const name: DOMString): IDOMAttr;
     function createEntityReference(const name: DOMString): IDOMEntityReference;
     function getElementsByTagName(const tagName: DOMString): IDOMNodeList;
     function importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
@@ -394,11 +394,12 @@ type
       EventHandler: TAsyncEventHandler);
   public
     constructor Create(
-         GDOMImpl:IDOMImplementation;
+				 GDOMImpl:IDOMImplementation;
       const namespaceURI, qualifiedName: DOMString;
       doctype: IDOMDocumentType); overload;
     constructor Create(GDOMImpl:IDOMImplementation); overload;
-    destructor destroy; override;
+    constructor Create(GDOMImpl:IDOMImplementation; aUrl: DomString); overload;
+		destructor destroy; override;
   end;
 
   { TMSDOMDocumentFragment }
@@ -426,18 +427,18 @@ type
 
   TGDOMDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
   private
-    FFreeThreading : Boolean;
-  public
-    constructor Create(AFreeThreading : Boolean);
-    destructor Destroy; override;
-    function  Get_DomImplementation : IDomImplementation;
-    function  Get_IsNamespaceAware : Boolean;
-    function  Get_IsValidating : Boolean;
-    function  Get_HasAsyncSupport : Boolean;
-    function  Get_HasAbsoluteURLSupport : Boolean;
-    function  newDocument : IDomDocument;
-    function  parse(const xml : DomString) : IDomDocument;
-    function load(const url : DomString) : IDomDocument;
+		FFreeThreading : Boolean;
+	public
+		constructor Create(AFreeThreading : Boolean);
+		destructor Destroy; override;
+		function  Get_DomImplementation : IDomImplementation;
+		function  Get_IsNamespaceAware : Boolean;
+		function  Get_IsValidating : Boolean;
+		function  Get_HasAsyncSupport : Boolean;
+		function  Get_HasAbsoluteURLSupport : Boolean;
+		function  newDocument : IDomDocument;
+		function  parse(const xml : DomString) : IDomDocument;
+		function  load(const url : DomString) : IDomDocument;
   end;
 
   PGdomeDomString=string;
@@ -618,7 +619,6 @@ begin
 end;
 
 constructor TGDomImplementation.Create;
-
 begin
   inherited Create;
 end;
@@ -642,9 +642,8 @@ function TGDOMNode.get_nodeName: DOMString;
 begin
 	case FGNode.type_ of
 		//todo: check the result for the other nodetypes
-	XML_TEXT_NODE:
-		Result := '#text'; //???
 	XML_HTML_DOCUMENT_NODE,
+	XML_DOCB_DOCUMENT_NODE,
 	XML_DOCUMENT_NODE:
 		Result := '#document';
 	else
@@ -2587,13 +2586,13 @@ end;
 
 function TGDOMDocumentBuilder.load(const url: DomString): IDomDocument;
 begin
-  result:=nil;
+	result:=TGDOMDocument.Create(Get_DomImplementation, url);
 end;
 
 function TGDOMDocumentBuilder.newDocument: IDomDocument;
 begin
-  //result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
-  result:=TGDOMDocument.Create(Get_DomImplementation);
+	//result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
+	result:=TGDOMDocument.Create(Get_DomImplementation);
 end;
 
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
@@ -2641,16 +2640,35 @@ end;
 
 constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
 var
-  root:xmlNodePtr;
+	root:xmlNodePtr;
 begin
-  FGdomimpl:=GDOMImpl;
-  FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
-  //Get root-node
-  root:= xmlNodePtr(FPGdomeDoc);
-  //Create root-node as pascal object
-  inherited create(root,nil);
-  //self._Release;
-  inc(doccount);
+	FGdomimpl:=GDOMImpl;
+	FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
+	//Get root-node
+	root:= xmlNodePtr(FPGdomeDoc);
+	//Create root-node as pascal object
+	inherited create(root,nil);
+	//self._Release;
+	inc(doccount);
+end;
+
+constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
+var
+	root:xmlNodePtr;
+	fn: string;
+begin
+	FGdomimpl:=GDOMImpl;
+	FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
+	//Get root-node
+	fn := UTF8Encode(aUrl);
+	root:= xmlNodePtr(xmlParseFile(PChar(fn)));
+	if (root=nil) then begin
+		//todo: exception
+	end;
+	//Create root-node as pascal object
+	inherited create(root,nil);
+	//self._Release;
+	inc(doccount);
 end;
 
 initialization
