@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltutils.h:1.31:
+// CVS-REV:libxslt/libxslt/xsltutils.h:1.34:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -108,7 +108,13 @@ procedure xsltTransformError(ctxt: xsltTransformContextPtr; style: xsltStyleshee
  * Sorting.
  *)
 procedure xsltDocumentSortFunction(list: xmlNodeSetPtr); cdecl; external LIBXSLT_SO;
+//procedure xsltDoSortFunction(ctxt: xsltTransformContextPtr; sorts: PxmlNodePtr; nbsorts: Longint); cdecl; external LIBXSLT_SO;
+
+procedure xsltSetSortFunc(handler: xsltSortFunc); cdecl; external LIBXSLT_SO;
+procedure xsltSetCtxtSortFunc(ctxt: xsltTransformContextPtr; handler: xsltSortFunc); cdecl; external LIBXSLT_SO;
+procedure xsltDefaultSortFunction(ctxt: xsltTransformContextPtr; sorts: PxmlNodePtr; nbsorts: Longint); cdecl; external LIBXSLT_SO;
 procedure xsltDoSortFunction(ctxt: xsltTransformContextPtr; sorts: PxmlNodePtr; nbsorts: Longint); cdecl; external LIBXSLT_SO;
+function  xsltComputeSortResult(ctxt: xsltTransformContextPtr; sort: xmlNodePtr): PxmlXPathObjectPtr; cdecl; external LIBXSLT_SO;
 
 (*
  * QNames handling.
@@ -128,6 +134,8 @@ function  xsltSaveResultToString(doc_txt_ptr: PPxmlChar; doc_txt_len: PLongint; 
  * Profiling.
  *)
 procedure xsltSaveProfiling(ctxt: xsltTransformContextPtr; output: PLibXml2File); cdecl; external LIBXSLT_SO;
+function  xsltGetProfileInformation(ctxt: xsltTransformContextPtr): xmlDocPtr; cdecl; external LIBXSLT_SO;
+
 function  xsltTimestamp: Longint; cdecl; external LIBXSLT_SO;
 procedure xsltCalibrateAdjust(delta: Longint); cdecl; external LIBXSLT_SO;
 

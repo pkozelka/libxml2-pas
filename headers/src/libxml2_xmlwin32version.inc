@@ -30,21 +30,21 @@ const
    *
    * the version string like "1.2.3"
    *)
-  LIBXML_DOTTED_VERSION = '2.4.26';
+  LIBXML_DOTTED_VERSION = '2.4.28';
 
   (**
    * LIBXML_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBXML_VERSION = 20426;
+  LIBXML_VERSION = 20428;
 
   (**
    * LIBXML_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-  LIBXML_VERSION_STRING = '20426';
+  LIBXML_VERSION_STRING = '20428';
 
   (**
    * LIBXML_TEST_VERSION:
@@ -53,7 +53,7 @@ const
    * the version the software has been compiled against
    *)
 
-//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20426);
+//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20428);
 
 {$IFDEF ALWAYS_FALSE}
 

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/HTMLtree.h:1.22:
+// CVS-REV:gnome-xml/include/libxml/HTMLtree.h:1.23:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -61,7 +61,7 @@ function  htmlSetMetaEncoding(doc: htmlDocPtr; encoding: PxmlChar): Longint; cde
 procedure htmlDocDumpMemory(cur: xmlDocPtr; mem: PPxmlChar; size: PLongint); cdecl; external LIBXML2_SO;
 function  htmlDocDump(f: PLibXml2File; cur: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 function  htmlSaveFile(filename: PChar; cur: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
-procedure htmlNodeDump(buf: xmlBufferPtr; doc: xmlDocPtr; cur: xmlNodePtr); cdecl; external LIBXML2_SO;
+function  htmlNodeDump(buf: xmlBufferPtr; doc: xmlDocPtr; cur: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 procedure htmlNodeDumpFile(aOut: PLibXml2File; doc: xmlDocPtr; cur: xmlNodePtr); cdecl; external LIBXML2_SO;
 function  htmlNodeDumpFileFormat(aOut: PLibXml2File; doc: xmlDocPtr; cur: xmlNodePtr; encoding: PChar; format: Longint): Longint; cdecl; external LIBXML2_SO;
 function  htmlSaveFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar): Longint; cdecl; external LIBXML2_SO;

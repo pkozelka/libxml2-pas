@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.113:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.116:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -617,7 +617,7 @@ function  xmlDocDump(f: PLibXml2File; cur: xmlDocPtr): Longint; cdecl; external 
 procedure xmlElemDump(f: PLibXml2File; doc: xmlDocPtr; cur: xmlNodePtr); cdecl; external LIBXML2_SO;
 function  xmlSaveFile(filename: PChar; cur: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlSaveFormatFile(filename: PChar; cur: xmlDocPtr; format: Longint): Longint; cdecl; external LIBXML2_SO;
-procedure xmlNodeDump(buf: xmlBufferPtr; doc: xmlDocPtr; cur: xmlNodePtr; level: Longint; format: Longint); cdecl; external LIBXML2_SO;
+function  xmlNodeDump(buf: xmlBufferPtr; doc: xmlDocPtr; cur: xmlNodePtr; level: Longint; format: Longint): Longint; cdecl; external LIBXML2_SO;
 { [pk] moved to libxml2.pas - needs declarations from xmlIO
 function  xmlSaveFileTo(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: Char): Integer; cdecl; external LIBXML2_SO;
 function  xmlSaveFormatFileTo(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: Char; format: Integer): Integer; cdecl; external LIBXML2_SO;
@@ -626,11 +626,17 @@ procedure xmlNodeDumpOutput(buf: xmlOutputBufferPtr; doc: xmlDocPtr; cur: xmlNod
 function  xmlSaveFormatFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar; format: Integer): Integer; cdecl; external LIBXML2_SO;
 function  xmlSaveFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar): Longint; cdecl; external LIBXML2_SO;
 
+
+(*
+ * XHTML
+ *)
+function xmlIsXHTML(systemID, publicID: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+
 (*
  * Compression.
  *)
 function  xmlGetDocCompressMode(doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 procedure xmlSetDocCompressMode(doc: xmlDocPtr; mode: Longint); cdecl; external LIBXML2_SO;
-function  xmlGetCompressMode: Longint; cdecl; external LIBXML2_SO;
+function  xmlGetCompressMode: Longint; cdecl; external LIBXML2_SO;                           
 procedure xmlSetCompressMode(mode: Longint); cdecl; external LIBXML2_SO;
 

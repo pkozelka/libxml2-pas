@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltInternals.h:1.70:
+// CVS-REV:libxslt/libxslt/xsltInternals.h:1.72:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -125,6 +125,16 @@ type
    *)
   xsltTransformFunction = procedure(ctxt: xsltTransformContextPtr; node, inst: xmlNodePtr; comp: xsltElemPreCompPtr); cdecl;
 
+  (**
+   * xsltSortFunc:
+   * @ctxt:    a transformation context
+   * @sorts:   the node-set to sort
+   * @nbsorts: the number of sorts
+   *
+   * Signature of the function to use during sorting
+   *)
+  xsltSortFunc = procedure (ctxt: xsltTransformContextPtr; var sorts: xmlNodePtr; nbsorts: Longint); cdecl;
+
   xsltStyleType = (
     DUMMY__XSLT_FUNC_0, // this is for D5 compatibility
     XSLT_FUNC_COPY, // = 1,
@@ -194,6 +204,10 @@ type
     order: PxmlChar;                             (* sort *)
     has_order: Longint;                          (* sort *)
     descending: Longint;                         (* sort *)
+    lang: PxmlChar;                              (* sort *)
+    has_lang: Longint;                           (* sort *)
+    case_order: PxmlChar;                        (* sort *)
+    lower_first: Longint;                        (* sort *)
     use: PxmlChar;                               (* copy, element *)
     has_use: Longint;                            (* copy, element *)
     noescape: Longint;                           (* text *)
@@ -390,6 +404,8 @@ type
 
     error: xmlGenericErrorFunc;		               (* a specific error handler *)
     errctx: Pointer;                             (* context for the error handler *)
+
+    sortfunc: xsltSortFunc;                      (* a ctxt specific sort routine *) 
   end;
 
 (**

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/parser.h:1.79:
+// CVS-REV:gnome-xml/include/libxml/parser.h:1.82:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -203,6 +203,7 @@ type
     loadsubset: Longint;                  (* should the external subset be loaded  *)
     linenumbers: Longint;                 (* set line number in element content *)
     catalogs: Pointer;                    (* document's own catalog *)
+    recovery: Longint;                    (* run in recovery mode *)
   end;
 
   (**
@@ -484,6 +485,8 @@ type
    * @...:  extra parameters for the message display
    *
    * Display and format fatal error messages, callback.
+   * Note: so far fatalError() SAX callbacks are not used, error()
+   *       get all the callbacks for errors.
    *)
   fatalErrorSAXFunc = procedure(ctx: Pointer; msg: PxmlChar); cdecl; //varargs;
 
@@ -547,7 +550,7 @@ type
     comment: commentSAXFunc;
     warning: warningSAXFunc;
     error: errorSAXFunc;
-    fatalError: fatalErrorSAXFunc;
+    fatalError: fatalErrorSAXFunc;      (* unused error() get all the errors *)
     getParameterEntity: getParameterEntitySAXFunc;
     cdataBlock: cdataBlockSAXFunc;
     externalSubset: externalSubsetSAXFunc;
@@ -649,6 +652,7 @@ function  xmlSAXParseDoc(sax: xmlSAXHandlerPtr; cur: PxmlChar; recovery: Longint
 function  xmlSAXUserParseFile(sax: xmlSAXHandlerPtr; user_data: Pointer; filename: PChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlSAXUserParseMemory(sax: xmlSAXHandlerPtr; user_data: Pointer; buffer: PChar; size: Longint): Longint; cdecl; external LIBXML2_SO;
 function  xmlSAXParseMemory(sax: xmlSAXHandlerPtr; buffer: PChar; size: Longint; recovery: Longint): xmlDocPtr; cdecl; external LIBXML2_SO;
+function  xmlSAXParseMemoryWithData(sax: xmlSAXHandlerPtr; buffer: PChar; size: Longint; recovery: Longint; data: Pointer): xmlDocPtr; cdecl; external LIBXML2_SO;
 function  xmlSAXParseFile(sax: xmlSAXHandlerPtr; filename: PChar; recovery: Longint): xmlDocPtr; cdecl; external LIBXML2_SO;
 function  xmlSAXParseFileWithData(sax: xmlSAXHandlerPtr; filename: PChar; recovery: Longint; data: Pointer): xmlDocPtr; cdecl; external LIBXML2_SO;
 function  xmlSAXParseEntity(sax: xmlSAXHandlerPtr; filename: PChar): xmlDocPtr; cdecl; external LIBXML2_SO;

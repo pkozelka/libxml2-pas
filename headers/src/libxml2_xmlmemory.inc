@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlmemory.h:1.27:
+// CVS-REV:gnome-xml/include/libxml/xmlmemory.h:1.28:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -113,6 +113,10 @@ function  xmlMemUsed: Longint; cdecl; external LIBXML2_SO;
 procedure xmlMemDisplay(fp: PLibXml2File); cdecl; external LIBXML2_SO;
 procedure xmlMemShow(fp: PLibXml2File; nr: Longint); cdecl; external LIBXML2_SO;
 procedure xmlMemoryDump; cdecl; external LIBXML2_SO;
+function  xmlMemMalloc(size: size_t): Pointer; cdecl; external LIBXML2_SO;
+function  xmlMemRealloc(ptr: Pointer; size: size_t): Pointer; cdecl; external LIBXML2_SO;
+procedure xmlMemFree(ptr: Pointer); cdecl; external LIBXML2_SO;
+function  xmlMemoryStrdup(str: PChar): PChar; cdecl; external LIBXML2_SO;
 
 {$IFDEF XML_DEBUG_MEMORY_LOCATION}
 (**
