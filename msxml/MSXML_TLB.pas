@@ -980,7 +980,7 @@ type
 
 	CoDOMDocument = class
 	public
-		class function Create: IXMLDOMNode;
+		class function Create: IXMLDOMDocument;
 	end;
 
 implementation
@@ -991,12 +991,12 @@ uses
 
 { CoDOMDocument }
 
-class function CoDOMDocument.Create: IXMLDOMNode;
+class function CoDOMDocument.Create: IXMLDOMDocument;
 var
 	doc: xmlDocPtr;
 begin
 	doc := xmlNewDoc(XML_DEFAULT_VERSION);
-	GetNodeObject(xmlNodePtr(doc), Result);
+	Result := GetDOMObject(xmlNodePtr(doc)) as IXMLDOMDocument;
 end;
 
 end.

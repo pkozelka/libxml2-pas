@@ -1,5 +1,10 @@
 unit domimpl;
-
+(**
+ * This unit is an object-oriented wrapper for libxml2.
+ * Object interfaces are fully compatitable with those defined by MSXML DOM.
+ *
+ * Author: Petr Kozelka <pkozelka@email.cz>
+ *)
 interface
 
 uses
@@ -24,14 +29,27 @@ type
 {$endif}
 
 type
+	TChildNodeList = class;
+	TAttrNodeMap = class;
+
 	ILibXml2Node = interface ['{1D4BD646-0AB9-4810-B4BD-7277FB0CFA30}']
 		function  NodePtr: xmlNodePtr;
 	end;
 
+	TUniNode = record
+		case integer of
+		1: (node: xmlNodePtr);
+		2: (doc: xmlDocPtr);
+	end;
+	(**
+	 * Abstract base for node implementations.
+	 *)
 	TXMLDOMNode = class (TMyDispatch,
 		ILibXml2Node,
 		IXMLDOMNode)
-		FNode: xmlNodePtr;
+	private
+		FNode: TUniNode;
+		FChildren_OnDemand: TChildNodeList;
 	protected //ILibXml2Node
 		function  NodePtr: xmlNodePtr;
 	protected //IXMLDOMNode
@@ -77,8 +95,25 @@ type
 		destructor Destroy; override;
 	end;
 
-	TXMLDOMElement = class(TXMLDOMNode)
-		//todo
+	(**
+	 * Element implementation
+	 *)
+	TXMLDOMElement = class(TXMLDOMNode,
+		IXMLDOMElement, IXMLDOMNode)
+	private
+		FAttributes_OnDemand: TAttrNodeMap;
+	protected //IXMLDOMNode
+		function  Get_attributes: IXMLDOMNamedNodeMap; safecall;
+	protected //IXMLDOMElement
+		function  Get_tagName: WideString; safecall;
+		function  getAttribute(const name: WideString): OleVariant; safecall;
+		procedure setAttribute(const name: WideString; value: OleVariant); safecall;
+		procedure removeAttribute(const name: WideString); safecall;
+		function  getAttributeNode(const name: WideString): IXMLDOMAttribute; safecall;
+		function  setAttributeNode(const DOMAttribute: IXMLDOMAttribute): IXMLDOMAttribute; safecall;
+		function  removeAttributeNode(const DOMAttribute: IXMLDOMAttribute): IXMLDOMAttribute; safecall;
+		function  getElementsByTagName(const tagName: WideString): IXMLDOMNodeList; safecall;
+		procedure normalize; safecall;
 	end;
 
 	TXMLDOMComment = class(TXMLDOMNode)
@@ -105,8 +140,42 @@ type
 		//todo
 	end;
 
-	TXMLDOMDocument = class(TXMLDOMNode)
-		//todo
+	TXMLDOMDocument = class(TXMLDOMNode,
+		IXMLDOMDocument)
+	protected //IXMLDOMDocument
+		function  Get_doctype: IXMLDOMDocumentType; safecall;
+		function  Get_implementation_: IXMLDOMImplementation; safecall;
+		function  Get_documentElement: IXMLDOMElement; safecall;
+		procedure Set_documentElement(const DOMElement: IXMLDOMElement); safecall;
+		function  createElement(const tagName: WideString): IXMLDOMElement; safecall;
+		function  createDocumentFragment: IXMLDOMDocumentFragment; safecall;
+		function  createTextNode(const data: WideString): IXMLDOMText; safecall;
+		function  createComment(const data: WideString): IXMLDOMComment; safecall;
+		function  createCDATASection(const data: WideString): IXMLDOMCDATASection; safecall;
+		function  createProcessingInstruction(const target: WideString; const data: WideString): IXMLDOMProcessingInstruction; safecall;
+		function  createAttribute(const name: WideString): IXMLDOMAttribute; safecall;
+		function  createEntityReference(const name: WideString): IXMLDOMEntityReference; safecall;
+		function  getElementsByTagName(const tagName: WideString): IXMLDOMNodeList; safecall;
+		function  createNode(type_: OleVariant; const name: WideString; const namespaceURI: WideString): IXMLDOMNode; safecall;
+		function  nodeFromID(const idString: WideString): IXMLDOMNode; safecall;
+		function  load(xmlSource: OleVariant): WordBool; safecall;
+		function  Get_readyState: Integer; safecall;
+		function  Get_parseError: IXMLDOMParseError; safecall;
+		function  Get_url: WideString; safecall;
+		function  Get_async: WordBool; safecall;
+		procedure Set_async(isAsync: WordBool); safecall;
+		procedure abort; safecall;
+		function  loadXML(const bstrXML: WideString): WordBool; safecall;
+		procedure save(destination: OleVariant); safecall;
+		function  Get_validateOnParse: WordBool; safecall;
+		procedure Set_validateOnParse(isValidating: WordBool); safecall;
+		function  Get_resolveExternals: WordBool; safecall;
+		procedure Set_resolveExternals(isResolving: WordBool); safecall;
+		function  Get_preserveWhiteSpace: WordBool; safecall;
+		procedure Set_preserveWhiteSpace(isPreserving: WordBool); safecall;
+		procedure Set_onreadystatechange(Param1: OleVariant); safecall;
+		procedure Set_ondataavailable(Param1: OleVariant); safecall;
+		procedure Set_ontransformnode(Param1: OleVariant); safecall;
 	end;
 
 	TXMLDOMDocumentType = class(TXMLDOMNode)
@@ -119,37 +188,53 @@ type
 
 	TListType = (LT_CHILDREN, LT_ATTRS, LT_OTHER);
 
+	(**
+	 * Abstract base class for NodeList and NamedNodeMap.
+	 * @todo implement it as LIVE ! (needs feedback from libxml2)
+	 *)
 	TXMLDOMNodeCollection = class(TMyDispatch)
 	private
-		FInitNode: xmlNodePtr;
-		FList: array of pointer;
 	protected // implementation ready for NodeList and NamedNodeMap
 		function  Get_item(index: Integer): IXMLDOMNode; safecall;
 		function  Get_length: Integer; safecall;
 		function  nextNode: IXMLDOMNode; safecall;
 		procedure reset; safecall;
 		function  Get__newEnum: IUnknown; safecall;
-	protected
-		constructor Create(aNode: xmlNodePtr; aListType: TListType);
+	public
+	end;
+
+	TChildNodeList = class(TXMLDOMNodeCollection,
+		IXMLDOMNodeList)
+	private
+		FParentPtr: xmlNodePtr;
+		FParent: TXMLDOMNode;
+	protected //IXMLDOMNodeList
+		function  Get_item(index: Integer): IXMLDOMNode; safecall;
+		function  Get_length: Integer; safecall;
+	private
+		constructor Create(aParent: TXMLDOMNode);
 	public
 		destructor Destroy; override;
 	end;
 
-	TXMLDOMNodeList = class(TXMLDOMNodeCollection,
-		IXMLDOMNodeList)
-	end;
-
-	TXMLDOMNamedNodeMap = class(TXMLDOMNodeCollection,
+	TAttrNodeMap = class(TXMLDOMNodeCollection,
 		IXMLDOMNamedNodeMap)
+	private
+		FParentPtr: xmlNodePtr;
+		FParent: TXMLDOMElement;
 	protected //IXMLDOMNamedNodeMap
 		function  getNamedItem(const name: WideString): IXMLDOMNode; safecall;
 		function  setNamedItem(const newItem: IXMLDOMNode): IXMLDOMNode; safecall;
 		function  removeNamedItem(const name: WideString): IXMLDOMNode; safecall;
 		function  getQualifiedItem(const baseName: WideString; const namespaceURI: WideString): IXMLDOMNode; safecall;
 		function  removeQualifiedItem(const baseName: WideString; const namespaceURI: WideString): IXMLDOMNode; safecall;
+	private
+		constructor Create(aParent: TXMLDOMElement);
+	public
+		destructor Destroy; override;
 	end;
 
-procedure GetNodeObject(const aNode: xmlNodePtr; var aResult);
+function GetDOMObject(const aNode: xmlNodePtr): IUnknown;
 
 implementation
 
@@ -169,35 +254,40 @@ begin
 	Result := IUnknown(TVarData(aVariant).VUnknown) as IXMLDOMNode;
 end;
 
-procedure GetNodeObject(const aNode: xmlNodePtr; var aResult);
+function GetNodePtr(aDOMNode: IXMLDOMNode): xmlNodePtr;
+begin
+	Result := (aDOMNode as ILibXml2Node).NodePtr;
+end;
+
+function GetDOMObject(const aNode: xmlNodePtr): IUnknown;
 begin
 	if (aNode = nil) then begin
-		IUnknown(aResult) := nil;
+		Result := nil;
 	end else if (nil = aNode._private) then begin
 		case aNode.type_ of
 		XML_ATTRIBUTE_NODE:
-			IUnknown(aResult) := TXMLDOMAttribute.Create(aNode);
+			Result := TXMLDOMAttribute.Create(aNode);
 		XML_ELEMENT_NODE:
-			IUnknown(aResult) := TXMLDOMElement.Create(aNode);
+			Result := TXMLDOMElement.Create(aNode);
 		XML_TEXT_NODE:
-			IUnknown(aResult) := TXMLDOMText.Create(aNode);
+			Result := TXMLDOMText.Create(aNode);
 		XML_CDATA_SECTION_NODE:
-			IUnknown(aResult) := TXMLDOMElement.Create(aNode);
+			Result := TXMLDOMElement.Create(aNode);
 		XML_ENTITY_REF_NODE:
-			IUnknown(aResult) := TXMLDOMEntityReference.Create(aNode);
+			Result := TXMLDOMEntityReference.Create(aNode);
 		XML_ENTITY_NODE:
-			IUnknown(aResult) := TXMLDOMEntity.Create(aNode);
+			Result := TXMLDOMEntity.Create(aNode);
 		XML_PI_NODE:
-			IUnknown(aResult) := TXMLDOMProcessingInstruction.Create(aNode);
+			Result := TXMLDOMProcessingInstruction.Create(aNode);
 		XML_COMMENT_NODE:
-			IUnknown(aResult) := TXMLDOMComment.Create(aNode);
+			Result := TXMLDOMComment.Create(aNode);
 		XML_DOCUMENT_NODE:
-			IUnknown(aResult) := TXMLDOMDocument.Create(aNode);
+			Result := TXMLDOMDocument.Create(aNode);
 		XML_DOCUMENT_TYPE_NODE:
-			IUnknown(aResult) := TXMLDOMDocumentType.Create(aNode);
+			Result := TXMLDOMDocumentType.Create(aNode);
 //		XML_DOCUMENT_FRAG_NODE:
 		XML_NOTATION_NODE:
-			IUnknown(aResult) := TXMLDOMNotation.Create(aNode);
+			Result := TXMLDOMNotation.Create(aNode);
 //		XML_HTML_DOCUMENT_NODE:
 //		XML_DTD_NODE:
 //		XML_ELEMENT_DECL:
@@ -211,7 +301,7 @@ begin
 {$endif}
 		end;
 	end else begin
-		IUnknown(aResult) := IUnknown(aNode._private);
+		Result := IUnknown(aNode._private);
 	end;
 end;
 
@@ -221,8 +311,8 @@ function TXMLDOMNode.appendChild(const newChild: IXMLDOMNode): IXMLDOMNode;
 var
 	cur: xmlNodePtr;
 begin
-	cur := (newChild as ILibXml2Node).NodePtr;
-	xmlAddChild(FNode, cur);
+	cur := GetNodePtr(newChild);
+	xmlAddChild(FNode.node, cur);
 	Result := newChild;
 end;
 
@@ -231,33 +321,33 @@ var
 	node: xmlNodePtr;
 begin
 	if (deep) then begin
-		node := xmlCopyNode(FNode, 1);
+		node := xmlCopyNode(FNode.node, 1);
 	end else begin
-		node := xmlCopyNode(FNode, 0);
+		node := xmlCopyNode(FNode.node, 0);
 	end;
-	GetNodeObject(node, Result);
+	Result := GetDOMObject(node) as IXMLDOMNode;
 end;
 
 constructor TXMLDOMNode.Create(aNode: xmlNodePtr);
 begin
-	FNode := aNode;
-	pointer(FNode._private) := self; // establish weak reference
+	FNode.node := aNode;
+	pointer(FNode.node._private) := self; // establish weak reference
 end;
 
 destructor TXMLDOMNode.Destroy;
 begin
-	pointer(FNode._private) := nil;  // remove weak reference
+	pointer(FNode.node._private) := nil;  // remove weak reference
 	inherited;
 end;
 
 function TXMLDOMNode.Get_attributes: IXMLDOMNamedNodeMap;
 begin
-	ENotImpl('');
+	Result := nil;
 end;
 
 function TXMLDOMNode.Get_baseName: WideString;
 begin
-	Result := UTF8Decode(FNode.ns.prefix);
+	Result := UTF8Decode(FNode.node.ns.prefix);
 end;
 
 function TXMLDOMNode.Get_dataType: OleVariant;
@@ -272,37 +362,44 @@ end;
 
 function TXMLDOMNode.Get_firstChild: IXMLDOMNode;
 begin
-	GetNodeObject(FNode.children, Result);
+	Result := GetDOMObject(FNode.node.children) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_childNodes: IXMLDOMNodeList;
 begin
-	ENotImpl('');
+	if FChildren_OnDemand=nil then begin
+		case FNode.node.type_ of
+		XML_ELEMENT_NODE,
+		XML_DOCUMENT_NODE:
+			FChildren_OnDemand := TChildNodeList.Create(self);
+		end;
+	end;
+	Result := FChildren_OnDemand;
 end;
 
 function TXMLDOMNode.Get_lastChild: IXMLDOMNode;
 begin
-	GetNodeObject(FNode.last, Result);
+	Result := GetDOMObject(FNode.node.last) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_namespaceURI: WideString;
 begin
-	Result := UTF8Decode(FNode.ns.href);
+	Result := UTF8Decode(FNode.node.ns.href);
 end;
 
 function TXMLDOMNode.Get_nextSibling: IXMLDOMNode;
 begin
-	GetNodeObject(FNode.next, Result);
+	Result := GetDOMObject(FNode.node.next) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_nodeName: WideString;
 begin
-	Result := UTF8Decode(FNode.name);
+	Result := UTF8Decode(FNode.node.name);
 end;
 
 function TXMLDOMNode.Get_nodeType: DOMNodeType;
 begin
-	Result := FNode.type_;
+	Result := FNode.node.type_;
 end;
 
 function TXMLDOMNode.Get_nodeTypedValue: OleVariant;
@@ -312,7 +409,7 @@ end;
 
 function TXMLDOMNode.Get_nodeTypeString: WideString;
 begin
-	case FNode.type_ of
+	case FNode.node.type_ of
 		XML_ATTRIBUTE_NODE:
 			Result := 'attribute';
 		XML_ELEMENT_NODE:
@@ -356,23 +453,23 @@ begin
 {$ifdef LIBXML_DOCB_ENABLED}
 		XML_DOCB_DOCUMENT_NODE:
 {$endif}
-	else Result := '*unknown_'+IntToStr(FNode.type_);
+	else Result := '*unknown_'+IntToStr(FNode.node.type_);
 	end;
 end;
 
 function TXMLDOMNode.Get_nodeValue: OleVariant;
 begin
-	Result := UTF8Decode(xmlNodeGetContent(FNode));
+	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
 end;
 
 function TXMLDOMNode.Get_ownerDocument: IXMLDOMDocument;
 begin
-	GetNodeObject(xmlNodePtr(FNode.doc), Result);
+	Result := GetDOMObject(xmlNodePtr(FNode.node.doc)) as IXMLDOMDocument;
 end;
 
 function TXMLDOMNode.Get_parentNode: IXMLDOMNode;
 begin
-	GetNodeObject(FNode.parent, Result);
+	Result := GetDOMObject(FNode.node.parent) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_parsed: WordBool;
@@ -382,12 +479,12 @@ end;
 
 function TXMLDOMNode.Get_prefix: WideString;
 begin
-	Result := UTF8Decode(FNode.ns.prefix);
+	Result := UTF8Decode(FNode.node.ns.prefix);
 end;
 
 function TXMLDOMNode.Get_previousSibling: IXMLDOMNode;
 begin
-	GetNodeObject(FNode.prev, Result);
+	Result := GetDOMObject(FNode.node.prev) as IXMLDOMNode;
 end;
 
 function TXMLDOMNode.Get_specified: WordBool;
@@ -397,17 +494,17 @@ end;
 
 function TXMLDOMNode.Get_text: WideString;
 begin
-	ENotImpl('');
+	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
 end;
 
 function TXMLDOMNode.Get_xml: WideString;
 begin
-	ENotImpl('');
+	ENotImpl('TXMLDOMNode.Get_xml');
 end;
 
 function TXMLDOMNode.hasChildNodes: WordBool;
 begin
-	Result := FNode.children <> nil;
+	Result := FNode.node.children <> nil;
 end;
 
 function TXMLDOMNode.insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode;
@@ -418,8 +515,8 @@ begin
 	if VarIsNull(refChild) then begin
 		appendChild(newChild);
 	end else begin
-		child := (newChild as ILibXml2Node).NodePtr;
-		ref := (VarToDOMNode(refChild) as ILibXml2Node).NodePtr;
+		child := GetNodePtr(newChild);
+		ref := GetNodePtr(IXMLDOMNode(TVarData(refChild).VUnknown));
 		xmlAddPrevSibling(ref, child);
 	end;
 	Result := newChild;
@@ -427,14 +524,14 @@ end;
 
 function TXMLDOMNode.NodePtr: xmlNodePtr;
 begin
-	Result := FNode;
+	Result := FNode.node;
 end;
 
 function TXMLDOMNode.removeChild(const childNode: IXMLDOMNode): IXMLDOMNode;
 var
 	node: xmlNodePtr;
 begin
-	node := (childNode as ILibXml2Node).NodePtr;
+	node := GetNodePtr(childNode);
 	xmlRemoveNode(node);
 end;
 
@@ -442,111 +539,464 @@ function TXMLDOMNode.replaceChild(const newChild, oldChild: IXMLDOMNode): IXMLDO
 var
 	old, cur: xmlNodePtr;
 begin
-	old := (oldChild as ILibXml2Node).NodePtr;
-	cur := (newChild as ILibXml2Node).NodePtr;
+	old := GetNodePtr(oldChild);
+	cur := GetNodePtr(newChild);
 	xmlReplaceNode(old, cur);
 end;
 
 function TXMLDOMNode.selectNodes(const queryString: WideString): IXMLDOMNodeList;
 begin
-	ENotImpl('');
+	ENotImpl('selectNodes');
 end;
 
 function TXMLDOMNode.selectSingleNode(const queryString: WideString): IXMLDOMNode;
 begin
-	ENotImpl('');
+	ENotImpl('selectSingleNode');
 end;
 
 procedure TXMLDOMNode.Set_dataType(const dataTypeName: WideString);
 begin
-	ENotImpl('');
+	ENotImpl('Set_dataType');
 end;
 
 procedure TXMLDOMNode.Set_nodeTypedValue(typedValue: OleVariant);
 begin
-	ENotImpl('');
+	ENotImpl('Set_nodeTypedValue');
 end;
 
 procedure TXMLDOMNode.Set_nodeValue(value: OleVariant);
 begin
-	ENotImpl('');
+	ENotImpl('Set_nodeValue');
 end;
 
 procedure TXMLDOMNode.Set_text(const text: WideString);
 begin
-	ENotImpl('');
+	ENotImpl('Set_text');
 end;
 
 function TXMLDOMNode.transformNode(const stylesheet: IXMLDOMNode): WideString;
 begin
-	ENotImpl('');
+	ENotImpl('transformNode');
 end;
 
 procedure TXMLDOMNode.transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant);
 begin
-	ENotImpl('');
+	ENotImpl('transformNodeToObject');
 end;
 
 { TXMLDOMNodeCollection }
 
 function TXMLDOMNodeCollection.Get__newEnum: IUnknown;
 begin
-	ENotImpl('');
+	ENotImpl('Get__newEnum');
 end;
 
 function TXMLDOMNodeCollection.Get_item(index: Integer): IXMLDOMNode;
 begin
+	ENotImpl('Get_item');
 end;
 
 function TXMLDOMNodeCollection.Get_length: Integer;
 begin
-
+	ENotImpl('Get_length');
 end;
 
 function TXMLDOMNodeCollection.nextNode: IXMLDOMNode;
 begin
-	ENotImpl('');
+	ENotImpl('nextNode');
 end;
 
 procedure TXMLDOMNodeCollection.reset;
 begin
-	ENotImpl('');
+	ENotImpl('reset');
 end;
 
-constructor TXMLDOMNodeCollection.Create(aNode: xmlNodePtr; aListType: TListType);
+{ TChildNodeList }
+
+constructor TChildNodeList.Create(aParent: TXMLDOMNode);
 begin
+	inherited Create;
+	FParent := aParent;
+	FParentPtr := GetNodePtr(FParent);
 end;
 
-destructor TXMLDOMNodeCollection.Destroy;
+destructor TChildNodeList.Destroy;
 begin
+	FParent.FChildren_OnDemand := nil; //???
 	inherited;
 end;
 
-{ TXMLDOMNamedNodeMap }
-
-function TXMLDOMNamedNodeMap.getNamedItem(const name: WideString): IXMLDOMNode;
+function TChildNodeList.Get_item(index: Integer): IXMLDOMNode;
+var
+	i: integer;
+	node: xmlNodePtr;
 begin
-
+	node := FParentPtr.children;
+	for i:=0 to index-1 do begin
+		node := node.next;
+		if (nil=node) then begin
+			raise Exception.Create('Index too high!');
+		end;
+	end;
+	Result := GetDOMObject(node) as IXMLDOMNode;
 end;
 
-function TXMLDOMNamedNodeMap.getQualifiedItem(const baseName, namespaceURI: WideString): IXMLDOMNode;
+function TChildNodeList.Get_length: Integer;
+var
+	node: xmlNodePtr;
 begin
-
+	node := FParentPtr.children;
+	Result := 0;
+	while (node<>nil) do begin
+		Inc(Result);
+		node := node.next;
+	end;
 end;
 
-function TXMLDOMNamedNodeMap.removeNamedItem(const name: WideString): IXMLDOMNode;
-begin
+{ TAttrNodeMap }
 
+constructor TAttrNodeMap.Create(aParent: TXMLDOMElement);
+begin
+	inherited Create;
+	FParent := aParent;
+	FParentPtr := GetNodePtr(FParent);
 end;
 
-function TXMLDOMNamedNodeMap.removeQualifiedItem(const baseName, namespaceURI: WideString): IXMLDOMNode;
+destructor TAttrNodeMap.Destroy;
 begin
-
+	FParent.FAttributes_OnDemand := nil;
+	inherited;
 end;
 
-function TXMLDOMNamedNodeMap.setNamedItem(const newItem: IXMLDOMNode): IXMLDOMNode;
+function TAttrNodeMap.getNamedItem(const name: WideString): IXMLDOMNode;
 begin
+	Result := FParent.getAttributeNode(name);
+end;
 
+function TAttrNodeMap.getQualifiedItem(const baseName, namespaceURI: WideString): IXMLDOMNode;
+var
+	attr: xmlAttrPtr;
+	s, ns: string;
+begin
+	s := baseName;
+	ns := namespaceURI;
+	attr := xmlHasNsProp(FParentPtr, PChar(s), PChar(ns));
+	Result := GetDOMObject(xmlNodePtr(attr)) as IXMLDOMNode;
+end;
+
+function TAttrNodeMap.removeNamedItem(const name: WideString): IXMLDOMNode;
+begin
+	fparent.removeAttribute(name);
+end;
+
+function TAttrNodeMap.removeQualifiedItem(const baseName, namespaceURI: WideString): IXMLDOMNode;
+var
+	attr: xmlAttrPtr;
+	s, ns: string;
+begin
+	s := baseName;
+	ns := namespaceURI;
+	attr := xmlHasNsProp(FParentPtr, PChar(s), PChar(ns));
+	xmlRemoveProp(attr);
+	Result := GetDOMObject(xmlNodePtr(attr)) as IXMLDOMNode;
+end;
+
+function TAttrNodeMap.setNamedItem(const newItem: IXMLDOMNode): IXMLDOMNode;
+begin
+	Result := FParent.setAttributeNode(newItem as IXMLDOMAttribute);
+end;
+
+{ TXMLDOMElement }
+
+function TXMLDOMElement.Get_tagName: WideString;
+begin
+	Result := Get_nodeName;
+end;
+
+function TXMLDOMElement.getAttribute(const name: WideString): OleVariant;
+var
+	domnode: IXMLDOMNode;
+begin
+	domnode := getAttributeNode(name);
+	if (nil=domnode) then begin
+		Result := null;
+	end else begin
+		Result := domnode.nodeValue;
+	end;
+end;
+
+function TXMLDOMElement.getAttributeNode(const name: WideString): IXMLDOMAttribute;
+var
+	attr: xmlAttrPtr;
+	s: string;
+begin
+	s := name;
+	attr := xmlHasProp(FNode.node, PChar(s));
+	Result := GetDOMObject(xmlNodePtr(attr)) as IXMLDOMAttribute;
+end;
+
+function TXMLDOMElement.Get_attributes: IXMLDOMNamedNodeMap;
+begin
+	if FAttributes_OnDemand=nil then begin
+		FAttributes_OnDemand := TAttrNodeMap.Create(self);
+	end;
+	Result := FAttributes_OnDemand;
+end;
+
+function TXMLDOMElement.getElementsByTagName(const tagName: WideString): IXMLDOMNodeList;
+begin
+	ENotImpl('getElementsByTagName');
+end;
+
+procedure TXMLDOMElement.normalize;
+begin
+	ENotImpl('normalize');
+end;
+
+procedure TXMLDOMElement.removeAttribute(const name: WideString);
+var
+	attr: xmlAttrPtr;
+	s: string;
+begin
+	s := name;
+	attr := xmlHasProp(FNode.node, PChar(s));
+	xmlRemoveProp(attr);
+end;
+
+function TXMLDOMElement.removeAttributeNode(const DOMAttribute: IXMLDOMAttribute): IXMLDOMAttribute;
+var
+	attr: xmlAttrPtr;
+begin
+	attr := xmlAttrPtr(GetNodePtr(DOMAttribute));
+	xmlRemoveProp(attr);
+end;
+
+procedure TXMLDOMElement.setAttribute(const name: WideString; value: OleVariant);
+var
+	s: string;
+	v: string;
+begin
+	s := name;
+	v := value;
+	xmlSetProp(FNode.node, PChar(s), PChar(v));
+end;
+
+function TXMLDOMElement.setAttributeNode(const DOMAttribute: IXMLDOMAttribute): IXMLDOMAttribute;
+var
+	attr: xmlAttrPtr;
+	s: string;
+	v: string;
+begin
+	s := DOMAttribute.name;
+	attr := xmlHasProp(FNode.node, PChar(s));
+	if (attr=nil) then begin
+		v := DOMAttribute.value;
+		xmlSetProp(FNode.node, PChar(s), PChar(v));
+		Result := GetDOMObject(xmlNodePtr(attr)) as IXMLDOMAttribute;
+	end else begin
+		xmlAddChild(FNode.node, xmlNodePtr(DOMAttribute)); //???
+		Result := DOMAttribute;
+	end;
+end;
+
+{ TXMLDOMDocument }
+
+procedure TXMLDOMDocument.abort;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.createAttribute(const name: WideString): IXMLDOMAttribute;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.createCDATASection(const data: WideString): IXMLDOMCDATASection;
+var
+	s: string;
+	node: xmlNodePtr;
+begin
+	s := data;
+	node := xmlNewCDataBlock(FNode.doc, PChar(s), -1);
+	Result := GetDOMObject(node) as IXMLDOMCDataSection;
+end;
+
+function TXMLDOMDocument.createComment(const data: WideString): IXMLDOMComment;
+var
+	s: string;
+	node: xmlNodePtr;
+begin
+	s := data;
+	node := xmlNewDocComment(FNode.doc, PChar(s));
+	Result := GetDOMObject(node) as IXMLDOMComment;
+end;
+
+function TXMLDOMDocument.createDocumentFragment: IXMLDOMDocumentFragment;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.createElement(const tagName: WideString): IXMLDOMElement;
+var
+	s: string;
+	node: xmlNodePtr;
+begin
+	s := tagName;
+	node := xmlNewDocNode(FNode.doc, nil, PChar(s), nil);
+	Result := GetDOMObject(node) as IXMLDOMElement;
+end;
+
+function TXMLDOMDocument.createEntityReference(const name: WideString): IXMLDOMEntityReference;
+var
+	s: string;
+	node: xmlNodePtr;
+begin
+	s := name;
+	node := xmlNewReference(FNode.doc, PChar(s));
+	Result := GetDOMObject(node) as IXMLDOMEntityReference;
+end;
+
+function TXMLDOMDocument.createNode(type_: OleVariant; const name, namespaceURI: WideString): IXMLDOMNode;
+begin
+end;
+
+function TXMLDOMDocument.createProcessingInstruction(const target, data: WideString): IXMLDOMProcessingInstruction;
+var
+	s, d: string;
+	node: xmlNodePtr;
+begin
+	s := target;
+	d := data;
+	node := xmlNewPI(PChar(s), PChar(d));
+	Result := GetDOMObject(node) as IXMLDOMProcessingInstruction;
+end;
+
+function TXMLDOMDocument.createTextNode(const data: WideString): IXMLDOMText;
+var
+	d: string;
+	node: xmlNodePtr;
+begin
+	d := data;
+	node := xmlNewDocText(FNode.doc, PChar(d));
+	GetDOMObject(node, Result);
+end;
+
+function TXMLDOMDocument.Get_async: WordBool;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_doctype: IXMLDOMDocumentType;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_documentElement: IXMLDOMElement;
+var
+	node: xmlNodePtr;
+begin
+	node := xmlDocGetRootElement(FNode.doc);
+	GetDOMObject(node,Result);
+end;
+
+function TXMLDOMDocument.Get_implementation_: IXMLDOMImplementation;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_parseError: IXMLDOMParseError;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_preserveWhiteSpace: WordBool;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_readyState: Integer;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_resolveExternals: WordBool;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_url: WideString;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.Get_validateOnParse: WordBool;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.getElementsByTagName(const tagName: WideString): IXMLDOMNodeList;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.load(xmlSource: OleVariant): WordBool;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.loadXML(const bstrXML: WideString): WordBool;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+function TXMLDOMDocument.nodeFromID(const idString: WideString): IXMLDOMNode;
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.save(destination: OleVariant);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_async(isAsync: WordBool);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_documentElement(const DOMElement: IXMLDOMElement);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_ondataavailable(Param1: OleVariant);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_onreadystatechange(Param1: OleVariant);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_ontransformnode(Param1: OleVariant);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_preserveWhiteSpace(isPreserving: WordBool);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_resolveExternals(isResolving: WordBool);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
+end;
+
+procedure TXMLDOMDocument.Set_validateOnParse(isValidating: WordBool);
+begin
+	ENotImpl('TXMLDOMDocument.xxx');
 end;
 
 end.
