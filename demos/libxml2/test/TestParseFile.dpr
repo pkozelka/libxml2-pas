@@ -6,12 +6,31 @@ uses
   libxml2,
   SysUtils;
 
+function myParseFile(aFileName: PxmlChar): xmlDocPtr;
+var
+  ctxt: xmlParserCtxtPtr;
+begin
+  Result := nil;
+  xmlInitParser();
+  ctxt := xmlCreateFileParserCtxt(aFileName);
+  if (ctxt = nil) then exit;
+  xmlParseDocument(ctxt);
+  if (ctxt.wellFormed<>0) then begin
+    Result := ctxt.myDoc;
+  end else begin
+     xmlFreeDoc(ctxt.myDoc);
+     ctxt.myDoc := nil;
+  end;
+  xmlFreeParserCtxt(ctxt);
+end;
+
+
 procedure TestXmlDocParseFile(aFileName: string);
 var
   doc: xmlDocPtr;
 begin
   Write(aFilename, ': ');
-  doc := xmlParseFile(PChar(aFileName));
+  doc := myParseFile(PChar(aFileName));
   if (doc=nil) then begin
     WriteLN('failed');
   end else begin
