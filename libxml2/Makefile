@@ -19,7 +19,6 @@ checkapi:
 	../utils/checkApiChanges.sh :pserver:anonymous@anoncvs.gnome.org:/cvs/gnome gnome-xml/include/libxml HEAD *.inc
 
 cvsexport: clean
-	mkdir $(MYTMP)
 	cvs -z4 -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
 
 tgz:
@@ -35,11 +34,14 @@ upload-zip:
 	ftp-put.sh upload.log upload.sourceforge.net incoming $(ARCHIVE).zip $(ARCHIVE).zip anonymous libxml2-pas@sourceforge.net; cat upload.log; rm upload.log
 
 utgz: cvsexport tgz upload-tgz clean
+	echo "TGZ uploaded"
 
 uzip: cvsexport zip upload-zip clean
+	echo "ZIP uploaded"
 
 
 clean:
+	echo "Cleaning"
 	rm -rf *.tmp
 	rm -f $(ARCHIVE).tgz
 	rm -f $(ARCHIVE).zip

@@ -3,16 +3,33 @@ Delphi-Headers for libxml2
 Libxml2 is a low-level library for the work with xml-documents.
 libxml2-pas is translation of the header files into Pascal language.
 
+
+Contents:
+	AUTHORS
+	VERSION COMPLIANCE
+	WHAT YOU FIND IN THIS PACKAGE
+	USAGE
+	H2PAS options
+	LINKS
+	HOW TO HELP
+
+
 AUTHORS
 -------
-Petr Kozelka <pkozelka@email.cz>	-  original header translations
-Uwe Fechner <ufechner@4commerce.de>	-  testing, demo application(s)
+Petr Kozelka <pkozelka@email.cz>
+	-  original header translations
+
+Following people contributed:
+
+Uwe Fechner <ufechner@4commerce.de>
+	- testing, demo application(s)
+Martijn Brinkers <martijn_brinkers@yahoo.co.uk>
+
 
 
 VERSION COMPLIANCE
 ------------------
-This set of units was successfully tested with libxml2 version 2.4.11. However, 
-translations of some API functions might be missing.
+Please look into file 'libxml_xmlwin32version.inc' for value of constant LIBXML_DOTTED_VERSION.
 
 
 WHAT YOU FIND IN THIS PACKAGE
@@ -39,10 +56,12 @@ directory listed in the PATH environment variable:
 iconv.dll
 libxml2.dll
 
+
 H2PAS options
 -------------
 The utility h2pas was used with the following options:
 h2pas -d -e -c -i <filename>.h -o libxml_<filename>.inc
+
 
 LINKS
 -----
@@ -51,3 +70,13 @@ mailto:libxml2-pas-devel@lists.sourceforge.net			- mailing list
 http://xmlsoft.org/						- the libxml2 libraries web site
 http://www.fh-frankfurt.de/~igor/projects/libxml/index.html	- Windows build of libxml2 by Igor Zlatkovic
 
+
+HOW TO HELP
+-----------
+You can help the project in various ways: the best thing to do first is to subscribe 
+to the abovementioned mailing-list, have a look at the archives; then you can: 
+* provide patches when you find problems 
+* provide new documentation pieces (translations, examples, etc ...) 
+* implement new features 
+* help with the packaging 
+* test, give feedback, send bugreports... 
