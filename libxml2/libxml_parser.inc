@@ -144,65 +144,65 @@ type
    *)
   xmlParserCtxtPtr = ^xmlParserCtxt;
   xmlParserCtxt = record
-    sax: xmlSAXHandlerPtr;                { The SAX handler  }
-    userData: Pointer;                    { For SAX interface only, used by DOM build  }
-    myDoc: xmlDocPtr;                     { the document being built  }
-    wellFormed: Longint;                  { is the document well formed  }
-    replaceEntities: Longint;             { shall we replace entities ?  }
-    version: PxmlChar;                    { the XML version string  }
-    encoding: PxmlChar;                   { the declared encoding, if any  }
-    standalone: Longint;                  { standalone document  }
-    html: Longint;                        { an HTML(1)/Docbook(2) document  }
+    sax: xmlSAXHandlerPtr;                (* The SAX handler  *)
+    userData: Pointer;                    (* For SAX interface only, used by DOM build  *)
+    myDoc: xmlDocPtr;                     (* the document being built  *)
+    wellFormed: Longint;                  (* is the document well formed  *)
+    replaceEntities: Longint;             (* shall we replace entities ?  *)
+    version: PxmlChar;                    (* the XML version string  *)
+    encoding: PxmlChar;                   (* the declared encoding, if any  *)
+    standalone: Longint;                  (* standalone document  *)
+    html: Longint;                        (* an HTML(1)/Docbook(2) document  *)
     (* Input stream stack *)
-    input: xmlParserInputPtr;             { Current input stream  }
-    inputNr: Longint;                     { Number of current input streams  }
-    inputMax: Longint;                    { Max number of input streams  }
+    input: xmlParserInputPtr;             (* Current input stream  *)
+    inputNr: Longint;                     (* Number of current input streams  *)
+    inputMax: Longint;                    (* Max number of input streams  *)
     (* stack of inputs *)
-    inputTab: ^xmlParserInputPtr; { Node analysis stack only used for DOM building  }
-    node: xmlNodePtr;                     { Current parsed Node  }
-    nodeNr: Longint;                      { Depth of the parsing stack  }
-    nodeMax: Longint;                     { Max depth of the parsing stack  }
-    nodeTab: ^xmlNodePtr;                 { array of nodes  }
-    record_info: Longint;                 { Whether node info should be kept  }
-    node_seq: xmlParserNodeInfoSeq;       { info about each node parsed  }
-    errNo: Longint;                       { error code  }
-    hasExternalSubset: Longint;           { reference and external subset  }
-    hasPErefs: Longint;                   { the internal subset has PE refs  }
-    external_: Longint;                   { are we parsing an external entity  }
-    valid: Longint;                       { is the document valid  }
-    validate: Longint;                    { shall we try to validate ?  }
-    vctxt: xmlValidCtxt;                  { The validity context  }
-    instate: xmlParserInputState;         { current type of input  }
-    token: Longint;                       { next char look-ahead  }
-    directory: PChar;                     { the data directory  }
+    inputTab: ^xmlParserInputPtr;         (* Node analysis stack only used for DOM building  *)
+    node: xmlNodePtr;                     (* Current parsed Node  *)
+    nodeNr: Longint;                      (* Depth of the parsing stack  *)
+    nodeMax: Longint;                     (* Max depth of the parsing stack  *)
+    nodeTab: ^xmlNodePtr;                 (* array of nodes  *)
+    record_info: Longint;                 (* Whether node info should be kept  *)
+    node_seq: xmlParserNodeInfoSeq;       (* info about each node parsed  *)
+    errNo: Longint;                       (* error code  *)
+    hasExternalSubset: Longint;           (* reference and external subset  *)
+    hasPErefs: Longint;                   (* the internal subset has PE refs  *)
+    external_: Longint;                   (* are we parsing an external entity  *)
+    valid: Longint;                       (* is the document valid  *)
+    validate: Longint;                    (* shall we try to validate ?  *)
+    vctxt: xmlValidCtxt;                  (* The validity context  *)
+    instate: xmlParserInputState;         (* current type of input  *)
+    token: Longint;                       (* next char look-ahead  *)
+    directory: PChar;                     (* the data directory  *)
     (* Node name stack *)
-    name: PxmlChar;                       { Current parsed Node  }
-    nameNr: Longint;                      { Depth of the parsing stack  }
-    nameMax: Longint;                     { Max depth of the parsing stack  }
-    nameTab: ^PxmlChar;                   { array of nodes  }
-    nbChars: Longint;                     { number of xmlChar processed  }
-    checkIndex: Longint;                  { used by progressive parsing lookup  }
-    keepBlanks: Longint;                  { ugly but ...  }
-    disableSAX: Longint;                  { SAX callbacks are disabled  }
-    inSubset: Longint;                    { Parsing is in int 1/ext 2 subset  }
-    intSubName: PxmlChar;                 { name of subset  }
-    extSubURI: PxmlChar;                  { URI of external subset  }
-    extSubSystem: PxmlChar;                 { SYSTEM ID of external subset  }
+    name: PxmlChar;                       (* Current parsed Node  *)
+    nameNr: Longint;                      (* Depth of the parsing stack  *)
+    nameMax: Longint;                     (* Max depth of the parsing stack  *)
+    nameTab: ^PxmlChar;                   (* array of nodes  *)
+    nbChars: Longint;                     (* number of xmlChar processed  *)
+    checkIndex: Longint;                  (* used by progressive parsing lookup  *)
+    keepBlanks: Longint;                  (* ugly but ...  *)
+    disableSAX: Longint;                  (* SAX callbacks are disabled  *)
+    inSubset: Longint;                    (* Parsing is in int 1/ext 2 subset  *)
+    intSubName: PxmlChar;                 (* name of subset  *)
+    extSubURI: PxmlChar;                  (* URI of external subset  *)
+    extSubSystem: PxmlChar;               (* SYSTEM ID of external subset  *)
     (* xml:space values *)
-    space: PLongint;                      { Should the parser preserve spaces  }
-    spaceNr: Longint;                     { Depth of the parsing stack  }
-    spaceMax: Longint;                    { Max depth of the parsing stack  }
-    spaceTab: PLongint;                   { array of space infos  }
-    depth: Longint;                       { to prevent entity substitution loops  }
-    entity: xmlParserInputPtr;            { used to check entities boundaries  }
-    charset: Longint;                     { encoding of the in-memory content - actually an xmlCharEncoding  }
-    nodelen: Longint;                     { Those two fields are there to  }
-    nodemem: Longint;                     { Speed up large node parsing  }
-    pedantic: Longint;                    { signal pedantic warnings  }
-    _private: Pointer;                    { For user data, libxml won't touch it  }
-    loadsubset: Longint;                  { should the external subset be loaded  }
-    linenumbers: Longint;                 { set line number in element content }
-    catalogs: Pointer;                    { document's own catalog }
+    space: PLongint;                      (* Should the parser preserve spaces  *)
+    spaceNr: Longint;                     (* Depth of the parsing stack  *)
+    spaceMax: Longint;                    (* Max depth of the parsing stack  *)
+    spaceTab: PLongint;                   (* array of space infos  *)
+    depth: Longint;                       (* to prevent entity substitution loops  *)
+    entity: xmlParserInputPtr;            (* used to check entities boundaries  *)
+    charset: Longint;                     (* encoding of the in-memory content - actually an xmlCharEncoding  *)
+    nodelen: Longint;                     (* Those two fields are there to  *)
+    nodemem: Longint;                     (* Speed up large node parsing  *)
+    pedantic: Longint;                    (* signal pedantic warnings  *)
+    _private: Pointer;                    (* For user data, libxml won't touch it  *)
+    loadsubset: Longint;                  (* should the external subset be loaded  *)
+    linenumbers: Longint;                 (* set line number in element content *)
+    catalogs: Pointer;                    (* document's own catalog *)
   end;
 
   (**

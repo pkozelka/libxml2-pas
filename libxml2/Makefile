@@ -1,7 +1,7 @@
 LIBNAME=libxml2
 I_VERSION="VERSION=`../utils/cutver.sh libxml_xmlwin32version.inc`"
 PACKAGE=$(LIBNAME)-pas
-ARCHIVE=$(PACKAGE)-$(VERSION)
+ARCHIVE=$(PACKAGE)-$(VERSION)-src
 TAG="`echo LIBXML2_$(VERSION) | sed 's/\./_/g'`"
 MYTMP=./$(TAG).tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
