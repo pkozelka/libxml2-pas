@@ -2,9 +2,9 @@ s/\([[:alnum:]]*\)[[:space:]]*:[[:space:]]*\([[:alnum:]]\)/\1: \2/
 s/longint/Longint/gi
 s/\(\* Const before type ignored \*\)//g
 s/{ C++ end of extern C conditionnal removed }//g
-s/[[:space:]]*Const/const/g
-s/ pointer/ Pointer/gi
-s/ pvoid/ Pointer/gi
+s/[[:space:]]*Const/const/gi
+s/[[:space:]]*pointer/ Pointer/gi
+s/[[:space:]]pvoid/ Pointer/gi
 s/ to:/ aTo:/g
 s/;cdecl;/; cdecl;/gi
 s/;external/; external/gi
