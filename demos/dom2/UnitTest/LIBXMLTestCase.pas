@@ -17,8 +17,11 @@ type TTestDOM2Methods = class(TTestCase)
   protected
     procedure SetUp; override;
     procedure TearDown; override;
+    function getCont(xml:string):string;
   public
   published
+    procedure ShowDom;
+    procedure AppendExistingChild;
     procedure TestDocumentElement;
     procedure CreateElementNS;
     procedure CreateElementNS1;
@@ -37,7 +40,7 @@ type TTestDomExceptions = class(TTestCase)
   public
   published
     procedure AppendAttribute;
-    procedure AppendExistingChild;
+
     procedure AppendNilNode;
     procedure InsertNilNode;
     procedure InsertAnchestor;
@@ -161,9 +164,10 @@ begin
   end;
 end;
 
-procedure TTestDomExceptions.AppendExistingChild;
+procedure TTestDom2Methods.AppendExistingChild;
 var
   node: IDOMNode;
+  temp: string;
 begin
   {
     DOM2: If the child is already in the tree, it
@@ -172,11 +176,11 @@ begin
     two calls of appendChild
   }
   node := doc.createElement('sub1');
-  //temp:=node.parentNode;
   doc.documentElement.appendChild(node);
-  //temp:=node.parentNode;
   doc.documentElement.appendChild(node);
-  outLog((doc as IDOMPersist).xml);
+  temp:=((doc as IDOMPersist).xml);
+  temp:=getCont(temp);
+  check(temp='<test><sub1/></test>','appendChild Error');
 end;
 
 procedure TTestDom2Methods.TestElementByID;
@@ -316,14 +320,7 @@ begin
   node:=doc.createElementNS('http://ns.4ct.de','ct:test');
   doc.documentElement.appendChild(node);
   temp:=(doc as IDOMPersist).xml;
-  if domvendor<>'LIBXML' then begin
-    temp:=(rightStr(temp,53));
-    temp:=(leftStr(temp,51));
-  end else begin
-    temp:=(rightStr(temp,52));
-    temp:=(leftStr(temp,51));
-  end;
-  OutLog(temp);
+  temp:=getCont(temp);
   check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
 end;
 
@@ -337,15 +334,8 @@ begin
   node:=doc1.createElementNS('http://ns.4ct.de','ct:test');
   doc1.documentElement.appendChild(node);
   temp:=(doc1 as IDOMPersist).xml;
-  OutLog(temp);
-  if domvendor<>'LIBXML' then begin
-    temp:=(rightStr(temp,53));
-    temp:=(leftStr(temp,51));
-  end else begin
-    temp:=(rightStr(temp,52));
-    temp:=(leftStr(temp,51));
-  end;
-  //check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
+  temp:=getCont(temp);
+  check(temp='<test xmlns="http://ns.4ct.de"><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
 end;
 
 procedure TTestDom2Methods.CreateAttributeNS;
@@ -357,7 +347,34 @@ begin
   attr.value:='hund';
   doc.documentElement.setAttributeNodeNS(attr);
   temp:=(doc as IDOMPersist).xml;
-  OutLog(temp);
+  temp:=getCont(temp);
+  //OutLog(temp);
+  check(temp='<test xmlns:ct="http://ns.4ct.de" ct:name1="hund"/>','failed')
+end;
+
+function TTestDOM2Methods.getCont(xml:string):string;
+// this function cuts the first line and
+// the leading crlf
+// ToDo: should be replaced by a more general implementation
+begin
+  if domvendor='LIBXML' then begin
+    result:=rightstr(xml,length(xml)-44);
+    result:=leftstr(result,length(result)-1);
+  end else begin
+    result:=rightstr(xml,length(xml)-23);
+    result:=leftstr(result,length(result)-2);
+  end;
+end;
+
+procedure TTestDOM2Methods.ShowDom;
+var
+  el: IDOMElement;
+  temp: string;
+begin
+  el:=doc.createElement('books');
+  doc.documentElement.appendChild(el);
+  temp:=((doc as IDOMPersist).xml);
+  outlog(getCont(temp));
 end;
 
 initialization
