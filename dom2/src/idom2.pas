@@ -1,5 +1,5 @@
 unit idom2;
-//$Id: idom2.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
+//$Id: idom2.pas,v 1.2 2002-08-13 19:50:25 pkozelka Exp $
 (*
  * Interface specifications for Dom level 2.
  *
@@ -35,7 +35,7 @@ unit idom2;
  * for DOM specs see:
  * http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/
  *
-*)
+ *)
 
 interface
 
@@ -55,87 +55,87 @@ const
   XMLNS_NAMESPACE_URI = 'http://www.w3.org/2000/xmlns/';
 
 
-  
+
   (*
    * If index or size is negative, or greater than the allowed value
-  *)
+   *)
   INDEX_SIZE_ERR = 1;
 
   (*
    * If the specified range of text does not fit into a DOMString
-  *)
+   *)
   DOMSTRING_SIZE_ERR = 2;
 
   (*
    * If any node is inserted somewhere it doesn't belong
-  *)
+   *)
   HIERARCHY_REQUEST_ERR = 3;
 
   (*
    * If a node is used in a different document than the one that created it
    * (that doesn't support it)
-  *)
+   *)
   WRONG_DOCUMENT_ERR = 4;
 
   (*
    * If an invalid or illegal character is specified, such as in a name.
    * See production 2 in the XML specification for the definition of a legal
    * character, and production 5 for the definition of a legal name character.
-  *)
+   *)
   INVALID_CHARACTER_ERR = 5;
 
   (*
    * If data is specified for a node which does not support data
-  *)
+   *)
   NO_DATA_ALLOWED_ERR = 6;
 
   (*
    * If an attempt is made to modify an object where modifications are not
    * allowed
-  *)
+   *)
   NO_MODIFICATION_ALLOWED_ERR = 7;
 
   (*
    * If an attempt is made to reference a node in a context where it does not
    * exist
-  *)
+   *)
   NOT_FOUND_ERR = 8;
 
   (*
    * If the implementation does not support the requested type of object or
    * operation
-  *)
+   *)
   NOT_SUPPORTED_ERR = 9;
 
   (*
    * If an attempt is made to add an attribute that is already in use elsewhere
-  *)
+   *)
   INUSE_ATTRIBUTE_ERR = 10;
 
   (*
    * If an attempt is made to use an object that is not, or is no longer, usable
-  *)
+   *)
   INVALID_STATE_ERR = 11;
 
   (*
    * If an invalid or illegal string is specified
-  *)
+   *)
   SYNTAX_ERR = 12;
 
   (*
    * If an attempt is made to modify the type of the underlying object
-  *)
+   *)
   INVALID_MODIFICATION_ERR = 13;
 
   (*
    * If an attempt is made to create or change an object in a way which is
    * incorrect with regard to namespaces
-  *)
+   *)
   NAMESPACE_ERR = 14;
 
   (*
    * If a parameter or an operation is not supported by the underlying object
-  *)
+   *)
   INVALID_ACCESS_ERR = 15;
 
 
@@ -150,7 +150,7 @@ const
    * future you should make sure not to rely on the numeric constant value but
    * always use the constant name declaration so the numeric value can be
    * changed without breaking existing code.
-  *)
+   *)
 
   PARSE_ERR = 1000;
 
@@ -160,65 +160,65 @@ const
    * These Integer values are provided for supporting DOM implementations
    * that work with Integer values. Conversion routines are provided to convert
    * from TNodeType <-> Integer
-  *)
+   *)
   (*
    * The node is an IDomElement
-  *)
+   *)
   ELEMENT_NODE = 1;
 
   (*
    * The node is an IDomAttr
-  *)
+   *)
   ATTRIBUTE_NODE = 2;
 
   (*
    * The node is a IDomText node
-  *)
+   *)
   TEXT_NODE = 3;
 
   (*
    * The node is a IDomCDATASection
-  *)
+   *)
   CDATA_SECTION_NODE = 4;
 
   (*
    * The node is an IDomEntityReference
-  *)
+   *)
   ENTITY_REFERENCE_NODE = 5;
 
   (*
    * The node is an IDomEntity
-  *)
+   *)
   ENTITY_NODE = 6;
 
   (*
    * The node is a IDomProcessingInstruction
-  *)
+   *)
   PROCESSING_INSTRUCTION_NODE = 7;
 
   (*
    * The node is a IDomComment
-  *)
+   *)
   COMMENT_NODE = 8;
 
   (*
    * The node is a IDomDocument
-  *)
+   *)
   DOCUMENT_NODE = 9;
 
   (*
    * The node is a IDomDocumentType
-  *)
+   *)
   DOCUMENT_TYPE_NODE = 10;
 
   (*
    * The node is a IDomDocumentFragment
-  *)
+   *)
   DOCUMENT_FRAGMENT_NODE = 11;
 
   (*
    * The node is a IDomNotation
-  *)
+   *)
   NOTATION_NODE = 12;
 
 type
@@ -277,7 +277,7 @@ type
      * @param QualifiedName [in]
      * @param DocType [in]
      * @Raises EDomException
-    *)
+     *)
     function createDocument(
             const namespaceURI  : DomString;
             const qualifiedName : DomString;
@@ -293,12 +293,12 @@ type
     (*
      * @param Value [in]
      * @Raises EDomException
-    *)
+     *)
     procedure set_NodeValue(const value : DomString);
 
     (*
      * @Raises EDomException
-    *)
+     *)
     function  get_NodeValue : DomString;
     function  get_NodeType : DomNodeType;
     function  get_ParentNode : IDomNode;
@@ -314,7 +314,7 @@ type
     (*
      * @param Prefix [in]
      * @Raises EDomException
-    *)
+     *)
     procedure set_Prefix(const prefix : DomString);
     function  get_Prefix : DomString;
 
@@ -326,26 +326,26 @@ type
      * @param NewChild [in]
      * @param RefChild [in]
      * @Raises EDomException
-    *)
+     *)
     function  insertBefore(const newChild, refChild : IDomNode) : IDomNode;
 
     (*
      * @param NewChild [in]
      * @param OldChild [in]
      * @Raises EDomException
-    *)
+     *)
     function  replaceChild(const newChild, oldChild : IDomNode) : IDomNode;
 
     (*
      * @param OldChild [in]
      * @Raises EDomException
-    *)
+     *)
     function  removeChild(const oldChild : IDomNode) : IDomNode;
 
     (*
      * @param NewChild [in]
      * @Raises EDomException
-    *)
+     *)
     function  appendChild(const newChild : IDomNode) : IDomNode;
 
     function  hasChildNodes : Boolean;
@@ -354,7 +354,7 @@ type
 
     (*
      * @param Deep [in]
-    *)
+     *)
     function  cloneNode(deep : Boolean) : IDomNode;
 
     procedure normalize;
@@ -362,7 +362,7 @@ type
     (*
      * @param Feature [in]
      * @param Version [in]
-    *)
+     *)
     function  isSupported(
             const feature : DomString;
             const version : DomString) : Boolean;
@@ -372,7 +372,7 @@ type
 
     (*
      * @Raises EDomException
-    *)
+     *)
     property nodeValue       : DomString read get_NodeValue write set_NodeValue;
     property nodeType        : DomNodeType read get_NodeType;
     property parentNode      : IDomNode read get_ParentNode;
@@ -387,7 +387,7 @@ type
 
     (*
      * @Raises EDomException
-    *)
+     *)
     property prefix          : DomString read get_Prefix write set_Prefix;
     property localName       : DomString read get_LocalName;
   end;
@@ -402,7 +402,7 @@ type
 
     (*
      * @Param Index [in]
-    *)
+     *)
     function  get_Item(index : Integer) : IDomNode;
 
     {properties}
@@ -417,7 +417,7 @@ type
 
     (*
      * @Param Index [in]
-    *)
+     *)
     function  get_Item(index : Integer) : IDomNode;
     function  get_Length : Integer;
 
@@ -425,26 +425,26 @@ type
 
     (*
      * @Param Name [in]
-    *)
+     *)
     function  getNamedItem(const name : DomString) : IDomNode;
 
     (*
      * @Param Arg [in]
      * @Raises EDomException
-    *)
+     *)
     function  setNamedItem(const newItem : IDomNode) : IDomNode;
 
     (*
      * @Param Name [in]
      * @Raises EDomException
-    *)
+     *)
     function  removeNamedItem(const name : DomString) : IDomNode;
 
     (*
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
      * @Raises EDomException
-    *)
+     *)
     function  getNamedItemNS(
             const namespaceURI : DomString;
             const localName    : DomString) : IDomNode;
@@ -452,14 +452,14 @@ type
     (*
      * @Param Arg [in]
      * @Raises EDomException
-    *)
+     *)
     function  setNamedItemNS(const NewItem : IDomNode) : IDomNode;
 
     (*
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
      * @Raises EDomException
-    *)
+     *)
     function  removeNamedItemNS(
             const namespaceURI : DomString;
             const localName    : DomString) : IDomNode;
@@ -478,12 +478,12 @@ type
     (*
      * @Param [in] Data
      * @Raises EDomException
-    *)
+     *)
     procedure set_Data(const data : DomString);
 
     (*
      * @Raises EDomException
-    *)
+     *)
     function  get_Data : DomString;
 
     function  get_Length : Integer;
@@ -494,26 +494,26 @@ type
      * @Param Offset [in]
      * @Param Count [in]
      * @Raises EDomException
-    *)
+     *)
     function  subStringData(offset : Integer; count : Integer) : DomString;
     (*
      * @Param Arg [in]
      * @Raises EDomException
-    *)
+     *)
     procedure appendData(const arg : DomString);
 
     (*
      * @Param Offset [in]
      * @Param Arg [in]
      * @Raises EDomException
-    *)
+     *)
     procedure insertData(offset : Integer; const arg : DomString);
 
     (*
      * @Param Offset [in]
      * @Param Count [in]
      * @Raises EDomException
-    *)
+     *)
     procedure deleteData(offset : Integer; count : Integer);
 
     (*
@@ -521,7 +521,7 @@ type
      * @Param Count [in]
      * @Param Arg [in]
      * @Raises EDomException
-    *)
+     *)
     procedure replaceData(
             offset    : Integer;
             count     : Integer;
@@ -531,7 +531,7 @@ type
 
     (*
      * @Raises EDomException
-    *)
+     *)
     property data : DOMString read get_Data write set_Data;
 
     property length : Integer read get_Length;
@@ -548,7 +548,7 @@ type
     (*
      * @Param Value [in]
      * @Raises EDomException
-    *)
+     *)
     procedure set_Value(const value : DomString);
     function  get_Value : DomString;
     function  get_OwnerElement : IDomElement;
@@ -559,7 +559,7 @@ type
     property specified : Boolean read get_Specified;
     (*
      * @Raises EDomException on write
-    *)
+     *)
     property value : DomString read get_Value write set_Value;
     property ownerElement : IDomElement read get_OwnerElement;
   end;
@@ -574,47 +574,47 @@ type
 
     (**
      * @Param [in] Name
-    *)
+     *)
     function  getAttribute(const name : DomString) : DomString;
 
     (**
      * @Raises EDomException
-    *)
+     *)
     procedure setAttribute(const name : DomString; const value : DomString);
 
     (**
      * @Param [in] Name
      * @Raises EDomException
-    *)
+     *)
     procedure removeAttribute(const name : DomString);
 
     (**
      * @Param Name [in]
      * @Raises EDomException
-    *)
+     *)
     function  getAttributeNode(const name : DomString) : IDomAttr;
 
     (**
      * @Param NewAttr [in]
      * @Raises EDomException
-    *)
+     *)
     function setAttributeNode(const newAttr : IDomAttr) : IDomAttr;
 
     (**
      * @Param OldAttr [in]
      * @Raises EDomException
-    *)
+     *)
     function removeAttributeNode(const oldAttr : IDomAttr) : IDomAttr;
 
     (**
      * @Param Name [in]
-    *)
+     *)
     function  getElementsByTagName(const name : DomString) : IDomNodeList;
 
     (*
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
-    *)
+     *)
     function  getAttributeNS(
             const namespaceURI : DomString;
             const localName    : DomString) : DomString;
@@ -624,7 +624,7 @@ type
      * @Param QualifiedName [in]
      * @Param Value [in]
      * @Raises EDomException
-    *)
+     *)
     procedure setAttributeNS(
             const namespaceURI  : DomString;
             const qualifiedName : DomString;
@@ -634,14 +634,14 @@ type
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
      * @Raises EDomException
-    *)
+     *)
     procedure removeAttributeNS(
             const namespaceURI : DomString;
             const localName    : DomString);
     (*
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
-    *)
+     *)
     function  getAttributeNodeNS(
             const namespaceURI : DomString;
             const localName    : DomString) : IDomAttr;
@@ -649,26 +649,26 @@ type
     (*
      * @Param NewAttr [in]
      * @Raises EDomException
-    *)
+     *)
     function  setAttributeNodeNS(const newAttr : IDomAttr) : IDomAttr;
 
     (*
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
-    *)
+     *)
     function  getElementsByTagNameNS(
             const namespaceURI : DomString;
             const localName    : DomString) : IDomNodeList;
 
     (*
      * @Param Name [in]
-    *)
+     *)
     function  hasAttribute(const name : DomString) : Boolean;
 
     (*
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
-    *)
+     *)
     function  hasAttributeNS(
             const namespaceURI : DomString;
             const localName    : DomString) : Boolean;
@@ -685,7 +685,7 @@ type
     (*
      * @Param Offset [in]
      * @Raises EDomException
-    *)
+     *)
     function splitText(offset : Integer) : IDomText;
   end;
 
@@ -761,7 +761,7 @@ type
     (*
      * @Param Data [in]
      * @Raises EDomException
-    *)
+     *)
     procedure set_Data(const data : DomString);
     function  get_Data : DomString;
 
@@ -788,32 +788,32 @@ type
     (*
      * @Param TagName [in]
      * @Raises EDomException
-    *)
+     *)
     function  createElement(const tagName : DomString) : IDomElement;
 
     function  createDocumentFragment : IDomDocumentFragment;
 
     (*
      * @Param Data [in]
-    *)
+     *)
     function  createTextNode(const data : DomString) : IDomText;
 
     (*
      * @Param Data [in]
-    *)
+     *)
     function  createComment(const data : DomString) : IDomComment;
 
     (*
      * @Param Data [in]
      * @Raises EDomException
-    *)
+     *)
     function  createCDataSection(const data : DomString) : IDomCDataSection;
 
     (*
      * @Param Target [in]
      * @Param Data [in]
      * @Raises EDomException
-    *)
+     *)
     function  createProcessingInstruction(
             const target : DomString;
             const data   : DomString) : IDomProcessingInstruction;
@@ -821,33 +821,33 @@ type
     (*
      * @Param Name [in]
      * @Raises EDomException
-    *)
+     *)
     function  createAttribute(const name : DomString) : IDomAttr;
 
     (*
      * @Param Name [in]
      * @Raises EDomException
-    *)
+     *)
     function  createEntityReference(const name : DomString) :
             IDomEntityReference;
 
     (*
      * @Param TagName [in]
-    *)
+     *)
     function  getElementsByTagName(const tagName : DomString) : IDomNodeList; //FE
 
     (*
      * @Param ImportedNode [in]
      * @Param Deep [in]
      * @Raises EDomException
-    *)
+     *)
     function  importNode(importedNode : IDomNode; deep : Boolean) : IDomNode;
 
     (*
      * @Param NamespaceURI [in]
      * @Param QualifiedName [in]
      * @Raises EDomException
-    *)
+     *)
     function  createElementNS(
             const namespaceURI  : DomString;
             const qualifiedName : DomString) : IDomElement;
@@ -856,7 +856,7 @@ type
      * @Param NamespaceURI [in]
      * @Param QualifiedName [in]
      * @Raises EDomException
-    *)
+     *)
     function  createAttributeNS(
             const namespaceURI  : DomString;
             const qualifiedName : DomString) : IDomAttr;
@@ -865,14 +865,14 @@ type
      * @Param NamespaceURI [in]
      * @Param LocalName [in]
      * @Raises EDomException
-    *)
+     *)
     function  getElementsByTagNameNS(
             const namespaceURI : DomString;
             const localName    : DomString) : IDomNodeList; //FE
 
     (*
      * @Param ElementId [in]
-    *)
+     *)
     function  getElementById(const elementId : DomString) : IDomElement;
 
     {properties}
@@ -882,83 +882,6 @@ type
     property domImplementation : IDomImplementation read get_DomImplementation;
     property documentElement : IDomElement read get_DocumentElement;
   end;
-
-{$ifdef WITHOUT_IDOM_EXPERIMENTAL}
-
-  (****************************************************************************
-   ***   the following interfaces are not part of the official DOM specs    ***
-   ****************************************************************************
-  *)
-
-  (*
-   * non standard DOM extension for persistency. Asynchronous operations are
-   * not always supported (check IDomDocumentBuilder.hasAsyncSupport for
-   * availabillity of async operations)
-  *)
-  IDomPersist = interface
-    ['{F644523B-3F88-49BC-9B31-976FE4B8153C}']
-    {property setters/getters}
-    function get_xml : DOMString;
-
-    { Methods }
-
-     (*
-     * Indicates the current state of the XML document. 
-    *)
-    function  asyncLoadState : Integer;
-
-    (*
-     * loads and parses the xml document from URL source.
-    *)
-    function  load(source: DOMString) : Boolean;
-    function  loadFromStream(const stream : TStream) : Boolean;
-
-    (*
-     * Loads and parses the given XML string
-     * @Param value The xml string to parse
-     * @Returns The newly created document
-     * @Raises DomException
-    *)
-    function  loadxml(const value : DOMString) : Boolean;
-
-    procedure save(destination: DOMString);
-    procedure saveToStream(const stream : TStream);
-    procedure set_OnAsyncLoad(
-            const sender : TObject;
-            eventHandler : TAsyncEventHandler);
-
-    {properties}
-    property xml : DomString read get_xml;
-  end;
-
-  (*
-   * IDOMParseOptions
-   *)
-  IDomParseOptions = interface
-    ['{FA884EC2-A131-4992-904A-0D71289FB87A}']
-    { Property Acessors }
-    function get_async : Boolean;
-    function get_preserveWhiteSpace : Boolean;
-    function get_resolveExternals : Boolean;
-    function get_validate : Boolean;
-    procedure set_async(value : Boolean);
-    procedure set_preserveWhiteSpace(value : Boolean);
-    procedure set_resolveExternals(value : Boolean);
-    procedure set_validate(value : Boolean);
-
-    { Properties }
-    property async : Boolean read get_async write set_async;
-    property preserveWhiteSpace : Boolean
-            read get_preserveWhiteSpace
-            write set_preserveWhiteSpace;
-    property resolveExternals : Boolean
-            read get_resolveExternals
-            write set_resolveExternals;
-    property validate : Boolean read get_validate write set_validate;
-  end;
-
-  
-{$endif} // WITHOUT_IDOM_EXPERIMENTAL
 
   (****************************************************************************
    *   following interfaces are not part of the DOM spec. but are needed to   *
@@ -982,7 +905,7 @@ type
     (*
      * true if asbsolute URLs are supported, false if only relative or local
      * URLs are supported
-    *)
+     *)
     function get_HasAbsoluteURLSupport : Boolean;
 
     {methods}
@@ -1112,20 +1035,20 @@ type
        * Pre-condition:
        *   - vendorID must be set
        *   - vendorID must be unique (if not EDomVendorRegisterException)
-      *)
+       *)
       procedure add(domDocumentBuilderFactory : IDomDocumentBuilderFactory);
 
       (*
        * returns the DomDocumentBuilderFactory with id vendorId
        * if vendorId is not found then result := nil
-      *)
+       *)
       function get_Factory(vendorID : DomString) : IDomDocumentBuilderFactory;
   end;
 
 var
   (*
    * global TDomVendorRegister. Used to register the domDocumentBuilderFactories
-  *)
+   *)
   gDomVendorRegister : TDomVendorRegister;
 
 (******************************************************************************)
