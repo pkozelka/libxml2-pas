@@ -1,21 +1,20 @@
 VERSION=2.4.11
 PACKAGE=libxml2-pas
 ARCHIVE=$(PACKAGE)-$(VERSION)
-TAG=`echo "LIBXML_$(VERSION)" | sed "s/\./_/" | sed "s/\./_/"`
+TAG=`echo "LIBXML_$(VERSION)" | sed "s/\./_/g"`
+MYTMP=./$(TAG).tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
 
 cvsexport: clean
-	mkdir tmp
-	cvs -d $(CVSROOT) export -l -r HEAD -d tmp .
-	cvs -d $(CVSROOT) export -r $(TAG) -d tmp .
+	mkdir $(MYTMP)
+	cvs -d $(CVSROOT) export -l -r HEAD -d $(MYTMP) .
+	cvs -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
 
 tgz:
-	cd tmp;tar -zcf ../$(ARCHIVE).tgz *;cd ..
-	mv $(ARCHIVE).tgz ..
+	cd $(MYTMP);tar -zcf ../$(ARCHIVE).tgz *;cd ..
 
 zip:
-	cd tmp;zip -rq ../$(ARCHIVE).zip *;cd ..
-	mv $(ARCHIVE).zip ..
+	cd $(MYTMP);zip -rq ../$(ARCHIVE).zip *;cd ..
 
 upload-tgz:
 	ftp-put.sh upload.log upload.sourceforge.net incoming $(ARCHIVE).tgz $(ARCHIVE).tgz anonymous libxml2-pas@sourceforge.net; cat upload.log; rm upload.log
@@ -23,9 +22,12 @@ upload-tgz:
 upload-zip:
 	ftp-put.sh upload.log upload.sourceforge.net incoming $(ARCHIVE).zip $(ARCHIVE).zip anonymous libxml2-pas@sourceforge.net; cat upload.log; rm upload.log
 
+utgz: cvsexport tgz upload-tgz clean
+
+uzip: cvsexport zip upload-zip clean
+
+
 clean:
-	rm -rf ./tmp
-	rm -f $(ARCHIVE).tgz | true
-	rm -f $(ARCHIVE).zip | true
-	rm -f ../$(ARCHIVE).tgz | true
-	rm -f ../$(ARCHIVE).zip | true
+	rm -rf $(MYTMP)
+	rm -f $(ARCHIVE).tgz
+	rm -f $(ARCHIVE).zip
