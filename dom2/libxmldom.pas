@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.75 2002-01-21 00:30:02 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.76 2002-01-21 00:40:56 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ type
 
   { TGDOMElement }
 
-  TGDOMElement = class(TGDOMNode, IDomElement)
+  TGDOMElement = class(TGDOMNode, IDomElement, IDomNode)
   private
     FAttributes: TGDOMAttributes; // non-counted reference
   protected //IDomNode
