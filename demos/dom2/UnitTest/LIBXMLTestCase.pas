@@ -3,13 +3,14 @@ unit LIBXMLTestCase;
 interface
 
 uses
-  SysUtils, Classes, TestFrameWork, libxmldom, dom2, Dialogs, msxml_impl, ActiveX;
+  SysUtils, Classes, TestFrameWork, libxmldom, dom2, Dialogs, msxml_impl,
+  ActiveX,GUITestRunner;
 
 const xmlstr = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
 
 type TTestCaseLIBXML = class(TTestCase)
   private
-    libdoc: IDOMDocument;
+    doc: IDOMDocument;
     msdoc: IDOMDocument;
   protected
     procedure SetUp; override;
@@ -17,6 +18,7 @@ type TTestCaseLIBXML = class(TTestCase)
   public
   published
     procedure TestDocumentElement;
+    procedure CreateElementNS;
     procedure CreateElement10000Times;
     procedure CreateAttribute10000Times;
     procedure SetAttributeNode10000Times;
@@ -40,7 +42,7 @@ type TTestCaseLIBXML = class(TTestCase)
 
 implementation
 
-var libimpl: IDOMImplementation;
+var impl: IDOMImplementation;
 
 { TTestCaseLIBXML }
 
@@ -50,24 +52,21 @@ procedure TTestCaseLIBXML.SetUp;
 var temp: integer;
 begin
   inherited;
-  libimpl := GetDom('LIBXML');
-  libdoc := libimpl.createDocument('','',nil);
-  (libdoc as IDOMPersist).loadxml(xmlstr);
-  //msimpl := GetDom('MSXML2_RENTAL_MODEL');
-  //msdoc := msimpl.createDocument('','',nil);
-  //(msdoc as IDOMPersist).loadxml(xmlstr);
+  impl := GetDom(domvendor);
+  doc := impl.createDocument('','',nil);
+  (doc as IDOMPersist).loadxml(xmlstr);
 end;
 
 procedure TTestCaseLIBXML.CreateElement10000Times;
 var
   i: integer;
 begin
-  for i := 0 to 10000 do libdoc.createElement('test');
+  for i := 0 to 10000 do doc.createElement('test');
 end;
 
 procedure TTestCaseLIBXML.TestDocCount;
 begin
-  libdoc := nil;
+  doc := nil;
   Check(doccount=0,'document not released');
 end;
 
@@ -77,15 +76,15 @@ var
   node: IDOMNode;
 begin
   for i := 0 to 10000 do begin
-    node := (libdoc.createElement('test') as IDOMNode);
-    libdoc.documentElement.appendChild(node);
+    node := (doc.createElement('test') as IDOMNode);
+    doc.documentElement.appendChild(node);
 
   end;
 end;
 
 procedure TTestCaseLIBXML.TestDocumentElement;
 begin
-  Check(libdoc.documentElement<>nil,'documentElement is nil');
+  Check(doc.documentElement<>nil,'documentElement is nil');
 end;
 
 procedure TTestCaseLIBXML.AppendAttribute;
@@ -93,46 +92,37 @@ var
   attr: IDOMAttr;
 begin
   try
-    attr := libdoc.createAttribute('test');
-    libdoc.documentElement.appendChild(attr);
+    attr := doc.createAttribute('test');
+    doc.documentElement.appendChild(attr);
     Check(False,'There should have been an EDomException');
   except
     on E: Exception do Check(E is EDomException);
   end;
-  {
-  attr := msdoc.createAttribute('test');
-  msdoc.documentElement.appendChild(attr);
-  }
 end;
 
 procedure TTestCaseLIBXML.AppendExistingChild;
 var
   node,temp: IDOMNode;
 begin
-  node := libdoc.createElement('sub1');
+  node := doc.createElement('sub1');
   //temp:=node.parentNode;
-  libdoc.documentElement.appendChild(node);
+  doc.documentElement.appendChild(node);
   //temp:=node.parentNode;
-  libdoc.documentElement.appendChild(node);
-  {
-  node := msdoc.createElement('sub1');
-  msdoc.documentElement.appendChild(node);
-  msdoc.documentElement.appendChild(node);
-  }
-  ShowMessage((libdoc as IDOMPersist).xml);
+  doc.documentElement.appendChild(node);
+  outLog((doc as IDOMPersist).xml);
 end;
 
 procedure TTestCaseLIBXML.TestElementByID;
 var
   elem: IDOMElement;
 begin
-  elem := libdoc.getElementById('110');
+  elem := doc.getElementById('110');
 end;
 
 procedure TTestCaseLIBXML.AppendNilNode;
 begin
   try
-    libdoc.documentElement.appendChild(nil);
+    doc.documentElement.appendChild(nil);
     Check(False,'There should have been an EDomError');
   except
     on E: Exception do Check(E is EDomException);
@@ -148,14 +138,9 @@ begin
   lib-dom does not;
   w3c says an exception is not expected !
   }
-  node := libdoc.createElement('sub1');
-  libdoc.documentElement.appendChild(node);
-  libdoc.documentElement.insertBefore(nil,node);
-  {
-  node := msdoc.createElement('sub1');
-  msdoc.documentElement.appendChild(node);
-  msdoc.documentElement.insertBefore(nil,node);
-  }
+  node := doc.createElement('sub1');
+  doc.documentElement.appendChild(node);
+  doc.documentElement.insertBefore(nil,node);
 end;
 
 procedure TTestCaseLIBXML.InsertAnchestor;
@@ -166,23 +151,16 @@ begin
   lib-dom does not;
   w3c says an exception is not expected !
   }
-  node1 := libdoc.createElement('sub1');
-  node2 := libdoc.createElement('sub2');
+  node1 := doc.createElement('sub1');
+  node2 := doc.createElement('sub2');
   node1.appendChild(node2);
-  libdoc.documentElement.appendChild(node1);
-  node1.insertBefore(libdoc.documentElement,node2);
-  {
-  node1 := msdoc.createElement('sub1');
-  node2 := msdoc.createElement('sub2');
-  node1.appendChild(node2);
-  msdoc.documentElement.appendChild(node1);
-  node1.insertBefore(msdoc.documentElement,node2);
-  }
+  doc.documentElement.appendChild(node1);
+  node1.insertBefore(doc.documentElement,node2);
 end;
 
 procedure TTestCaseLIBXML.TearDown;
 begin
-  libdoc := nil;
+  doc := nil;
   inherited;
 end;
 
@@ -190,42 +168,42 @@ procedure TTestCaseLIBXML.CreateComment10000Times;
 var
   i: integer;
 begin
-  for i := 0 to 10000 do libdoc.createComment('test');
+  for i := 0 to 10000 do doc.createComment('test');
 end;
 
 procedure TTestCaseLIBXML.CreateAttribute10000Times;
 var
   i: integer;
 begin
-  for i := 0 to 10000 do libdoc.createAttribute('test');
+  for i := 0 to 10000 do doc.createAttribute('test');
 end;
 
 procedure TTestCaseLIBXML.CreateCDataSection10000Times;
 var
   i: integer;
 begin
-   for i := 0 to 10000 do libdoc.createCDATASection('test');
+   for i := 0 to 10000 do doc.createCDATASection('test');
 end;
 
 procedure TTestCaseLIBXML.CreateTextNode10000Times;
 var
   i: integer;
 begin
-   for i := 0 to 10000 do libdoc.createTextNode('test');
+   for i := 0 to 10000 do doc.createTextNode('test');
 end;
 
 procedure TTestCaseLIBXML.CreateDocumentFragment10000Times;
 var
   i: integer;
 begin
-  for i := 0 to 10000 do libdoc.createDocumentFragment;
+  for i := 0 to 10000 do doc.createDocumentFragment;
 end;
 
 procedure TTestCaseLIBXML.CreateAttributeNS10000Times;
 var
   i: integer;
 begin
-  for i := 0 to 10000 do libdoc.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');;
+  for i := 0 to 10000 do doc.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');;
 end;
 
 procedure TTestCaseLIBXML.SetAttributeNode10000Times;
@@ -234,7 +212,7 @@ var
   attr: IDOMAttr;
 begin
   for i := 0 to 10000 do begin
-    attr := libdoc.createAttribute('test') ;
+    attr := doc.createAttribute('test') ;
   end;
 end;
 
@@ -244,8 +222,8 @@ var
   attr: IDOMAttr;
 begin
   for i := 0 to 1000 do begin
-    attr := libdoc.createAttribute('test'+inttostr(i)) ;
-    libdoc.documentElement.setAttributeNode(attr);
+    attr := doc.createAttribute('test'+inttostr(i)) ;
+    doc.documentElement.setAttributeNode(attr);
   end;
 end;
 
@@ -255,9 +233,18 @@ var
   attr: IDOMAttr;
 begin
   for i := 0 to 10000 do begin
-    attr := libdoc.createAttribute('test') ;
-    libdoc.documentElement.setAttributeNode(attr);
+    attr := doc.createAttribute('test') ;
+    doc.documentElement.setAttributeNode(attr);
   end;
+end;
+
+procedure TTestCaseLIBXML.CreateElementNS;
+var
+  node: IDOMNode;
+begin
+  node:=doc.createElementNS('http://ns.4ct.de','ct:test');
+  doc.documentElement.appendChild(node);
+  OutLog((doc as IDOMPersist).xml);
 end;
 
 initialization
