@@ -1,4 +1,5 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.80 2002-01-23 09:58:56 pkozelka Exp $
+unit libxmldom;
+//$Id: libxmldom.pas,v 1.81 2002-01-27 11:04:35 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -872,6 +873,8 @@ begin
 end;
 
 function TGDOMNode.get_nodeValue: DomString;
+var
+  p: PxmlChar;
 begin
   case FGNode.type_ of
   XML_ATTRIBUTE_NODE,
@@ -881,7 +884,11 @@ begin
   XML_COMMENT_NODE,
   XML_PI_NODE:
     begin
-      Result := UTF8Decode(xmlNodeGetContent(FGNode));
+      p := xmlNodeGetContent(FGNode);
+      if (p<>nil) then begin
+        Result := UTF8Decode(p);
+        xmlFree(p);
+      end;
     end;
   else
     Result := '';
@@ -1484,12 +1491,13 @@ begin
   Result:=selectNodes(name);
 end;
 
-function TGDOMElement.getAttributeNS(const namespaceURI, localName: DomString):
-  DomString;
+function TGDOMElement.getAttributeNS(const namespaceURI, localName: DomString): DomString;
+var
+  p: PxmlChar;
 begin
-  Result := UTF8Decode(xmlGetNSProp(FGNode,
-    PChar(UTF8Encode(localName)),
-    PChar(UTF8Encode(namespaceURI))));
+  p := xmlGetNSProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
+  Result := UTF8Decode(p);
+  xmlFree(p);
 end;
 
 procedure TGDOMElement.setAttributeNS(const namespaceURI, qualifiedName, value: DomString);
@@ -1521,9 +1529,7 @@ function TGDOMElement.getAttributeNodeNS(const namespaceURI, localName: DomStrin
 var
   attr: xmlAttrPtr;
 begin
-  attr := xmlHasNSProp(FGNode,
-    PChar(UTF8Encode(localName)),
-    PChar(UTF8Encode(namespaceURI)));
+  attr := xmlHasNSProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
