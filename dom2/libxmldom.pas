@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.69 2002-01-20 20:32:16 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.70 2002-01-20 21:26:47 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ type
     function  hasAttributes : Boolean;
     function  cloneNode(deep: Boolean): IDOMNode;
     procedure normalize;
-  protected //IDOMNodeSelect
+  protected //IDomNodeSelect
     function  selectNode(const nodePath: WideString): IDOMNode;
     function  selectNodes(const nodePath: WideString): IDOMNodeList;
     procedure RegisterNS(const prefix,URI: DomString);
@@ -127,11 +127,11 @@ type
   end;
 
   { TGDOMChildNodeList }
-  
-  TGDOMChildNodeList = class(TGDOMInterface, IDOMNodeList)
+
+  TGDOMChildNodeList = class(TGDOMInterface, IDomNodeList)
   private
     FOwnerNode: TGDOMNode; // non-counted reference
-  protected // IDOMNodeList
+  protected // IDomNodeList
     function get_item(index: Integer): IDOMNode;
     function get_length: Integer;
   protected
@@ -140,12 +140,29 @@ type
     destructor Destroy; override;
   end;
 
+  { TGDOMXPathNodeList }
+
+  TGDOMXPathNodeList = class(TGDOMInterface, IDomNodeList)
+  private
+    FXPathCtxt: xmlXPathContextPtr;
+    FXPathObj: xmlXPathObjectPtr;
+    FQuery: string;
+    procedure Eval;
+  protected // IDomNodeList
+    function get_item(index: Integer): IDomNode;
+    function get_length: Integer;
+  protected
+    constructor Create(aBaseNode: TGDOMNode; aQuery: string);
+  public
+    destructor Destroy; override;
+  end;         
+
   { TGDOMAttributes }
 
   TGDOMAttributes = class(TGDOMInterface, IDOMNamedNodeMap)
   private
     FOwnerElement: TGDOMElement; // non-counted reference
-  protected // IDOMNamedNodeMap
+  protected // IDomNamedNodeMap
     function get_item(index: Integer): IDOMNode;
     function get_length: Integer;
     function getNamedItem(const name: DOMString): IDOMNode;
@@ -1118,41 +1135,8 @@ begin
 end;
 
 function TGDOMNode.selectNodes(const nodePath: WideString): IDOMNodeList;
-// todo: raise  exceptions
-//       a) if invalid nodePath expression
-//       b) if result type <> nodelist
-var
-  doc: xmlDocPtr;
-  ctxt: xmlXPathContextPtr;
-  res:  xmlXPathObjectPtr;
-  temp: string;
-  nodetype{,nodecount}: integer;
-  //ok:integer;
 begin
-  temp:=UTF8Encode(nodePath);
-  doc := requestNodePtr.doc;
-  if doc=nil then DomAssert(false, 100);
-  ctxt:=xmlXPathNewContext(doc);
-  ctxt.node:=FGNode;
-//???	{ok:=}xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
-  res:=xmlXPathEvalExpression(pchar(temp),ctxt);
-  if res<>nil then  begin
-    nodetype:=res.type_;
-    case nodetype of
-    XPATH_NODESET:
-      begin
-        nodecount:=res.nodesetval.nodeNr;
-//TODO!!        result:=TGDOMXPathNodeList.Create(res, get_OwnerDocument)
-      end
-    else
-      result:=nil;
-    end;
-    //xmlXPathFreeNodeSetList(res);
-    //xmlXPathFreeObject(res);
-  end else begin
-    result:=nil;
-  end;
-  xmlXPathFreeContext(ctxt);
+  Result := TGDOMXPathNodeList.Create(self, nodePath);
 end;
 
 procedure TGDOMNode.set_Prefix(const prefix: DomString);
@@ -1205,6 +1189,57 @@ begin
     Inc(Result);
     node := node.next;
   end;
+end;
+
+{ TGDOMXPathNodeList }
+
+constructor TGDOMXPathNodeList.Create(aBaseNode: TGDOMNode; aQuery: string);
+begin
+  inherited Create;
+  DomAssert(aBaseNode<>nil, HIERARCHY_REQUEST_ERR, 'XPath query must have a parent');
+  FXPathCtxt := xmlXPathNewContext(aBaseNode.Gnode.doc);
+  Eval;
+end;
+
+destructor TGDOMXPathNodeList.Destroy;
+begin
+	if (FXPathObj<>nil) then begin
+    xmlXPathFreeObject(FXPathObj);
+  end;
+  xmlXPathFreeContext(FXPathCtxt);
+  inherited;
+end;
+
+(**
+ * This function re-evaluates the query against the base node.
+ * The purpose of having it is, to achieve DOM requirement that
+ * all nodelists are 'live'. Later (but very soon) we should call it in get_item
+ * and get_length whenever any tree change is detected after the last call. [pk]
+ *)
+procedure TGDOMXPathNodeList.Eval;
+begin
+	if (FXPathObj<>nil) then begin
+    xmlXPathFreeObject(FXPathObj);
+  end;
+  FXPathObj := xmlXPathEvalExpression(PChar(FQuery), FXPathCtxt);
+  DomAssert(FXPathObj<>nil, INVALID_ACCESS_ERR, 'XPath object does not exist');
+  if (FXPathObj.type_ <> XPATH_NODESET) then begin
+    DomAssert(false, INVALID_ACCESS_ERR, 'XPath object is not a nodeset');
+    xmlXPathFreeObject(FXPathObj);
+    FXPathObj := nil;
+  end;
+end;
+
+function TGDOMXPathNodeList.get_item(index: Integer): IDomNode;
+begin
+  DomAssert(index<0, INVALID_ACCESS_ERR, 'Index below zero');
+  DomAssert(index>=FXPathObj.nodesetval.nodeNr, INVALID_ACCESS_ERR, 'Index too high');
+  Result := GetDomObject(xmlXPathNodeSetItem(FXPathObj.nodesetval, index)) as IDomNode;
+end;
+
+function TGDOMXPathNodeList.get_length: Integer;
+begin
+  Result := xmlXPathNodeSetGetLength(FXPathObj.nodesetval);
 end;
 
 { TGDOMAttributes }
