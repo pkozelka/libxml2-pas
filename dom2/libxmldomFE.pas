@@ -58,6 +58,7 @@ uses
   classes,
   xdom2,
   libxml2,
+  libxslt,
   sysutils;
 
 const
@@ -97,9 +98,17 @@ type
     function GetGDOMNode: xmlNodePtr;
   end;
 
+  { IXMLDOMNodeCompare }
+
+  IDOMNodeCompare = Interface
+  ['{ED63440C-6A94-4267-89A9-E093247F10F8}']
+    function IsSameNode(node:IDOMNode): boolean;
+  end;
+
  TGDOMNodeClass = class of TGDOMNode;
 
- TGDOMNode = class(TGDOMInterface, IDOMNode, IXMLDOMNodeRef,IDOMNodeSelect)
+ TGDOMNode = class(TGDOMInterface, IDOMNode, IXMLDOMNodeRef,IDOMNodeSelect,
+   IDOMNodeEx,IDOMNodeCompare)
   private
     FGNode: xmlNodePtr;
     FOwnerDocument: IDOMDocument;
@@ -134,12 +143,16 @@ type
     function  hasAttributes : WordBool;
     function cloneNode(deep: WordBool): IDOMNode;
     procedure normalize;
-    //function supports(const feature, version: DOMString): WordBool;
-    function isSupported(const feature, version: DOMString): WordBool;
+    function IsSupported(const feature, version: DOMString): WordBool;
     { IDOMNodeSelect }
     function selectNode(const nodePath: WideString): IDOMNode;
     function selectNodes(const nodePath: WideString): IDOMNodeList;
     procedure RegisterNS(const prefix,URI: DomString);
+    { IDOMNodeEx}
+    procedure transformNode(const stylesheet: IDOMNode; var output: WideString); overload;
+    procedure transformNode(const stylesheet: IDOMNode; const output: IDOMDocument); overload;
+    { IDOMNodeCompare }
+    function IsSameNode(node:IDOMNode): boolean;
   public
     constructor Create(ANode: xmlNodePtr;ADocument:IDOMDocument);
     destructor destroy; override;
@@ -149,12 +162,7 @@ type
   //xmlNodePtrList=xmlNodePtr;
   PGDomeNamedNodeMap=Pointer;
 
-  IDOMNodeListExt = Interface
-  ['{4223A6AA-7934-4013-B5C7-563513F4B750}']
-    procedure AddNode(node:xmlNodePtr);
-  end;
-
-  TGDOMNodeList = class(TGDOMInterface, IDOMNodeList, IDOMNodeListExt)
+  TGDOMNodeList = class(TGDOMInterface, IDOMNodeList)
   private
      FParent: xmlNodePtr;
      FXPathObject: xmlXPathObjectPtr;
@@ -512,6 +520,7 @@ uses Dialogs;
 
 function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
 function IsXmlName(const S: wideString): boolean; forward;
+function IsXmlChars(const S: wideString): boolean; forward;
 function appendNamespace(element:xmlNodePtr;ns: xmlNsPtr): boolean; forward;
 
 function MakeNode(Node: xmlNodePtr;ADocument:IDOMDocument): IDOMNode;
@@ -563,20 +572,14 @@ function libxmlStringToString(libstring:pchar):WideString;
   end;
 
 function IsSameNode(node1,node2: IDOMNode):boolean;
-var
-  xnode1,xnode2: xmlNodePtr;
 begin
-  result:=true;
-  if (node1=nil) and (node2=nil)
-    then exit;
-  result:=false;
-  if (node1=nil) or (node2=nil)
-    then exit;
-  xnode1:=GetGNode(node1);
-  xnode2:=GetGNode(node2);
-  if xnode1=xnode2
-    then result:=true
-    else result:=false;
+  try
+    (node1 as IDomNodeCompare).IsSameNode(node2);
+  except
+    if node1=node2
+      then result:=true
+      else result:=false;
+  end;
 end;
 
 (*
@@ -939,15 +942,30 @@ begin
 end;
 
 function TGDOMNode.insertBefore(const newChild, refChild: IDOMNode): IDOMNode;
+const
+  FAllowedChildTypes= [ Element_Node,
+                        Text_Node,
+                        CDATA_Section_Node,
+                        Entity_Reference_Node,
+                        Processing_Instruction_Node,
+                        Comment_Node,
+                        Document_Type_Node,
+                        Document_Fragment_Node,
+                        Notation_Node];
 var node: xmlNodePtr;
 begin
   if self.isAncestorOrSelf(GetGNode(newChild))
     then CheckError(HIERARCHY_REQUEST_ERR);
-  if newChild<>nil
+  if not (newChild.NodeType in FAllowedChildTypes)
+    then CheckError(HIERARCHY_REQUEST_ERR);
+  if (GetGNode(refChild)=GetGNode(refChild.OwnerDocument.documentElement))
+    then if (newChild.nodeType=Element_Node)
+      then CheckError(HIERARCHY_REQUEST_ERR);
+  if (newChild<>nil) and (refChild<>nil)
     then node:=xmlAddPrevSibling(GetGNode(refChild),GetGNode(newChild))
     else node:=nil;
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then result:=newChild
     else result:=nil;
 end;
 
@@ -1025,41 +1043,30 @@ begin
     then CheckError(WRONG_DOCUMENT_ERR);
   if self.isAncestorOrSelf(GetGNode(newChild))
     then CheckError(HIERARCHY_REQUEST_ERR);
-  {if self.isAncestorOrSelf(xmlDocGetRootElement(xmlDocPtr(FGNode)))
-    then if (newChild.nodeType = Element_Node) then begin
-      attr:=node.properties;
-      while attr<>nil do begin
-        (FOwnerDocument as IDOMInternal).appendAttr(attr);
-      end;
-    end;}
   if IsReadOnlyNode(node.parent)
     then CheckError(NO_MODIFICATION_ALLOWED_ERR);
   // if the new child is already in the tree, it is first removed
   if node.parent<>nil
     then xmlUnlinkNode(node);
-    //then node.parent:=nil;
-  if FGNode.children<>nil
-   then if FGNode.children.last<>nil
-    then if FGNode.children.last.type_ = XML_TEXT_NODE
-      then if (node.type_=XML_TEXT_NODE)then begin
-       (FOwnerDocument as IDOMInternal).removeNode((node));
-      end else begin
-      //(FOwnerDocument as IDOMInternal).removeNode(node);
+  // if the new child is a document_fragment, then the entire contents of the document fragment are
+  // moved into the child list of this node
+  if node.type_=XML_DOCUMENT_FRAG_NODE
+    then begin
+      //todo: implement a faster loop
+      while NewChild.HasChildNodes do begin
+        appendChild(newChild.ChildNodes[0])
       end;
-//node.parent:=FGNode;
-  //node:=xmlAddChild(FGNode,node);
-//  if node.type_=XML_ATTRIBUTE_NODE then begin
-//  end else begin
-//  end;
-  {tmp:=FGNode.last;
-  FGNode.last.next:=node;
-  FGNode.last:=node;
-  node.next:=nil;
-  node.parent:=FGNode;}
-  node:=xmlAddChild(FGNode,node);
-  FGNode.children.last:=node;
+    end else begin
+      if FGNode.children<>nil
+       then if FGNode.children.last<>nil
+        then if FGNode.children.last.type_ = XML_TEXT_NODE
+          then if (node.type_=XML_TEXT_NODE)then begin
+           (FOwnerDocument as IDOMInternal).removeNode((node));
+          end;
+      node:=xmlAddChild(FGNode,node);
+      FGNode.children.last:=node;
+    end;
   if node<>nil
-    //then result:=MakeNode(node,FOwnerDocument) as IDOMNode
     then result:=newChild
     else result:=nil;
 end;
@@ -1124,7 +1131,7 @@ begin
   end;
 end;
 
-function TGDOMNode.isSupported(const feature, version: DOMString): WordBool;
+function TGDOMNode.IsSupported(const feature, version: DOMString): WordBool;
 begin
   if (((upperCase(feature)='CORE') and (version='2.0')) or
      (upperCase(feature)='XML')  and (version='2.0')) //[pk] ??? what ???
@@ -1355,36 +1362,45 @@ end;
 
 function TGDOMNamedNodeMap.setNamedItemNS(const newItem: IDOMNode): IDOMNode;
 var
-  attr,xmlnewAttr: xmlAttrPtr;
+  attr,oldattr,xmlnewAttr: xmlAttrPtr;
   value:pchar;
   temp,slocalName: string;
   ns:xmlNSPtr;
   namespace:pchar;
+  newAttr: IDOMAttr;
 begin
-  if newItem<>nil then begin
-    xmlnewAttr:=xmlAttrPtr(GetGNode(newItem));              // Get the libxml2-Attribute
-    ns:=xmlnewAttr.ns;
-    if ns<>nil
-      then namespace:=ns.href
-      else namespace:='';
+  newAttr:=newItem as IDOMAttr;
+  if newAttr<>nil then begin
+    xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));    // Get the libxml2-Attribute
+    node:=FGNamedNodeMap;
+    xmlnewAttr.parent:=node;
+    if xmlnewAttr.ns<>nil
+      then begin
+        namespace:=xmlnewAttr.ns.href;
+        appendNamespace(node,xmlnewAttr.ns);
+      end else namespace:='';
     slocalName:=localName(xmlNewattr.name);
-    attr:=xmlHasNSProp(FGNamedNodeMap,pchar(slocalName),namespace); // Check if the Element has
-                                                                    // already an attribute with this name
-    if attr=nil then begin
-      temp:=(newItem as IDOMAttr).value;
-      if xmlnewAttr.children<>nil
-        //todo: test the following case with a non-empty newAttr.value
-        //newAttr.value must be the same as xmlnewAttr.children.content
-        then value:=xmlnewAttr.children.content             // not tested
-        else value:='';
-      if ns<> nil
-        then attr:=xmlSetNSProp(FGNamedNodeMap,ns,pchar(slocalName),value)
-        else attr:=xmlSetProp(FGNamedNodeMap,pchar(slocalName),value);
-      if attr<>nil
-        then result:=TGDomAttr.Create(attr,FOwnerDocument) as IDOMAttr
-        else result:=nil;
-    end;
-  end else result:=nil;
+    oldattr:=xmlHasNSProp(node,pchar(slocalName),namespace); // already an attribute with this name?
+    attr:=node.properties;                                   // if not, then oldattr=nil
+    if attr=oldattr
+      then node.properties:=xmlNewAttr
+      else begin
+         while attr.next <> oldattr do begin
+           attr:=attr.next
+         end;
+         attr.next:=xmlNewAttr;
+      end;
+    (FOwnerDocument as IDOMInternal).removeAttr(xmlnewAttr);
+    if oldattr<>nil
+      then begin
+        temp:=oldattr.name;
+        result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDOMAttr;
+        (FOwnerDocument as IDOMInternal).appendAttr(oldattr);
+      end
+      else begin
+        result:=nil;
+      end;
+  end;
 end;
 
 function TGDOMNamedNodeMap.removeNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
@@ -1899,6 +1915,8 @@ begin
       then if (doctype.ownerDocument as IUnknown) <> (self as IUnknown)
         then checkError(WRONG_DOCUMENT_ERR);
   alocalName:=localName(qualifiedName);
+  if (qualifiedName='') and (namespaceURI<>'')
+    then checkError(NAMESPACE_ERR);
   if (prefix(qualifiedName)='xml') and (namespaceURI<>'http://www.w3.org/XML/1998/namespace')
     then checkError(NAMESPACE_ERR);
   if (((Pos(':',alocalName))>0)
@@ -2007,6 +2025,8 @@ var
   name1: TGdomString;
   AElement: xmlNodePtr;
 begin
+  if not IsXMLName(tagName)
+    then checkError(INVALID_CHARACTER_ERR);
   name1:=TGdomString.create(tagName);
   AElement:=xmlNewDocNode(FPGdomeDoc,nil,name1.CString,nil);
   name1.free;
@@ -2086,6 +2106,8 @@ var
   name1,name2: TGdomString;
   AProcessingInstruction: PGdomeProcessingInstruction;
 begin
+  if not IsXMLChars(target)
+    then CheckError(INVALID_CHARACTER_ERR);
   name1:=TGdomString.create(target);
   name2:=TGdomString.create(data);
   AProcessingInstruction:=xmlNewPI(name1.CString, name2.CString);
@@ -2106,6 +2128,8 @@ var
   name1: TGdomString;
   AAttr: xmlAttrPtr;
 begin
+  if not IsXMLName(name)
+    then checkError(INVALID_CHARACTER_ERR);
   name1:=TGdomString.create(name);
   AAttr:=xmlNewDocProp(FPGdomeDoc,name1.CString,nil);
   AAttr.parent:=nil;
@@ -2122,7 +2146,8 @@ var
   name1: TGdomString;
   AEntityReference: xmlNodePtr;
 begin
-  //checkError(NOT_SUPPORTED_ERR);
+  if not IsXMLName(name)
+    then checkError(INVALID_CHARACTER_ERR);
   name1:=TGdomString.create(name);
   AEntityReference:=xmlNewReference(FPGdomeDoc,name1.CString);
   name1.free;
@@ -2260,6 +2285,8 @@ begin
   alocalName:=localName(qualifiedName);
   if (prefix(qualifiedName)='xml') and (namespaceURI<>'http://www.w3.org/XML/1998/namespace')
     then checkError(NAMESPACE_ERR);
+  if ((qualifiedName='xmlns') or(prefix(qualifiedName)='xmlns')) and (namespaceURI<>'http://www.w3.org/2000/xmlns/')
+    then checkError(NAMESPACE_ERR);
   if (((Pos(':',alocalName))>0)
     or ((length(namespaceURI))=0) and ((Pos(':',qualifiedName))>0))
       then checkError(NAMESPACE_ERR);
@@ -2377,9 +2404,11 @@ var
   CString,encoding:pchar;
   length:LongInt;
 begin
-  CString:='';
+  //CString:='';
   encoding:=FPGdomeDoc.encoding;
   xmlDocDumpMemoryEnc(FPGdomeDoc,CString,@length,encoding);
+  //xmlRealloc(CString,length);
+  //xmlFreeFunc(CString);
   result:=CString;
 end;
 
@@ -2868,7 +2897,7 @@ begin
   ctxt:=xmlXPathNewContext(doc);
   ctxt.node:=FGNode;
   if (FPrefix<>'') and (FURI<>'')
-  {ok:=}then xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
+    then xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
   res:=xmlXPathEvalExpression(pchar(temp),ctxt);
   if res<>nil then  begin
     nodetype:=res.type_;
@@ -2885,6 +2914,7 @@ begin
     //xmlXPathFreeObject(res);
   end else begin
     result:=nil;
+    checkError(SYNTAX_ERR);
   end;
   xmlXPathFreeContext(ctxt);
 end;
@@ -3139,6 +3169,44 @@ begin
     then Result:= true
     else Result:= false;
 end;
+function IsUtf16LowSurrogate(const S: WideChar): boolean;
+begin
+  Case Word(S) of
+    $DC00..$DFFF: result:= true;
+  else
+    result:= false;
+  end;
+end;
+
+function IsXmlChars(const S: wideString): boolean;
+var
+  i,l,pl: integer;
+  sChar: wideChar;
+begin
+  result:= true;
+  i:= 0;
+  l:= length(S);
+  pl:= pred(l);
+  while i < pl do begin
+    inc(i);
+    sChar:= S[i];
+    case Word(sChar) of
+      $0009,$000A,$000D,$0020..$D7FF,$E000..$FFFD: // Unicode below $FFFF
+        ; // do nothing.
+      $D800..$DBFF: // High surrogate of Unicode character [$10000..$10FFFF]
+        begin
+          if i = l
+            then begin result:= false; break; end; // End of wideString --> No low surrogate found
+          inc(i);
+          sChar:= S[i];
+          if not IsUtf16LowSurrogate(sChar)
+            then begin result:= false; break; end; // No low surrogate found
+        end;
+    else
+      begin result:= false; break; end;
+    end; {case ...}
+  end; {while ...}
+end;
 
 function IsXmlName(const S: wideString): boolean;
 var
@@ -3155,10 +3223,45 @@ begin
       then begin Result:= false; exit; end;
 end;
 
+//********************************************************************//
+// | The preceding routines for testing XML rules were taken from the //
+// | Extended Document Object Model (XDOM) package,                   //
+// | copyright (c) 1999-2002 by Dieter Köhler.                        //
+//********************************************************************//
+
 procedure TGDOMDocument.removeNode(node: xmlNodePtr);
 begin
   if node<>nil
     then FNodeList.Remove(node);
+end;
+
+procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
+  var output: WideString);
+begin
+
+end;
+
+procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
+  const output: IDOMDocument);
+begin
+
+end;
+
+function TGDOMNode.IsSameNode(node: IDOMNode): boolean;
+var
+  xnode1,xnode2: xmlNodePtr;
+begin
+  result:=true;
+  if (self=nil) and (node=nil)
+    then exit;
+  result:=false;
+  if (self=nil) or (node=nil)
+    then exit;
+  xnode1:=GetGNode(self);
+  xnode2:=GetGNode(node);
+  if xnode1=xnode2
+    then result:=true
+    else result:=false;
 end;
 
 initialization
