@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.37 2002-01-15 09:50:58 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.38 2002-01-15 10:08:18 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ type
 		function  IsReadOnly: boolean;
 		function  IsAncestorOrSelf(newNode:xmlNodePtr): boolean; //new
 	public
-		constructor Create(ANode: xmlNodePtr);
+		constructor Create(aNode: xmlNodePtr);
 		destructor Destroy; override;
 		property GNode: xmlNodePtr read FGNode;
 	end;
@@ -369,7 +369,7 @@ type
 		constructor Create(GDOMImpl:IDOMImplementation; const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType); overload;
 		constructor Create(GDOMImpl:IDOMImplementation); overload;
 		constructor Create(GDOMImpl:IDOMImplementation; aUrl: DomString); overload;
-		destructor destroy; override;
+		destructor Destroy; override;
 	end;
 
 	{ TMSDOMDocumentFragment }
@@ -421,25 +421,39 @@ resourcestring
 	SNodeExpected = 'Node cannot be null';
 	SGDOMNotInstalled = 'GDOME2 is not installed';
 
-function MakeNode(aNode: pointer): IDOMNode;
+function GetDOMObject(aNode: pointer): IUnknown;
 const
-	NodeClasses: array[XML_ELEMENT_NODE..XML_NOTATION_NODE] of TGDOMNodeClass =
-		(TGDOMElement, TGDOMAttr, TGDOMText, TGDOMCDataSection,
-		 TGDOMEntityReference, TGDOMEntity ,TGDOMProcessingInstruction,
-		 TGDOMComment, TGDOMDocument, TGDOMDocumentType, TGDOMDocumentFragment,
-		 TGDOMNotation);
+	NodeClasses: array[XML_ELEMENT_NODE..XML_NOTATION_NODE] of TGDOMNodeClass = (
+		TGDOMElement,
+		TGDOMAttr,
+		TGDOMText,
+		TGDOMCDataSection,
+		TGDOMEntityReference,
+		TGDOMEntity,
+		TGDOMProcessingInstruction,
+		TGDOMComment,
+		TGDOMDocument,
+		TGDOMDocumentType,
+		TGDOMDocumentFragment,
+		TGDOMNotation
+	);
 var
-	nodeType: integer;
 	obj: TGDOMNode;
 	node: xmlNodePtr;
+	ok: boolean;
 begin
 	if aNode <> nil then begin
 		node := xmlNodePtr(aNode);
 		if (node._private=nil) then begin
-			nodeType:=node.type_;
-			obj := NodeClasses[nodeType].Create(node);
+			ok := (node.type_ >= Low(NodeClasses))
+				and (node.type_ <= High(NodeClasses))
+				and Assigned(NodeClasses[node.type_]);
+			Assert(ok, Format('LibXml2 node type "%d" is not supported', [node.type_]));
+//todo:      Assert(node.doc<>nil, 'Cannot wrap node not attached to any document');
+			obj := NodeClasses[node.type_].Create(node);
 			// notify the node that it has a wrapper already
 			node._private := obj;
+			//todo: handle flying nodes
 		end else begin
 			// wrapper is already created, use it
 			obj := node._private;
@@ -685,7 +699,7 @@ end;
 
 function TGDOMNode.get_parentNode: IDOMNode;
 begin
-	Result := MakeNode(FGNode.parent) as IDOMNode
+	Result := GetDOMObject(FGNode.parent) as IDOMNode
 end;
 
 function TGDOMNode.get_childNodes: IDOMNodeList;
@@ -696,22 +710,22 @@ end;
 
 function TGDOMNode.get_firstChild: IDOMNode;
 begin
-	Result := MakeNode(FGNode.children) as IDOMNode;
+	Result := GetDOMObject(FGNode.children) as IDOMNode;
 end;
 
 function TGDOMNode.get_lastChild: IDOMNode;
 begin
-	Result := MakeNode(FGNode.last) as IDOMNode;
+	Result := GetDOMObject(FGNode.last) as IDOMNode;
 end;
 
 function TGDOMNode.get_previousSibling: IDOMNode;
 begin
-	Result := MakeNode(FGNode.prev) as IDOMNode;
+	Result := GetDOMObject(FGNode.prev) as IDOMNode;
 end;
 
 function TGDOMNode.get_nextSibling: IDOMNode;
 begin
-	Result := MakeNode(FGNode.next) as IDOMNode;
+	Result := GetDOMObject(FGNode.next) as IDOMNode;
 end;
 
 function TGDOMNode.get_attributes: IDOMNamedNodeMap;
@@ -725,7 +739,7 @@ end;
 
 function TGDOMNode.get_ownerDocument: IDOMDocument;
 begin
-	Result := MakeNode(FGNode.doc) as IDOMDocument;
+	Result := GetDOMObject(FGNode.doc) as IDOMDocument;
 end;
 
 function TGDOMNode.get_namespaceURI: DOMString;
@@ -783,7 +797,7 @@ var
 begin
 	if (newChild<>nil) then begin
 		node:=xmlAddPrevSibling(GetGNode(refChild),GetGNode(newChild));
-		Result := MakeNode(node) as IDOMNode;
+		Result := GetDOMObject(node) as IDOMNode;
 	end else begin
 		Result := nil;
 	end;
@@ -799,7 +813,7 @@ begin
 			old := GetGNode(oldChild);
 			cur := GetGNode(newChild);
 			node:=xmlReplaceNode(old, cur);
-			result:=MakeNode(node) as IDOMNode
+			result:=GetDOMObject(node) as IDOMNode
 		end
 		else result:=nil;
 end;
@@ -866,7 +880,7 @@ begin
 		(get_OwnerDocument as IDOMInternal).removeAttr(xmlAttrPtr(node));
 	end;
 	node := xmlAddChild(FGNode,node);
-	Result:=MakeNode(node) as IDOMNode;
+	Result:=GetDOMObject(node) as IDOMNode;
 end;
 
 function TGDOMNode.hasChildNodes: Boolean;
@@ -890,7 +904,7 @@ begin
 	then recursive:= 1
 	else recursive:= 0;
 	node:=xmlCopyNode(FGNode,recursive);
-	Result:=MakeNode(node) as IDOMNode;
+	Result:=GetDOMObject(node) as IDOMNode;
 end;
 
 procedure TGDOMNode.normalize;
@@ -929,7 +943,7 @@ end;
 
 constructor TGDOMNode.Create(aNode: xmlNodePtr);
 begin
-	inherited create;
+	inherited Create;
 	if(not Assigned(aNode)) then begin
 		raise EDomException.Create('TGDOMNode.Create: Cannot wrap unassigned node');
 	end;
@@ -994,7 +1008,7 @@ begin
 		DomAssert(FXPathObject<>nil, 101);
 		node := xmlXPathNodeSetItem(FXPathObject.nodesetval,i)
 	end;
-	Result:=MakeNode(node) as IDOMNode;
+	Result:=GetDOMObject(node) as IDOMNode;
 end;
 
 function TGDOMNodeList.get_length: Integer;
@@ -1028,7 +1042,7 @@ begin
 		dec(i);
 		node:=node.next
 	end;
-	Result:=MakeNode(node) as IDOMNode
+	Result:=GetDOMObject(node) as IDOMNode
 end;
 
 function TGDOMNamedNodeMap.get_length: Integer;
@@ -1061,7 +1075,7 @@ begin
 		uname:=UTF8Encode(name);
 		node:=xmlNodePtr(xmlHasProp(FGNamedNodeMap, PChar(uname)));
 	end;
-	Result := MakeNode(node) as IDOMNode;
+	Result := GetDOMObject(node) as IDOMNode;
 end;
 
 function TGDOMNamedNodeMap.setNamedItem(const newItem: IDOMNode): IDOMNode;
@@ -1111,7 +1125,7 @@ begin
 		uname := UTF8Encode(name);
 		node:=xmlNodePtr(xmlUnsetProp(FGNamedNodeMap, PChar(uname)));
 	end;
-	Result := MakeNode(node) as IDOMNode;
+	Result := GetDOMObject(node) as IDOMNode;
 end;
 
 function TGDOMNamedNodeMap.getNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
@@ -1125,7 +1139,7 @@ begin
 		ulocal := UTF8Encode(localName);
 		node := xmlNodePtr(xmlHasNSProp(FGNamedNodeMap, PChar(uns), PChar(ulocal)));
 	end;
-	Result := MakeNode(node) as IDOMNode;
+	Result := GetDOMObject(node) as IDOMNode;
 end;
 
 function TGDOMNamedNodeMap.setNamedItemNS(const newItem: IDOMNode): IDOMNode;
@@ -1179,7 +1193,7 @@ begin
 				xmlRemoveProp(attr);
 			end else node:=nil;
 	end;
-	result:=MakeNode(node) as IDOMNode;
+	result:=GetDOMObject(node) as IDOMNode;
 end;
 
 constructor TGDOMNamedNodeMap.Create(ANamedNodeMap: xmlNodePtr; AOwnerDocument: IDomDocument);
@@ -1580,7 +1594,7 @@ end;
 
 function TGDOMDocument.get_documentElement: IDOMElement;
 begin
-	Result := MakeNode(xmlDocGetRootElement(GDoc)) as IDomElement;
+	Result := GetDOMObject(xmlDocGetRootElement(GDoc)) as IDomElement;
 end;
 
 procedure TGDOMDocument.set_documentElement(const IDOMElement: IDOMElement);
@@ -1593,7 +1607,7 @@ var
 	node: xmlNodePtr;
 begin
 	node := xmlNewDocNode(GDoc,nil, PChar(UTF8Encode(tagName)),nil);
-	Result := MakeNode(node) as IDomElement;
+	Result := GetDOMObject(node) as IDomElement;
 end;
 
 function TGDOMDocument.createDocumentFragment: IDomDocumentFragment;
@@ -1601,7 +1615,7 @@ var
 	node: xmlNodePtr;
 begin
 	node := xmlNewDocFragment(GDoc);
-	Result := MakeNode(node) as IDomDocumentFragment;
+	Result := GetDOMObject(node) as IDomDocumentFragment;
 end;
 
 function TGDOMDocument.createTextNode(const data: DOMString): IDomText;
@@ -1609,7 +1623,7 @@ var
 	node: xmlNodePtr;
 begin
 	node := xmlNewDocText(GDoc, PChar(UTF8Encode(data)));
-	Result := MakeNode(node) as IDomText;
+	Result := GetDOMObject(node) as IDomText;
 end;
 
 function TGDOMDocument.createComment(const data: DOMString): IDomComment;
@@ -1617,7 +1631,7 @@ var
 	node: xmlNodePtr;
 begin
 	node := xmlNewDocComment(GDoc, PChar(UTF8Encode(data)));
-	Result := MakeNode(node) as IDomComment;
+	Result := GetDOMObject(node) as IDomComment;
 end;
 
 function TGDOMDocument.createCDATASection(const data: DOMString): IDomCDataSection;
@@ -1627,7 +1641,7 @@ var
 begin
 	s := UTF8Encode(data);
 	node := xmlNewCDataBlock(GDoc, PChar(s), length(s));
-	Result := MakeNode(node) as IDomCDataSection;
+	Result := GetDOMObject(node) as IDomCDataSection;
 end;
 
 function TGDOMDocument.createProcessingInstruction(const target, data: DOMString): IDomProcessingInstruction;
@@ -1635,7 +1649,7 @@ var
 	pi: xmlNodePtr;
 begin
 	pi := xmlNewPI(PChar(UTF8Encode(target)), PChar(UTF8Encode(data)));
-	Result := MakeNode(pi) as IDomProcessingInstruction;
+	Result := GetDOMObject(pi) as IDomProcessingInstruction;
 end;
 
 function TGDOMDocument.createAttribute(const name: DOMString): IDomAttr;
@@ -1643,7 +1657,7 @@ var
 	attr: xmlAttrPtr;
 begin
 	attr := xmlNewProp(nil, PChar(UTF8Encode(name)), nil);
-	Result := MakeNode(attr) as IDomAttr;
+	Result := GetDOMObject(attr) as IDomAttr;
 end;
 
 function TGDOMDocument.createEntityReference(const name: DOMString): IDomEntityReference;
@@ -1651,7 +1665,7 @@ var
 	node: xmlNodePtr;
 begin
 	node := xmlNewReference(GDoc, PChar(UTF8Encode(name)));
-	Result := MakeNode(node) as IDomEntityReference;
+	Result := GetDOMObject(node) as IDomEntityReference;
 end;
 
 function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList;
@@ -1698,7 +1712,7 @@ begin
 		then recurse:=1
 		else recurse:=0;
 		node:=xmlDocCopyNode(GetGNode(importedNode),GDoc,recurse);
-		Result := MakeNode(node);
+		Result := GetDOMObject(node) as IDomNode;
 	end;
 end;
 (* the c-code to translate (from gdome)
@@ -1752,7 +1766,7 @@ begin
 		ulocal := UTF8Encode(qualifiedName);
 	end;
 	node := xmlNewDocNode(GDoc, ns, PChar(UTF8Encode(qualifiedName)), nil);
-	Result := MakeNode(node) as IDomElement;
+	Result := GetDOMObject(node) as IDomElement;
 end;
 
 function TGDOMDocument.createAttributeNS(const namespaceURI, qualifiedName: DOMString): IDOMAttr;
@@ -1770,7 +1784,7 @@ begin
 		ulocal := UTF8Encode(qualifiedName);
 	end;
 	attr := xmlNewNsProp(FGNode, ns, PChar(ulocal), nil);
-	Result := MakeNode(attr) as IDomAttr;
+	Result := GetDOMObject(attr) as IDomAttr;
 	if attr<>nil then begin
 		FAttrList.Add(attr);
 	end;
