@@ -27,8 +27,32 @@ type
    * The hash table
    *)
   xmlHashTablePtr = ^xmlHashTable;
-  xmlHashTable = record end;
-  (*
+
+  // **************** BY FE *************************
+
+
+     xmlHashEntryPtr = ^xmlHashEntry;
+     xmlHashEntry = record
+          next : xmlHashEntryPtr;
+          name : PxmlChar;
+          name2 : PxmlChar;
+          name3 : PxmlChar;
+          payload : pointer;
+       end;
+
+  {
+     The entire hash table
+    }
+     pXmlHashEntryPtr=^xmlHashEntryPtr;
+     xmlHashTable = record
+          table : pXmlHashEntryPtr;
+          size : longint;
+          nbElems : longint;
+       end;
+
+  // **************** BY FE *************************
+
+(*
    * function types:
    *)
   (**
