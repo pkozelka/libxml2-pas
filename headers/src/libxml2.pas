@@ -205,7 +205,7 @@ begin
 end;
 
 {$IFDEF USE_PASCAL_MM}
-// Delphi memory handling
+// Pascal memory handling
 procedure PascalFreeFunc(ptr: Pointer); cdecl;
 begin
   FreeMem(ptr);
@@ -240,7 +240,7 @@ end;
 
 initialization
 {$IFDEF USE_PASCAL_MM}
-  // setup Delphi memory handler
+  // setup Pascal memory handler
   xmlMemSetup(@PascalFreeFunc, @PascalMallocFunc, @PascalReallocFunc, @PascalStrdupFunc);
 {$ELSE}
   // The Delphi 'external' directive can only be used for functions and procedures,
