@@ -1062,6 +1062,7 @@ procedure TXMLDOMCharacterData.appendData(const data: WideString);
 var
 	s: string;
 begin
+	s := data;
 	xmlNodeAddContent(FNode.node, PChar(s));
 end;
 
@@ -1106,7 +1107,7 @@ end;
 
 function TXMLDOMEntity.Get_publicId: OleVariant;
 begin
-	Result := UTF8Decode(xmlEntityPtr(FNode).ExternalID);
+	Result := UTF8Decode(FNode.entity.ExternalID);
 end;
 
 function TXMLDOMEntity.Get_systemId: OleVariant;
@@ -1117,10 +1118,7 @@ end;
 { TXMLDOMDocumentType }
 
 function TXMLDOMDocumentType.Get_entities: IXMLDOMNamedNodeMap;
-var
-	n: xmlDtdPtr;
 begin
-	n.
 	ENotImpl('TXMLDOMDocumentType.Get_entities');
 end;
 
@@ -1133,12 +1131,12 @@ end;
 
 function TXMLDOMNotation.Get_publicId: OleVariant;
 begin
-	Result := UTF8Decode(xmlNotationPtr(FNode).PublicID);
+	Result := UTF8Decode(FNode.notation.PublicID);
 end;
 
 function TXMLDOMNotation.Get_systemId: OleVariant;
 begin
-	Result := UTF8Decode(xmlNotationPtr(FNode).SystemID);
+	Result := UTF8Decode(FNode.notation.SystemID);
 end;
 
 end.
