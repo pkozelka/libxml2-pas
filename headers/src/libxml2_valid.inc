@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/valid.h:1.35:
+// CVS-REV:gnome-xml/include/libxml/valid.h:1.37:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -65,6 +65,14 @@ type
     vstateNr: Longint;                  (* Depth of the validation stack  *)
     vstateMax: Longint;                 (* Max depth of the validation stack  *)
     vstateTab: xmlValidStatePtr;        (* array of validation states  *)
+
+{$IFDEF LIBXML_REGEXP_ENABLED}
+    am: xmlAutomataPtr;                 (* the automata *)
+    state: xmlAutomataStatePtr;         (* used to build the automata *)
+{$ELSE}
+    am: Pointer;
+    state: Pointer;
+{$ENDIF}
   end;
 
   (*
@@ -183,4 +191,10 @@ function  xmlValidateNameValue(value: PxmlChar): Longint; cdecl; external LIBXML
 function  xmlValidateNamesValue(value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateNmtokenValue(value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateNmtokensValue(value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+{$IFDEF LIBXML_REGEXP_ENABLED}
+(*
+ * Validation based on the regexp support
+ *)
+function  xmlValidBuildContentModel(ctxt: xmlValidCtxtPtr; elem: xmlElementPtr): Longint; cdecl; external LIBXML2_SO;
+{$ENDIF}
 

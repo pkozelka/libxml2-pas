@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlregexp.h:1.1:
+// CVS-REV:gnome-xml/include/libxml/xmlregexp.h:1.3:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -39,6 +39,7 @@ function xmlRegexpCompile(regexp: PxmlChar): xmlRegexpPtr; cdecl; external LIBXM
 procedure xmlRegFreeRegexp(regexp: xmlRegexpPtr); cdecl; external LIBXML2_SO;
 function xmlRegexpExec(comp: xmlRegexpPtr; value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 procedure xmlRegexpPrint(output: PLibXml2File; regexp: xmlRegexpPtr); cdecl; external LIBXML2_SO;
+function xmlRegexpIsDeterminist(comp: xmlRegexpPtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Callback function when doing a transition in the automata

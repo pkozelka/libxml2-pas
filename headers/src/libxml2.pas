@@ -40,22 +40,28 @@ type
   PLongint = ^Longint;
   PByte = ^Byte;
   PPChar = ^PChar;
-  PLibXml2File = pointer; //placeholder for 'FILE *' C-type
+  PLibXml2File = Pointer; //placeholder for 'FILE *' C-type
+  xmlChar = Char;
+  PxmlChar = PChar;
+  PPxmlChar = ^PxmlChar;
 
 {$DEFINE LIBXML_THREAD_ALLOC_ENABLED}
 {$DEFINE LIBXML_THREAD_ENABLED}
 {$DEFINE LIBXML_HTML_ENABLED}
 {$DEFINE LIBXML_DOCB_ENABLED}
+{$DEFINE LIBXML_REGEXP_ENABLED}
 
 {$I libxml2_xmlwin32version.inc}
 
 {$I libxml2_xmlmemory.inc}
+{$I libxml2_xmlregexp.inc}
 {$I libxml2_tree.inc}
 {$I libxml2_encoding.inc}
 {$I libxml2_xmlIO.inc}
 {$I libxml2_hash.inc}
 {$I libxml2_entities.inc}
 {$I libxml2_list.inc}
+{$I libxml2_xmlautomata.inc}
 {$I libxml2_valid.inc}
 {$I libxml2_parser.inc}
 {$I libxml2_SAX.inc}
@@ -79,8 +85,6 @@ type
 {$I libxml2_c14n.inc}
 
 {$I libxml2_xmlunicode.inc}
-{$I libxml2_xmlregexp.inc}
-{$I libxml2_xmlautomata.inc}
 {$I libxml2_schemasInternals.inc}
 {$I libxml2_xmlschemastypes.inc}
 {$I libxml2_xmlschemas.inc}

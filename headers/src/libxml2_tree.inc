@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.111:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.112:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -92,10 +92,11 @@ type
    * It's unsigned allowing to pinpoint case where char * are assigned
    * to xmlChar * (possibly making serialization back impossible).
    *)
+{[pk] moved to libxml2.pas
   xmlChar = Char;
   PxmlChar = PChar;
   PPxmlChar = ^PxmlChar;
-
+}
 // BAD_CAST: not necessary in Pascal
 
 const
@@ -270,6 +271,11 @@ type
     content: xmlElementContentPtr;  (* the allowed element content  *)
     attributes: xmlAttributePtr;    (* List of the declared attributes  *)
     prefix: PxmlChar;               (* the namespace prefix if any  *)
+{$IFDEF LIBXML_REGEXP_ENABLED}
+    contModel: xmlRegexpPtr;        (* the validating regexp *)
+{$ELSE}
+    contModel: Pointer;
+{$ENDIF}
   end;
 
   xmlNsType = xmlElementType;
