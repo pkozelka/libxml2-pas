@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.23 2002-02-25 12:50:57 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.24 2002-02-25 22:18:25 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -24,6 +24,7 @@ uses
 
 type
   TLDomChildNodeList = class;
+  TLDomNode = class;
   TLDomElement = class;
 
   { TLDomObject class }
@@ -39,16 +40,35 @@ type
     function SafeCallException(aExceptObject: TObject; aExceptAddr: Pointer): HRESULT; override;
   end;
 
+  { TLDomNodeExtension }
+
+  TLDomNodeExtensionClass = class of TLDomNodeExtension;
+  TLDomNodeExtension = class(TAggregatedObject)
+  private
+    fLDomNode: TLDomNode;  // weak reference to controller
+    function  GetLDomNode: TLDomNode;
+  protected // IInterface
+    function  QueryInterface(const aIID: TGUID; out aObj): HResult; stdcall;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+  public
+    constructor Create(const aLDomNode: TLDomNode);
+    property LDomNode: TLDomNode read GetLDomNode;
+  end;
+
   { TLDomNode class }
 
   TLDomNodeClass = class of TLDomNode;
   TLDomNode = class(TLDomObject, IDomNode, ILibXml2Node)
-  protected //temporary!
+  private
+    fExtensionObj: TLDomNodeExtension;
     FGNode: xmlNodePtr;
     function  returnChildNodes: IDomNodeList;
   private
     FChildNodes: TLDomChildNodeList; // non-counted reference
     function  isAncestorOrSelf(aNode:xmlNodePtr): Boolean; //new
+  protected //IUnknown
+    function  QueryInterface(const aIID: TGUID; out aObj): HResult; stdcall;
   protected //ILibXml2Node
     function  LibXml2NodePtr: xmlNodePtr;
   protected //IDomNode
@@ -82,10 +102,10 @@ type
     function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
   protected
     constructor Create(aLibXml2Node: pointer); virtual;
-    function  requestNodePtr: xmlNodePtr; virtual;
   public
     property  GNode: xmlNodePtr read FGNode;
     destructor Destroy; override;
+    function  requestNodePtr: xmlNodePtr; virtual;
   end;
 
   { TLDomAttr class }
@@ -331,13 +351,14 @@ type
      * On-demand creation of the underlying document.
      *)
     function  requestDocPtr: xmlDocPtr;
-    function  requestNodePtr: xmlNodePtr; override;
     function  GetGDoc: xmlDocPtr;
     procedure SetGDoc(aNewDoc: xmlDocPtr);
     property  GDoc: xmlDocPtr read GetGDoc write SetGDoc;
     property  FlyingNodes: TList read GetFlyingNodes;
   public
     destructor Destroy; override;
+    function  requestNodePtr: xmlNodePtr; override;
+
     property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
   end;
 
@@ -436,7 +457,8 @@ var
     nil, //XML_XINCLUDE_END,
     TLDomDocument //XML_DOCB_DOCUMENT_NODE
   );
-
+  GlbNodeExtensionClass: TLDomNodeExtensionClass = nil;
+  
 //temporarily exposed:
 function  GetDomObject(aNode: pointer): IUnknown;
 
@@ -576,14 +598,42 @@ begin
   Result := 0; //todo
 end;
 
+{ TLDomNodeExtension }
+
+function TLDomNodeExtension._AddRef: Integer;
+begin
+  Result := IInterface(fLDomNode)._AddRef;
+end;
+
+function TLDomNodeExtension._Release: Integer;
+begin
+  Result := IInterface(fLDomNode)._Release;
+end;
+
+constructor TLDomNodeExtension.Create(const aLDomNode: TLDomNode);
+begin
+  // weak reference to controller - don't keep it alive
+  fLDomNode := aLDomNode;
+end;
+
+function TLDomNodeExtension.GetLDomNode: TLDomNode;
+begin
+  Result := fLDomNode;
+end;
+
+function TLDomNodeExtension.QueryInterface(const aIID: TGUID; out aObj): HResult;
+begin
+  if fLDomNode.GetInterface(aIID, aObj) then begin
+    Result := 0;
+  end else if GetInterface(aIID, aObj) then begin
+    Result := 0;
+  end else begin
+    Result := E_NOINTERFACE;
+  end;
+end;
+
 { TLDomNode }
 
-(**
- * Appends a node at the end of childlist.
- * @param newChild  The node to add
- *
- * @return  the node added.
- *)
 function TLDomNode.appendChild(const newChild: IDomNode): IDomNode;
 begin
   Result := insertBefore(newChild, nil);
@@ -623,6 +673,10 @@ begin
       get_ownerDocument._AddRef;
     end;
   end;
+  // create object implementing additional interfaces
+  if Assigned(GlbNodeExtensionClass) then begin
+    fExtensionObj := GlbNodeExtensionClass.Create(self);
+  end;
   Inc(GlbNodeCount);
 end;
 
@@ -637,6 +691,11 @@ begin
   end;
   if (FGNode<>nil) then begin
     FGNode._private := nil;
+  end;
+  //destroy extension object
+  if (fExtensionObj<>nil) then begin
+    fExtensionObj.Free;
+    fExtensionObj := nil;
   end;
   FChildNodes.Free;
   Dec(GlbNodeCount);
@@ -913,6 +972,19 @@ begin
       //todo
     end;
     node:=next;
+  end;
+end;
+
+function TLDomNode.QueryInterface(const aIID: TGUID; out aObj): HResult;
+begin
+  if GetInterface(aIID, aObj) then begin
+    Result := 0;
+  end else if (fExtensionObj=nil) then begin
+    Result := E_NOINTERFACE;
+  end else if (fExtensionObj.GetInterface(aIID, aObj)) then begin
+    Result := 0;
+  end else begin
+    Result := E_NOINTERFACE;
   end;
 end;
 
