@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.47] parserInternals.h
+// CVS-SIGN: [1.48] parserInternals.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -28,8 +28,8 @@ const
   (**
    * INPUT_CHUNK:
    *
-   * The parser tries to always have that amount of input ready
-   * one of the point is providing context when reporting errors
+   * The parser tries to always have that amount of input ready.
+   * One of the point is providing context when reporting errors.
    *)
   INPUT_CHUNK = 250;
 
@@ -43,7 +43,7 @@ const
  * IS_CHAR:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  * [2] Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
  *                  | [#x10000-#x10FFFF]
@@ -55,7 +55,7 @@ function  IS_CHAR(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIsC
  * IS_BLANK:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  * [3] S ::= (#x20 | #x9 | #xD | #xA)+
  *)
@@ -65,7 +65,7 @@ function  IS_BLANK(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIs
  * IS_BASECHAR:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  * [85] BaseChar ::= ... long list see REC ...
  *)
@@ -75,7 +75,7 @@ function  IS_BASECHAR(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xm
  * IS_DIGIT:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  * [88] Digit ::= ... long list see REC ...
  *)
@@ -85,7 +85,7 @@ function  IS_DIGIT(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlIs
  * IS_COMBINING:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  * [87] CombiningChar ::= ... long list see REC ...
  *)
@@ -95,7 +95,7 @@ function  IS_COMBINING(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'x
  * IS_EXTENDER:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  *
  * [89] Extender ::= #x00B7 | #x02D0 | #x02D1 | #x0387 | #x0640 |
@@ -108,7 +108,7 @@ function  IS_EXTENDER(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xm
  * IS_IDEOGRAPHIC:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  *
  * [86] Ideographic ::= [#x4E00-#x9FA5] | #x3007 | [#x3021-#x3029]
@@ -119,7 +119,7 @@ function  IS_IDEOGRAPHIC(c: Longint): LongBool; cdecl; external LIBXML2_SO name 
  * IS_LETTER:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  *
  * [84] Letter ::= BaseChar | Ideographic
@@ -130,7 +130,7 @@ function  IS_LETTER(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'xmlI
  * IS_PUBIDCHAR:
  * @c:  an UNICODE value (int)
  *
- * Macro to check the following production in the XML spec
+ * Macro to check the following production in the XML spec:
  *
  *
  * [13] PubidChar ::= #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;!*#@$_%]
@@ -141,7 +141,7 @@ function  IS_PUBIDCHAR(c: Longint): LongBool; cdecl; external LIBXML2_SO name 'x
  * SKIP_EOL:
  * @p:  and UTF8 string pointer
  *
- * Skips the end of line chars
+ * Skips the end of line chars.
  *)
 procedure SKIP_EOL(var p: PxmlChar); //[pk] implemented in libxml2.pas
 
@@ -149,7 +149,7 @@ procedure SKIP_EOL(var p: PxmlChar); //[pk] implemented in libxml2.pas
  * MOVETO_ENDTAG:
  * @p:  and UTF8 string pointer
  *
- * Skips to the next '>' char
+ * Skips to the next '>' char.
  *)
 procedure MOVETO_ENDTAG(var p: PxmlChar); //[pk] implemented in libxml2.pas
 
@@ -157,21 +157,22 @@ procedure MOVETO_ENDTAG(var p: PxmlChar); //[pk] implemented in libxml2.pas
  * MOVETO_STARTTAG:
  * @p:  and UTF8 string pointer
  *
- * Skips to the next '<' char
+ * Skips to the next '<' char.
  *)
 procedure MOVETO_STARTTAG(var p: PxmlChar); //[pk] implemented in libxml2.pas
 
 (**
- * Global variables used for predefined strings
+ * Global variables used for predefined strings.
  *)
 
 (*[pk]: todo somehow
+LIBXML_DLL_IMPORT extern const xmlChar xmlStringText[];
 LIBXML_DLL_IMPORT extern const xmlChar xmlStringTextNoenc[];
 LIBXML_DLL_IMPORT extern const xmlChar xmlStringComment[];
 *)
 
 (*
- * Function to finish the work of the macros where needed
+ * Function to finish the work of the macros where needed.
  *)
 function  xmlIsBaseChar(c: Longint): LongBool; cdecl; external LIBXML2_SO;
 function  xmlIsBlank(c: Longint): LongBool; cdecl; external LIBXML2_SO;
@@ -184,7 +185,7 @@ function  xmlIsExtender(c: Longint): LongBool; cdecl; external LIBXML2_SO;
 function  xmlIsChar(c: Longint): LongBool; cdecl; external LIBXML2_SO;
 
 (**
- * Parser context
+ * Parser context.
  *)
 function  xmlCreateFileParserCtxt(filename: PChar): xmlParserCtxtPtr; cdecl; external LIBXML2_SO;
 function  xmlCreateMemoryParserCtxt(buffer: PChar; size: Longint): xmlParserCtxtPtr; cdecl; external LIBXML2_SO;
@@ -194,12 +195,12 @@ function  xmlSwitchEncoding(ctxt: xmlParserCtxtPtr; enc: xmlCharEncoding): Longi
 function  xmlSwitchToEncoding(ctxt: xmlParserCtxtPtr; handler: xmlCharEncodingHandlerPtr): Longint; cdecl; external LIBXML2_SO;
 
 (**
- * Entities
+ * Entities.
  *)
 procedure xmlHandleEntity(ctxt: xmlParserCtxtPtr; entity: xmlEntityPtr); cdecl; external LIBXML2_SO;
 
 (**
- * Input Streams
+ * Input Streams.
  *)
 function  xmlNewStringInputStream(ctxt: xmlParserCtxtPtr; buffer: PxmlChar): xmlParserInputPtr; cdecl; external LIBXML2_SO;
 function  xmlNewEntityInputStream(ctxt: xmlParserCtxtPtr; entity: xmlEntityPtr): xmlParserInputPtr; cdecl; external LIBXML2_SO;
@@ -220,7 +221,7 @@ function  xmlParseQuotedString(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; externa
 procedure xmlParseNamespace(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
 
 (**
- * Generic production rules
+ * Generic production rules.
  *)
 function  xmlScanName(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlParseName(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
@@ -278,25 +279,25 @@ const
 (**
  * XML_SUBSTITUTE_NONE:
  *
- * If no entities need to be substituted
+ * If no entities need to be substituted.
  *)
   XML_SUBSTITUTE_NONE = 0;
 (**
  * XML_SUBSTITUTE_REF:
  *
- * Whether general entities need to be substituted
+ * Whether general entities need to be substituted.
  *)
   XML_SUBSTITUTE_REF = 1;
 (**
  * XML_SUBSTITUTE_PEREF:
  *
- * Whether parameter entities need to be substituted
+ * Whether parameter entities need to be substituted.
  *)
   XML_SUBSTITUTE_PEREF = 2;
 (**
  * XML_SUBSTITUTE_BOTH:
  *
- * Both general and parameter entities need to be substituted
+ * Both general and parameter entities need to be substituted.
  *)
   XML_SUBSTITUTE_BOTH = 3;
 
@@ -304,7 +305,7 @@ function  xmlDecodeEntities(ctxt: xmlParserCtxtPtr; len: Longint; what: Longint;
 function  xmlStringDecodeEntities(ctxt: xmlParserCtxtPtr; str: PxmlChar; what: Longint; end1, end2, end3: xmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 
 (*
- * Generated by MACROS on top of parser.c c.f. PUSH_AND_POP
+ * Generated by MACROS on top of parser.c c.f. PUSH_AND_POP.
  *)
 function  nodePush(ctxt: xmlParserCtxtPtr; value: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 function  nodePop(ctxt: xmlParserCtxtPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
@@ -314,7 +315,7 @@ function  namePop(ctxt: xmlParserCtxtPtr): PxmlChar; cdecl; external LIBXML2_SO;
 function  namePush(ctxt: xmlParserCtxtPtr; value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * other commodities shared between parser.c and parserInternals
+ * other commodities shared between parser.c and parserInternals.
  *)
 function  xmlSkipBlankChars(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlStringCurrentChar(ctxt: xmlParserCtxtPtr; cur: PxmlChar; len: PLongint): Longint; cdecl; external LIBXML2_SO;
@@ -323,7 +324,7 @@ procedure xmlParserHandleReference(ctxt: xmlParserCtxtPtr); cdecl; external LIBX
 function  xmlCheckLanguageID(lang: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Really core function shared with HTML parser
+ * Really core function shared with HTML parser.
  *)
 function  xmlCurrentChar(ctxt: xmlParserCtxtPtr; len: PLongint): Longint; cdecl; external LIBXML2_SO;
 function  xmlCopyCharMultiByte(out: PxmlChar; val: Longint): Longint; cdecl; external LIBXML2_SO;
@@ -333,7 +334,7 @@ procedure xmlParserInputShrink(inp: xmlParserInputPtr); cdecl; external LIBXML2_
 
 {$IFDEF LIBXML_HTML_ENABLED}
 (*
- * Actually comes from the HTML parser but launched from the init stuff
+ * Actually comes from the HTML parser but launched from the init stuff.
  *)
 procedure htmlInitAutoClose; cdecl; external LIBXML2_SO;
 function  htmlCreateFileParserCtxt(filename: PChar; encoding: PChar): htmlParserCtxtPtr; cdecl; external LIBXML2_SO;
@@ -345,15 +346,15 @@ function  htmlCreateFileParserCtxt(filename: PChar; encoding: PChar): htmlParser
  * @firstNode:  the fist node in the chunk
  * @lastNode:  the last nod in the chunk
  *
- * Callback function used when one need to be able to track back the
- * provenance of a chunk of nodes inherited from an entity replacement
+ * Callback function used when one needs to be able to track back the
+ * provenance of a chunk of nodes inherited from an entity replacement.
  *)
 type
   xmlEntityReferenceFunc = procedure(ent: xmlEntityPtr; firstNode, lastNode: xmlNodePtr); cdecl;
 
 (*
  * Specific function to keep track of entities references
- * and used by the XSLT debugger
+ * and used by the XSLT debugger.
  *)
 procedure xmlSetEntityReferenceFunc(func: xmlEntityReferenceFunc); cdecl; external LIBXML2_SO;
 

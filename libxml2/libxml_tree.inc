@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.104] tree.h
+// CVS-SIGN: [1.106] tree.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -188,9 +188,9 @@ type
    *)
   xmlNotationPtr = ^xmlNotation;
   xmlNotation = record
-    name: PxmlChar;                 { Notation name  }
-    PublicID: PxmlChar;             { Public identifier, if any  }
-    SystemID: PxmlChar;             { System identifier, if any  }
+    name: PxmlChar;                 (* Notation name  *)
+    PublicID: PxmlChar;             (* Public identifier, if any  *)
+    SystemID: PxmlChar;             (* System identifier, if any  *)
   end;
 
   (**
@@ -215,8 +215,8 @@ type
    *)
   xmlEnumerationPtr = ^xmlEnumeration;
   xmlEnumeration = record
-    next: xmlEnumerationPtr; { next one  }
-    name: PxmlChar; { Enumeration name  }
+    next: xmlEnumerationPtr;        (* next one  *)
+    name: PxmlChar;                 (* Enumeration name  *)
   end;
 
   (**
@@ -226,22 +226,22 @@ type
    *)
   xmlAttributePtr = ^xmlAttribute;
   xmlAttribute = record
-    _private: Pointer;              { application data }
-    type_: xmlElementType;          { XML_ATTRIBUTE_DECL, must be second !  }
-    name: PxmlChar;                 { Attribute name  }
-    children: xmlNodePtr;           { NULL  }
-    last: xmlNodePtr;               { NULL  }
-    parent: xmlDtdPtr;              { -> DTD  }
-    next: xmlNodePtr;               { next sibling link   }
-    prev: xmlNodePtr;               { previous sibling link   }
-    doc: xmlDocPtr;                 { the containing document  }
-    nexth: xmlAttributePtr;         { next in hash table  }
-    atype: xmlAttributeType;        { The attribute type  }
-    def: xmlAttributeDefault;       { the default  }
-    defaultValue: PxmlChar;         { or the default value  }
-    tree: xmlEnumerationPtr;        { or the enumeration tree if any  }
-    prefix: PxmlChar;               { the namespace prefix if any  }
-    elem: PxmlChar;                 { Element holding the attribute  }
+    _private: Pointer;              (* application data *)
+    type_: xmlElementType;          (* XML_ATTRIBUTE_DECL, must be second !  *)
+    name: PxmlChar;                 (* Attribute name  *)
+    children: xmlNodePtr;           (* NULL  *)
+    last: xmlNodePtr;               (* NULL  *)
+    parent: xmlDtdPtr;              (* -> DTD  *)
+    next: xmlNodePtr;               (* next sibling link   *)
+    prev: xmlNodePtr;               (* previous sibling link   *)
+    doc: xmlDocPtr;                 (* the containing document  *)
+    nexth: xmlAttributePtr;         (* next in hash table  *)
+    atype: xmlAttributeType;        (* The attribute type  *)
+    def: xmlAttributeDefault;       (* the default  *)
+    defaultValue: PxmlChar;         (* or the default value  *)
+    tree: xmlEnumerationPtr;        (* or the enumeration tree if any  *)
+    prefix: PxmlChar;               (* the namespace prefix if any  *)
+    elem: PxmlChar;                 (* Element holding the attribute  *)
   end;
 
   (**
@@ -266,13 +266,13 @@ type
    *)
   xmlElementContentPtr = ^xmlElementContent;
   xmlElementContent = record
-    type_: xmlElementContentType;   { PCDATA, ELEMENT, SEQ or OR  }
-    ocur: xmlElementContentOccur;   { ONCE, OPT, MULT or PLUS  }
-    name: PxmlChar;                 { Element name  }
-    c1: xmlElementContentPtr;       { first child  }
-    c2: xmlElementContentPtr;       { second child  }
-    parent: xmlElementContentPtr;   { parent  }
-    prefix: PxmlChar;               { prefix }
+    type_: xmlElementContentType;   (* PCDATA, ELEMENT, SEQ or OR  *)
+    ocur: xmlElementContentOccur;   (* ONCE, OPT, MULT or PLUS  *)
+    name: PxmlChar;                 (* Element name  *)
+    c1: xmlElementContentPtr;       (* first child  *)
+    c2: xmlElementContentPtr;       (* second child  *)
+    parent: xmlElementContentPtr;   (* parent  *)
+    prefix: PxmlChar;               (* prefix *)
   end;
 
   (**
@@ -289,19 +289,19 @@ type
    *)
   xmlElementPtr = ^xmlElement;
   xmlElement = record
-    _private: Pointer;              { application data }
-    type_: xmlElementType;          { XML_ELEMENT_DECL, must be second !  }
-    name: PxmlChar;                 { Element name  }
-    children: xmlNodePtr;           { NULL  }
-    last: xmlNodePtr;               { NULL  }
-    parent: xmlDtdPtr;              { -> DTD  }
-    next: xmlNodePtr;               { next sibling link   }
-    prev: xmlNodePtr;               { previous sibling link   }
-    doc: xmlDocPtr;                 { the containing document  }
-    etype: xmlElementTypeVal;       { The type  }
-    content: xmlElementContentPtr;  { the allowed element content  }
-    attributes: xmlAttributePtr;    { List of the declared attributes  }
-    prefix: PxmlChar;               { the namespace prefix if any  }
+    _private: Pointer;              (* application data *)
+    type_: xmlElementType;          (* XML_ELEMENT_DECL, must be second !  *)
+    name: PxmlChar;                 (* Element name  *)
+    children: xmlNodePtr;           (* NULL  *)
+    last: xmlNodePtr;               (* NULL  *)
+    parent: xmlDtdPtr;              (* -> DTD  *)
+    next: xmlNodePtr;               (* next sibling link   *)
+    prev: xmlNodePtr;               (* previous sibling link   *)
+    doc: xmlDocPtr;                 (* the containing document  *)
+    etype: xmlElementTypeVal;       (* The type  *)
+    content: xmlElementContentPtr;  (* the allowed element content  *)
+    attributes: xmlAttributePtr;    (* List of the declared attributes  *)
+    prefix: PxmlChar;               (* the namespace prefix if any  *)
   end;
 
   xmlNsType = xmlElementType;
@@ -317,10 +317,10 @@ type
   xmlNsPtr = ^xmlNs;
   PxmlNsPtr = ^xmlNsPtr;
   xmlNs = record
-    next: xmlNsPtr;                 { next Ns link for this node   }
-    nodetype: xmlNsType;            { global or local  }
-    href: PxmlChar;                 { URL for the namespace  }
-    prefix: PxmlChar;               { prefix for the namespace  }
+    next: xmlNsPtr;                 (* next Ns link for this node   *)
+    nodetype: xmlNsType;            (* global or local  *)
+    href: PxmlChar;                 (* URL for the namespace  *)
+    prefix: PxmlChar;               (* prefix for the namespace  *)
   end;
 
   (**
@@ -330,23 +330,23 @@ type
    * the internal subset and for the external subset.
    *)
   xmlDtd = record
-    _private: Pointer;              { application data }
-    type_: xmlElementType;          { XML_DTD_NODE, must be second !  }
-    name: PxmlChar;                 { Name of the DTD  }
-    children: xmlNodePtr;           { the value of the property link  }
-    last: xmlNodePtr;               { last child link  }
-    parent: xmlDocPtr;              { child->parent link  }
-    next: xmlNodePtr;               { next sibling link   }
-    prev: xmlNodePtr;               { previous sibling link   }
-    doc: xmlDocPtr;                 { the containing document  }
-    { End of common part  }
-    notations: Pointer;             { Hash table for notations if any  }
-    elements: Pointer;              { Hash table for elements if any  }
-    attributes: Pointer;            { Hash table for attributes if any  }
-    entities: Pointer;              { Hash table for entities if any  }
-    ExternalID: PxmlChar;           { External identifier for PUBLIC DTD  }
-    SystemID: PxmlChar;             { URI for a SYSTEM or PUBLIC DTD  }
-    pentities: Pointer;             { Hash table for param entities if any  }
+    _private: Pointer;              (* application data *)
+    type_: xmlElementType;          (* XML_DTD_NODE, must be second !  *)
+    name: PxmlChar;                 (* Name of the DTD  *)
+    children: xmlNodePtr;           (* the value of the property link  *)
+    last: xmlNodePtr;               (* last child link  *)
+    parent: xmlDocPtr;              (* child->parent link  *)
+    next: xmlNodePtr;               (* next sibling link   *)
+    prev: xmlNodePtr;               (* previous sibling link   *)
+    doc: xmlDocPtr;                 (* the containing document  *)
+    (* End of common part  *)
+    notations: Pointer;             (* Hash table for notations if any  *)
+    elements: Pointer;              (* Hash table for elements if any  *)
+    attributes: Pointer;            (* Hash table for attributes if any  *)
+    entities: Pointer;              (* Hash table for entities if any  *)
+    ExternalID: PxmlChar;           (* External identifier for PUBLIC DTD  *)
+    SystemID: PxmlChar;             (* URI for a SYSTEM or PUBLIC DTD  *)
+    pentities: Pointer;             (* Hash table for param entities if any  *)
   end;
 
   (**
@@ -357,17 +357,17 @@ type
 
   xmlAttrPtr = ^xmlAttr;
   xmlAttr = record
-    _private: Pointer;              { application data }
-    type_: xmlElementType;          { XML_ATTRIBUTE_NODE, must be second !  }
-    name: PxmlChar;                 { the name of the property  }
-    children: xmlNodePtr;           { the value of the property  }
-    last: xmlNodePtr;               { NULL  }
-    parent: xmlNodePtr;             { child->parent link  }
-    next: xmlAttrPtr;               { next sibling link   }
-    prev: xmlAttrPtr;               { previous sibling link   }
-    doc: xmlDocPtr;                 { the containing document  }
-    ns: xmlNsPtr;                   { Pointer to the associated namespace  }
-    atype: xmlAttributeType;        { the attribute type if validating  }
+    _private: Pointer;              (* application data *)
+    type_: xmlElementType;          (* XML_ATTRIBUTE_NODE, must be second !  *)
+    name: PxmlChar;                 (* the name of the property  *)
+    children: xmlNodePtr;           (* the value of the property  *)
+    last: xmlNodePtr;               (* NULL  *)
+    parent: xmlNodePtr;             (* child->parent link  *)
+    next: xmlAttrPtr;               (* next sibling link   *)
+    prev: xmlAttrPtr;               (* previous sibling link   *)
+    doc: xmlDocPtr;                 (* the containing document  *)
+    ns: xmlNsPtr;                   (* Pointer to the associated namespace  *)
+    atype: xmlAttributeType;        (* the attribute type if validating  *)
   end;
 
   (**
@@ -376,9 +376,9 @@ type
    *)
   xmlIDPtr = ^xmlID;
   xmlID = record
-    next: xmlIDPtr;                 { next ID  }
-    value: PxmlChar;                { The ID name  }
-    attr: xmlAttrPtr;               { The attribut holding it  }
+    next: xmlIDPtr;                 (* next ID  *)
+    value: PxmlChar;                (* The ID name  *)
+    attr: xmlAttrPtr;               (* The attribut holding it  *)
   end;
 
   (**
@@ -387,9 +387,9 @@ type
    *)
   xmlRefPtr = ^xmlRef;
   xmlRef = record
-    next: xmlRefPtr;                { next Ref  }
-    value: PxmlChar;                { The Ref name  }
-    attr: xmlAttrPtr;               { The attribut holding it  }
+    next: xmlRefPtr;                (* next Ref  *)
+    value: PxmlChar;                (* The Ref name  *)
+    attr: xmlAttrPtr;               (* The attribut holding it  *)
   end;
 
   (**
@@ -408,10 +408,10 @@ type
    *)
   xmlBufferPtr = ^xmlBuffer;
   xmlBuffer = record
-    content: PxmlChar; { The buffer content UTF8  }
-    use: DWORD; { The buffer size used  }
-    size: DWORD; { The buffer size  }
-    alloc: xmlBufferAllocationScheme; { The realloc method  }
+    content: PxmlChar; (* The buffer content UTF8  *)
+    use: DWORD; (* The buffer size used  *)
+    size: DWORD; (* The buffer size  *)
+    alloc: xmlBufferAllocationScheme; (* The realloc method  *)
   end;
 
   (**
@@ -420,20 +420,20 @@ type
    * A node in an XML tree.
    *)
   xmlNode = record
-    _private: Pointer;              { application data }
-    type_: xmlElementType;          { type number, must be second !  }
-    name: PxmlChar;                 { the name of the node, or the entity  }
-    children: xmlNodePtr;           { parent->childs link  }
-    last: xmlNodePtr;               { last child link  }
-    parent: xmlNodePtr;             { child->parent link  }
-    next: xmlNodePtr;               { next sibling link   }
-    prev: xmlNodePtr;               { previous sibling link   }
-    doc: xmlDocPtr;                 { the containing document  }
-    { End of common part  }
-    ns: xmlNsPtr;                   { Pointer to the associated namespace  }
-    content: PxmlChar;              { the content  }
-    properties: xmlAttrPtr;         { properties list  }
-    nsDef: xmlNsPtr; { namespace definitions on this node  }
+    _private: Pointer;              (* application data *)
+    type_: xmlElementType;          (* type number, must be second !  *)
+    name: PxmlChar;                 (* the name of the node, or the entity  *)
+    children: xmlNodePtr;           (* parent->childs link  *)
+    last: xmlNodePtr;               (* last child link  *)
+    parent: xmlNodePtr;             (* child->parent link  *)
+    next: xmlNodePtr;               (* next sibling link   *)
+    prev: xmlNodePtr;               (* previous sibling link   *)
+    doc: xmlDocPtr;                 (* the containing document  *)
+    (* End of common part  *)
+    ns: xmlNsPtr;                   (* Pointer to the associated namespace  *)
+    content: PxmlChar;              (* the content  *)
+    properties: xmlAttrPtr;         (* properties list  *)
+    nsDef: xmlNsPtr; (* namespace definitions on this node  *)
   end;
 
   (**
@@ -442,40 +442,40 @@ type
    * An XML document.
    *)
   xmlDoc = record
-    _private: Pointer;              { application data }
-    type_: xmlElementType;          { XML_DOCUMENT_NODE, must be second !  }
-    name: PChar;                    { name/filename/URI of the document  }
-    children: xmlNodePtr;           { the document tree  }
-    last: xmlNodePtr;               { last child link  }
-    parent: xmlNodePtr;             { child->parent link  }
-    next: xmlNodePtr;               { next sibling link   }
-    prev: xmlNodePtr;               { previous sibling link   }
-    doc: xmlDocPtr;                 { autoreference to itself  }
-    { End of common part  }
-    compression: Longint;           { level of zlib compression  }
-    standalone: Longint;            { standalone document (no external refs)  }
-    intSubset: xmlDtdPtr;           { the document internal subset  }
-    extSubset: xmlDtdPtr;           { the document external subset  }
-    oldNs: xmlNsPtr;                { Global namespace, the old way  }
-    version: PxmlChar;              { the XML version string  }
-    encoding: PxmlChar;             { external initial encoding, if any  }
-    ids: Pointer;                   { Hash table for ID attributes if any  }
-    refs: Pointer;                  { Hash table for IDREFs attributes if any  }
-    URL: PxmlChar;                  { The URI for that document  }
-    charset: Longint;               { encoding of the in-memory content - actually an xmlCharEncoding  }
+    _private: Pointer;              (* application data *)
+    type_: xmlElementType;          (* XML_DOCUMENT_NODE, must be second !  *)
+    name: PChar;                    (* name/filename/URI of the document  *)
+    children: xmlNodePtr;           (* the document tree  *)
+    last: xmlNodePtr;               (* last child link  *)
+    parent: xmlNodePtr;             (* child->parent link  *)
+    next: xmlNodePtr;               (* next sibling link   *)
+    prev: xmlNodePtr;               (* previous sibling link   *)
+    doc: xmlDocPtr;                 (* autoreference to itself  *)
+    (* End of common part  *)
+    compression: Longint;           (* level of zlib compression  *)
+    standalone: Longint;            (* standalone document (no external refs)  *)
+    intSubset: xmlDtdPtr;           (* the document internal subset  *)
+    extSubset: xmlDtdPtr;           (* the document external subset  *)
+    oldNs: xmlNsPtr;                (* Global namespace, the old way  *)
+    version: PxmlChar;              (* the XML version string  *)
+    encoding: PxmlChar;             (* external initial encoding, if any  *)
+    ids: Pointer;                   (* Hash table for ID attributes if any  *)
+    refs: Pointer;                  (* Hash table for IDREFs attributes if any  *)
+    URL: PxmlChar;                  (* The URI for that document  *)
+    charset: Longint;               (* encoding of the in-memory content - actually an xmlCharEncoding  *)
   end;
 
 (**
  * Variables.
  *)
 (*TODO: translate somehow
-{$if False}
+{$IF False}
 LIBXML_DLL_IMPORT extern int oldXMLWDcompatibility;/* maintain compatibility with old WD */
 LIBXML_DLL_IMPORT extern int xmlIndentTreeOutput;  /* try to indent the tree dumps */
 LIBXML_DLL_IMPORT extern xmlBufferAllocationScheme xmlBufferAllocScheme; /* alloc scheme to use */
 LIBXML_DLL_IMPORT extern int xmlSaveNoEmptyTags; /* save empty tags as <empty></empty> */
 LIBXML_DLL_IMPORT extern int xmlDefaultBufferSize; /* default buffer size */
-{$ifend}
+{$IFEND}
 *)
 
 (*
