@@ -1635,16 +1635,20 @@ begin
 end;
 
 function TSimpleTests.myIsSameNode(node1, node2: IDOMNode): boolean;
+var
+  comp: IDomNodeCompare;
 begin
-  try
-    result:=(node1 as IDomNodeCompare).IsSameNode(node2);
-  except
-    if (node1 as IUnKnown) = (node2 as IUnKnown)
-      then result:=true
-      else result:=false;
+  Result := node1=node2; //quick check
+  if (Result) then exit;
+  if (node1=nil) then exit;
+  if (node2=nil) then exit;
+  node1.QueryInterface(IDomNodeCompare, comp);
+  if (comp=nil) then begin
+    Result := (node1 as IUnknown) = (node2 as IUnknown);
+  end else begin
+    Result := comp.IsSameNode(node2);
   end;
 end;
-
 
 procedure TSimpleTests.namedNodeMap;
 begin
