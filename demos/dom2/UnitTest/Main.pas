@@ -57,11 +57,12 @@ initialization
    * will be run for every Dom Implementation (specified by VendorID)
   *)
 
-  TestFramework.RegisterTest(DomSetup.createDomSetupTest(MSXML2Rental,getAllTests('Ms-DOM Rental')));
+  TestFramework.RegisterTest(DomSetup.createDomSetupTest(MSXML2Rental,
+    getAllTests('Ms-DOM Rental')));
 
   {remove comments to add testing of the Appartment Free Ms version }
   //  TestFramework.RegisterTest(
   //      DomSetup.createDomSetupTest(MSXML2Free, getAllTests('Ms-DOM Free')));
 
-  TestFramework.RegisterTest(DomSetup.createDomSetupTest(SLIBXML,getAllTests('Lib XML 2')));
+  TestFramework.RegisterTest(DomSetup.createDomSetupTest(SLIBXML, getAllTests('Lib XML 2')));
 end.
