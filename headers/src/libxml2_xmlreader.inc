@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.5:
+// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.7:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -17,8 +17,9 @@ type
   xmlParserProperties = (
     DUMMY__XML_PARSER_LOADDTD_0,
     XML_PARSER_LOADDTD,       // = 1
-    XML_PARSER_DEFAULTATTRS,
-    XML_PARSER_VALIDATE
+    XML_PARSER_DEFAULTATTRS,  // = 2
+    XML_PARSER_VALIDATE,      // = 3
+    XML_PARSER_SUBST_ENTITIES // = 4
   );
   
   xmlTextReader = record end;
@@ -27,7 +28,7 @@ type
 (*
  * Constructors & Destructor
  *)
-function xmlNewTextReader(input: xmlParserInputBufferPtr): xmlTextReaderPtr; cdecl; external LIBXML2_SO;
+function xmlNewTextReader(input: xmlParserInputBufferPtr; URI: PChar): xmlTextReaderPtr; cdecl; external LIBXML2_SO;
 function xmlNewTextReaderFilename(URI: Pchar): xmlTextReaderPtr; cdecl; external LIBXML2_SO;
 procedure xmlFreeTextReader(reader: xmlTextReaderPtr); cdecl; external LIBXML2_SO;
 
@@ -82,4 +83,6 @@ function xmlTextReaderNormalization(reader: xmlTextReaderPtr): Longint; cdecl; e
  *)
 function xmlTextReaderSetParserProp(reader: xmlTextReaderPtr; prop: Longint; value: Longint): Longint; cdecl; external LIBXML2_SO;
 function xmlTextReaderGetParserProp(reader: xmlTextReaderPtr; prop: Longint): Longint; cdecl; external LIBXML2_SO;
+function xmlTextReaderCurrentNode(reader: xmlTextReaderPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
+function xmlTextReaderCurrentDoc(reader: xmlTextReaderPtr): xmlDocPtr; cdecl; external LIBXML2_SO;
 

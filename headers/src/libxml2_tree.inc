@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.117:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.118:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -351,9 +351,11 @@ type
    *)
   xmlIDPtr = ^xmlID;
   xmlID = record
-    next: xmlIDPtr;                 (* next ID  *)
-    value: PxmlChar;                (* The ID name  *)
-    attr: xmlAttrPtr;               (* The attribut holding it  *)
+    next: xmlIDPtr;                 (* next ID *)
+    value: PxmlChar;                (* The ID name *)
+    attr: xmlAttrPtr;               (* The attribut holding it *)
+    name: PxmlChar;                 (* The attribute if attr is not available *)
+    lineno: Longint;                (* The line number if attr is not available *)
   end;
 
   (**
@@ -365,6 +367,8 @@ type
     next: xmlRefPtr;                (* next Ref  *)
     value: PxmlChar;                (* The Ref name  *)
     attr: xmlAttrPtr;               (* The attribut holding it  *)
+    name: PxmlChar;                 (* The attribute if attr is not available *)
+    lineno: Longint;                (* The line number if attr is not available *)
   end;
 
   (**

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/entities.h:1.35:
+// CVS-REV:gnome-xml/include/libxml/entities.h:1.36:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -50,6 +50,7 @@ type
     SystemID : PxmlChar;            (* URI for a SYSTEM or PUBLIC Entity  *)
     nexte : xmlEntityPtr;           (* unused  *)
     URI : PxmlChar;                 (* the full URI as computed  *)
+    owner : Longint;                (* does the entity own the children *)
   end;
 
   (*

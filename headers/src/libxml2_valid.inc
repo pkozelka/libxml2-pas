@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/valid.h:1.38:
+// CVS-REV:gnome-xml/include/libxml/valid.h:1.39:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -197,5 +197,8 @@ function  xmlValidateNmtokensValue(value: PxmlChar): Longint; cdecl; external LI
  * Validation based on the regexp support
  *)
 function  xmlValidBuildContentModel(ctxt: xmlValidCtxtPtr; elem: xmlElementPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidatePushElement(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlNodePtr; qname: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidatePushCData(ctxt: xmlValidCtxtPtr; data: PxmlChar; len: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidatePopElement(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlNodePtr; qname: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 {$ENDIF}
 
