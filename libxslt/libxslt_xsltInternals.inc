@@ -1,561 +1,431 @@
+// CVS-SIGN: [1.65] libxslt/xsltInternals.h
 {
-    ------------------------------------------------------------------------------
-    Translated into pascal with help of h2pas utility from the FreePascal project.
-    Copyright for the header translation:
-        4commerce technologies AG
-        Kamerbalken 10-14
-        22525 Hamburg, Germany
-    Published under a double license:
-    a) the GNU Library General Public License: 
-       http://www.gnu.org/copyleft/lgpl.html
-    b) the Mozilla Public License:
-       http://www.mozilla.org/MPL/MPL-1.1.html
-    Please send corrections to: ufechner@4commerce.de
-    ------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Uwe Fechner <ufechner@4commerce.de> - 4commerce technologies AG
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+}
+(*
+ * xsltInternals.h: internal data structures, constants and functions used
+ *                  by the XSLT engine.
+ *                  They are not part of the API or ABI, i.e. they can change
+ *                  without prior notice, use carefully.
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
+
+
+const
+  (**
+   * XSLT_MAX_SORT:
+   *
+   * Max number of specified xsl: sort on an element.
+  *)
+  XSLT_MAX_SORT = 5;
+
+  (**
+   * XSLT_PAT_NO_PRIORITY:
+   *
+   * Specific value for pattern without priority expressed.
+  *)
+  XSLT_PAT_NO_PRIORITY = -(12345789);
+
+  (**
+   * xsltRuntimeExtra:
+   *
+   * Extra information added to the transformation context.
+  *)
+
+type
+  xsltStylesheetPtr=^xsltStylesheet;
+
+  xsltTemplatePtr = ^xsltTemplate;
+  xsltTemplate = record
+    next: xsltTemplatePtr;                       (* chained list sorted by priority *)
+    style: xsltStylesheetPtr;                    (* the containing stylesheet *)
+    match: PxmlChar;                             (* the matching string *)
+    priority: double;                            (* as given from the stylesheet, not computed *)
+    name: PxmlChar;                              (* the local part of the name QName *)
+    nameURI: PxmlChar;                           (* the URI part of the name QName *)
+    mode: PxmlChar;                              (* the local part of the mode QName *)
+    modeURI: PxmlChar;                           (* the URI part of the mode QName *)
+    content: xmlNodePtr;                         (* the template replacement value *)
+    elem: xmlNodePtr;                            (* the source element *)
+
+    inheritedNsNr: Longint;                      (* number of inherited namespaces *)
+    inheritedNs: PxmlNsPtr;                      (* inherited non-excluded namespaces *)
+
+    (* Profiling informations *)
+    nbCalls: Longint;                            (* the number of time the template was called *)
+    time: dword;                                 (* the time spent in this template *)
+  end;
+
+  (**
+   * xsltDecimalFormat:
+   *
+   * Data structure of decimal-format.
+  *)
+  xsltDecimalFormatPtr = ^xsltDecimalFormat;
+  xsltDecimalFormat = record
+    next: xsltDecimalFormatPtr;                  (* chained list *)
+    name: PxmlChar;
+    (* Used for interpretation of pattern *)
+    digit: PxmlChar;
+    patternSeparator: PxmlChar;
+    (* May appear in result *)
+    minusSign: PxmlChar;
+    infinity: PxmlChar;
+    noNumber: PxmlChar;                          (* Not-a-number *)
+    (* Used for interpretation of pattern and may appear in result *)
+    decimalPoint: PxmlChar;
+    grouping: PxmlChar;
+    percent: PxmlChar;
+    permille: PxmlChar;
+    zeroDigit: PxmlChar;
+  end;
+
+  (**
+   * xsltDocument:
+   *
+   * Data structure associated to a parsed document.
+  *)
+  xsltDocumentPtr = ^xsltDocument;
+  xsltDocument = record
+    next: xsltDocumentPtr;                       (* documents are kept in a chained list *)
+    main: Longint;                               (* is this the main document *)
+    doc: xmlDocPtr;                              (* the parsed document *)
+    keys: Pointer;                               (* key tables storage *)
+  end;
+
+  xsltTransformContextPtr = ^xsltTransformContext;
+
+  (**
+   * xsltElemPreComp:
+   *
+   * The in-memory structure corresponding to element precomputed data,
+   * designed to be extended by extension implementors.
+  *)
+  xsltElemPreCompPtr = ^xsltElemPreComp;
+
+  (**
+   * xsltTransformFunction:
+   * @ctxt: the XSLT transformation context
+   * @node: the input node
+   * @inst: the stylesheet node
+   * @comp: the compiled information from the stylesheet
+   *
+   * Signature of the function associated to elements part of the
+   * stylesheet language like xsl: if or xsl: apply-templates.
+  *)
+  xsltTransformFunction = procedure(ctxt: xsltTransformContextPtr; node, inst: xmlNodePtr; comp: xsltElemPreCompPtr); cdecl;
+
+  xsltStyleType = (
+    XSLT_FUNC_COPY = 1,
+    XSLT_FUNC_SORT,
+    XSLT_FUNC_TEXT,
+    XSLT_FUNC_ELEMENT,
+    XSLT_FUNC_ATTRIBUTE,
+    XSLT_FUNC_COMMENT,
+    XSLT_FUNC_PI,
+    XSLT_FUNC_COPYOF,
+    XSLT_FUNC_VALUEOF,
+    XSLT_FUNC_NUMBER,
+    XSLT_FUNC_APPLYIMPORTS,
+    XSLT_FUNC_CALLTEMPLATE,
+    XSLT_FUNC_APPLYTEMPLATES,
+    XSLT_FUNC_CHOOSE,
+    XSLT_FUNC_IF,
+    XSLT_FUNC_FOREACH,
+    XSLT_FUNC_DOCUMENT,
+    XSLT_FUNC_WITHPARAM,
+    XSLT_FUNC_PARAM,
+    XSLT_FUNC_VARIABLE,
+    XSLT_FUNC_WHEN,
+    XSLT_FUNC_EXTENSION
+  );
+  (**
+   * xsltElemPreCompDeallocator:
+   * @comp: the #xsltElemPreComp to free up
+   *
+   * Deallocates an #xsltElemPreComp structure.
+  *)
+  xsltElemPreCompDeallocator = procedure(comp: xsltElemPreCompPtr); cdecl;
+
+  (**
+   * xsltElemPreComp:
+   *
+   * The in-memory structure corresponding to element precomputed data,
+   * designed to be extended by extension implementors.
+  *)
+  xsltElemPreComp = record
+    next: xsltElemPreCompPtr;                    (* chained list *)
+    type_: xsltStyleType;                        (* type of the element *)
+    func: xsltTransformFunction;                 (* handling function *)
+    inst: xmlNodePtr;                            (* the instruction *)
+    (* end of common part *)
+    free: xsltElemPreCompDeallocator;            (* the deallocator *)
+  end;
+
+  (**
+   * xsltStylePreComp:
+   *
+   * The in-memory structure corresponding to XSLT stylesheet constructs
+   * precomputed data.
+  *)
+  xsltStylePreCompPtr = ^xsltStylePreComp;
+  xsltStylePreComp = record
+    next: xsltElemPreCompPtr;                    (* chained list *)
+    type_: xsltStyleType;                        (* type of the element *)
+    func: xsltTransformFunction;                 (* handling function *)
+    inst: xmlNodePtr;                            (* the instruction *)
+    (*
+     * Pre computed values
+    *)
+    stype: PxmlChar;                             (* sort *)
+    has_stype: Longint;                          (* sort *)
+    number: Longint;                             (* sort *)
+    order: PxmlChar;                             (* sort *)
+    has_order: Longint;                          (* sort *)
+    descending: Longint;                         (* sort *)
+    use: PxmlChar;                               (* copy, element *)
+    has_use: Longint;                            (* copy, element *)
+    noescape: Longint;                           (* text *)
+    name: PxmlChar;                              (* element, attribute, pi *)
+    has_name: Longint;                           (* element, attribute, pi *)
+    ns: PxmlChar;                                (* element *)
+    has_ns: Longint;                             (* element *)
+    mode: PxmlChar;                              (* apply-templates *)
+    modeURI: PxmlChar;                           (* apply-templates *)
+    test: PxmlChar;                              (* if *)
+    templ: xsltTemplatePtr;                      (* call-template *)
+    select: PxmlChar;                            (* sort, copy-of, value-of, apply-templates *)
+    ver11: Longint;                              (* document *)
+    filename: PxmlChar;                          (* document URL *)
+    has_filename: Longint;                       (* document *)
+    numdata: xsltNumberData;                     (* number *)
+    comp: xmlXPathCompExprPtr;                   (* a precompiled XPath expression *)
+    nsList: PxmlNsPtr;                           (* the namespaces in scope *)
+    nsNr: Longint;                               (* the number of namespaces in scope *)
+  end;
+
+  (*
+   * The in-memory structure corresponding to an XSLT Variable
+   * or Param.
+  *)
+  xsltStackElemPtr = ^xsltStackElem;
+  xsltStackElem = record
+    next: xsltStackElemPtr;                      (* chained list *)
+    comp: xsltStylePreCompPtr;                   (* the compiled form *)
+    computed: Longint;                           (* was the evaluation done *)
+    name: PxmlChar;                              (* the local part of the name QName *)
+    nameURI: PxmlChar;                           (* the URI part of the name QName *)
+    select: PxmlChar;                            (* the eval string *)
+    tree: xmlNodePtr;                            (* the tree if no eval string or the location *)
+    value: xmlXPathObjectPtr;                    (* The value if computed *)
+  end;
+
+  (*
+   * The in-memory structure corresponding to an XSLT Stylesheet.
+   * NOTE: most of the content is simply linked from the doc tree
+   *       structure, no specific allocation is made.
+  *)
+//  xsltStylesheetPtr = ^xsltStylesheet;
+  xsltStylesheet = record
+    (*
+     * The stylesheet import relation is kept as a tree.
+    *)
+    parent: xsltStylesheetPtr;
+    next: xsltStylesheetPtr;
+    imports: xsltStylesheetPtr;
+    docList: xsltDocumentPtr;                    (* the include document list *)
+    (*
+     * General data on the style sheet document.
+    *)
+    doc: xmlDocPtr;                              (* the parsed XML stylesheet *)
+    stripSpaces: xmlHashTablePtr;                (* the hash table of the strip-space and
+                                                    preserve space elements *)
+    stripAll: Longint;                           (* strip-space   (1) preserve-space   (-1) *)
+    cdataSection: xmlHashTablePtr;               (* the hash table of the cdata-section *)
+    (*
+     * Global variable or parameters.
+    *)
+    variables: xsltStackElemPtr;                 (* linked list of param and variables *)
+    (*
+     * Template descriptions.
+    *)
+    templates: xsltTemplatePtr;                  (* the ordered list of templates *)
+    templatesHash: Pointer;                      (* hash table or wherever compiled templates
+                                                        informations are stored *)
+    rootMatch: Pointer;                          (* template based on / *)
+    keyMatch: Pointer;                           (* template based on key() *)
+    elemMatch: Pointer;                          (* template based on   *)
+    attrMatch: Pointer;                          (* template based on @  *)
+    parentMatch: Pointer;                        (* template based on .. *)
+    textMatch: Pointer;                          (* template based on text() *)
+    piMatch: Pointer;                            (* template based on processing-instruction() *)
+    commentMatch: Pointer;                       (* template based on comment() *)
+    (*
+     * Namespace aliases.
+    *)
+    nsAliases: xmlHashTablePtr;                  (* the namespace alias hash tables *)
+    (*
+     * Attribute sets.
+    *)
+    attributeSets: xmlHashTablePtr;              (* the attribute sets hash tables *)
+    (*
+     * Namespaces.
+    *)
+    nsHash: xmlHashTablePtr;                     (* the set of namespaces in use *)
+    nsDefs: Pointer;                             (* the namespaces defined *)
+    (*
+     * Key definitions.
+    *)
+    keys: Pointer;                               (* key definitions *)
+    (*
+     * Output related stuff.
+    *)
+    method: PxmlChar;                            (* the output method *)
+    methodURI: PxmlChar;                         (* associated namespace if any *)
+    version: PxmlChar;                           		(* version string *)
+    encoding: PxmlChar;                          (* encoding string *)
+    omitXmlDeclaration: Longint;                 (* omit-xml-declaration = "yes" | "no" *)
+    (*
+     * Number formatting.
+    *)
+    decimalFormat: xsltDecimalFormatPtr;
+    standalone: Longint;                         (* standalone = "yes" | "no" *)
+    doctypePublic: PxmlChar;                     (* doctype-public string *)
+    doctypeSystem: PxmlChar;                     (* doctype-system string *)
+    indent: Longint;                             (* should output being indented *)
+    mediaType: PxmlChar;                         (* media-type string *)
+    (*
+     * Precomputed blocks.
+    *)
+    preComps: xsltElemPreCompPtr;                (* list of precomputed blocks *)
+    warnings: Longint;                           (* number of warnings found at compilation *)
+    errors: Longint;                             (* number of errors found at compilation *)
+    exclPrefix: PxmlChar;                        (* last excluded prefixes *)
+    exclPrefixTab: PPxmlChar;                    (* array of excluded prefixes *)
+    exclPrefixNr: Longint;                       (* number of excluded prefixes in scope *)
+    exclPrefixMax: Longint;                      (* size of the array *)
+    _private: Pointer;                           (* user defined data *)
+    (*
+     * Extensions.
+    *)
+    extInfos: xmlHashTablePtr;                   (* the extension data *)
+    extrasNr: Longint;                           (* the number of extras required *)
+  end;
+
+  (*
+   * The in-memory structure corresponding to an XSLT Transformation.
+  *)
+  xsltOutputType = (
+    XSLT_OUTPUT_XML = 0,
+    XSLT_OUTPUT_HTML,
+    XSLT_OUTPUT_TEXT
+  );
+
+  xsltTransformState = (
+    XSLT_STATE_OK = 0,
+    XSLT_STATE_ERROR,
+    XSLT_STATE_STOPPED
+  );
+
+  xsltTransformContext = record
+    style: xsltStylesheetPtr;                    (* the stylesheet used *)
+    type_: xsltOutputType;                       (* the type of output *)
+    templ: xsltTemplatePtr;                      (* the current template *)
+    templNr: Longint;                            (* Nb of templates in the stack *)
+    templMax: Longint;                           (* Size of the templtes stack *)
+    templTab: xsltTemplatePtr;                   (* the template stack *)
+    vars: xsltStackElemPtr;                      (* the current variable list *)
+    varsNr: Longint;                             (* Nb of variable list in the stack *)
+    varsMax: Longint;                            (* Size of the variable list stack *)
+    varsTab: xsltStackElemPtr;                   (* the variable list stack *)
+    varsBase: Longint;                           (* the var base for current templ *)
+    (*
+     * Extensions
+    *)
+    extFunctions: xmlHashTablePtr;               (* the extension functions *)
+    extElements: xmlHashTablePtr;                (* the extension elements *)
+    extInfos: xmlHashTablePtr;                   (* the extension data *)
+    mode: PxmlChar;                              (* the current mode *)
+    modeURI: PxmlChar;                           (* the current mode URI *)
+    docList: xsltDocumentPtr;                    (* the document list *)
+    document: xsltDocumentPtr;                   (* the current document *)
+    node: xmlNodePtr;                            (* the current node being processed *)
+    nodeList: xmlNodeSetPtr;                     (* the current node list *)
+    (* xmlNodePtr current;			the node *)
+    output: xmlDocPtr;                           (* the resulting document *)
+    insert: xmlNodePtr;                          (* the insertion node *)
+    xpathCtxt: xmlXPathContextPtr;               (* the XPath context *)
+    state: xsltTransformState;                   (* the current state *)
+    (*
+     * Global variables
+    *)
+    globalVars: xmlHashTablePtr;                 (* the global variables and params *)
+    inst: xmlNodePtr;                            (* the instruction in the stylesheet *)
+    xinclude: Longint;                           (* should XInclude be processed *)
+    outputFile: Pchar;                           (* the output URI if known *)
+    profile: Longint;                            (* is this run profiled *)
+    prof: Longint;                               (* the current profiled value *)
+    profNr: Longint;                             (* Nb of templates in the stack *)
+    profMax: Longint;                            (* Size of the templtaes stack *)
+    profTab: PLongint;                           (* the profile template stack *)
+    _private: Pointer;                           (* user defined data *)
+  end;
+
+(**
+ * CHECK_STOPPED:
+ *
+ * Macro to check if the XSLT processing should be stopped.
+ * Will return from the function.
+ *)
+{-macro-
+#define CHECK_STOPPED if (ctxt->state == XSLT_STATE_STOPPED) return;
 }
 
-  {
-     xsltInternals.h: internal data structures, constants and functions used
-                      by the XSLT engine
-                      They are not part of the API or ABI, i.e. they can change
-                      without prior notice, use carefully.
-
-		 See Copyright for the status of this software.
-
-     daniel@veillard.com
-    }
-
-
-{
-     XSLT_MAX_SORT:
-
-     Max number of specified xsl:sort on an element
-    }
-
-  const
-     XSLT_MAX_SORT = 5;
-	{
-     XSLT_PAT_NO_PRIORITY:
-
-     specific value for pattern without priority expressed
-    }
-     XSLT_PAT_NO_PRIORITY = -(12345789);
-  {
-     xsltTemplate:
-
-     The in-memory structure corresponding to an XSLT Template
-    }
-
-  type
-     //_xsltTemplate = xsltTemplate;
-     xsltStylesheetPtr=^xsltStylesheet;
-     xsltTemplatePtr = ^xsltTemplate;
-  { chained list sorted by priority  }
-  { the containing stylesheet  }
-  { the matching string  }
-  { as given from the stylesheet, not computed  }
-  { the local part of the name QName  }
-  { the URI part of the name QName  }
-  { the local part of the mode QName  }
-  { the URI part of the mode QName  }
-  { the template replacement value  }
-  { the source element  }
-  { number of inherited namespaces  }
-  { inherited non-excluded namespaces  }
-  { Profiling informations  }
-  { the number of time the template was called  }
-  { the time spent in this template  }
-     xsltTemplate = record
-					next : xsltTemplatePtr;
-          style : xsltStylesheetPtr;
-          match : PxmlChar;
-          priority : double;
-          name : PxmlChar;
-          nameURI : PxmlChar;
-          mode : PxmlChar;
-          modeURI : PxmlChar;
-          content : xmlNodePtr;
-          elem : xmlNodePtr;
-          inheritedNsNr : longint;
-          inheritedNs : PxmlNsPtr;
-          nbCalls : longint;
-          time : dword;
-       end;
-
-  { 
-     xsltDecimalFormat:
-    
-     Data structure of decimal-format
-    }
-     //_xsltDecimalFormat = xsltDecimalFormat;
-
-     //xsltDecimalFormatPtr = PxsltDecimalFormat;
-     xsltDecimalFormatPtr = ^xsltDecimalFormat;
-  { chained list  }
-  { Used for interpretation of pattern  }
-  { May appear in result  }
-  { Not-a-number  }
-  { Used for interpretation of pattern and may appear in result  }
-     xsltDecimalFormat = record
-          next : xsltDecimalFormatPtr;
-					name : PxmlChar;
-          digit : PxmlChar;
-          patternSeparator : PxmlChar;
-          minusSign : PxmlChar;
-          infinity : PxmlChar;
-          noNumber : PxmlChar;
-          decimalPoint : PxmlChar;
-          grouping : PxmlChar;
-          percent : PxmlChar;
-          permille : PxmlChar;
-          zeroDigit : PxmlChar;
-       end;
-
-  { 
-     xsltDocument:
-    
-     Data structure associated to a parsed document
-    }
-     //_xsltDocument = xsltDocument;
-
-     //xsltDocumentPtr = PxsltDocument;
-     xsltDocumentPtr = ^xsltDocument;
-  { documents are kept in a chained list  }
-  { is this the main document  }
-  { the parsed document  }
-  { key tables storage  }
-     xsltDocument = record
-          next : xsltDocumentPtr;
-          main : longint;
-          doc : xmlDocPtr;
-          keys : pointer;
-       end;
-
-     xsltTransformContextPtr = ^xsltTransformContext;
-  {
-     xsltElemPreComp:
-
-     The in-memory structure corresponding to element precomputed data,
-     designed to be extended by extension implementors.
-    }
-  {
-     xsltTransformFunction:
-     @ctxt: the XSLT transformation context
-     @node: the input node
-     @inst: the stylesheet node
-     @comp: the compiled information from the stylesheet
-
-     signature of the function associated to elements part of the
-     stylesheet language like xsl:if or xsl:apply-templates.
-    }
-(* error
-			               xsltElemPreCompPtr comp);
-in declaration at line 131 *)
-
-       xsltStyleType = (XSLT_FUNC_COPY = 1,XSLT_FUNC_SORT,
-         XSLT_FUNC_TEXT,XSLT_FUNC_ELEMENT,XSLT_FUNC_ATTRIBUTE,
-         XSLT_FUNC_COMMENT,XSLT_FUNC_PI,XSLT_FUNC_COPYOF,
-         XSLT_FUNC_VALUEOF,XSLT_FUNC_NUMBER,
-         XSLT_FUNC_APPLYIMPORTS,XSLT_FUNC_CALLTEMPLATE,
-         XSLT_FUNC_APPLYTEMPLATES,XSLT_FUNC_CHOOSE,
-         XSLT_FUNC_IF,XSLT_FUNC_FOREACH,XSLT_FUNC_DOCUMENT,
-         XSLT_FUNC_WITHPARAM,XSLT_FUNC_PARAM,
-         XSLT_FUNC_VARIABLE,XSLT_FUNC_WHEN,
-         XSLT_FUNC_EXTENSION);
-		{
-       xsltElemPreCompDeallocator:
-       @comp:  the #xsltElemPreComp to free up
-
-       Deallocates an #xsltElemPreComp structure
-      }
-(* error 
-typedef void (*xsltElemPreCompDeallocator) (xsltElemPreCompPtr comp);
-in declaration at line 164 *)
-    { 
-       xsltElemPreComp:
-      
-       The in-memory structure corresponding to element precomputed data,
-       designed to be extended by extension implementors.
-      }
-    { chained list  }
-    { type of the element  }
-    { handling function  }
-    { the instruction  }
-    { end of common part  }
-    { the deallocator  }
-
-    {todo1: add parameters}
-    xsltElemPreCompDeallocator = procedure;
-    xsltTransformFunction = procedure;
-
-    xsltElemPreCompPtr=^xsltElemPreComp; //by FE
-
-       xsltElemPreComp = record
-            next : xsltElemPreCompPtr;
-            type_ : xsltStyleType;
-            func : xsltTransformFunction;
-						inst : xmlNodePtr;
-            free : xsltElemPreCompDeallocator;
-         end;
-
-    { 
-       xsltStylePreComp:
-      
-       The in-memory structure corresponding to XSLT stylesheet constructs
-       precomputed data.
-      }
-       xsltStylePreCompPtr = ^xsltStylePreComp;
-    { chained list  }
-    { type of the element  }
-    { handling function  }
-    { the instruction  }
-    {
-           Pre computed values
-          }
-    { sort  }
-    { sort  }
-    { sort  }
-    { sort  }
-    { sort  }
-    { sort  }
-    { copy, element  }
-    { copy, element  }
-    { text  }
-    { element, attribute, pi  }
-    { element, attribute, pi  }
-    { element  }
-    { element  }
-    { apply-templates  }
-		{ apply-templates  }
-    { if  }
-    { call-template  }
-    { sort, copy-of, value-of, apply-templates  }
-    { document  }
-    { document URL  }
-    { document  }
-    { number  }
-    { a precompiled XPath expression  }
-    { the namespaces in scope  }
-    { the number of namespaces in scope  }
-       xsltStylePreComp = record
-            next : xsltElemPreCompPtr;
-            type_ : xsltStyleType;
-            func : xsltTransformFunction;
-            inst : xmlNodePtr;
-            stype : PxmlChar;
-            has_stype : longint;
-            number : longint;
-            order : PxmlChar;
-            has_order : longint;
-            descending : longint;
-            use : PxmlChar;
-            has_use : longint;
-            noescape : longint;
-            name : PxmlChar;
-            has_name : longint;
-            ns : PxmlChar;
-            has_ns : longint;
-            mode : PxmlChar;
-            modeURI : PxmlChar;
-            test : PxmlChar;
-						templ : xsltTemplatePtr;
-            select : PxmlChar;
-            ver11 : longint;
-            filename : PxmlChar;
-            has_filename : longint;
-            numdata : xsltNumberData;
-            comp : xmlXPathCompExprPtr;
-            nsList : PxmlNsPtr;
-            nsNr : longint;
-         end;
-
-    {
-       The in-memory structure corresponding to an XSLT Variable
-       or Param
-      }
-       xsltStackElemPtr = ^xsltStackElem;
-    { chained list  }
-    { the compiled form  }
-    { was the evaluation done  }
-    { the local part of the name QName  }
-    { the URI part of the name QName  }
-    { the eval string  }
-    { the tree if no eval string or the location  }
-    { The value if computed  }
-       xsltStackElem = record
-            next : xsltStackElemPtr;
-            comp : xsltStylePreCompPtr;
-            computed : longint;
-            name : PxmlChar;
-            nameURI : PxmlChar;
-            select : PxmlChar;
-            tree : xmlNodePtr;
-						value : xmlXPathObjectPtr;
-         end;
-
-    {
-       The in-memory structure corresponding to an XSLT Stylesheet
-       NOTE: most of the content is simply linked from the doc tree
-             structure, no specific allocation is made.
-      }
-
-
-       //xsltStylesheetPtr = PxsltStylesheet;
-
-    {
-           The stylesheet import relation is kept as a tree
-          }
-    { the include document list  }
-    {
-           General data on the style sheet document
-          }
-    { the parsed XML stylesheet  }
-    { the hash table of the strip-space and
-    				   preserve space elements  }
-    { strip-space   (1) preserve-space   (-1)  }
-    { the hash table of the cdata-section  }
-    {
-           Global variable or parameters
-          }
-    { linked list of param and variables  }
-    {
-           Template descriptions
-          }
-    { the ordered list of templates  }
-		{ hash table or wherever compiled templates
-    				   informations are stored  }
-    { template based on /  }
-    { template based on key()  }
-    { template based on    }
-    { template based on @   }
-    { template based on ..  }
-    { template based on text()  }
-    { template based on processing-instruction()  }
-    { template based on comment()  }
-    {
-           Namespace aliases
-          }
-    { the namespace alias hash tables  }
-    {
-           Attribute sets
-          }
-    { the attribute sets hash tables  }
-    {
-           Namespaces
-          }
-    { the set of namespaces in use  }
-    { the namespaces defined  }
-    {
-           Key definitions
-          }
-    { key definitions  }
-    {
-           Output related stuff.
-          }
-    { the output method  }
-    { associated namespace if any  }
-		{ version string  }
-    { encoding string  }
-    { omit-xml-declaration = "yes" | "no"  }
-    { Number formatting  }
-    { standalone = "yes" | "no"  }
-    { doctype-public string  }
-    { doctype-system string  }
-    { should output being indented  }
-    { media-type string  }
-    {
-           Precomputed blocks
-          }
-    { list of precomputed blocks  }
-    { number of warnings found at compilation  }
-    { number of errors found at compilation  }
-    { last excluded prefixes  }
-    { array of excluded prefixes  }
-    { number of excluded prefixes in scope  }
-    { size of the array  }
-    { user defined data  }
-    {
-           Extensions
-          }
-    { the extension data  }
-       xsltStylesheet = record
-            parent : xsltStylesheetPtr;
-            next : xsltStylesheetPtr;
-            imports : xsltStylesheetPtr;
-            docList : xsltDocumentPtr;
-            doc : xmlDocPtr;
-            stripSpaces : xmlHashTablePtr;
-            stripAll : longint;
-						cdataSection : xmlHashTablePtr;
-            variables : xsltStackElemPtr;
-            templates : xsltTemplatePtr;
-            templatesHash : pointer;
-            rootMatch : pointer;
-            keyMatch : pointer;
-            elemMatch : pointer;
-            attrMatch : pointer;
-            parentMatch : pointer;
-            textMatch : pointer;
-            piMatch : pointer;
-            commentMatch : pointer;
-            nsAliases : xmlHashTablePtr;
-            attributeSets : xmlHashTablePtr;
-            nsHash : xmlHashTablePtr;
-            nsDefs : pointer;
-            keys : pointer;
-            method : PxmlChar;
-            methodURI : PxmlChar;
-            version : PxmlChar;
-            encoding : PxmlChar;
-            omitXmlDeclaration : longint;
-            decimalFormat : xsltDecimalFormatPtr;
-            standalone : longint;
-            doctypePublic : PxmlChar;
-            doctypeSystem : PxmlChar;
-            indent : longint;
-            mediaType : PxmlChar;
-            preComps : xsltElemPreCompPtr;
-            warnings : longint;
-            errors : longint;
-            exclPrefix : PxmlChar;
-						exclPrefixTab : PPxmlChar;
-            exclPrefixNr : longint;
-            exclPrefixMax : longint;
-            _private : pointer;
-            extInfos : xmlHashTablePtr;
-         end;
-
-    {
-       The in-memory structure corresponding to an XSLT Transformation
-      }
-
-       xsltOutputType = (XSLT_OUTPUT_XML = 0,XSLT_OUTPUT_HTML,
-         XSLT_OUTPUT_TEXT);
-
-       xsltTransformState = (XSLT_STATE_OK = 0,XSLT_STATE_ERROR,
-         XSLT_STATE_STOPPED);
-    { the stylesheet used  }
-    { the type of output  }
-    { the current template  }
-    { Nb of templates in the stack  }
-    { Size of the templtes stack  }
-    { the template stack  }
-    { the current variable list  }
-    { Nb of variable list in the stack  }
-    { Size of the variable list stack  }
-    { the variable list stack  }
-    { the var base for current templ  }
-    {
-           Extensions
-          }
-    { the extension functions  }
-    { the extension elements  }
-		{ the extension data  }
-    { the current mode  }
-    { the current mode URI  }
-    { the document list  }
-    { the current document  }
-    { the current node being processed  }
-    { the current node list  }
-    { xmlNodePtr current;			the node  }
-    { the resulting document  }
-    { the insertion node  }
-    { the XPath context  }
-    { the current state  }
-    {
-           Global variables
-          }
-    { the global variables and params  }
-    { the instruction in the stylesheet  }
-    { should XInclude be processed  }
-    { the output URI if known  }
-    { is this run profiled  }
-    { the current profiled value  }
-    { Nb of templates in the stack  }
-    { Size of the templtaes stack  }
-    { the profile template stack  }
-    { user defined data  }
-       xsltTransformContext = record
-            style : xsltStylesheetPtr;
-            type_ : xsltOutputType;
-            templ : xsltTemplatePtr;
-            templNr : longint;
-            templMax : longint;
-            templTab : xsltTemplatePtr;
-						vars : xsltStackElemPtr;
-            varsNr : longint;
-            varsMax : longint;
-            varsTab : xsltStackElemPtr;
-            varsBase : longint;
-            extFunctions : xmlHashTablePtr;
-            extElements : xmlHashTablePtr;
-            extInfos : xmlHashTablePtr;
-            mode : PxmlChar;
-            modeURI : PxmlChar;
-            docList : xsltDocumentPtr;
-            document : xsltDocumentPtr;
-            node : xmlNodePtr;
-            nodeList : xmlNodeSetPtr;
-            output : xmlDocPtr;
-            insert : xmlNodePtr;
-            xpathCtxt : xmlXPathContextPtr;
-            state : xsltTransformState;
-            globalVars : xmlHashTablePtr;
-            inst : xmlNodePtr;
-            xinclude : longint;
-            outputFile : Pchar;
-            profile : longint;
-            prof : longint;
-            profNr : longint;
-            profMax : longint;
-            profTab : Plongint;
-            _private : pointer;
-         end;
-
-    {
-       CHECK_STOPPED:
-
-       Macro to check if the XSLT processing should be stopped
-       will return from the function
-      }
-(* error
-#define CHECK_STOPPED if (ctxt->state == XSLT_STATE_STOPPED) return;
-in declaration at line 438 *)
-    {
-       CHECK_STOPPEDE:
-
-       Macro to check if the XSLT processing should be stopped
-       will goto the error: label
-      }
-(* error
+(**
+ * CHECK_STOPPEDE:
+ *
+ * Macro to check if the XSLT processing should be stopped.
+ * Will goto the error: label.
+ *)
+{-macro-
 #define CHECK_STOPPEDE if (ctxt->state == XSLT_STATE_STOPPED) goto error;
-in declaration at line 446 *)
-    {
-       CHECK_STOPPED0:
+}
 
-       Macro to check if the XSLT processing should be stopped
-       will return from the function with a 0 value
-      }
-(* error
+(**
+ * CHECK_STOPPED0:
+ *
+ * Macro to check if the XSLT processing should be stopped.
+ * Will return from the function with a 0 value.
+ *)
+{-macro-
 #define CHECK_STOPPED0 if (ctxt->state == XSLT_STATE_STOPPED) return(0);
-in declaration at line 454 *)
-    {
-       Functions associated to the internal types
-    xsltDecimalFormatPtr	xsltDecimalFormatGetByName(xsltStylesheetPtr sheet,
-    						   xmlChar  name);
-      }
+}
 
-function  xsltNewStylesheet:xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-function  xsltParseStylesheetFile(filename:PxmlChar):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-procedure xsltFreeStylesheet(sheet:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
-function  xsltIsBlank(str:PxmlChar):longint;cdecl;external LIBXSLT_SO;
-procedure xsltFreeStackElemList(elem:xsltStackElemPtr);cdecl;external LIBXSLT_SO;
-function  xsltDecimalFormatGetByName(sheet:xsltStylesheetPtr; name:PxmlChar):xsltDecimalFormatPtr;cdecl;external LIBXSLT_SO;
-function  xsltParseStylesheetProcess(ret:xsltStylesheetPtr; doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-procedure xsltParseStylesheetOutput(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
-function  xsltParseStylesheetDoc(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-function  xsltLoadStylesheetPI(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-procedure xsltNumberFormat(ctxt:xsltTransformContextPtr; data:xsltNumberDataPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
-function  xsltFormatNumberConversion(self:xsltDecimalFormatPtr; format:PxmlChar; number:double; result:PPxmlChar):TxmlXPathError;cdecl;external LIBXSLT_SO;
-procedure xsltParseTemplateContent(style:xsltStylesheetPtr; templ:xmlNodePtr);cdecl;external LIBXSLT_SO;
+(*
+ * Functions associated to the internal types
+xsltDecimalFormatPtr	xsltDecimalFormatGetByName(xsltStylesheetPtr sheet,
+						   xmlChar *name);
+ *)
+function  xsltNewStylesheet: xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+function  xsltParseStylesheetFile(filename: PxmlChar): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+procedure xsltFreeStylesheet(sheet: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
+function  xsltIsBlank(str: PxmlChar): Longint; cdecl; external LIBXSLT_SO;
+procedure xsltFreeStackElemList(elem: xsltStackElemPtr); cdecl; external LIBXSLT_SO;
+function  xsltDecimalFormatGetByName(sheet: xsltStylesheetPtr; name: PxmlChar): xsltDecimalFormatPtr; cdecl; external LIBXSLT_SO;
+function  xsltParseStylesheetProcess(ret: xsltStylesheetPtr; doc: xmlDocPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+procedure xsltParseStylesheetOutput(style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
+function  xsltParseStylesheetDoc(doc: xmlDocPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+function  xsltLoadStylesheetPI(doc: xmlDocPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+procedure xsltNumberFormat(ctxt: xsltTransformContextPtr; data: xsltNumberDataPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
+function  xsltFormatNumberConversion(self: xsltDecimalFormatPtr; format: PxmlChar; number: double; result: PPxmlChar): TxmlXPathError; cdecl; external LIBXSLT_SO;
+procedure xsltParseTemplateContent(style: xsltStylesheetPtr; templ: xmlNodePtr); cdecl; external LIBXSLT_SO;
+function  xsltAllocateExtra(style: xsltStylesheetPtr): Longint; cdecl; external LIBXSLT_SO;
+function  xsltAllocateExtraCtxt	(ctxt: xsltTransformContextPtr): Longint; cdecl; external LIBXSLT_SO;
 
