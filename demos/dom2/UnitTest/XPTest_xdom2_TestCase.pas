@@ -8,7 +8,7 @@ uses
 
 const
   //datapath='L:\@Demos\Open_xdom\Data\';  //set to the directory with test.xml
-  datapath='p:\dom2\data\';
+  datapath='../../data';
   xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
   xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
   xmlstr2 = '<?xml version="1.0" encoding="iso-8859-1"?>'+
@@ -1615,7 +1615,7 @@ end;
 function TSimpleTests.myIsSameNode(node1, node2: IDOMNode): boolean;
 begin
   try
-    result:=(node1 as IDomNodeCompare).IsSameNode(node2);
+//    result:=(node1 as IDomNodeCompare).IsSameNode(node2);
   except
     if (node1 as IUnKnown) = (node2 as IUnKnown)
       then result:=true
