@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.77 2002-01-21 01:23:22 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.78 2002-01-21 21:46:06 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ type
 
   TGDOMObject = class(TInterfacedObject)
   protected
-    procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: widestring='');
+    procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: WideString='');
   public
     function SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT; override;
   end;
@@ -147,13 +147,13 @@ type
   private
     FXPathCtxt: xmlXPathContextPtr;
     FXPathObj: xmlXPathObjectPtr;
-    FQuery: string;
+    FQuery: String;
     procedure Eval;
   protected //IDomNodeList
     function get_item(index: Integer): IDomNode;
     function get_length: Integer;
   protected
-    constructor Create(aBaseNode: TGDOMNode; aQuery: string);
+    constructor Create(aBaseNode: TGDOMNode; aQuery: String);
   public
     destructor Destroy; override;
   end;
@@ -197,22 +197,6 @@ type
     function  get_ownerElement: IDomElement;
   end;
 
-  { TGDOMCharacterData }
-  
-  TGDOMCharacterData = class(TGDOMNode, IDomCharacterData)
-  private
-  protected // IDomCharacterData
-    function  get_data: DomString;
-    procedure set_data(const data: DomString);
-    function  get_length: Integer;
-    function  substringData(offset, count: Integer): DomString;
-    procedure appendData(const data: DomString);
-    procedure insertData(offset: Integer; const data: DomString);
-    procedure deleteData(offset, count: Integer);
-    procedure replaceData(offset, count: Integer; const data: DomString);
-  public
-  end;
-
   { TGDOMElement }
 
   TGDOMElement = class(TGDOMNode, IDomElement, IDomNode)
@@ -243,23 +227,54 @@ type
     destructor Destroy; override;
   end;
 
-  { TMSDOMText }
+  { TGDOMCharacterData }
 
-  TGDOMText = class(TGDOMCharacterData, IDomText)
+  TGDOMCharacterData = class(TGDOMNode, IDomCharacterData, IDomNode)
+  private
+  protected // IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
+    function  get_length: Integer;
+    function  substringData(offset, count: Integer): DomString;
+    procedure appendData(const data: DomString);
+    procedure insertData(offset: Integer; const data: DomString);
+    procedure deleteData(offset, count: Integer);
+    procedure replaceData(offset, count: Integer; const data: DomString);
+  public
+  end;
+
+  { TGDOMText }
+
+  TGDOMText = class(TGDOMCharacterData, IDomText, IDomCharacterData, IDomNode)
+  protected // IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
   protected //IDomText
+    function  IDomText.get_data = get_nodeValue;
+    procedure IDomText.set_data = set_nodeValue;
     function splitText(offset: Integer): IDomText;
   end;
 
   { TGDOMComment }
 
-  TGDOMComment = class(TGDOMCharacterData, IDomComment)
+  TGDOMComment = class(TGDOMCharacterData, IDomComment, IDomCharacterData, IDomNode)
+  protected // IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
+  protected //IDomComment
+    function  IDomComment.get_data = get_nodeValue;
+    procedure IDomComment.set_data = set_nodeValue;
   end;
 
   { TGDOMCDATASection }
 
-  TGDOMCDATASection = class(TGDOMText, IDomCDataSection)
-  private
-  public
+  TGDOMCDATASection = class(TGDOMText, IDomCDataSection, IDomCharacterData, IDomNode)
+  protected // IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
+  protected //IDomCDataSection
+    function  IDomCDataSection.get_data = get_nodeValue;
+    procedure IDomCDataSection.set_data = set_nodeValue;
   end;
 
   { TGDOMDocumentType }
@@ -299,7 +314,7 @@ type
 
   { TGDOMEntityReference }
 
-  TGDOMEntityReference = class(TGDOMNode, IDomEntityReference)
+  TGDOMEntityReference = class(TGDOMNode, IDomEntityReference, IDomNode)
   end;
 
   { TGDOMProcessingInstruction }
@@ -307,15 +322,15 @@ type
   TGDOMProcessingInstruction = class(TGDOMNode, IDomProcessingInstruction)
   private
   protected //IDomProcessingInstruction
-    function get_target: DomString;
-    function get_data: DomString;
-    procedure set_data(const value: DomString);
+    function  IDomProcessingInstruction.get_target = get_nodeName;
+    function  IDomProcessingInstruction.get_data = get_nodeValue;
+    procedure IDomProcessingInstruction.set_data = set_nodeValue;
   public
   end;
 
   { TGDOMDocument }
   
-  TGDOMDocument = class(TGDOMNode, IDomNode, IDomDocument, IDomParseOptions, IDomPersist)
+  TGDOMDocument = class(TGDOMNode, IDomDocument, IDomParseOptions, IDomPersist, IDomNode)
   private
     FGDOMImpl: IDomImplementation;
     FAsync: boolean;              //for compatibility, not really supported
@@ -405,8 +420,8 @@ type
   end;
 
   { TGDOMDocumentBuilder }
-  
-  TGDOMDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
+
+  TGDOMDocumentBuilder = class(TGDOMObject, IDomDocumentBuilder)
   private
     FFreeThreading : Boolean;
   protected //IDomDocumentBuilder
@@ -440,47 +455,47 @@ const
   DEFAULT_IMPL_FREE_THREADED = false;
   GDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
 
-function ErrorString(err:integer):string;
+function ErrorString(err:integer):String;
 begin
   case err of
-    INDEX_SIZE_ERR: result:='INDEX_SIZE_ERR';
-    DOMSTRING_SIZE_ERR: result:='DOMSTRING_SIZE_ERR';
-    HIERARCHY_REQUEST_ERR: result:='HIERARCHY_REQUEST_ERR';
-    WRONG_DOCUMENT_ERR: result:='WRONG_DOCUMENT_ERR';
-    INVALID_CHARACTER_ERR: result:='INVALID_CHARACTER_ERR';
-    NO_DATA_ALLOWED_ERR: result:='NO_DATA_ALLOWED_ERR';
-    NO_MODIFICATION_ALLOWED_ERR: result:='NO_MODIFICATION_ALLOWED_ERR';
-    NOT_FOUND_ERR: result:='NOT_FOUND_ERR';
-    NOT_SUPPORTED_ERR: result:='NOT_SUPPORTED_ERR';
-    INUSE_ATTRIBUTE_ERR: result:='INUSE_ATTRIBUTE_ERR';
-    INVALID_STATE_ERR: result:='INVALID_STATE_ERR';
-    SYNTAX_ERR: result:='SYNTAX_ERR';
-    INVALID_MODIFICATION_ERR: result:='INVALID_MODIFICATION_ERR';
-    NAMESPACE_ERR: result:='NAMESPACE_ERR';
-    INVALID_ACCESS_ERR: result:='INVALID_ACCESS_ERR';
-    20: result:='SaveXMLToMemory_ERR';
-    21: result:='NotSupportedByLibxmldom_ERR';
-    22: result:='SaveXMLToDisk_ERR';
-    100: result:='LIBXML2_NULL_POINTER_ERR';
-    101: result:='INVALID_NODE_SET_ERR';
-    102: result:='PARSE_ERR';
+    INDEX_SIZE_ERR: Result:='INDEX_SIZE_ERR';
+    DOMSTRING_SIZE_ERR: Result:='DOMSTRING_SIZE_ERR';
+    HIERARCHY_REQUEST_ERR: Result:='HIERARCHY_REQUEST_ERR';
+    WRONG_DOCUMENT_ERR: Result:='WRONG_DOCUMENT_ERR';
+    INVALID_CHARACTER_ERR: Result:='INVALID_CHARACTER_ERR';
+    NO_DATA_ALLOWED_ERR: Result:='NO_DATA_ALLOWED_ERR';
+    NO_MODIFICATION_ALLOWED_ERR: Result:='NO_MODIFICATION_ALLOWED_ERR';
+    NOT_FOUND_ERR: Result:='NOT_FOUND_ERR';
+    NOT_SUPPORTED_ERR: Result:='NOT_SUPPORTED_ERR';
+    INUSE_ATTRIBUTE_ERR: Result:='INUSE_ATTRIBUTE_ERR';
+    INVALID_STATE_ERR: Result:='INVALID_STATE_ERR';
+    SYNTAX_ERR: Result:='SYNTAX_ERR';
+    INVALID_MODIFICATION_ERR: Result:='INVALID_MODIFICATION_ERR';
+    NAMESPACE_ERR: Result:='NAMESPACE_ERR';
+    INVALID_ACCESS_ERR: Result:='INVALID_ACCESS_ERR';
+    20: Result:='SaveXMLToMemory_ERR';
+    21: Result:='NotSupportedByLibxmldom_ERR';
+    22: Result:='SaveXMLToDisk_ERR';
+    100: Result:='LIBXML2_NULL_POINTER_ERR';
+    101: Result:='INVALID_NODE_SET_ERR';
+    102: Result:='PARSE_ERR';
   else
-    result:='Unknown error no: '+inttostr(err);
+    Result:='Unknown error no: '+inttostr(err);
   end;
 end;
 
 (**
  * Checks if the condition is true, and raises specified exception if not.
  *)
-procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: widestring=''; aClassName: string='');
+procedure DomAssert1(aCondition: boolean; aErrorCode:integer; aMsg: WideString; aLocation: String);
 begin
   if aErrorCode=0 then exit;
   if aCondition then exit;
   if aMsg='' then begin
     aMsg := ErrorString(aErrorCode);
   end;
-  if (aClassName<>'') then begin
-    aMsg := 'in class '+aClassName+': '+aMsg;
+  if (aLocation<>'') then begin
+    aMsg := 'in class '+aLocation+': '+aMsg;
   end;
   raise EDOMException.Create(aMsg);
 end;
@@ -512,7 +527,7 @@ begin
       ok := (node.type_ >= Low(NodeClasses))
         and (node.type_ <= High(NodeClasses))
         and Assigned(NodeClasses[node.type_]);
-      DomAssert(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [node.type_]));
+      DomAssert1(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [node.type_]), 'GetDomObject()');
       obj := NodeClasses[node.type_].Create(node); // this assigns node._private
       // notify the node that it has a wrapper already
     end else begin
@@ -521,7 +536,7 @@ begin
       ok := (node.type_ >= Low(XML_ELEMENT_NODE))
         and (node.type_ <= High(XML_DOCB_DOCUMENT_NODE))
         and Assigned(NodeClasses[node.type_]);
-      DomAssert(ok, INVALID_ACCESS_ERR, 'not a DOM wrapper');
+      DomAssert1(ok, INVALID_ACCESS_ERR, 'not a DOM wrapper', 'GetDomObject()');
       obj := node._private;
     end;
   end else begin
@@ -532,7 +547,7 @@ end;
 
 function GetGNode(const aNode: IDomNode): xmlNodePtr;
 begin
-  DomAssert(Assigned(aNode), INVALID_ACCESS_ERR, SNodeExpected);
+  DomAssert1(Assigned(aNode), INVALID_ACCESS_ERR, SNodeExpected, 'GetGNode()');
   Result := (aNode as ILibXml2Node).LibXml2NodePtr;
 end;
 
@@ -540,12 +555,12 @@ function IsReadOnlyNode(node:xmlNodePtr): boolean;
 begin
   if node<>nil
     then  case node.type_ of
-      XML_NOTATION_NODE,XML_ENTITY_NODE,XML_ENTITY_DECL: result:=true;
+      XML_NOTATION_NODE,XML_ENTITY_NODE,XML_ENTITY_DECL: Result:=true;
     else
-      result:=false;
+      Result:=false;
     end
   else
-    result:=false;
+    Result:=false;
 end;
 
 function canAppendNode(priv,newPriv:xmlNodePtr): boolean;
@@ -556,22 +571,22 @@ begin
 //Finish the translation from C
 //	if newPriv<>nil
 //		then new_type:=newPriv.type_;
-  result:=true;
+  Result:=true;
 end;
 
-function prefix(qualifiedName:string):string;
+function prefix(qualifiedName:String):String;
 begin
-  result := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
+  Result := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
 end;
 
-function localName(qualifiedName:string):string;
-var prefix: string;
+function localName(qualifiedName:String):String;
+var prefix: String;
 begin
   prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
   if length(prefix)>0
-    then result:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
+    then Result:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
       length(qualifiedName)-length(prefix)-1))
-    else result:=qualifiedName;
+    else Result:=qualifiedName;
 end;
 
 (**
@@ -584,8 +599,8 @@ procedure RegisterFlyingNode(aNode: xmlNodePtr);
 var
   doc: TGDOMDocument;
 begin
-  DomAssert(aNode<>nil, INVALID_ACCESS_ERR);
-  DomAssert(aNode.parent=nil, INVALID_STATE_ERR, 'Node has a parent, cannot be registered as flying');
+  DomAssert1(aNode<>nil, INVALID_ACCESS_ERR, '', 'RegisterFlyingNode()');
+  DomAssert1(aNode.parent=nil, INVALID_STATE_ERR, 'Node has a parent, cannot be registered as flying', 'RegisterFlyingNode()');
   case aNode.type_ of
   XML_HTML_DOCUMENT_NODE,
   XML_DOCB_DOCUMENT_NODE,
@@ -711,9 +726,9 @@ end;
 
 { TGDOMObject }
 
-procedure TGDOMObject.DomAssert(aCondition: boolean; aErrorCode: integer; aMsg: widestring);
+procedure TGDOMObject.DomAssert(aCondition: boolean; aErrorCode: integer; aMsg: WideString);
 begin
-  libxmldom.DomAssert(aCondition, aErrorCode, aMsg, ClassName);
+  DomAssert1(aCondition, aErrorCode, aMsg, ClassName);
 end;
 
 function TGDOMObject.SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT;
@@ -734,14 +749,14 @@ end;
 function TGDOMImplementation.hasFeature(const feature, version: DomString): Boolean;
 begin
   if (uppercase(feature) ='CORE') and (version = '2.0')
-    then result:=true
-    else result:=false;
+    then Result:=true
+    else Result:=false;
 end;
 
 function TGDOMImplementation.createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
 var
   dtd:xmlDtdPtr;
-  uqname, upubid, usysid: string;
+  uqname, upubid, usysid: String;
 begin
   uqname := UTF8Encode(qualifiedName);
   upubid := UTF8Encode(publicId);
@@ -984,7 +999,7 @@ end;
 
 function TGDOMNode.IsReadOnly: boolean;
 begin
-  result:=IsReadOnlyNode(FGNode)
+  Result:=IsReadOnlyNode(FGNode)
 end;
 
 function TGDOMNode.IsAncestorOrSelf(newNode: xmlNodePtr): boolean;
@@ -992,13 +1007,13 @@ var
   node:xmlNodePtr;
 begin
   node:=FGNode;
-  result:=true;
+  Result:=true;
   while node<>nil do begin
     if node=newNode
       then exit;
     node:=node.parent;
   end;
-  result:=false;
+  Result:=false;
 end;
 
 function TGDOMNode.requestNodePtr: xmlNodePtr;
@@ -1069,7 +1084,7 @@ begin
   child := GetGNode(childNode);
   xmlUnlinkNode(child);
   RegisterFlyingNode(child);
-  result := childNode;
+  Result := childNode;
 end;
 
 (**
@@ -1138,14 +1153,14 @@ function TGDOMNode.isSupported(const feature, version: DomString): Boolean;
 begin
   if (((upperCase(feature)='CORE') and (version='2.0')) or
      (upperCase(feature)='XML')  and (version='2.0')) //[pk] ??? what ???
-    then result:=true
-  else result:=false;
+    then Result:=true
+  else Result:=false;
 end;
 
 function TGDOMNode.selectNode(const nodePath: WideString): IDomNode;
 // todo: raise  exceptions
 //       a) if invalid nodePath expression
-//       b) if result type <> nodelist
+//       b) if Result type <> nodelist
 var
 	ctxt: xmlXPathContextPtr;
 	rv: xmlXPathObjectPtr;
@@ -1223,7 +1238,7 @@ end;
 
 { TGDOMXPathNodeList }
 
-constructor TGDOMXPathNodeList.Create(aBaseNode: TGDOMNode; aQuery: string);
+constructor TGDOMXPathNodeList.Create(aBaseNode: TGDOMNode; aQuery: String);
 begin
   inherited Create;
   DomAssert(aBaseNode<>nil, HIERARCHY_REQUEST_ERR, 'XPath query must have a parent');
@@ -1353,11 +1368,11 @@ end;
 
 function TGDOMAttr.get_name: DomString;
 var
-  temp: string;
+  temp: String;
 begin
   //temp:=libxmlStringToString(GAttribute.name);
   temp:=inherited get_nodeName;
-  result:=temp;
+  Result:=temp;
 end;
 
 function TGDOMAttr.get_ownerElement: IDomElement;
@@ -1368,7 +1383,7 @@ end;
 function TGDOMAttr.get_specified: Boolean;
 begin
   //todo: implement it correctly
-  result:=true;
+  Result:=true;
 end;
 
 function TGDOMAttr.get_value: DomString;
@@ -1380,7 +1395,7 @@ procedure TGDOMAttr.set_value(const attributeValue: DomString);
 var
   attr: xmlAttrPtr;
   tmp: xmlNodePtr;
-  v: string;
+  v: String;
 begin
   v := UTF8Encode(attributeValue);
   attr := xmlAttrPtr(FGNode);
@@ -1460,7 +1475,7 @@ end;
 
 function TGDOMElement.getElementsByTagName(const name: DomString): IDomNodeList;
 begin
-  result:=selectNodes(name);
+  Result:=selectNodes(name);
 end;
 
 function TGDOMElement.getAttributeNS(const namespaceURI, localName: DomString):
@@ -1473,7 +1488,7 @@ end;
 
 procedure TGDOMElement.setAttributeNS(const namespaceURI, qualifiedName, value: DomString);
 var
-  uprefix, ulocal: string;
+  uprefix, ulocal: String;
   ns: xmlNsPtr;
 begin
   uprefix := prefix(qualifiedName);
@@ -1485,7 +1500,7 @@ end;
 procedure TGDOMElement.removeAttributeNS(const namespaceURI, localName: DomString);
 var
   attr: xmlAttrPtr;
-  uns, ulocal: string;
+  uns, ulocal: String;
   ok: integer;
 begin
   uns := UTF8Encode(localName);
@@ -1549,7 +1564,7 @@ function TGDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DomS
 begin
   //todo: more generic code
   RegisterNs('xyz4ct',namespaceURI);
-  result:=selectNodes('xyz4ct:'+localName);
+  Result:=selectNodes('xyz4ct:'+localName);
 end;
 
 function TGDOMElement.hasAttribute(const name: DomString): Boolean;
@@ -1650,7 +1665,7 @@ end;
 
 function TGDOMDocument.createCDATASection(const data: DomString): IDomCDataSection;
 var
-  s: string;
+  s: String;
   node: xmlNodePtr;
 begin
   s := UTF8Encode(data);
@@ -1715,7 +1730,7 @@ var
  * Returns: the imported node that belongs to this Document.
  *)
 begin
-  result:=nil;
+  Result:=nil;
   if importedNode=nil then exit;
   case integer(importedNode.nodeType) of
     DOCUMENT_NODE,
@@ -1773,7 +1788,7 @@ function TGDOMDocument.createElementNS(const namespaceURI, qualifiedName: DomStr
 var
   node: xmlNodePtr;
   ns: xmlNsPtr;
-  uprefix, ulocal: string;
+  uprefix, ulocal: String;
 begin
   if (namespaceURI<>'') then begin
     uprefix := prefix(qualifiedName);
@@ -1792,7 +1807,7 @@ function TGDOMDocument.createAttributeNS(const namespaceURI, qualifiedName: DomS
 var
   attr: xmlAttrPtr;
   ns: xmlNsPtr;
-  uprefix, ulocal: string;
+  uprefix, ulocal: String;
 begin
   if (namespaceURI<>'') then begin
     uprefix := prefix(qualifiedName);
@@ -1829,22 +1844,22 @@ end;
 
 function TGDOMDocument.get_async: Boolean;
 begin
-  result:=FAsync;
+  Result:=FAsync;
 end;
 
 function TGDOMDocument.get_preserveWhiteSpace: Boolean;
 begin
-  result:=FPreserveWhiteSpace;
+  Result:=FPreserveWhiteSpace;
 end;
 
 function TGDOMDocument.get_resolveExternals: Boolean;
 begin
-  result:=FResolveExternals;
+  Result:=FResolveExternals;
 end;
 
 function TGDOMDocument.get_validate: Boolean;
 begin
-  result:=FValidate;
+  Result:=FValidate;
 end;
 
 procedure TGDOMDocument.set_async(Value: Boolean);
@@ -1875,12 +1890,12 @@ begin
   CString:='';
   encoding:=GDoc.encoding;
   xmlDocDumpMemoryEnc(GDoc,CString,@length,encoding);
-  result:=CString;
+  Result:=CString;
 end;
 
 function TGDOMDocument.asyncLoadState: Integer;
 begin
-  result:=0;
+  Result:=0;
 end;
 
 (**
@@ -1888,7 +1903,7 @@ end;
  *)
 function TGDOMDocument.load(source: OleVariant): Boolean;
 var
-  fn: string;
+  fn: String;
   newdoc: xmlDocPtr;
 begin
 {$ifdef WIN32}
@@ -1906,13 +1921,13 @@ end;
 function TGDOMDocument.loadFromStream(const stream: TStream): Boolean;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  result:=false;
+  Result:=false;
 end;
 
 function TGDOMDocument.loadxml(const Value: DomString): Boolean;
 var
   newdoc: xmlDocPtr;
-  s: string;
+  s: String;
 begin
   s := UTF8Encode(Value);
   newdoc := xmlParseMemory(PChar(s), Length(s));
@@ -1924,7 +1939,7 @@ end;
 
 procedure TGDOMDocument.save(destination: OleVariant);
 var
-  temp:string;
+  temp:String;
   encoding:pchar;
   bytes: integer;
 begin
@@ -2076,60 +2091,42 @@ begin
   replaceData(offset, count, '');
 end;
 
-function TGDOMCharacterData.get_data: DomString;
-begin
-  result:= inherited get_nodeValue;
-end;
-
 function TGDOMCharacterData.get_length: Integer;
 begin
-  result:=length(get_data);
+  Result := Length(get_nodeValue);
 end;
 
-procedure TGDOMCharacterData.insertData(offset: Integer;
-  const data: DomString);
+procedure TGDOMCharacterData.insertData(offset: Integer; const data: DomString);
 begin
   replaceData(offset, 0, PChar(UTF8Encode(data)));
 end;
 
-procedure TGDOMCharacterData.replaceData(offset, count: Integer;
-  const data: DomString);
+procedure TGDOMCharacterData.replaceData(offset, count: Integer; const data: DomString);
 var
   s1,s2,s: WideString;
 begin
-  s := Get_data;
-  s1:= Copy(s, 1, offset);
-  s2:= Copy(s, offset + count+1, Length(s)-offset-count);
-  s := s1 + data + s2;
-  Set_data(s);
+  s := get_nodeValue;
+  s1 := Copy(s, 1, offset);
+  s2 := Copy(s, offset + count+1, Length(s)-offset-count);
+  set_nodeValue(s1 + data + s2);
 end;
 
-procedure TGDOMCharacterData.set_data(const data: DomString);
-begin
- inherited set_nodeValue(data);
-end;
-
-function TGDOMCharacterData.substringData(offset,
-  count: Integer): DomString;
+function TGDOMCharacterData.substringData(offset, count: Integer): DomString;
 //var
 //  temp:PGdomeDomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
   {temp:=gdome_cd_substringData(GCharacterData,offset,count,@exc);
   DomAssert(false, exc);
-  result:=GdomeDOMStringToString(temp);}
+  Result:=GdomeDOMStringToString(temp);}
 end;
 
 { TGDOMText }
 
 function TGDOMText.splitText(offset: Integer): IDomText;
-var
-  s: WideString;
 begin
-  s := Get_data;
-  s:= Copy(s, 1, offset);
-  Set_data(s);
-  result:= self;
+  set_nodeValue(Copy(get_nodeValue, 1, offset));
+  Result := self;
 end;
 
 { TMSDOMEntity }
@@ -2137,38 +2134,21 @@ end;
 function TGDOMEntity.get_notationName: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //result:=GdomeDOMStringToString(gdome_ent_notationName(GEntity,@exc));
+  //Result:=GdomeDOMStringToString(gdome_ent_notationName(GEntity,@exc));
   //DomAssert(exc);
 end;
 
 function TGDOMEntity.get_publicId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //result:=GdomeDOMStringToString(gdome_ent_publicID(GEntity,@exc));
+  //Result:=GdomeDOMStringToString(gdome_ent_publicID(GEntity,@exc));
   //DomAssert(exc);
 end;
 
 function TGDOMEntity.get_systemId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
-  //result:=GdomeDOMStringToString(gdome_ent_systemID(GEntity,@exc));
-end;
-
-{ TGDOMProcessingInstruction }
-
-function TGDOMProcessingInstruction.get_data: DomString;
-begin
-  result:=inherited get_nodeValue;
-end;
-
-function TGDOMProcessingInstruction.get_target: DomString;
-begin
-  result:=inherited get_nodeName;
-end;
-
-procedure TGDOMProcessingInstruction.set_data(const value: DomString);
-begin
-  inherited set_nodeValue(value);
+  //Result:=GdomeDOMStringToString(gdome_ent_systemID(GEntity,@exc));
 end;
 
 { TGDOMDocumentType }
@@ -2181,8 +2161,8 @@ begin
   {entities:=gdome_dt_entities(GDocumentType,@exc);
   DomAssert(exc);
   if entities<>nil
-    then result:=TGDOMxxx.Create(entities,FOwnerDocument) as IDomNamedNodeMap
-    else result:=nil;}
+    then Result:=TGDOMxxx.Create(entities,FOwnerDocument) as IDomNamedNodeMap
+    else Result:=nil;}
 end;
 
 function TGDOMDocumentType.get_internalSubset: DomString;
@@ -2212,8 +2192,8 @@ begin
   {notations:=gdome_dt_notations(GDocumentType,@exc);
   DomAssert(exc);
   if notations<>nil
-    then result:=TGDOMxxxx.Create(notations,FOwnerDocument) as IDomNamedNodeMap
-    else result:=nil;}
+    then Result:=TGDOMxxxx.Create(notations,FOwnerDocument) as IDomNamedNodeMap
+    else Result:=nil;}
 end;
 
 function TGDOMDocumentType.get_publicId: DomString;
@@ -2228,7 +2208,7 @@ end;
 
 function TGDOMDocumentType.GetGDocumentType: xmlDtdPtr;
 begin
-  result:=xmlDtdPtr(GNode);
+  Result := xmlDtdPtr(GNode);
 end;
 
 { TGDOMNotation }
@@ -2240,7 +2220,7 @@ begin
   DomAssert(false, NOT_SUPPORTED_ERR);
   //temp:=GdomeDOMStringToString(gdome_not_publicId(GNotation, @exc));
   //DomAssert(exc);
-  //result:=temp;
+  //Result:=temp;
 end;
 
 function TGDOMNotation.get_systemId: DomString;
@@ -2250,7 +2230,7 @@ begin
   DomAssert(false, NOT_SUPPORTED_ERR);
   //temp:=GdomeDOMStringToString(gdome_not_systemId(GNotation, @exc));
   //DomAssert(exc);
-  //result:=temp;
+  //Result:=temp;
 end;
 
 initialization
