@@ -1,5 +1,5 @@
 unit libxml2_experimental;
-//$Id: libxml2_experimental.pas,v 1.5 2002-02-25 12:56:12 pkozelka Exp $
+//$Id: libxml2_experimental.pas,v 1.6 2002-03-08 08:13:17 pkozelka Exp $
 (**
  * Title:        libxml2 experimental unit
  * Description:  Contains experimental code for support or development of libxml2
@@ -17,7 +17,7 @@ uses
   libxml2;
 
 type
-  TMessageHandler = procedure(aMsg: string) of object;
+  TMessageHandler = procedure(aMsg: WideString) of object;
 
 procedure RegisterErrorHandler(aHandler: TMessageHandler);
 
@@ -37,10 +37,10 @@ begin
     myErrH(msg);
   end;
 {$IFDEF WIN32}
-  OutputDebugString(msg);
+  OutputDebugStringW(PWideChar(UTF8Decode(msg)));
 {$ENDIF}
 {$IFDEF LINUX}
-  Writeln(StrPas(msg));
+  Writeln(UTF8Decode(msg));
 {$ENDIF}
 end;
 
