@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.73 2002-01-20 22:40:57 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.74 2002-01-21 00:07:15 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -219,12 +219,12 @@ type
   protected //IDomNode
     function  get_attributes: IDomNamedNodeMap;
   protected //IDomElement
-    function  get_tagName: DomString;
+    function  IDomElement.get_tagName = get_localName;
     function  getAttribute(const name: DomString): DomString;
     procedure setAttribute(const name, value: DomString);
     procedure removeAttribute(const name: DomString);
     function  getAttributeNode(const name: DomString): IDomAttr;
-    function  setAttributeNode(const newAttr: IDomAttr): IDomAttr;
+    function  IDomElement.setAttributeNode = setAttributeNodeNS;
     function  removeAttributeNode(const oldAttr: IDomAttr):IDomAttr;
     function  getElementsByTagName(const name: DomString): IDomNodeList;
     function  getAttributeNS(const namespaceURI, localName: DomString): DomString;
@@ -392,7 +392,7 @@ type
   end;
 
   { TGDOMDocumentBuilderFactory }
-  
+
   TGDOMDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
   private
     FFreeThreading : Boolean;
@@ -580,6 +580,7 @@ procedure RegisterFlyingNode(aNode: xmlNodePtr);
 var
   doc: TGDOMDocument;
 begin
+  DomAssert(aNode<>nil, INVALID_ACCESS_ERR);
   DomAssert(aNode.parent=nil, INVALID_STATE_ERR, 'Node has a parent, cannot be registered as flying');
   case aNode.type_ of
   XML_HTML_DOCUMENT_NODE,
@@ -1316,7 +1317,7 @@ end;
 
 function TGDOMAttributes.setNamedItem(const newItem: IDomNode): IDomNode;
 begin
-  Result := FOwnerElement.setAttributeNode(newItem as IDomAttr);
+  Result := FOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
 end;
 
 function TGDOMAttributes.removeNamedItem(const name: DomString): IDomNode;
@@ -1393,11 +1394,6 @@ end;
 
 { TGDOMElement }
 
-function TGDOMElement.get_tagName: DomString;
-begin
-  result:=self.get_nodeName;
-end;
-
 function TGDOMElement.getAttribute(const name: DomString): DomString;
 var
   p: PxmlChar;
@@ -1427,10 +1423,10 @@ procedure TGDOMElement.removeAttribute(const name: DomString);
 var
   attr: xmlAttrPtr;
 begin
-  //todo: RegisterFlyingNode
   attr := xmlHasProp(FGNode, PChar(UTF8Encode(name)));
   if attr <> nil then begin
     xmlRemoveProp(attr);
+    RegisterFlyingNode(xmlNodePtr(attr));
   end;
 end;
 
@@ -1442,71 +1438,15 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
-function TGDOMElement.setAttributeNode(const newAttr: IDomAttr):IDomAttr;
-var
-  attr,xmlnewAttr,oldattr: xmlAttrPtr;
-  temp: string;
-  node: xmlNodePtr;
-begin
-  //todo: RegisterFlyingNode
-  //todo: unRegisterFlyingNode
-  if newAttr<>nil then begin
-    xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));     // Get the libxml2-Attribute
-    node:=FGNode;
-    oldattr:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
-    attr:=node.properties;                         // if not, then oldattr=nil
-    if attr=oldattr
-      then node.properties:=xmlNewAttr
-      else begin
-         while attr.next <> oldattr do begin
-           attr:=attr.next
-         end;
-         attr.next:=xmlNewAttr;
-      end;
-//		(get_OwnerDocument as IDomInternal).removeAttr(xmlnewAttr);
-    if oldattr<>nil
-      then begin
-        temp:=oldattr.name;
-        Result := GetDOMObject(oldattr) as IDomAttr;
-      end
-      else begin
-        result:=nil;
-      end;
-  end;
-end;
-
-
 function TGDOMElement.removeAttributeNode(const oldAttr: IDomAttr):IDomAttr;
 var
-  attr,xmlnewAttr,oldattr1: xmlAttrPtr;
-  node: xmlNodePtr;
+  attr: xmlAttrPtr;
 begin
-  //todo: RegisterFlyingNode
-  if oldAttr<>nil then begin
-    xmlnewAttr:=xmlAttrPtr(GetGNode(oldAttr));     // Get the libxml2-Attribute
-    node:=FGNode;
-    oldattr1:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
-    if oldattr1<>nil then begin
-      attr:=node.properties;                         // if not, then oldattr=nil
-      if attr=oldattr1
-        then node.properties:=nil
-        else begin
-           while attr.next <> oldattr1 do begin
-             attr:=attr.next
-           end;
-           attr.next:=nil;
-        end;
-      //(FOwnerDocument as IDomInternal).removeAttr(oldAttr1);
-      if oldattr<>nil
-        then begin
-          result:=oldattr;
-          //(FOwnerDocument as IDomInternal).appendAttr(oldattr);
-        end
-        else begin
-          result:=nil;
-        end;
-    end;
-  end else result:=nil;
+  Result := oldAttr;
+  if oldAttr=nil then exit;
+  attr := xmlAttrPtr(GetGNode(oldAttr));
+  xmlUnlinkNode(xmlNodePtr(attr));
+  RegisterFlyingNode(xmlNodePtr(attr));
 end;
 
 function TGDOMElement.getElementsByTagName(const name: DomString): IDomNodeList;
@@ -1539,7 +1479,6 @@ var
   uns, ulocal: string;
   ok: integer;
 begin
-  //todo: RegisterFlyingNode
   uns := UTF8Encode(localName);
   ulocal := UTF8Encode(namespaceURI);
   attr := xmlHasNSProp(FGNode, PChar(uns), PChar(ulocal));
@@ -1561,43 +1500,37 @@ end;
 
 function TGDOMElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
 var
-  attr,xmlnewAttr,oldattr: xmlAttrPtr;
-  temp: string;
-  node: xmlNodePtr;
-  namespace: pchar;
-  slocalname: string;
+  attr, newa, olda: xmlAttrPtr;
 begin
-  //todo: RegisterFlyingNode
-  //todo: unRegisterFlyingNode
   if newAttr<>nil then begin
-    xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));    // Get the libxml2-Attribute
-    node:=FGNode;
-    xmlnewAttr.parent:=node;
-    if xmlnewAttr.ns<>nil
-      then begin
-        namespace:=xmlnewAttr.ns.href;
-        node.nsDef:=xmlnewAttr.ns;
-        //xmlSetNs(node,xmlnewAttr.ns);
-      end else namespace:='';
-    slocalName:=localName(xmlNewattr.name);
-    oldattr:=xmlHasNSProp(node,pchar(slocalName),namespace); // already an attribute with this name?
-    attr:=node.properties;                                   // if not, then oldattr=nil
-    if attr=oldattr
-      then node.properties:=xmlNewAttr
-      else begin
-         while attr.next <> oldattr do begin
-           attr:=attr.next
-         end;
-         attr.next:=xmlNewAttr;
+    newa := xmlAttrPtr(GetGNode(newAttr));
+    if (newa.ns=nil) then begin
+      olda := xmlHasProp(FGNode, newa.name);
+    end else begin
+      olda := xmlHasNsProp(FGNode, newa.name, newa.ns.href);
+    end;
+    if (newa=olda) then begin
+      Result := newAttr;
+    end else begin
+      if (olda<>nil) then begin
+        xmlRemoveProp(olda);
+        RegisterFlyingNode(xmlNodePtr(olda));
       end;
-    if oldattr<>nil
-      then begin
-        temp:=oldattr.name;
-        Result := GetDOMObject(attr) as IDomAttr;
-      end
-      else begin
-        result:=nil;
+
+      //put it to the front of attrlist (because it is the simplest way)
+      attr := FGNode.properties;
+      FGNode.properties := newa;
+      newa.next := attr;
+      if attr=nil then begin
+        FGNode.properties := newa;
+      end else begin
+        attr.prev := newa;
       end;
+      Result := GetDomObject(olda) as IDomAttr;
+      UnregisterFlyingNode(xmlNodePtr(newa));
+    end;
+  end else begin
+    Result := nil;
   end;
 end;
 
@@ -1632,7 +1565,7 @@ begin
   Inc(elementcount);
 end;
 
-destructor TGDOMElement.destroy;
+destructor TGDOMElement.Destroy;
 begin
   Dec(elementcount);
   inherited Destroy;
