@@ -85,7 +85,11 @@ type
 	xmlXPathObject = record
 		type_ : xmlXPathObjectType;
 		nodesetval : xmlNodeSetPtr;
-		boolval : int64; //??? IS THIS REALLY OK ???
+                {$IFDEF LINUX}
+                  boolval : longInt;
+                {$ELSE}
+		  boolval : int64; //??? IS THIS REALLY OK ???
+                {$ENDIF}
 		floatval : double;
 		stringval : PxmlChar;
 		user : pointer;
