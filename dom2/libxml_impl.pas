@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.18 2002-02-17 01:40:11 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.19 2002-02-17 02:00:15 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -351,6 +351,7 @@ type
 
   { TLDOMImplementation class }
 
+  TLDomImplementationClass = class of TLDomImplementation;
   TLDomImplementation = class(TLDomObject, IDomImplementation)
   private
     class function getInstance(aFreeThreading: boolean): IDomImplementation;
@@ -363,6 +364,7 @@ type
 
   { TLDomDocumentBuilder class }
 
+  TLDomDocumentBuilderClass = class of TLDomDocumentBuilder;
   TLDomDocumentBuilder = class(TLDOMObject, IDomDocumentBuilder)
   private
     FFreeThreading : Boolean;
@@ -383,6 +385,7 @@ type
 
   { TLDomDocumentBuilderFactory class }
 
+  TLDomDocumentBuilderFactoryClass = class of TLDomDocumentBuilderFactory;
   TLDomDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
   private
     FFreeThreading : Boolean;
@@ -419,6 +422,18 @@ var
     TLDomDocument //XML_DOCB_DOCUMENT_NODE
   );
 
+  (**
+   * This variable holds acutual classes used for instantiating classes
+   * implementing certain DOM aspects. Extended implementations are
+   * supposed to replace these values with the extended (and derived) ones.
+   *)
+  GlbClasses: record
+    DomImplementation: TLDomImplementationClass;
+    DomBuilder: TLDomDocumentBuilderClass;
+  end = (
+    DomImplementation: TLDomImplementation;
+    DomBuilder: TLDomDocumentBuilder;
+  );
 
 //temporarily exposed:
 function  GetDomObject(aNode: pointer): IUnknown;
@@ -1716,7 +1731,7 @@ class function TLDomImplementation.getInstance(aFreeThreading: boolean): IDomImp
 begin
   Result := LDOMImplementation[aFreeThreading];
   if (Result = nil) then begin
-    Result := TLDomImplementation.Create; // currently, the same imlementation for both cases
+    Result := GlbClasses.DomImplementation.Create; // currently, the same imlementation for both cases
     LDOMImplementation[aFreeThreading] := Result;
   end;
 end;
@@ -1806,7 +1821,7 @@ end;
 
 function TLDomDocumentBuilderFactory.NewDocumentBuilder : IDomDocumentBuilder;
 begin
-  Result := TLDomDocumentBuilder.Create(FFreeThreading);
+  Result := GlbClasses.DomBuilder.Create(FFreeThreading);
 end;
 
 function TLDomDocumentBuilderFactory.Get_VendorID : DomString;
