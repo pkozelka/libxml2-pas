@@ -5,12 +5,12 @@ libxml2-pas is translation of the header files into Pascal language.
 
 AUTHORS
 -------
-Uwe Fechner <ufechner@4commerce.de>	-  original header translations
-
+Uwe Fechner <ufechner@4commerce.de> - original header translations
+Petr Kozelka <pkozelka@email.cz>    - completed the translations and converted files into the CVS-SIGN maintenance format
 
 VERSION COMPLIANCE
 ------------------
-(unknown)
+Please look into file 'libxml_xsltwin32version.inc' for value of constant LIBXSLT_DOTTED_VERSION.
 
 WHAT YOU FIND IN THIS PACKAGE
 -----------------------------
@@ -42,7 +42,6 @@ iconv.dll
 libxml2.dll
 libxslt.dll
 libexslt.dll
-
 
 
 LINKS
