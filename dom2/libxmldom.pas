@@ -263,7 +263,7 @@ type
 
   TGDOMDocumentType = class(TGDOMNode, IDOMDocumentType)
   private
-    function GetGDocumentType: PGDomeDocumentType;
+    function GetGDocumentType: xmlDtdPtr;
   protected
     { IDOMDocumentType }
     function get_name: DOMString; 
@@ -273,9 +273,8 @@ type
     function get_systemId: DOMString; 
     function get_internalSubset: DOMString; 
   public
-    property GDocumentType: PGdomeDocumentType read GetGDocumentType;
-    constructor Create(PGDOMImplementation:PGdomeDOMImplementation;
-         const qualifiedName, publicID, systemID: DOMString);
+    property GDocumentType: xmlDtdPtr read GetGDocumentType;
+    constructor Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
     destructor destroy; override;
   end;
 
@@ -565,7 +564,9 @@ end;
 
 function TGDOMImplementation.hasFeature(const feature, version: DOMString): WordBool;
 begin
-  result:=false;
+  if (uppercase(feature) ='CORE') and (version = '2.0')
+    then result:=true
+    else result:=false;
 end;
 
 function TGDOMInterface.SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT;
@@ -574,9 +575,21 @@ begin
 end;
 
 function TGDOMImplementation.createDocumentType(const qualifiedName, publicId,
-                systemId: DOMString): IDOMDocumentType; 
+                systemId: DOMString): IDOMDocumentType;
+var
+  dtd:xmlDtdPtr;
+  name1,name2,name3: TGdomString;
 begin
-  //Result := TGDOMDocumentType.Create(qualifiedName,publicId, systemID) as IDOMDocumentType;
+  name1:=TGdomString.create(qualifiedName);
+  name2:=TGdomString.create(publicId);
+  name3:=TGdomString.create(systemId);
+  dtd:=xmlCreateIntSubSet(nil,name1.CString,name2.CString,name3.CString);
+  name1.free;
+  name2.free;
+  name3.free;
+  if dtd<>nil
+    then Result := TGDOMDocumentType.Create(dtd,nil) as IDOMDocumentType
+    else Result := nil;
 end;
 
 function TGDOMImplementation.createDocument(const namespaceURI, qualifiedName: DOMString;
@@ -1524,13 +1537,18 @@ begin
 end;
 
 // IDOMDocument
-function TGDOMDocument.get_doctype: IDOMDocumentType; 
+function TGDOMDocument.get_doctype: IDOMDocumentType;
+var dtd: xmlDtdPtr;
 begin
+   dtd:=FPGdomeDoc.intSubset;
+   if dtd <> nil
+     then result:=TGDOMDocumentType.Create(dtd,self)
+     else result:=nil;
 end;
 
 function TGDOMDocument.get_domImplementation: IDOMImplementation; 
 begin
-  //result:=FGDOMImpl;
+  result:=FGDOMImpl;
 end;
 
 function TGDOMDocument.get_documentElement: IDOMElement; 
@@ -1538,7 +1556,6 @@ var root1:xmlElementPtr;
     exc: GdomeException;
     FGRoot: TGDOMElement;
 begin
-  //root1:=xmlElementPtr(FPGdomeDoc.children);
   root1:=xmlElementPtr(xmlDocGetRootElement(FPGdomeDoc));
   if root1<>nil
     then FGRoot:=TGDOMElement.create(root1,self)
@@ -1688,13 +1705,10 @@ begin
 end;
 
 function TGDOMDocument.createElementNS(const namespaceURI,
-  qualifiedName: DOMString): IDOMElement; 
+  qualifiedName: DOMString): IDOMElement;
 var
-  exc:GdomeException;
-  name2: TGdomString;
   AElement: xmlElementPtr;
   ns: TGDOMNamespace;
-  prefix: string;
 begin
   ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName);
   AElement:=xmlElementPtr(xmlNewDocNode(FPGdomeDoc,ns.NS,ns.localName.CString,nil));
@@ -1703,22 +1717,6 @@ begin
     then result:=TGDOMElement.Create(AElement,self)
     else result:=nil;
 end;
-
-{var
-  exc:GdomeException;
-  name1,name2: TGdomString;
-  AElement: xmlElementPtr;
-begin
-  name1:=TGdomString.create(namespaceURI);
-  name2:=TGdomString.create(qualifiedName);
-  AElement:=gdome_doc_createElementNS(FPGdomeDoc,name1.GetPString,name2.GetPString,@exc);
-  CheckError(exc);
-  name1.Free;
-  name2.Free;
-  if AElement<>nil
-    then result:=TGDOMElement.Create(AElement,self)
-    else result:=nil;
-end;}
 
 function TGDOMDocument.createAttributeNS(const namespaceURI,
   qualifiedName: DOMString): IDOMAttr; 
@@ -2129,11 +2127,12 @@ end;
 function TGDOMDocumentType.get_internalSubset: DOMString;
 var
   temp: String;
-  exc: GdomeException;
+  buff:xmlBufferPtr;
 begin
-  //temp:=GdomeDOMStringToString(gdome_dt_internalSubset(GDocumentType, @exc));
-  //CheckError(exc);
-  //result:=temp;
+  buff:=xmlBufferCreate();
+  xmlNodeDump(buff,nil,xmlNodePtr(GetGDocumentType),0,0);
+  result:=libxmlStringToString(buff.content);
+  xmlBufferFree(buff);
 end;
 
 function TGDOMDocumentType.get_name: DOMString;
@@ -2141,15 +2140,16 @@ var
   temp: String;
   exc: GdomeException;
 begin
-  //temp:=GdomeDOMStringToString(gdome_dt_name(GDocumentType, @exc));
-  //CheckError(exc);
-  //result:=temp;
+  result:=self.get_nodeName;
 end;
 
 function TGDOMDocumentType.get_notations: IDOMNamedNodeMap;
 var notations: PGdomeNamedNodeMap;
     exc: GdomeException;
 begin
+  //Implementing this method requires to implement a new
+  //type of NodeList
+  //GetGDocumentType.notations;
   {notations:=gdome_dt_notations(GDocumentType,@exc);
   CheckError(exc);
   if notations<>nil
@@ -2158,61 +2158,33 @@ begin
 end;
 
 function TGDOMDocumentType.get_publicId: DOMString;
-var
-  temp: String;
-  exc: GdomeException;
 begin
-  {temp:=GdomeDOMStringToString(gdome_dt_publicId(GDocumentType, @exc));
-  CheckError(exc);
-  result:=temp;}
+  result:=libxmlStringToString(GetGDocumentType.ExternalID);
 end;
 
 function TGDOMDocumentType.get_systemId: DOMString;
-var
-  temp: String;
-  exc: GdomeException;
 begin
-  {temp:=GdomeDOMStringToString(gdome_dt_systemId(GDocumentType, @exc));
-  CheckError(exc);
-  result:=temp;}
+  result:=libxmlStringToString(GetGDocumentType.SystemID);
 end;
 
-function TGDOMDocumentType.GetGDocumentType: PGDomeDocumentType;
+function TGDOMDocumentType.GetGDocumentType: xmlDtdPtr;
 begin
-  //result:=PGdomeDocumentType(GNode);
+  result:=xmlDtdPtr(GNode);
 end;
 
-constructor TGDOMDocumentType.Create(
-  PGDOMImplementation: PGdomeDOMImplementation; const qualifiedName,
-  publicID, systemID: DOMString);
+constructor TGDOMDocumentType.Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
 var
-  exc: GdomeException;
-  name1,name2,name3: TGdomString;
   root:xmlNodePtr;
-  temp:PGdomeDocumentType;
 begin
-  {name1:=TGdomString.create(qualifiedName);
-  name2:=TGdomString.create(publicID);
-  name3:=TGdomString.create(systemID);
-  temp:=gdome_di_createDocumentType(PGDOMImplementation,
-    name1.GetPString,name2.GetPString,name3.GetPString,@exc);
-  CheckError(exc);
-  name1.Free;
-  name2.Free;
-  name3.Free;
   //Get root-node
-  root:= xmlNodePtr(temp);
+  root:= xmlNodePtr(dtd);
   //Create root-node as pascal object
-  inherited create(root,nil);}
+  inherited create(root,ADocument);
 end;
 
 
 destructor TGDOMDocumentType.destroy;
-var
-  exc: GdomeException;
 begin
-  //gdome_dt_unref(GetGDocumentType,@exc);
-  //CheckError(exc);
   inherited destroy;
 end;
 
