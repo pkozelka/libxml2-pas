@@ -1,5 +1,5 @@
 unit libxml_impl_utils;
-//$Id: libxml_impl_utils.pas,v 1.2 2002-02-17 01:40:11 pkozelka Exp $
+//$Id: libxml_impl_utils.pas,v 1.3 2002-08-05 01:31:27 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -85,14 +85,18 @@ end;
 
 function IsReadOnlyNode(node:xmlNodePtr): boolean;
 begin
-  if node<>nil
-    then  case node.type_ of
-      XML_NOTATION_NODE,XML_ENTITY_NODE,XML_ENTITY_DECL: Result:=true;
+  if node<>nil then begin
+    case node.type_ of
+      XML_NOTATION_NODE,
+      XML_ENTITY_NODE,
+      XML_ENTITY_DECL:
+        Result := True;
     else
-      Result:=false;
-    end
-  else
-    Result:=false;
+      Result := False;
+    end;
+  end else begin
+    Result := False;
+  end;
 end;
 
 function canAppendNode(priv,newPriv:xmlNodePtr): boolean;
@@ -103,7 +107,7 @@ begin
 //Finish the translation from C
 //	if newPriv<>nil
 //		then new_type:=newPriv.type_;
-  Result:=true;
+  Result := True;
 end;
 
 procedure SplitQName(aQName: String; out aPrefix, aLocalName: String);

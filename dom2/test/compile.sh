@@ -15,5 +15,5 @@ function PasCompile()
 }
 
 
-PasCompile DomTestSuite.dpr $LIBXML2_PAS/headers/src:$LIBXML2_PAS/dom2:$LIBXML2_PAS/dom2/test:$LIBXML2_PAS/dom2/test/tests:$LIBXML2_PAS/../dunit/dunit/src
+PasCompile test/DomTestSuite.dpr $LIBXML2_PAS/headers/src:$LIBXML2_PAS/dom2:$LIBXML2_PAS/dom2/test:$LIBXML2_PAS/dom2/test/tests:$LIBXML2_PAS/../dunit/dunit/src
 
