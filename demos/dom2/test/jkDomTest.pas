@@ -122,7 +122,7 @@ var
   document: IDOMDocument;
 begin
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
-  document := getDoc(filename,vendorstr,TestSet);
+  document := getDoc(filename,vendorstr);
   if document=nil then exit;
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   test('document',(document <> nil));
@@ -242,7 +242,7 @@ var
   nodelist: IDOMNodeList;
   dom2: boolean;
 begin
-  document := getDoc(filename,vendorstr,TestSet);
+  document := getDoc(filename,vendorstr);
   if document=nil then exit;
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   element := document.documentElement;
@@ -793,6 +793,9 @@ begin
   filename := '..\data\'+name;
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
 
+  // testing IDOMDocumentBuilder
+  document := getDoc(filename,vendorstr,testset);
+
   // testing document
   if (testset and 2) = 2
      then TestDocument(filename,vendorstr,testset);
@@ -834,7 +837,7 @@ begin
   // testing IDOMPersist
   if (testset and 256) =256 then begin
     document := nil;
-    document := getDoc(filename,vendorstr,TestSet);
+    document := getDoc(filename,vendorstr);
     if document=nil then exit;
     FDomPersist := document as IDomPersist;
     FDomPersist.save('..\data\saved.xml');
