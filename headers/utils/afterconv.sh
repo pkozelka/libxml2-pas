@@ -4,7 +4,7 @@
 
 for fn in $* ; do
   echo $fn
-  sed -f $LIBXML2_PAS/utils/afterconv.sed $fn >$fn.new
+  sed -f $LIBXML2_PAS/headers/utils/afterconv.sed $fn >$fn.new
   diff $fn $fn.new >$fn.diff
 #  mv $fn $fn.bak
 #  mv $fn.new $fn
