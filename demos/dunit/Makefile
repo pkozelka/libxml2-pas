@@ -24,7 +24,9 @@ extract-cygwin: download-cygwin
 	unzip -d $(MYTMP) $(DOWNLOADDIR)/$(ZIPFILE)
 extract-linux-gnu: download-linux-gnu
 	mkdir $(MYTMP) | true
-	tar -C $(MYTMP) zxvf $(DOWNLOADDIR)/$(TGZFILE)
+	cp $(DOWNLOADDIR)/$(TGZFILE) $(MYTMP)/
+	cd $(MYTMP);tar zxvf $(TGZFILE);cd ..
+	mv $(MYTMP)/dunit/src $(MYTMP)/src
 
 
 compile: compile-$(OSTYPE)
