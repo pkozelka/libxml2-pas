@@ -273,12 +273,12 @@ type
       function  getElementById(const elementId : DomString) : IDomElement;
 
       { IDOMPersist methods}
-      function  get_xml : DOMString;
+      function  get_xml : DomString;
       function  asyncLoadState : Integer;
-      function  load(source: DOMString) : Boolean;
+      function  load(source : DomString) : Boolean;
       function  loadFromStream(const stream : TStream) : Boolean;
       function  loadxml(const value : DomString) : Boolean;
-      procedure save(destination: DOMString);
+      procedure save(destination : DomString);
       procedure saveToStream(const stream : TStream);
       procedure set_OnAsyncLoad(
               const sender : TObject;
@@ -814,6 +814,8 @@ begin
     end;
   if not assigned(result) then
     raise EDOMException.create(NOT_FOUND_ERR,'MSDOM not installed!');
+
+  result.async := false;  
 end;
 
 
@@ -1008,6 +1010,10 @@ function TMSXMLImplementation.createDocument(
         const qualifiedName : DomString;
         docType             : IDomDocumentType) : IDomDocument;
 begin
+  if (namespaceURI <> '') or (qualifiedName <> '') then
+    raise EDomException.create(NOT_SUPPORTED_ERR, 'namespace not supported');
+  if (docType <> nil) then
+    raise EDomException.create(NOT_SUPPORTED_ERR, 'doctype not supported');
   result := domCreateDocument(createDOMDocument(fFreeThreading));
 end;
 
@@ -1242,7 +1248,7 @@ begin
   result := fMSDomDocument.readyState;
 end;
 
-function TMSXMLDocument.load(source: DomString) : Boolean;
+function TMSXMLDocument.load(source : DomString) : Boolean;
 begin
   result := fMSDomDocument.load(source);
   if not result then
@@ -1288,7 +1294,7 @@ begin
   end;
 end;
 
-procedure TMSXMLDocument.save(destination: DomString);
+procedure TMSXMLDocument.save(destination : DomString);
 begin
   fMSDomDocument.save(destination);
 end;
@@ -2295,5 +2301,6 @@ initialization
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(false));
   {register Free-threading factory}
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(true));
+  {create the global 'memory manager' managing all wrappers}
   gDomWrapperRepository := TDomWrapperRepository.create;
 end.
