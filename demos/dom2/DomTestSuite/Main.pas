@@ -11,9 +11,10 @@ uses
   TestFrameWork,
   DomSetup,
   libxmldom,
+  libxmldomFE,
   msxml_impl,
 
-  (* add new tests to uses class *)  
+  (* add new tests to uses class *)
   DomImplementationTests,
   DomDocumentTests;
 
@@ -37,20 +38,22 @@ begin
  result := allTestSuite;
 end;
 
+procedure RegisterAllTests;
+var
+  i: integer;
+  vlist: IDomVendorList;
+  vfact: IDomDocumentBuilderFactory;
+  vid: DomString;
+begin
+  vlist := getDomVendorList;
+  if (vlist=nil) then exit;
+  for i:=0 to vlist.Count-1 do begin
+    vfact := vlist.Item[i];
+    vid := vfact.vendorID;
+    TestFramework.RegisterTest(createDomSetupTest(vid, getAllTests(vid)));
+  end;
+end;
+
 initialization
-  (*
-   * for every DomVendorID add a new line. This make sure that all tests will
-   * will be run for every Dom Implementation (specified by VendorID)
-  *)
-
-  TestFramework.RegisterTest(
-      DomSetup.createDomSetupTest(MSXML2Rental, getAllTests('Ms-DOM Rental')));
-
-{remove comments to add testing of the Appartment Free Ms version }       
-//  TestFramework.RegisterTest(
-//      DomSetup.createDomSetupTest(MSXML2Free, getAllTests('Ms-DOM Free')));
-
-  TestFramework.RegisterTest(
-      DomSetup.createDomSetupTest(SLIBXML, getAllTests('Lib XML 2')));
-
+  RegisterAllTests;
 end.
