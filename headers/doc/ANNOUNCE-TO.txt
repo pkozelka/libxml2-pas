@@ -1,0 +1,5 @@
+news://forums.borland.com/borland.public.delphi.winapi
+news://forums.borland.com/borland.public.delphi.xml
+news://forums.borland.com/borland.public.kylix.linuxapi
+mailto:xml-bindings@gnome.org
+mailto:libxml2-pas-devel@lists.sourceforge.net

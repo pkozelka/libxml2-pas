@@ -1,0 +1,47 @@
+Subject: ANN: libxml2 for DELPHI/KYLIX: version 2.4.15 released
+
+Hello all,
+(sorry for the cross-posting)
+
+I am happy to announce that the newest Pascal translations of libxml2
+headers were just released.
+This release matches libxml2-2.4.15 release, as indicated inthe subject.
+
+Note that, besides this package, the libxml2-pas sourceforge project works
+on following modules:
+- header translations for libxslt (not yet completed; help wanted!)
+- Dom2 wrappers based on JAXP model (under heavy development)
+    Currently we develop this wrapper for these well-known implementations:
+    - MSXML (win32 only)
+    - LIBXML (win32, Linux)
+    - support for Xerces-C (win32, Linux) would be highly welcome
+- MSXML DOM compatible wrapper (currently not developed much)
+- iconv.h translation, a work in progress, is actually included in libxml2-pas at the moment
+
+****************************
+Help wanted for all modules!
+****************************
+Anyone willing to contribute by patches, testcases, bugreports,
+documentation, hints or
+just "Hi, I am using it!" messages is welcome to post on our open mailing list:
+libxml2-pas-devel@lists.sourceforge.net .
+
+This translation will be also donated to the Delphi-JEDI project soon.
+
+For your convenience, you can use following direct links and commands:
+Main project page:
+    http://sourceforge.net/projects/libxml2-pas
+DOWNLOAD:
+    http://sourceforge.net/project/showfiles.php?group_id=31011
+CVS repository Web interface:
+    http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/libxml2-pas/
+CVS checkout command:
+    cvs -z3 -d:pserver:anonymous@cvs.libxml2-pas.sourceforge.net:/cvsroot/libxml2-pas co -d libxml2-pas .
+
+Regards
+Petr Kozelka
+in behalf of the libxml2-pas team
+________________________________________________
+libxml2-pas - header translations of libxml2 api
+libxml2-pas-devel@lists.sourceforge.net
+http://sourceforge.net/projects/libxml2-pas
