@@ -1,13 +1,13 @@
 unit libxmldom;
 
 {
-    ------------------------------------------------------------------------------
+   ------------------------------------------------------------------------------
    This unit is an object-oriented wrapper for libxml2.
    It implements the interfaces defined in dom2.pas.
 
    Author:
    Uwe Fechner <ufechner@4commerce.de>
-   
+   .
    Some Code by:
    Martijn Brinkers
    Petr Kozelka
@@ -484,12 +484,19 @@ begin
     else Result := nil;
 end;
 
+function prefix(qualifiedName:string):string;
+begin
+  result := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
+end;
+
 function localName(qualifiedName:string):string;
 var prefix: string;
 begin
   prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
-  result:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
-    length(qualifiedName)-length(prefix)-1));
+  if length(prefix)>0
+    then result:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
+      length(qualifiedName)-length(prefix)-1))
+    else result:=qualifiedName;
 end;
 
 function libxmlStringToString(libstring:pchar):String;
@@ -1156,9 +1163,8 @@ end;
 
 function TGDOMAttr.get_specified: WordBool;
 begin
-  //result:=GDomeBooleanToBoolean(gdome_a_specified(GAttribute,@exc));
-  //CheckError(exc);
-  result:=false;
+  //todo: implement it correctly
+  result:=true;
 end;
 
 function TGDOMAttr.get_value: DOMString;
@@ -1220,12 +1226,14 @@ end;
 
 procedure TGDOMElement.removeAttribute(const name: DOMString);
 var
+  attr: xmlAttrPtr;
   name1: TGdomString;
 begin
-  {name1:=TGdomString.create(name);
-  gdome_el_removeAttribute(GElement,name1.GetPString, @exc);
-  CheckError(exc);
-  name1.Free;}
+  name1:=TGdomString.create(name);
+  attr := xmlHasProp(xmlNodePtr(GElement), name1.CString);
+  name1.free;
+  if attr <> nil
+    then xmlRemoveProp(attr);
 end;
 
 function TGDOMElement.getAttributeNode(const name: DOMString): IDOMAttr;
@@ -1305,7 +1313,8 @@ begin
   if nodeList<>nil
     then result:=TGDOMNodeList.Create(nodeList,FOwnerDocument) as IDOMNodeList
     else result:=nil;}
-  result:=nil;
+  //result:=nil;
+  result:=selectNodes(name);
 end;
 
 function TGDOMElement.getAttributeNS(const namespaceURI, localName: DOMString):
@@ -1338,14 +1347,16 @@ end;
 
 procedure TGDOMElement.removeAttributeNS(const namespaceURI, localName: DOMString);
 var
+  attr: xmlAttrPtr;
   name1,name2: TGdomString;
 begin
-  {name1:=TGdomString.create(namespaceURI);
-  name2:=TGdomString.create(localName);
-  gdome_el_removeAttributeNS(GElement,name1.GetPString,name2.GetPString, @exc);
-  CheckError(exc);
-  name1.Free;
-  name2.Free;}
+  name1:=TGdomString.create(localName);
+  name2:=TGdomString.create(namespaceURI);
+  attr := xmlHasNSProp(xmlNodePtr(GElement), name1.CString,name2.CString);
+  name1.free;
+  name2.free;
+  if attr <> nil
+    then xmlRemoveProp(attr);
 end;
 
 function TGDOMElement.getAttributeNodeNS(const namespaceURI, localName: DOMString): IDOMAttr;
@@ -1411,32 +1422,35 @@ begin
     else result:=nil;
   name1.Free;
   name2.Free;}
-  result:=nil;
+  //result:=nil;
+  result:=selectNodes(namespaceURI+'::'+localName);
 end;
 
 function TGDOMElement.hasAttribute(const name: DOMString): WordBool; 
 var
   name1: TGdomString;
 begin
-  {name1:=TGdomString.create(name);
-  result:=GDomeBooleanToBoolean(gdome_el_hasAttribute(GElement,name1.GetPString, @exc));
-  CheckError(exc);
-  name1.Free;}
-  result:=false;
+  name1:=TGdomString.create(name);
+  if xmlGetProp(xmlNodePtr(GElement),name1.CString) <> nil
+    then result:=true
+    else result:=false;
+  name1.free;
 end;
 
 
 function TGDOMElement.hasAttributeNS(const namespaceURI, localName: DOMString): WordBool;
 var
+  temp: string;
   name1,name2: TGdomString;
 begin
-  {name1:=TGdomString.create(namespaceURI);
-  name2:=TGdomString.create(localName);
-  result:=GDomeBooleanToBoolean(gdome_el_hasAttributeNS(GElement,name1.GetPString,name2.GetPString, @exc));
-  CheckError(exc);
-  name1.Free;
-  name2.Free;}
-  result:=false;
+  name2:=TGdomString.create(namespaceURI);
+  name1:=TGdomString.create(localName);
+  if (xmlGetNSProp(xmlNodePtr(GElement),name1.CString,
+    name2.CString)) <> nil
+    then result:=true
+    else result:=false;
+  name1.free;
+  name2.free;
 end;
 
 procedure TGDOMElement.normalize;
@@ -2306,7 +2320,8 @@ begin
       node1:=xmlXPathNodeSetItem(res.nodesetval,0);
     end else
       node1:=nil;
-    xmlXPathFreeObject(res);
+    xmlXPathFreeNodeSetList(res);
+    //xmlXPathFreeObject(res);
     xmlXPathFreeContext(ctxt);
   end;
   result:=MakeNode(node1,FOwnerDocument);
@@ -2334,9 +2349,13 @@ begin
   if res<>nil then  begin
     nodetype:=res.type_;   //1 = nodeset
     if nodetype = 1
-      then result:=TGDOMNodeList.Create(res.nodesetval,FOwnerDocument)
+      then begin
+        nodecount:=res.nodesetval.nodeNr;
+        result:=TGDOMNodeList.Create(res.nodesetval,FOwnerDocument)
+      end
       else result:=nil;
-    xmlXPathFreeObject(res);
+    xmlXPathFreeNodeSetList(res);
+    //xmlXPathFreeObject(res);
     xmlXPathFreeContext(ctxt);
   end else result:=nil;
 end;
