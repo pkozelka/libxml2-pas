@@ -43,6 +43,18 @@ type
       procedure createElementCaseSensitiveTest;
       (* converted from: documentCreateElementDefaultAttr.js *)
       procedure createElementDefaultAttrTest;
+      (* converted from: documentCreateElementMalformedXMLNS.js *)
+      procedure createElementMalformedXMLNSTest;
+      (* converted from: documentCreateElementNullXMLNS.js *)
+      procedure createElementNullXMLNSTest;
+      (* converted from: documentCreateElementXMLNSIllegalName.js *)
+      procedure createElementXMLNSIllegalNameTest;
+      (* converted from: documentCreateELementXMLNSPrefixXML.js *)
+      procedure createELementXMLNSPrefixXMLTest;
+      (* converted from: documentCreateEntityReference.js *)
+      procedure createEntityReferenceTest;
+      (* converted from: documentCreateEntityReferenceKnown.js *)
+      procedure createEntityReferenceKnownTest;
 
   end;
 
@@ -154,7 +166,7 @@ end;
 
 
 (*
- * checks if creating a attribute with a qualified name using illegal chars
+ * checks if creating an attribute with a qualified name using illegal chars
  * results in EDomException etInvalidCharacterErr
 *)
 procedure TDomDocumentFundamentalTests.createAttributeXMLNSIllegalNameTest;
@@ -331,6 +343,150 @@ begin
   check(attrMap.item[0].nodeValue = 'Yes', 'attr.nodeValue <> Yes');
 end;
 
+
+(* creates an element with malformed name *)
+procedure TDomDocumentFundamentalTests.createElementMalformedXMLNSTest;
+var
+  document      : IDomDocument;
+  element       : IDomElement;
+  namespaceURI  : DomString;
+  malformedName : DomString;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  try
+    namespaceURI := 'http://www.ecommerce.org/';
+    malformedName := 'prefix::local';
+    element := document.createElementNS(namespaceURI, malformedName);
+    fail('NAMESPACE_ERR should have been thrown');
+  except
+    on e : EDomException do
+      check(e.code = NAMESPACE_ERR, 'NAMESPACE_ERR should have been thrown');
+  end;
+end;
+
+
+(* creates an element with nil namespacURI but with name *)
+procedure TDomDocumentFundamentalTests.createElementNullXMLNSTest;
+var
+  document      : IDomDocument;
+  element       : IDomElement;
+  namespaceURI  : DomString;
+  qualifiedName : DomString;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  try
+    namespaceURI := '';
+    qualifiedName := 'prefix:local';
+    element := document.createElementNS(namespaceURI, qualifiedName);
+    fail('NAMESPACE_ERR should have been thrown');
+  except
+    on e : EDomException do
+      check(e.code = NAMESPACE_ERR, 'NAMESPACE_ERR should have been thrown');
+  end;
+end;
+
+(*
+ * checks if creating an element with a qualified name using illegal chars
+ * results in EDomException etInvalidCharacterErr
+*)
+procedure TDomDocumentFundamentalTests.createElementXMLNSIllegalNameTest;
+var
+  document      : IDomDocument;
+  element       : IDomElement;
+  qualifiedName : DomString;
+  prefix        : DomString;
+  namespaceURI  : DomString;
+  i             : Integer;
+begin
+  document     := fDomImplementation.createDocument('', '', nil);
+	namespaceURI := 'www.pingpolice.com';
+  prefix       := 'prefix:local';
+  for i := low(DomSetup.illegalChars) to high(DomSetup.illegalChars) do
+  begin
+    try
+      qualifiedName := prefix + DomSetup.illegalChars[i];
+      element := document.createElementNS(namespaceURI, qualifiedName);
+
+      fail('EDomException INVALID_CHARACTER_ERR should have been thrown ' +
+           'but was not');
+    except
+      on e : EDomException do
+        check(e.code = INVALID_CHARACTER_ERR,
+                'INVALID_CHARACTER_ERR should be thrown but was: ' + e.message);
+    end;
+  end;
+end;
+
+
+(*
+ * creates an element with xml prefix and namespace <>
+ * http://www.w3.org/XML/1998/namespace. This should result in NAMESPACE_ERR
+*)
+procedure TDomDocumentFundamentalTests.createELementXMLNSPrefixXMLTest;
+var
+  document      : IDomDocument;
+  element       : IDomElement;
+  namespaceURI  : DomString;
+  qualifiedName : DomString;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  try
+    namespaceURI := 'http://www.w3.org/XML/1998/AnotherNamespace';
+    qualifiedName := 'xml:local';
+    element := document.createElementNS(namespaceURI, qualifiedName);
+    fail('NAMESPACE_ERR should have been thrown');
+  except
+    on e : EDomException do
+      check(e.code = NAMESPACE_ERR, 'NAMESPACE_ERR should have been thrown');
+  end;
+end;
+
+
+(* creates an entity reference and checks its properties *)
+procedure TDomDocumentFundamentalTests.createEntityReferenceTest;
+const
+  ENTITY_NAME = 'SomeEntity';
+var
+  document  : IDomDocument;
+  entityRef : IDomEntityReference;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  entityRef := document.createEntityReference(ENTITY_NAME);
+  check(entityRef.nodeType = ENTITY_REFERENCE_NODE,
+          'nodeType <> ENTITY_REFERENCE_NODE');
+  check(entityRef.nodeName = ENTITY_NAME, 'entity name <> SomeEntity');
+  check(entityRef.nodeValue = '', 'entity nodeValue <> ''''');
+  check(entityRef.childNodes.length = 0, 'entityRef.childNodes.length <> 0');
+end;
+
+
+
+(* creates an entity reference with a known name and checks its properties *)
+procedure TDomDocumentFundamentalTests.createEntityReferenceKnownTest;
+const
+  XML_VALID_DOC =
+         '<?xml version=''1.0''?>' +
+         '  <!DOCTYPE address [' +
+         '  <!ELEMENT address (#PCDATA)>' +
+         '  <!ENTITY ent1 "SomeEntity">' +
+         '  ]>' +
+         '  <address>some text</address>';
+
+  ENTITY_NAME  = 'ent1';
+  ENTITY_VALUE = 'SomeEntity';
+var
+  document  : IDomDocument;
+  entityRef : IDomEntityReference;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  entityRef := document.createEntityReference(ENTITY_NAME);
+  check(entityRef.childNodes.length = 1, 'entityRef.childNodes.length <> 1');
+  check(entityRef.childNodes.item[0].nodeName = '#text',
+          'entity nodeName <> #text');
+  check(entityRef.childNodes.item[0].nodeValue = ENTITY_VALUE,
+          'entity nodeValue <> SomeEntity');
+end;
 
 (******************************************************************************)
 (******************************************************************************)
