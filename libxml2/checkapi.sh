@@ -6,8 +6,7 @@ RELEASE_REV="HEAD"
 
 MYDIR=REV-$RELEASE_REV.tmp
 rm -rf $MYDIR
-
-cvs -d $CVSBASE co -r $RELEASE_REV -d $MYDIR gnome-xml/include/libxml
+cvs -z4 -d $CVSBASE co -r $RELEASE_REV -d $MYDIR gnome-xml/include/libxml
 
 for fn in *.inc; do
 	echo $fn
@@ -21,16 +20,20 @@ for fn in *.inc; do
 	NEWREV=`echo $ENTRY | sed 's/\/\([^\/]*\)\/\([^\/]*\).*/\2/'`
 	CHGDATE=`echo $ENTRY | sed 's/\/\([^\/]*\)\/\([^\/]*\)\/\([^\/]*\).*/\3/'`
 
-	if [ X$REV != X$NEWREV ] ; then
-		echo "    $FILENAME revision changed from $REV to $NEWREV"
-		echo "         (modification date: $CHGDATE)"
-		cmd="cvs -d$CVSBASE rdiff -r $REV -r $RELEASE_REV $CVSREPOS/$FILENAME"
-		echo "    Creating diff file ($MYDIR/$FILENAME.diff) :"
-		echo "    $cmd"
-		$cmd >$MYDIR/$FILENAME.diff
-		cvs -d$CVSBASE log -N -r$REV:$NEWREV $MYDIR/$FILENAME >$MYDIR/$FILENAME.log
+	if [ X$NEWREV = X ] ; then
+		echo "    NOT FOUND IN CVS ENTRIES"
 	else
-		rm $MYDIR/$FILENAME
+		if [ X$REV != X$NEWREV ] ; then
+			echo "    $FILENAME revision changed from $REV to $NEWREV"
+			echo "         (modification date: $CHGDATE)"
+			cmd="cvs -z4 -d$CVSBASE rdiff -r $REV -r $RELEASE_REV $CVSREPOS/$FILENAME"
+			echo "    Creating diff file ($MYDIR/$FILENAME.diff) :"
+			echo "    $cmd"
+			$cmd >$MYDIR/$FILENAME.diff
+			cvs -z4 -d$CVSBASE log -N -r$REV:$NEWREV $MYDIR/$FILENAME >$MYDIR/$FILENAME.log
+		else
+			rm $MYDIR/$FILENAME
+		fi
 	fi
 
 #	echo LINE=$LINE
