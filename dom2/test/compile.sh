@@ -21,7 +21,7 @@ myUnitPath=$myUnitPath:$LIBXML2_PAS/../dunit/dunit/src
 DELPHI_HOME=`cygpath -u 'F:\sw\Borland\Delphi50'`
 DCC=$DELPHI_HOME/Bin/dcc32.exe
 
-PasCompile DomTestSuite.dpr $myUnitPath:$DELPHI_HOME/Lib
+PasCompile DomTestSuite.dpr $myUnitPath
 
 # D6
 DELPHI_HOME=`cygpath -u 'F:\sw\Borland\Delphi6'`
