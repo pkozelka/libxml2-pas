@@ -9,9 +9,10 @@
 # - convert hardcoded parts into script arguments
 # - make it more generic, so that it can later be usable for libxslt
 # - autodetect source of DLL symbols
+# - polish, brush, beautify :-)
 #
 # NOTES:
-# - this script expects the file libxml2.def in current directory
+# - this script expects the file libxml2.def.src in current directory
 # - the output displays symbols missing in the Pascal implementation at the left side, and symbols missing in the library on the right.
 
 
@@ -22,7 +23,10 @@ grep "external LIBXML2_SO;" PASSYMBOLS.tmp | sed "s/[a-zA-Z][a-zA-Z]*[[:space:]]
 rm PASSYMBOLS.tmp
 
 # libxml2.def version
-grep -v " DATA" libxml2.def | grep '^[[:space:]][[:alpha:]]' | sed "s/ //g" | sed "s/[[:space:]]*\([[:alnum:]]*\).*/\1/" | sort -u >DLLSYMBOLS.txt
+#grep -v " DATA" libxml2.def | grep '^[[:space:]][[:alpha:]]' | sed "s/ //g" | sed "s/[[:space:]]*\([[:alnum:]]*\).*/\1/" | sort -u >DLLSYMBOLS.txt
+
+# libxml2.def.src version
+grep -v " DATA" libxml2.def.src | grep '^[[:space:]][[:alnum:]]*$' | sed "s/ //g" | sed "s/[[:space:]]*\([[:alnum:]]*\).*/\1/" | sort -u >DLLSYMBOLS.txt
 
 # DUMPBIN version - shows variables
 #grep '^[[:space:]]\{6,\}[[:digit:]]\{1,\}[[:space:]]\{1,\}[[:digit:]]' libxml2.dll.txt \
