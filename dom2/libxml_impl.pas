@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.2 2002-02-11 00:30:04 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.3 2002-02-11 19:11:22 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -103,6 +103,19 @@ type
   private
     FGDOMImpl: IDomImplementation;
     function  GetFlyingNodes: TList;
+  protected //IDomNode
+    function  get_nodeName: DomString;
+    function  IDomNode.get_nodeValue = returnEmptyString;
+    procedure set_nodeValue(const value: DomString);
+    function  get_nodeType: DOMNodeType;
+    function  IDomNode.get_childNodes = returnChildNodes;
+    function  IDomNode.get_parentNode = returnNullDomNode;
+    function  IDomNode.get_previousSibling = returnNullDomNode;
+    function  IDomNode.get_nextSibling = returnNullDomNode;
+    function  get_ownerDocument: IDomDocument; override;
+    function  IDomNode.get_namespaceURI = returnEmptyString;
+    function  IDomNode.get_prefix = returnEmptyString;
+    function  IDomNode.get_localName = returnEmptyString;
   protected //IDomDocument
     function  get_domImplementation: IDomImplementation;
   protected //
@@ -732,6 +745,26 @@ begin
 //TODO!    FGDOMImpl := TGDOMImplementation.getInstance(DEFAULT_IMPL_FREE_THREADED);
   end;
   Result := FGDOMImpl;
+end;
+
+function TLDOMDocument.get_nodeName: DomString;
+begin
+  Result := '#document';
+end;
+
+function TLDOMDocument.get_nodeType: DOMNodeType;
+begin
+  Result := DOCUMENT_NODE;
+end;
+
+function TLDOMDocument.get_ownerDocument: IDomDocument;
+begin
+  Result := nil; // required by DOM spec.
+end;
+
+procedure TLDOMDocument.set_nodeValue(const value: DomString);
+begin
+  DomAssert(False, NO_MODIFICATION_ALLOWED_ERR);
 end;
 
 end.
