@@ -24,6 +24,7 @@ unit jkDomTest;
 }
 
 interface
+{$DEFINE NodeTypeInteger}
 
 uses dom2,libxmldom,msxml_impl; // IDOMIMplementation, IDOMDocument
 
@@ -293,11 +294,11 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     node := nil;
 
     node := document.documentElement as IDOMNode;
-    test('node.nodeType (ELEMENT_NODE)',(node.nodeType = ntELEMENTNODE));
+    test('node.nodeType (ELEMENT_NODE)',(node.nodeType = ELEMENT_NODE));
     node := nil;
 
     node := document as IDOMNode;
-    test('node.nodeType (DOCUMENT_NODE)',(node.nodeType = ntDOCUMENTNODE));
+    test('node.nodeType (DOCUMENT_NODE)',(node.nodeType = DOCUMENT_NODE));
     node := nil;
 
     //p=1
@@ -324,7 +325,7 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
 
     //P=1
     for i := 0 to node.childNodes.length-1 do begin
-      if node.childNodes[i].nodeType = ntTEXTNODE then begin
+      if node.childNodes[i].nodeType = TEXT_NODE then begin
          test('node.nodeValue of TEXT_NODE (get)',(node.childNodes[i].nodeValue = 'abc')) ;
          node.childNodes[i].nodeValue := 'def';
          test('node.nodeValue of TEXT_NODE (set)',(node.childNodes[i].nodeValue = 'def')) ;
@@ -405,7 +406,7 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     temp:='';
     node:=document.documentElement as IDOMNode;
       for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = ntTEXTNODE then begin
+        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
           childnode := node.firstChild.childNodes[i].cloneNode(True);
           Break;
         end;
@@ -413,13 +414,13 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
       node.firstChild.appendChild(childnode);
       //node.firstChild.appendChild(childnode);
       for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = ntTEXTNODE then begin
+        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
           temp:=temp+node.firstChild.childNodes[i].nodeValue;
         end;
       end;
       node.firstChild.normalize;
       for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = ntTEXTNODE then begin
+        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
           test('node.normalize',node.firstChild.childNodes[i].nodeValue=temp);
           //outLog('text after normalize: '+node.firstChild.childNodes[i].nodeValue);
         end;
@@ -663,14 +664,14 @@ begin
   attlist := document.documentElement.firstChild.attributes;
   node := attlist.item[0];
   attlist := nil;
-  test('namedNodeMap.item[i].nodeType = ATTRIBUTE_NODE (attributes)',(node.nodeType = ntATTRIBUTENODE)) ;
+  test('namedNodeMap.item[i].nodeType = ATTRIBUTE_NODE (attributes)',(node.nodeType = ATTRIBUTE_NODE)) ;
   attr := node as IDOMAttr;
   node := nil;
   test('attribute-interface of node',(attr <> nil)) ;
   test('attribute.name',(attr.name = 'name')) ;
   test('attribute.value',(attr.value = '1st child of DocumentElement')) ;
   test('attribute.specified',attr.specified) ;
-  test('attribute.nodeType = ATTRIBUTE_NODE',(attr.nodeType = ntATTRIBUTENODE)) ;
+  test('attribute.nodeType = ATTRIBUTE_NODE',(attr.nodeType = ATTRIBUTE_NODE)) ;
   attr := nil;
   element := document.documentElement.firstChild as IDOMElement;
   test('element.hasAttribute',element.hasAttribute('name')) ;
