@@ -1,0 +1,10 @@
+
+Version 2.4.14:
+---------------
+- API adjusted to match libxml2-2.4.14
+- added support for extension handling
+- comments changed to look exactly as in original
+- TAB indentation changed to 2 spaces
+- added iconv.pas translation, as work in progress
+- added unit libxml2_experimental to allow having Pascal integration experiments under revision control
+- all implementation functionality is now in the main file, libxml2.pas
