@@ -3,7 +3,7 @@
 {$MAXSTACKSIZE $00100000}
 {$IMAGEBASE $00400000}
 {$APPTYPE GUI}
-unit domimpl;
+unit msxml_dom_impl;
 (**
  * This unit is an object-oriented wrapper for libxml2.
  * Object interfaces are fully compatitable with those defined by MSXML DOM.
@@ -18,7 +18,7 @@ uses
 	Variants,
 {$endif}
 	libxml2,
-	MSXML_TLB,
+	msxml_libxml,
 	Classes;
 
 type

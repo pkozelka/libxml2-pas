@@ -1,4 +1,4 @@
-unit MSXML_TLB;
+unit msxml_libxml;
 
 {$TYPEDADDRESS OFF} // Unit must be compiled without type-checked pointers.
 interface
@@ -987,7 +987,7 @@ implementation
 
 uses
 	libxml2,
-	domimpl;
+	msxml_dom_impl;
 
 { CoDOMDocument }
 
