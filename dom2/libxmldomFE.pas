@@ -3,7 +3,7 @@ unit libxmldom;
 {
    ------------------------------------------------------------------------------
    This unit is an object-oriented wrapper for libxml2.
-   It implements the interfaces defined in xdom2.pas.
+   It implements the interfaces defined in idom2.pas.
 
    Original author:
    Uwe Fechner <ufechner@4commerce.de>
@@ -43,10 +43,10 @@ unit libxmldom;
 // see tests_libxml2.txt
 
 // Partly supported by libxml2:
-// IDOMPersist
+// IDOMPersist, IDOMNodeEx
 //
 // Not Supported by libxml2:
-// IDOMNodeEx, IDOMParseError (extended interfaces, not part of dom-spec)
+// IDOMParseError (extended interface, not part of dom-spec)
 
 
 interface
