@@ -1,6 +1,7 @@
 TEMPORARY NOTE:
+---------------
 - special build of libxml2.dll is needed to work with this release. 
-You will find it at 
+You will find it at http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/libxml2-pas/libxml2/Attic/libxml2.zip?rev=1.2
 
 Delphi-Headers for libxml2
 ==========================
