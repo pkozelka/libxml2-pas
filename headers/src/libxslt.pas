@@ -45,6 +45,7 @@ type
 {$I libxslt_templates.inc}
 {$I libxslt_imports.inc}
 {$I libxslt_variables.inc}
+{-$I libxslt_security.inc}
 
 {TODO: $I  libxslt_xsltconfig.inc}
 
