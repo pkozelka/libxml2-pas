@@ -15,6 +15,11 @@ libxslt
 utils
 utils/dunit
 
+Under Project->Options you have to define the following 
+conditionals:
+
+FE
+WITHOUT_IDOM_EXPERIMENTAL
 
 Have fun!
 
