@@ -12,7 +12,10 @@ kamerbalken 10-14
 {$APPTYPE CONSOLE}
 
 uses
-  SysUtils,TestXPATH;
+  SysUtils,
+  TestXPATH,
+  conapp in 'conapp.pas',
+  libxml2 in '../../../libxml2/libxml2.pas';
 
 begin
   writeln;
@@ -22,10 +25,12 @@ begin
   writeln;
   if paramcount=0 then begin
     writeln('Usage:');
-    writeln('demo1 <xml-filename> <xpath-expression>');
+    writeln('Demo1 <xml-filename> <xpath-expression>');
     writeln;
-    writeln('For example:');
-    writeln('demo1 calServer.xml //remark');
+    writeln('    For example:');
+    writeln('    Demo1 calServer.xml //remark');
+    writeln('or: Demo1 calServer.xml "count(//remark)"');
+    writeln('');
   end
   else
     if paramcount = 2 then begin

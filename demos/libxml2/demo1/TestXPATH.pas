@@ -15,7 +15,7 @@ procedure test1(filename, expr: string);
 
 implementation
 
-uses libxml2,MicroTime,conApp,SysUtils;
+uses libxml2,MicroTime,conapp,SysUtils;
 
 procedure test1(filename, expr: string);
 // An Example Programm for the use of XPATH-expressions

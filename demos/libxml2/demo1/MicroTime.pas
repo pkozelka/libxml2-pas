@@ -40,23 +40,27 @@ interface
 
 implementation
 
+
+{$IFDEF WIN32}
 USES
-
   windows,MMSystem;
+{$ELSE}
+USES
+  sysutils,libc;
+{$ENDIF}
 
 
-
-//Type TLargeInteger= LongInt;
-
-
-{  type TLargeInteger = record
-    case Integer of
-    0: (
-      LowPart: DWORD;
-      HighPart: Longint);
-    1: (
-      QuadPart: LONGLONG);
-  end;}
+{$IFDEF LINUX}
+  type TLargeInteger = Extended;
+  //type TLargeInteger = record
+  //  case Integer of
+  //  0: (
+  //    LowPart: DWORD;
+  //    HighPart: Longint);
+  //  1: (
+  //    QuadPart: LONGLONG);
+  //end;
+{$ENDIF}
 
 VAR
 
@@ -80,21 +84,27 @@ END;   (* TimeOK  *)
 
 FUNCTION CurrentTime : DOUBLE;
 (* returns the elapsed time in seconds since the unit was started.
-   
+
    To time some event, call this before the event starts, and
-   again after the event ends. Subtract the times to get the elapsed 
+   again after the event ends. Subtract the times to get the elapsed
    time in seconds between the 2 events.
 
-   Returns a negative value if there is a problem or if the 
+   Returns a negative value if there is a problem or if the
    time can't be read on the current system.
 *)
 VAR
   t : TLargeInteger;
 
 BEGIN  (* CurrentTime  *)
-  IF timerOK AND QueryPerformanceCounter( t ) THEN
-    result := (t - startTime) * spt
-  ELSE
+{$IFDEF WIN32}
+  IF timerOK AND QueryPerformanceCounter( t ) THEN begin
+{$ELSE}
+  IF timerOK then begin
+    //t:=(now());
+    t:=clock();
+{$ENDIF}
+    result := (t - startTime) * spt;
+  END ELSE
     result := -1.0;
 END;   (* CurrentTime  *)
 
@@ -123,14 +133,20 @@ END;   (* TimeResolution  *)
 PROCEDURE InitTimeValues;
 
 BEGIN  (* InitTimeValues *)
+{$IFDEF WIN32}
   timerOK := FALSE;
-  IF (QueryPerformanceFrequency( ticksPerSecond )) AND 
+  IF (QueryPerformanceFrequency( ticksPerSecond )) AND
      ( ticksPerSecond > 1 ) THEN
     BEGIN
-      spt := 1.0 / ticksPerSecond;   
+      spt := 1.0 / ticksPerSecond;
       IF QueryPerformanceCounter( startTime ) THEN
         timerOK := TRUE;
     END;
+{$ELSE}
+  timerOK := true;
+  spt:=1/CLOCKS_PER_SEC;
+  ticksPerSecond:=CLOCKS_PER_SEC
+{$ENDIF}
 END;   (* InitTimeValues *)
 
 
@@ -138,7 +154,9 @@ END;   (* InitTimeValues *)
 INITIALIZATION
 
   BEGIN
-    timeBeginPeriod( 1 );
+    {$IFDEF WIN32}
+      timeBeginPeriod( 1 );
+    {$ENDIF}
     InitTimeValues;
   END;
 
@@ -147,7 +165,9 @@ INITIALIZATION
 FINALIZATION
 
   BEGIN
-    timeEndPeriod( 1 );
+    {$IFDEF WIN32}
+      timeEndPeriod( 1 );
+    {$ENDIF}
   END;
 
 
