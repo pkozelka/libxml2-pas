@@ -1,5 +1,5 @@
 unit libxml2_experimental;
-//$Id: libxml2_experimental.pas,v 1.3 2002-02-18 20:32:32 pkozelka Exp $
+//$Id: libxml2_experimental.pas,v 1.4 2002-02-18 20:37:51 pkozelka Exp $
 (**
  * Title:        libxml2 experimental unit
  * Description:  Contains experimental code for support or development of libxml2
@@ -36,7 +36,6 @@ begin
   if Assigned(myErrH) then begin
     myErrH(msg);
   end;
-  Writeln(StrPas(msg));
 {$IFDEF WIN32}
   OutputDebugString(msg);
 {$ENDIF}
