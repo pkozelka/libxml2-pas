@@ -32,8 +32,10 @@ function copySourceFilesToDist()
 	# copy files to be released there
 	mkdir $DIST/src
 	cp $SRC/*.inc $SRC/*.pas $DIST/src
-	cp $SRC/libxml2_pas.dpk $DIST/src/libxml2_pas_$LIBXML_MAJOR_VERSION'_
-	'$LIBXML_MINOR_VERSION'_'$LIBXML_MICRO_VERSION.dpk
+	local pkgName="libxml2_pas_$LIBXML_MAJOR_VERSION"_"$LIBXML_MINOR_VERSION"_"$LIBXML_MICRO_VERSION"
+sed -f - $SRC/libxml2_pas.dpk >$DIST/src/$pkgName.dpk <<EOF
+s/package libxml2_pas;/package $pkgName;/
+EOF
 	cp $HEADERS_DIR/*.txt $DIST
 	cp $HEADERS_DIR/../common/license/COPYING* $DIST
 
