@@ -65,7 +65,7 @@ uses
 
 const
 
-  SLIBXML = 'LIBXML';  { Do not localize }
+  SLIBXML = 'LIBXML_4CT';  { Do not localize }
 
 type
 
