@@ -5,8 +5,7 @@ libxml2-pas is translation of the header files into Pascal language.
 
 AUTHORS
 -------
-Petr Kozelka <pkozelka@email.cz>	-  original header translations
-Uwe Fechner <ufechner@4commerce.de>	-  testing, demo application(s)
+Uwe Fechner <ufechner@4commerce.de>	-  original header translations
 
 
 VERSION COMPLIANCE
