@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.32 2002-01-14 21:43:04 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.33 2002-01-14 21:58:35 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -72,18 +72,13 @@ type
 
 	{ IXMLDOMNodeRef }
 
-	IXMLDOMNodeRef = interface
-	['{7787A532-C8C8-4F3C-9529-29098FE954B0}']
-		function GetGDOMNode: xmlNodePtr;
-	end;
-
 	TGDOMNodeClass = class of TGDOMNode;
 
-	TGDOMNode = class(TGDOMInterface, IDOMNode, IXMLDOMNodeRef, IDOMNodeSelect)
+	TGDOMNode = class(TGDOMInterface, IDOMNode, ILibXml2Node, IDOMNodeSelect)
 	private
 		FGNode: xmlNodePtr;
 	protected //IXMLDOMNodeRef
-		function  GetGDOMNode: xmlNodePtr;
+		function  LibXml2NodePtr: xmlNodePtr;
 	protected //IDOMNode
 		function  get_nodeName: DOMString;
 		function  get_nodeValue: DOMString;
@@ -476,11 +471,12 @@ begin
 	Result := obj;
 end;
 
-function GetGNode(const Node: IDOMNode): xmlNodePtr;
+function GetGNode(const aNode: IDOMNode): xmlNodePtr;
 begin
-	if not Assigned(Node) then
+	if not Assigned(aNode) then begin
 		raise EDOMException.Create(SNodeExpected);
-	Result := (Node as IXMLDOMNodeRef).GetGDOMNode;
+	end;
+	Result := (aNode as ILibXml2Node).LibXml2NodePtr;
 end;
 
 function ErrorString(err:integer):string;
@@ -632,24 +628,24 @@ end;
 // TGDomeNode Implementation
 // *************************************************************
 
-function TGDOMNode.GetGDOMNode: xmlNodePtr;
+function TGDOMNode.LibXml2NodePtr: xmlNodePtr;
 begin
-	result:=FGNode;
+	Result := FGNode;
 end;
 
 // IDOMNode
 function TGDOMNode.get_nodeName: DOMString;
 begin
 	case FGNode.type_ of
-		XML_HTML_DOCUMENT_NODE,
-		XML_DOCB_DOCUMENT_NODE,
-		XML_DOCUMENT_NODE:
-			Result := '#document';
-		XML_TEXT_NODE,
-		XML_CDATA_SECTION_NODE,
-		XML_COMMENT_NODE,
-		XML_DOCUMENT_FRAG_NODE:
-			Result := '#'+UTF8Decode(FGNode.name);
+	XML_HTML_DOCUMENT_NODE,
+	XML_DOCB_DOCUMENT_NODE,
+	XML_DOCUMENT_NODE:
+		Result := '#document';
+	XML_TEXT_NODE,
+	XML_CDATA_SECTION_NODE,
+	XML_COMMENT_NODE,
+	XML_DOCUMENT_FRAG_NODE:
+		Result := '#'+UTF8Decode(FGNode.name);
 	else
 		Result := UTF8Decode(FGNode.name);
 		if (FGNode.ns<>nil) and (FGNode.ns.prefix<>nil) then begin
@@ -692,7 +688,7 @@ begin
 			xmlNodeSetContent(FGNode, PChar(UTF8Encode(value)));
 		end;
 	else
-		//todo: raise exception
+		//todo: raise exception - this node does not carry a value
 	end;
 end;
 
