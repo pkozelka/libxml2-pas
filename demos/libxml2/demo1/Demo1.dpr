@@ -14,8 +14,7 @@ kamerbalken 10-14
 uses
   SysUtils,
   TestXPATH,
-  conapp in 'conapp.pas',
-  libxml2 in '../../../libxml2/libxml2.pas';
+  conapp in 'conapp.pas';
 
 begin
   writeln;
