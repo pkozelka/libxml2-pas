@@ -5,7 +5,11 @@ interface
 uses
   TestFrameWork,
   TestExtensions,
-  libxmldom,
+  {$ifdef FE}
+    libxmldomFE,
+  {$else}
+    libxmldom,
+  {$endif}
   idom2,
   SysUtils,
   XPTest_idom2_Shared,

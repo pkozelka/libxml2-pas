@@ -5,7 +5,11 @@ interface
 uses
   IniFiles,
   domSetup,
-  libxmldom,
+  {$ifdef FE}
+    libxmldomFE,
+  {$else}
+    libxmldom,
+  {$endif}
   idom2,
   sysutils,
   strutils,
@@ -196,9 +200,13 @@ end;
 function myIsSameNode(node1, node2: IDomNode): boolean;
   // compare if two nodes are the same (not equal)
 begin
+  {$ifdef FE}
   if (domvendor = 'LIBXML_4CT')
     then Result := (node1 as IDomNodeCompare).IsSameNode(node2)
     else Result := ((node1 as IUnknown) = (node2 as IUnknown));
+  {$else}
+  Result := ((node1 as IUnknown) = (node2 as IUnknown));
+  {$endif}
 end;
 
 { TMemoryTestCase }

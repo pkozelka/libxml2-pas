@@ -4,7 +4,11 @@ interface
 
 uses
   TestFrameWork,
-  libxmldom,
+  {$ifdef FE}
+    libxmldomFE,
+  {$else}
+    libxmldom,
+  {$endif}
   idom2,
   SysUtils,
   XPTest_idom2_Shared,
@@ -338,7 +342,9 @@ begin
       tmp1:=Unify(tmp1,false);
       //showMessage(tmp+CRLF+tmp1);
       check(tmp=tmp1,'encoding error');
+      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='iso-8859-1','wrong parsed encoding');
+      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -369,7 +375,9 @@ begin
       tmp1:=Unify(tmp1,false);
       //showMessage(tmp+CRLF+tmp1);
       check(tmp<>tmp1,'encoding error');
+      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='','wrong parsed encoding');
+      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -396,14 +404,18 @@ begin
     try
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
+      {$ifdef FE}
       (doc as IDomOutputOptions).encoding:='utf-8';
+      {$endif}
       tmp1:= (doc as IDomPersist).xml;
       tmp1:=UTF8Decode(tmp1);
       tmp1:=Unify(tmp1);
       tmp:=Unify(tmp);
       //showMessage(tmp+CRLF+tmp1);
       check(tmp=tmp1,'encoding error');
+      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='iso-8859-1','wrong parsed encoding');
+      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -431,7 +443,9 @@ begin
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
       if FileExists('temp.xml') then DeleteFile('temp.xml');
+      {$ifdef FE}
       (doc as IDomOutputOptions).encoding:='utf-8';
+      {$endif}
       (doc as IDomPersist).save('temp.xml');
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
@@ -440,7 +454,9 @@ begin
       tmp1:=Unify(tmp1);
       tmp:=Unify(tmp);
       check(tmp=tmp1,'encoding error');
+      {$ifdef FE}
       check((doc as IDomOutputOptions).parsedEncoding='utf-8','wrong parsed encoding');
+      {$endif}
     finally
       if FileExists('temp.xml') then DeleteFile('temp.xml');
     end;
@@ -469,7 +485,9 @@ begin
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
       if FileExists('temp.xml') then DeleteFile('temp.xml');
+      {$ifdef FE}
       (doc as IDomOutputOptions).prettyPrint:=true;
+      {$endif}
       (doc as IDomPersist).save('temp.xml');
       sl := TStringList.Create;
       sl.LoadFromFile('temp.xml');
@@ -505,7 +523,9 @@ begin
       (doc as IDomParseOptions).preserveWhiteSpace:=false;
       ok:=(doc as IDomPersist).load('temp.xml');
       check(ok,'parse error');
+      {$ifdef FE}
       (doc as IDomOutputOptions).prettyPrint:=true;
+      {$endif}
       tmp1:= (doc as IDomPersist).xml;
       //tmp1:=Unify(tmp1);
       //tmp:=Unify(tmp);

@@ -4,7 +4,11 @@ interface
 
 uses
   TestFrameWork,
-  libxmldom,
+  {$ifdef FE}
+    libxmldomFE,
+  {$else}
+    libxmldom,
+  {$endif}
   idom2,
   domSetup,
   SysUtils,
@@ -34,8 +38,10 @@ type
     procedure CreateDocumentFragment10000Times;
     procedure CreateTextNode10000Times;
     procedure AppendElement10000Times;
+    {$ifdef FE}
     procedure xsltTransformToString1000Times;
     procedure xsltTransformToDoc1000Times;
+    {$endif}
     procedure jkTestDocument;
     procedure jkTestElement;
     procedure jkNamedNodemap;
@@ -1103,7 +1109,7 @@ begin
     end;
   end;
 end;
-
+{$ifdef FE}
 procedure TTestMemoryLeaks.xsltTransformToString1000Times;
 var
   Text:     widestring;
@@ -1115,6 +1121,7 @@ var
   persist:  IDomPersist;
   delement: IDomElement;
   exNode:   IDomNodeExt;
+
 begin
   for i := 1 to 1000 do begin
     // apply a stylesheet that produces html-output
@@ -1172,5 +1179,6 @@ begin
     Text := '';
   end;
 end;
+{$endif}
 
 end.

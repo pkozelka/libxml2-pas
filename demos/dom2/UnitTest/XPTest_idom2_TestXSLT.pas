@@ -4,7 +4,11 @@ interface
 
 uses
   TestFrameWork,
-  libxmldom,
+  {$ifdef FE}
+    libxmldomFE,
+  {$else}
+    libxmldom,
+  {$endif}
   idom2,
   SysUtils,
   domSetup,
