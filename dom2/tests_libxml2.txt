@@ -9,17 +9,17 @@ class                       method                 importance    ok     remark
 attr                        name                   1             X                                                                
 attr                        specified              3             X      more tests neccessary                                                          
 attr                        value                  1             X      test again, please                                                                 
-characterData               appendData             3                                                                             
-characterData               deleteData             3                                                                             
+characterData               appendData             3             X                                                                
+characterData               deleteData             3             X                                                                
 characterData               Data                   2             X                                                                
-characterData               Length                 2                                                                             
-characterData               insertData             3                                                                             
-characterData               replaceData            3                                                                             
+characterData               Length                 2             X                                                                
+characterData               insertData             3             X                                                                
+characterData               replaceData            3             X                                                                
 document                    createAttribute        1             X                                                                
 document                    createAttributeNS      1             X                                                                
 document                    createElement          1             X                                                                
 document                    createElementNS        1             X                                                                
-document                    createCDATASection     2                                                                             
+document                    createCDATASection     2             X                                                                
 document                    createComment          2                                                                             
 document                    createDocumentFragment 3                                                                             
 document                    createEntityReference  3                                                                             
@@ -112,4 +112,4 @@ Summary:
 43 high priority methods
 all done
 
-59 methods done totally       
+67 methods done totally       

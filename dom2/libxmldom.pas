@@ -1606,23 +1606,21 @@ begin
     else result:=nil;}
 end;
 
-function TGDOMDocument.createCDATASection(const data: DOMString): IDOMCDATASection; 
+function TGDOMDocument.createCDATASection(const data: DOMString): IDOMCDATASection;
 var
-  exc:GdomeException;
-  data1: TGdomString;
-  //ASection: PGdomeCDATASection;
+  name1: TGdomString;
+  node: xmlNodePtr;
 begin
-  {data1:=TGdomString.create(data);
-  ASection:=gdome_doc_createCDATASection(FPGdomeDoc,data1.GetPString,@exc);
-  CheckError(exc);
-  data1.free;
-  if ASection <> nil
-    then result:=TGDOMCDATASection.Create(PGdomeCharacterData(ASection),self)
-    else result:=nil;}
+  name1:=TGdomString.create(data);
+  node := xmlNewCDataBlock(FPGdomeDoc, name1.CString, length(name1.CString));
+  name1.Free;
+  if node<>nil
+    then result:=TGDOMCDataSection.Create(node,self)
+    else result:=nil;
 end;
 
 function TGDOMDocument.createProcessingInstruction(const target,
-  data: DOMString): IDOMProcessingInstruction; 
+  data: DOMString): IDOMProcessingInstruction;
 var
   exc:GdomeException;
   name1,name2: TGdomString;
@@ -1967,39 +1965,26 @@ end;
 
 procedure TGDOMCharacterData.appendData(const data: DOMString);
 var
-  exc:GdomeException;
   value1: TGdomString;
 begin
-  {value1:=TGdomString.create(data);
-  gdome_cd_appendData(GCharacterData,value1.GetPString,@exc);
-  CheckError(exc);
-  value1.free;}
+  value1:=TGdomString.create(data);
+  xmlNodeAddContent(GetGCharacterData, value1.CString);
+  value1.free;
 end;
 
 procedure TGDOMCharacterData.deleteData(offset, count: Integer);
-var
-  exc:GdomeException;
 begin
-  {gdome_cd_deleteData(GCharacterData,offset,count,@exc);
-  CheckError(exc);}
+  replaceData(offset, count, '');
 end;
 
 function TGDOMCharacterData.get_data: DOMString;
-var
-  temp:PGdomeDomString;
-  exc: GdomeException;
-  t1: xmlNodePtr;
 begin
-  t1:=GCharacterData;
-  temp:=libxmlStringToString(t1.content);
-  result:=temp;
+  result:= inherited get_nodeValue;
 end;
 
 function TGDOMCharacterData.get_length: Integer;
-var exc: GdomeException;
 begin
-  //Result := gdome_cd_length(GCharacterData,@exc);
-  //CheckError(exc);
+  result:=length(get_data);
 end;
 
 function TGDOMCharacterData.GetGCharacterData: PGDomeCharacterData;
@@ -2010,36 +1995,28 @@ end;
 procedure TGDOMCharacterData.insertData(offset: Integer;
   const data: DOMString);
 var
-  exc:GdomeException;
   value1: TGdomString;
 begin
-  {value1:=TGdomString.create(data);
-  gdome_cd_insertData(GCharacterData,offset,value1.GetPString,@exc);
-  CheckError(exc);
-  value1.free;}
+  value1:=TGdomString.create(data);
+  replaceData(offset, 0, data);
+  value1.free;
 end;
 
 procedure TGDOMCharacterData.replaceData(offset, count: Integer;
   const data: DOMString);
 var
-  exc:GdomeException;
-  value1: TGdomString;
+  s1,s2,s: WideString;
 begin
-  {value1:=TGdomString.create(data);
-  gdome_cd_replaceData(GCharacterData,offset,count,value1.GetPString,@exc);
-  CheckError(exc);
-  value1.free;}
+  s := Get_data;
+  s1:= Copy(s, 1, offset);
+  s2:= Copy(s, offset + count+1, Length(s)-offset-count);
+  s := s1 + data + s2;
+  Set_data(s);
 end;
 
 procedure TGDOMCharacterData.set_data(const data: DOMString);
-var
-  exc:GdomeException;
-  value1: TGdomString;
 begin
-  {value1:=TGdomString.create(data);
-  gdome_cd_set_Data(GCharacterData,value1.GetPString,@exc);
-  CheckError(exc);
-  value1.free;}
+ inherited set_nodeValue(data);
 end;
 
 function TGDOMCharacterData.substringData(offset,
@@ -2063,9 +2040,6 @@ destructor TGDOMCharacterData.destroy;
 var exc: GdomeException;
 begin
   inherited destroy;
-  {gdome_cd_unref(GCharacterData,@exc);
-  CheckError(exc);
-  inherited destroy;}
 end;
 
 { TGDOMText }
