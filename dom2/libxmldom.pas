@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.49 2002-01-16 16:02:51 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.50 2002-01-16 17:45:49 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ type
 		function  get_previousSibling: IDOMNode;
 		function  get_nextSibling: IDOMNode;
 		function  get_attributes: IDOMNamedNodeMap;
-		function  get_ownerDocument: IDOMDocument;
+		function  get_ownerDocument: IDOMDocument; virtual;
 		function  get_namespaceURI: DOMString;
 		function  get_prefix: DOMString;
 		procedure set_Prefix(const prefix : DomString);
@@ -158,21 +158,29 @@ type
 
 	{ TGDOMAttr }
 
-	TGDOMAttr = class(TGDOMNode, IDOMAttr)
+	TGDOMAttr = class(TGDOMNode,
+		IDomNode,
+		IDomAttr)
 	private
 		//ns:
-		function GetGAttribute: xmlAttrPtr;
+		function  GetGAttribute: xmlAttrPtr;
+		function  noDomNode: IDomNode;
 	protected //IDomNode
-		function  IDomAttr.get_nodeValue = get_value;
-		procedure IDomAttr.set_nodeValue = set_value;
+		function  IDomNode.get_nodeValue = get_value;
+		procedure IDomNode.set_nodeValue = set_value;
+		function  IDomNode.get_parentNode = noDomNode;
+		function  IDomNode.get_firstChild = noDomNode;
+		function  IDomNode.get_lastChild = noDomNode;
+		function  IDomNode.get_previousSibling = noDomNode;
+		function  IDomNode.get_nextSibling = noDomNode;
 	protected //IDomAttr
 	protected
 		{ Property Get/Set }
-		function get_name: DOMString;
-		function get_specified: Boolean;
-		function get_value: DOMString;
+		function  get_name: DOMString;
+		function  get_specified: Boolean;
+		function  get_value: DOMString;
 		procedure set_value(const attributeValue: DOMString);
-		function get_ownerElement: IDOMElement;
+		function  get_ownerElement: IDOMElement;
 		{ Properties }
 		property name: DOMString read get_name;
 		property specified: Boolean read get_specified;
@@ -315,7 +323,9 @@ type
 		FresolveExternals: boolean;   //difficult to support
 		Fvalidate: boolean;           //check if default is ok
 		FFlyingNodes: TList;          // list of nodes not attached to the document tree
-	protected // IDOMDocument
+	protected //IDomNode
+		function  get_ownerDocument: IDOMDocument; override;
+	protected //IDomDocument
 		function  get_doctype: IDOMDocumentType;
 		function  get_domImplementation: IDOMImplementation;
 		function  get_documentElement: IDOMElement;
@@ -1251,9 +1261,7 @@ end;
 
 function TGDOMAttr.get_ownerElement: IDOMElement;
 begin
-	DomAssert(false, NOT_SUPPORTED_ERR);
-	//DOMVendorNotSupported('get_ownerElement', SGXML); { Do not localize }
-	Result := nil;
+	Result := GetDOMObject(FGNode.parent) as IDomElement;
 end;
 
 function TGDOMAttr.get_specified: Boolean;
@@ -1959,6 +1967,15 @@ begin
 	DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
+(**
+ * This function implements null return value for all the traversal functions
+ * where null is required by DOM spec. in Attr interface 
+ *)
+function TGDOMAttr.noDomNode: IDOMNode;
+begin
+	Result := nil;
+end;
+
 { TGDOMCharacterData }
 
 procedure TGDOMCharacterData.appendData(const data: DOMString);
@@ -2374,6 +2391,11 @@ begin
 	doc := xmlNewDoc(XML_DEFAULT_VERSION);
 
 	SetGDoc(doc);
+end;
+
+function TGDOMDocument.get_ownerDocument: IDOMDocument;
+begin
+	Result := nil; // required by DOM spec.
 end;
 
 initialization
