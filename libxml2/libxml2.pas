@@ -23,6 +23,9 @@ const
 {$ifdef WIN32}
   LIBXML2_SO = 'libxml2.dll';
 {$endif}
+{$ifdef LINUX}
+  LIBXML2_SO = 'libxml2.so';
+{$endif}
 
 //{$WEAKPACKAGEUNIT}
 
@@ -172,20 +175,23 @@ end;
 procedure InitExportedVar;
 {$ifdef WIN32}
 begin
-  xmlDoValidityCheckingDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
+  xmlDoValidityCheckingDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)),
+   'xmlDoValidityCheckingDefaultValue');
   Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
-  xmlSubstituteEntitiesDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
+  xmlSubstituteEntitiesDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)),
+   'xmlSubstituteEntitiesDefaultValue');
   Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);
 end;
 {$else}
 begin
   // to do:
-  // not yet tested
-  // I suppose, that I don't use dlopen correctly
-  xmlDoValidityCheckingDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
+  // implement a working solution for linux
+  {xmlDoValidityCheckingDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)), 
+    'xmlDoValidityCheckingDefaultValue');
   Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
-  xmlSubstituteEntitiesDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
-  Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);
+  xmlSubstituteEntitiesDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)),
+    'xmlSubstituteEntitiesDefaultValue');
+  Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);}
 end;
 {$endif}
 
