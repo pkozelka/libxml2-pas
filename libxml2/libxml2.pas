@@ -158,12 +158,13 @@ end;
 
 procedure MOVETO_ENDTAG(var p: PxmlChar);
 begin
-  while ((p^<>#0) and (p^<>'>')) do Inc(p);
+  NextCharIndex()
+  while ((p^<>#0) and (p^<>'>')) do p := StrNextChar(p);
 end;
 
 procedure MOVETO_STARTTAG(var p: PxmlChar);
 begin
-  while ((p^<>#0) and (p^<>'<')) do Inc(p);
+  while ((p^<>#0) and (p^<>'<')) do p := StrNextChar(p);
 end;
 
 // Delphi memory handling
