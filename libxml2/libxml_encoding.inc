@@ -1,3 +1,10 @@
+{ [1.23] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
+
 {
 	encoding.h : interface for the encoding conversion functions needed for XML
 
@@ -15,13 +22,6 @@
 	See Copyright for the status of this software.
 
 	daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 type
@@ -74,9 +74,9 @@ type
 	{
 		xmlCharEncodingInputFunc:
 		@aOut:  a pointer ot an array of bytes to store the UTF-8 result
-		@outlen:  the lenght of @out
+		@outlen:  the length of @out
 		@aIn:  a pointer ot an array of chars in the original encoding
-		@inlen:  the lenght of @in
+		@inlen:  the length of @in
 
 		Take a block of chars in the original encoding and try to convert
 		it to an UTF-8 block of chars out.
@@ -92,9 +92,9 @@ type
 	{
 		xmlCharEncodingOutputFunc:
 		@aOut:  a pointer ot an array of bytes to store the result
-		@outlen:  the lenght of @out
+		@outlen:  the length of @out
 		@aIn:  a pointer ot an array of UTF-8 chars
-		@inlen:  the lenght of @in
+		@inlen:  the length of @in
 
 		Take a block of UTF-8 chars in and try to convert it to an other
 		encoding.

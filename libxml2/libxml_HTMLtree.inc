@@ -1,6 +1,6 @@
 {
 	tree.h : describes the structures found in an tree resulting
-					from an XML parsing.
+					 from an XML parsing.
 
 	See Copyright for the status of this software.
 
@@ -63,9 +63,7 @@ procedure htmlNodeDumpFile(var aOut:TextFile; doc:xmlDocPtr; cur:xmlNodePtr);cde
 function  htmlNodeDumpFileFormat(var aOut:TextFile; doc:xmlDocPtr; cur:xmlNodePtr; encoding:Pchar; format:longint):longint;cdecl;external LIBXML2_SO;
 function  htmlSaveFileEnc(filename:Pchar; cur:xmlDocPtr; encoding:Pchar):longint;cdecl;external LIBXML2_SO;
 function  htmlSaveFileFormat(filename:Pchar; cur:xmlDocPtr; encoding:Pchar; format:longint):longint;cdecl;external LIBXML2_SO;
-{ This one is imported from xmlIO.h
-void		htmlDocContentDumpOutput(xmlOutputBufferPtr buf,
-					 xmlDocPtr cur,
-					 const char  encoding);
-}
+procedure htmlNodeDumpFormatOutput(buf:xmlOutputBufferPtr; doc: xmlDocPtr; cur:xmlDocPtr; encoding:PChar; format: longint);cdecl;external LIBXML2_SO;
+procedure htmlDocContentDumpOutput(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:PChar);cdecl;external LIBXML2_SO;
+procedure htmlDocContentDumpFormatOutput(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:PChar; format: longint);cdecl;external LIBXML2_SO;
 

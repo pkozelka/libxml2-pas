@@ -1,22 +1,46 @@
-{
-   tree.h : describes the structures found in an tree resulting
-            from an XML parsing.
-  
-   See Copyright for the status of this software.
-  
-	 daniel@veillard.com
-}
-
-{
- 	------------------------------------------------------------------------------
+{ [1.96] libxml2-2.4.12
+	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
 }
 
+{
+	tree.h : describes the structures found in an tree resulting
+					 from an XML parsing.
+
+	See Copyright for the status of this software.
+
+	daniel@veillard.com
+}
+
 type
 	xmlElementType =  Longint;
+
+{[pk] following declarations are only in xmlIO.inc:
+xmlParserInputBuffer
+xmlParserInputBufferPtr
+xmlOutputBuffer
+xmlOutputBufferPtr
+}
+
+{[pk] following declarations are only in parser.inc:
+xmlParserInput
+xmlParserInputPtr
+xmlParserCtxt
+xmlParserCtxtPtr
+}
+
 const
+	BASE_BUFFER_SIZE = 4000;
+	(**
+	 * XML_XML_NAMESPACE:
+	 *
+	 * This is the namespace for the special xml: prefix predefined in the
+	 * XML Namespace specification
+	 *)
+	XML_XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
+
 	{
 		The different element types carried by an XML tree
 
@@ -26,31 +50,51 @@ const
 		Actually this had diverged a bit, and now XML_DOCUMENT_TYPE_NODE should
 		be deprecated to use an XML_DTD_NODE.
 	}
-	XML_ELEMENT_NODE = 1;
-	XML_ATTRIBUTE_NODE = 2;
-	XML_TEXT_NODE = 3;
+	XML_ELEMENT_NODE       = 1;
+	XML_ATTRIBUTE_NODE     = 2;
+	XML_TEXT_NODE          = 3;
 	XML_CDATA_SECTION_NODE = 4;
-	XML_ENTITY_REF_NODE = 5;
-	XML_ENTITY_NODE = 6;
-	XML_PI_NODE = 7;
-	XML_COMMENT_NODE = 8;
-	XML_DOCUMENT_NODE = 9;
+	XML_ENTITY_REF_NODE    = 5;
+	XML_ENTITY_NODE        = 6;
+	XML_PI_NODE            = 7;
+	XML_COMMENT_NODE       = 8;
+	XML_DOCUMENT_NODE      = 9;
 	XML_DOCUMENT_TYPE_NODE = 10;
 	XML_DOCUMENT_FRAG_NODE = 11;
-	XML_NOTATION_NODE = 12;
+	XML_NOTATION_NODE      = 12;
 	XML_HTML_DOCUMENT_NODE = 13;
-	XML_DTD_NODE = 14;
-	XML_ELEMENT_DECL = 15;
-	XML_ATTRIBUTE_DECL = 16;
-	XML_ENTITY_DECL = 17;
-	XML_NAMESPACE_DECL = 18;
-	XML_XINCLUDE_START = 19;
-	XML_XINCLUDE_END = 20;
+	XML_DTD_NODE           = 14;
+	XML_ELEMENT_DECL       = 15;
+	XML_ATTRIBUTE_DECL     = 16;
+	XML_ENTITY_DECL        = 17;
+	XML_NAMESPACE_DECL     = 18;
+	XML_XINCLUDE_START     = 19;
+	XML_XINCLUDE_END       = 20;
 {$ifdef LIBXML_DOCB_ENABLED}
 	XML_DOCB_DOCUMENT_NODE = 21;
 {$endif}
 
+type
+	{
+		xmlChar:
+
+		This is a basic byte in an UTF-8 encoded string.
+		It's unsigned allowing to pinpoint case where char   are assigned
+		to xmlChar   (possibly making serialization back impossible).
+	}
+	xmlChar = char;
+	PxmlChar = PChar;
+	PPxmlChar = ^PxmlChar;
+
+	// BAD_CAST: not needed in Pascal
+
+
 const
+	(**
+	 * XML_LOCAL_NAMESPACE:
+	 *
+	 * A namespace declaration node
+	 *)
 	XML_LOCAL_NAMESPACE = XML_NAMESPACE_DECL;
 
 const
@@ -99,17 +143,6 @@ type
 	xmlNodePtr = ^xmlNode;
 
 	PxmlNodePtr = ^xmlNodePtr;
-
-	{
-		xmlChar:
-
-		This is a basic byte in an UTF-8 encoded string.
-		It's unsigned allowing to pinpoint case where char   are assigned
-		to xmlChar   (possibly making serialization back impossible).
-	}
-	xmlChar = char;
-	PxmlChar = PChar;
-	PPxmlChar = ^PxmlChar;
 
 	{
 		xmlNotation:
@@ -199,6 +232,7 @@ type
 		c1 : xmlElementContentPtr;      { first child  }
 		c2 : xmlElementContentPtr;      { second child  }
 		parent : xmlElementContentPtr;  { parent  }
+		prefix: PxmlChar;               { prefix }
 	end;
 
 	{
@@ -240,7 +274,6 @@ type
 		Note that prefix == NULL is valid, it defines the default namespace
 		within the subtree (until overriden).
 
-		XML_GLOBAL_NAMESPACE is now deprecated for good
 		xmlNsType is unified with xmlElementType
 	}
 	xmlNsPtr = ^xmlNs;
@@ -438,7 +471,6 @@ function  xmlBufferShrink(buf:xmlBufferPtr; len:dword):longint;cdecl;external LI
 function  xmlBufferGrow(buf:xmlBufferPtr; len:dword):longint;cdecl;external LIBXML2_SO;
 procedure xmlBufferEmpty(buf:xmlBufferPtr);cdecl;external LIBXML2_SO;
 function  xmlBufferContent(buf:xmlBufferPtr):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlBufferUse(buf:xmlBufferPtr):longint;cdecl;external LIBXML2_SO;
 procedure xmlBufferSetAllocationScheme(buf:xmlBufferPtr; scheme:xmlBufferAllocationScheme);cdecl;external LIBXML2_SO;
 function  xmlBufferLength(buf:xmlBufferPtr):longint;cdecl;external LIBXML2_SO;
 
@@ -491,6 +523,8 @@ function  xmlNewDocFragment(doc:xmlDocPtr):xmlNodePtr;cdecl;external LIBXML2_SO;
 {
 	Navigating
 }
+function  xmlGetLineNo(node: xmlNodePtr): int64; cdecl;external LIBXML2_SO;
+function  xmlGetNodePath(node: xmlNodePtr): PxmlChar; cdecl;external LIBXML2_SO;
 function  xmlDocGetRootElement(doc:xmlDocPtr):xmlNodePtr;cdecl;external LIBXML2_SO;
 function  xmlGetLastChild(parent:xmlNodePtr):xmlNodePtr;cdecl;external LIBXML2_SO;
 function  xmlNodeIsText(node:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
@@ -585,13 +619,12 @@ procedure xmlElemDump(var f:TextFile; doc:xmlDocPtr; cur:xmlNodePtr);cdecl;exter
 function  xmlSaveFile(filename:Pchar; cur:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
 function  xmlSaveFormatFile(filename:Pchar; cur:xmlDocPtr; format:longint):longint;cdecl;external LIBXML2_SO;
 procedure xmlNodeDump(buf:xmlBufferPtr; doc:xmlDocPtr; cur:xmlNodePtr; level:longint; format:longint);cdecl;external LIBXML2_SO;
-
-{ These are exported from xmlIO.h
-
-int xmlSaveFileTo (xmlOutputBuffer  buf, xmlDocPtr cur, const char  encoding);
-int xmlSaveFormatFileTo (xmlOutputBuffer  buf, xmlDocPtr cur, const char  encoding, int format);
+{ [pk] moved to libxml2.pas - needs declarations from xmlIO
+function  xmlSaveFileTo(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: char): integer; cdecl;external LIBXML2_SO;
+function  xmlSaveFormatFileTo(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: char; format: integer): integer; cdecl;external LIBXML2_SO;
+procedure xmlNodeDumpOutput(buf: xmlOutputBufferPtr; doc: xmlDocPtr; cur: xmlNodePtr; level: integer; format: integer; encoding: PChar); cdecl;external LIBXML2_SO;
 }
-
+function  xmlSaveFormatFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar; format: integer): integer; cdecl;external LIBXML2_SO;
 function  xmlSaveFileEnc(filename:Pchar; cur:xmlDocPtr; encoding:Pchar):longint;cdecl;external LIBXML2_SO;
 
 {

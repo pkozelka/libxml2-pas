@@ -1,3 +1,10 @@
+{ [1.33] libxml2-2.4.12
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
+
 {
 	xmlIO.h : interface for the I/O interfaces used by the parser
 
@@ -6,22 +13,15 @@
 	daniel@veillard.com
 }
 
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
-}
-
 type
 	{
 		Those are the functions and datatypes for the parser input
 		I/O structures.
 	}
-	xmlInputMatchCallback = function(filename: PChar):Integer;cdecl;
-	xmlInputOpenCallback = procedure (filename:Pchar);cdecl;
-	xmlInputReadCallback = function (context: pointer; buffer: PChar; len: integer):Integer;cdecl;
-	xmlInputCloseCallback = procedure (context: pointer);
+	xmlInputMatchCallback = function (filename: PChar):longint;cdecl;
+	xmlInputOpenCallback  = function (filename:Pchar): pointer;cdecl;
+	xmlInputReadCallback  = function (context: pointer; buffer: PChar; len: integer):longint;cdecl;
+	xmlInputCloseCallback = function (context: pointer): longint;
 
 	xmlParserInputBufferPtr = ^xmlParserInputBuffer;
 	xmlParserInputBuffer = record
@@ -38,9 +38,9 @@ type
 		I/O structures.
 	}
 	xmlOutputMatchCallback = function (const filename: PChar): integer;
-	xmlOutputOpenCallback = function (filename:Pchar):pointer;cdecl;
-	xmlOutputWriteCallback = function(context: pointer; buffer: PChar; len: integer): integer; cdecl;
-	xmlOutputCloseCallback = procedure (context: pointer); cdecl;
+	xmlOutputOpenCallback  = function (filename:Pchar):pointer;cdecl;
+	xmlOutputWriteCallback = function (context: pointer; buffer: PChar; len: longint): longint; cdecl;
+	xmlOutputCloseCallback = function (context: pointer): longint; cdecl;
 
 	xmlOutputBufferPtr = ^xmlOutputBuffer;
 	xmlOutputBuffer = record
@@ -56,10 +56,11 @@ type
 {
 	Interfaces for input
 }
+procedure xmlCleanupInputCallbacks; cdecl;external LIBXML2_SO;
+procedure xmlCleanupOutputCallbacks; cdecl;external LIBXML2_SO;
 procedure xmlRegisterDefaultInputCallbacks;cdecl;external LIBXML2_SO;
 function  xmlAllocParserInputBuffer(enc:xmlCharEncoding):xmlParserInputBufferPtr;cdecl;external LIBXML2_SO;
 function  xmlParserInputBufferCreateFilename(URI:Pchar; enc:xmlCharEncoding):xmlParserInputBufferPtr;cdecl;external LIBXML2_SO;
-
 function  xmlParserInputBufferCreateFile(var file_:TextFile; enc:xmlCharEncoding):xmlParserInputBufferPtr;cdecl;external LIBXML2_SO;
 function  xmlParserInputBufferCreateFd(fd:longint; enc:xmlCharEncoding):xmlParserInputBufferPtr;cdecl;external LIBXML2_SO;
 function  xmlParserInputBufferCreateMem(mem:Pchar; size:longint; enc:xmlCharEncoding):xmlParserInputBufferPtr;cdecl;external LIBXML2_SO;
@@ -87,10 +88,16 @@ function  xmlOutputBufferClose(out:xmlOutputBufferPtr):longint;cdecl;external LI
 function  xmlRegisterOutputCallbacks(matchFunc:xmlOutputMatchCallback; openFunc:xmlOutputOpenCallback; writeFunc:xmlOutputWriteCallback; closeFunc:xmlOutputCloseCallback):longint;cdecl;external LIBXML2_SO;
 
 {
-	This save function are part of tree.h and HTMLtree.h actually
+	This function only exists if HTTP support built into the library
 }
-function  xmlSaveFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar):longint;cdecl;external LIBXML2_SO;
-function  xmlSaveFormatFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar; format:longint):longint;cdecl;external LIBXML2_SO;
-procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePtr; level:longint; format:longint; encoding:Pchar);cdecl;external LIBXML2_SO;
-procedure htmlDocContentDumpOutput(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar);cdecl;external LIBXML2_SO;
+{$ifdef LIBXML_HTTP_ENABLED}
+function  xmlIOHTTPOpenW(const char * post_uri, int   compression ): pointer; cdecl;external LIBXML2_SO;
+procedure xmlRegisterHTTPPostCallbacks; cdecl;external LIBXML2_SO;
+{$endif} // LIBXML_HTTP_ENABLED
 
+(**
+ * A predefined entity loader disabling network accesses
+ *)
+{ [pk] moved to libxml2.pas
+function xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
+}
