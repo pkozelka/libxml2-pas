@@ -8,7 +8,7 @@ uses
 
 const
   //datapath='L:\@Demos\Open_xdom\Data';  //set to the directory with test.xml
-  datapath='P:\dom2\data';
+  datapath='..\data';
   xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
   xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
 
@@ -502,7 +502,9 @@ var node: IDomNode;
   end;
 
 begin //TreeWalker
+  assert(directoryExists(datapath),'Wrong Path to data directory!');
   filename:=datapath+'\events.xml';
+  assert(fileExists(filename),'Testfile events.xml missing!');
   dom:=getDom(domvendor);
   doc:=dom.createDocument('','',nil);
   //the following option is default for libxml2, but not for msdom
