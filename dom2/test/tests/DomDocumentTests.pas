@@ -502,16 +502,16 @@ end;
 (* creates an entity reference with a known name and checks its properties *)
 procedure TDomDocumentFundamentalTests.createEntityReferenceKnownTest;
 const
+  ENTITY_NAME  = 'ent1';
+  ENTITY_VALUE = 'SomeEntity';
   XML_VALID_DOC =
          '<?xml version=''1.0''?>' +
          '  <!DOCTYPE address [' +
          '  <!ELEMENT address (#PCDATA)>' +
-         '  <!ENTITY ent1 "SomeEntity">' +
+         '  <!ENTITY '+ENTITY_NAME+' "'+ENTITY_VALUE+'">' +
          '  ]>' +
          '  <address>some text</address>';
 
-  ENTITY_NAME  = 'ent1';
-  ENTITY_VALUE = 'SomeEntity';
 var
   document  : IDomDocument;
   entityRef : IDomEntityReference;
