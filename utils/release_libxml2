@@ -1,23 +1,36 @@
 #!/bin/bash
 
-VERSION=2.4.13
+VERSION=`../utils/cutver.sh libxml_xmlwin32version.inc`
 PACKAGE=libxml2-pas
-ARCHIVE=$PACKAGE-$VERSION
-TAG=`echo "LIBXML_$VERSION" | sed "s/\./_/g"`
+ARCHIVE=$PACKAGE-$VERSION-src
+TAG=`echo "LIBXML2_$VERSION" | sed "s/\./_/g"`
 
-rm $ARCHIVE.tgz
+rm -f $ARCHIVE.tgz $ARCHIVE.zip
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
 echo "Reading files for export from tag '$TAG' ..."
-#mkdir tmp
-cvs -d $CVSROOT export -l -r HEAD -d tmp .
+rm -rf tmp
 cvs -d $CVSROOT export -r $TAG -d tmp .
 
-echo "Creating archive $ARCHIVE.tgz"
-cd tmp
-tar -zcf ../$ARCHIVE.tgz *
-cd ..
-rm -rf ./tmp
 
-echo "Sending archive $ARCHIVE.tgz to upload.sourceforge.net ..."
-ftp-put.sh upload.log upload.sourceforge.net incoming $ARCHIVE.tgz $ARCHIVE.tgz anonymous libxml2-pas@sourceforge.net; cat upload.log; rm upload.log
+case $TERM in
+  cygwin*) EXT=zip ;;
+  *) EXT=tgz ;;
+esac
+
+echo "Creating archive $ARCHIVE.$EXT"
+cd tmp
+
+
+cat libxml2/INFO.txt.template | sed "s:@VERSION@:$VERSION:g" | sed "s:@DATE@:`date | cut -d\  -f 2,3,6`:g" >INFO.txt
+rm libxml2/INFO.txt.template 
+
+case $EXT in
+  tgz*) tar -zcf ../$ARCHIVE.tgz * ;;
+  zip*) zip -rq ../$ARCHIVE.zip * ;;
+esac
+cd ..
+#rm -rf ./tmp
+
+#echo "Sending archive $ARCHIVE.tgz to upload.sourceforge.net ..."
+#ftp-put.sh upload.log upload.sourceforge.net incoming $ARCHIVE.tgz $ARCHIVE.tgz anonymous libxml2-pas@sourceforge.net; cat upload.log; rm upload.log
 echo "Done."
