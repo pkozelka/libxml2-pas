@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.56 2002-01-16 20:45:41 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.57 2002-01-16 21:02:57 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ type
 		function  IsReadOnly: boolean;
 		function  IsAncestorOrSelf(newNode:xmlNodePtr): boolean; //new
 	public
-		constructor Create(aNode: xmlNodePtr);
+		constructor Create(aLibXml2Node: pointer); virtual;
 		destructor Destroy; override;
 		property GNode: xmlNodePtr read FGNode;
 	end;
@@ -189,8 +189,6 @@ type
 		property ownerElement: IDOMElement read get_ownerElement;
 	public
 		property GAttribute: xmlAttrPtr read GetGAttribute;
-		constructor Create(AAttribute: xmlAttrPtr);
-		destructor destroy; override;
 	end;
 
 	TGDOMCharacterData = class(TGDOMNode, IDOMCharacterData)
@@ -206,8 +204,6 @@ type
 		procedure deleteData(offset, count: Integer);
 		procedure replaceData(offset, count: Integer; const data: DOMString);
 	public
-		constructor Create(ACharacterData: xmlNodePtr);
-		destructor Destroy; override;
 	end;
 
 	{ TGDOMElement }
@@ -234,7 +230,7 @@ type
 		function  hasAttributeNS(const namespaceURI, localName: DOMString): Boolean;
 		procedure normalize;
 	public
-		constructor Create(AElement: xmlNodePtr);
+		constructor Create(aLibXml2Node: pointer); override;
 		destructor Destroy; override;
 	end;
 
@@ -270,8 +266,6 @@ type
 		function get_internalSubset: DOMString;
 	public
 		property GDocumentType: xmlDtdPtr read GetGDocumentType;
-		constructor Create(dtd:xmlDtdPtr);
-		destructor Destroy; override;
 	end;
 
 	{ TGDOMNotation }
@@ -369,7 +363,7 @@ type
 
 		property  GDoc: xmlDocPtr read GetGDoc write SetGDoc;
 	protected
-		property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl;
+		property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
 	public
 		destructor Destroy; override;
 	end;
@@ -408,7 +402,6 @@ type
 	end;
 
 var
-	//[pk] following should be in implementation, or nowhere at all:
 	doccount: integer=0;
 	domcount: integer=0;
 	nodecount: integer=0;
@@ -427,7 +420,7 @@ const
 	DEFAULT_IMPL_FREE_THREADED = false;
 	GDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
 
-function GetDOMObject(aNode: pointer): IUnknown;
+function GetDomObject(aNode: pointer): IUnknown;
 const
 	NodeClasses: array[XML_ELEMENT_NODE..XML_NOTATION_NODE] of TGDOMNodeClass = (
 		TGDOMElement,
@@ -974,33 +967,33 @@ begin
 	else result:=false;
 end;
 
-constructor TGDOMNode.Create(aNode: xmlNodePtr);
+constructor TGDOMNode.Create(aLibXml2Node: pointer);
 var
 	doc: IDomDocument;
 begin
 	inherited Create;
+	FGNode := aLibXml2Node;
 	self.QueryInterface(IDomDocument, doc);
 	if (doc=nil) then begin
 		// this node is not a document
-		DomAssert(Assigned(aNode), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
-		DomAssert(aNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
+		DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
+		DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
 		// if the node is flying, register it in the owner document
-		if (aNode.parent=nil) then begin
-			RegisterFlyingNode(aNode);
+		if (FGNode.parent=nil) then begin
+			RegisterFlyingNode(FGNode);
 		end;
-		// if this is not the document itself, pretend having a reference to the owner document.
-		// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
 		if (doc = nil) then begin
-	//		get_ownerDocument._AddRef;
 		end;
 	end else begin
 		// this is a document node
 		TGDOMDocument(self).FFlyingNodes := TList.Create; //DIRTY - beutify this (with virtual constructor)
 		Inc(doccount);
 		_AddRef; //todo: replace with better solution
+		// if this is not the document itself, pretend having a reference to the owner document.
+		// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+		//		get_ownerDocument._AddRef;
 	end;
-	FGNode := aNode;
-	inc(nodecount);
+	Inc(nodecount);
 end;
 
 destructor TGDOMNode.destroy;
@@ -1338,17 +1331,6 @@ begin
 	end;
 end;
 
-constructor TGDOMAttr.Create(AAttribute: xmlAttrPtr);
-begin
-	inherited create(xmlNodePtr(AAttribute));
-end;
-
-destructor TGDOMAttr.destroy;
-begin
-	inherited destroy;
-end;
-
-
 //***************************
 //TGDOMElement Implementation
 //***************************
@@ -1579,18 +1561,16 @@ begin
 	inherited normalize;
 end;
 
-constructor TGDOMElement.Create(AElement: xmlNodePtr);
+constructor TGDOMElement.Create(aLibXml2Node: pointer);
 begin
-	inc(elementcount);
-	inherited create(xmlNodePtr(AElement));
+	inherited Create(aLibXml2Node);
+	Inc(elementcount);
 end;
 
 destructor TGDOMElement.destroy;
 begin
-	if elementcount >0 then begin
-		dec(elementcount);
-	end;
-	inherited destroy;
+	Dec(elementcount);
+	inherited Destroy;
 end;
 
 { TGDOMDocument }
@@ -2022,16 +2002,6 @@ begin
 	result:=GdomeDOMStringToString(temp);}
 end;
 
-constructor TGDOMCharacterData.Create(ACharacterData: xmlNodePtr);
-begin
-	inherited create(xmlNodePtr(ACharacterData));
-end;
-
-destructor TGDOMCharacterData.destroy;
-begin
-	inherited destroy;
-end;
-
 { TGDOMText }
 
 function TGDOMText.splitText(offset: Integer): IDOMText;
@@ -2146,18 +2116,6 @@ end;
 function TGDOMDocumentType.GetGDocumentType: xmlDtdPtr;
 begin
 	result:=xmlDtdPtr(GNode);
-end;
-
-constructor TGDOMDocumentType.Create(dtd:xmlDtdPtr);
-begin
-	//Create root-node as pascal object
-	inherited Create(xmlNodePtr(dtd));
-end;
-
-
-destructor TGDOMDocumentType.destroy;
-begin
-	inherited destroy;
 end;
 
 { TGDOMNotation }
