@@ -18,5 +18,13 @@ c) Benchmark the speed of treewalking and parsing
 
 You can switch between msxml-dom and libxml2 at runtime.
 
+Hints for compiling:
+- add the dom2 and the libxml2 folders to your library path
+- you have to edit the following lines in dom2demo.dpr with
+  a texteditor, to match your installation path:
+  > libxmldom in 'L:\dom2\libxmldom.pas',
+  > Dom2 in 'L:\dom2\Dom2.pas',
+  > msxml_impl in 'L:\dom2\msxml_impl.pas';
+
 Uwe Fechner (ufechner@csi.com)
 

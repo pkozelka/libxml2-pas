@@ -216,12 +216,12 @@ procedure TestGDom3b(name,vendorstr:string);
       test('document.getElementsByTagName (length)',(nodelist.length = 1)) ;
     end;
     nodelist := nil;
-    if vendorstr<>'LIBXML' then begin
-      //p=2
-      dom := document.domImplementation;
-      test('document.domImplementation',(dom <> nil)) ;
-      dom := nil;
 
+    //p=2
+    dom := document.domImplementation;
+    test('document.domImplementation',(dom <> nil)) ;
+    dom := nil;
+    if vendorstr<>'LIBXML' then begin
       //p=2
       cdata := document.createCDATASection('zzz');
       test('document.createCDATASection',(cdata <> nil));
@@ -462,8 +462,6 @@ begin
   document := getDoc(filename,vendorstr);
   TestNode1(filename,vendorstr);
 
-
-
   // testing documenttype
   documenttype:=document.doctype;
   test('document.docType',(documenttype <> nil));
@@ -472,8 +470,8 @@ begin
   except
     outLog('__documentType.internalSubset doesn''t work!');
   end;
+  test('documentType.name',(documenttype.name = 'test'));
   if vendorstr<>'LIBXML' then begin
-    test('documentType.name',(documenttype.name = 'test'));
     namednodemap := documenttype.entities;
     test('documentType.entities',(namednodemap <> nil));
     test('entity.length',(namednodemap.length = 2));
@@ -489,47 +487,45 @@ begin
     test('notation.systemId',((namednodemap[0] as IDOMNotation).systemId = 'program2'));
     namednodemap := nil;
     documenttype:=nil;
+  end;
+  // end
+  document:=nil;
+  document := getDoc(filename,vendorstr);
 
-    // end
-    document:=nil;
-    document := getDoc(filename,vendorstr);
+  // testing domimplementation
 
-    // testing domimplementation
+  try
+    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','test');
+    test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
+    documenttype := nil;
+  except
+    outLog('__domImplementation.createDocument (NS) doesn''t work!');
+  end;
 
-    try
-      documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','test');
-      test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
-      documenttype := nil;
-    except
-      outLog('__domImplementation.createDocument (NS) doesn''t work!');
-    end;
+  try
+    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','');
+    test('domImplementation.createDocumentType',(documenttype <> nil));
+    documenttype := nil;
+  except
+    outLog('__domImplementation.createDocumentType doesn''t work!');
+  end;
 
-    try
-      documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','');
-      test('domImplementation.createDocumentType',(documenttype <> nil));
-      documenttype := nil;
-    except
-      outLog('__domImplementation.createDocumentType doesn''t work!');
-    end;
+  test('domImplementation.hasFeature',document.domImplementation.hasFeature('CORE','2.0'));
 
-    test('domImplementation.hasFeature',document.domImplementation.hasFeature('CORE','2.0'));
+  // testing documenttype, part II
 
-    // testing documenttype, part II
+  try
+    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','a','test');
+    test('documentType.name',(documenttype.name = 'http://xmlns.4commerce.de/eva'));
 
-    try
-      documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','a','test');
-      test('documentType.name',(documenttype.name = '//xmlns.4commerce.de/eva'));
+    //outLog('___'+documenttype.internalSubset);
 
-      //outLog('___'+documenttype.internalSubset);
-
-      test('documentType.systemId',(documenttype.systemId = 'test'));
-      test('documentType.publicId',(documenttype.publicId = 'a'));
-      documenttype := nil;
-    except
-      outLog('__documentType.systemId doesn''t work!');
-      outLog('__documentType.publicId doesn''t work!');
-    end;
-
+    test('documentType.systemId',(documenttype.systemId = 'test'));
+    test('documentType.publicId',(documenttype.publicId = 'a'));
+    documenttype := nil;
+  except
+    outLog('__documentType.systemId doesn''t work!');
+    outLog('__documentType.publicId doesn''t work!');
   end;
 
   // testing character data
