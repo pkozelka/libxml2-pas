@@ -1,29 +1,28 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.89 2002-01-28 23:35:20 pkozelka Exp $
-
+//$Id: libxmldom.pas,v 1.90 2002-01-29 00:16:57 pkozelka Exp $
 {
-   ------------------------------------------------------------------------------
-   This unit is an object-oriented wrapper for libxml2.
-   It implements the interfaces defined in dom2.pas.
+    ------------------------------------------------------------------------------
+    This unit is an object-oriented wrapper for libxml2.
+    It implements the interfaces defined in dom2.pas.
 
-   Author:
-   Uwe Fechner <ufechner@4commerce.de>
-   .
-   Some Code by:
-   Martijn Brinkers
-   Petr Kozelka
-
-     Copyright:
-     4commerce technologies AG
-     Kamerbalken 10-14
-     22525 Hamburg, Germany
+    Authors:
+      Uwe Fechner <ufechner@4commerce.de>
+        - submitted the original code
+        - created various testcases
+      Martijn Brinkers <m.brinkers@pobox.com>
+        - contributed with hints, ideas, some code, and especially with
+          the dom2 interface declarations
+        - translated a strict testsuite from javascript code
+      Petr Kozelka <pkozelka@email.cz>
+        - polishing and optimization
+        - complete redesign and restructuralization
 
     Published under a double license:
-    a) the GNU Library General Public License: 
-       http://www.gnu.org/copyleft/lgpl.html
-    b) the Mozilla Public License:
-       http://www.mozilla.org/MPL/MPL-1.1.html
-   ------------------------------------------------------------------------------
+      a) the GNU Library General Public License:
+         http://www.gnu.org/copyleft/lgpl.html
+      b) the Mozilla Public License:
+         http://www.mozilla.org/MPL/MPL-1.1.html
+    ------------------------------------------------------------------------------
 }
 
 // implemented methods:
