@@ -41,6 +41,6 @@ uzip: cvsexport zip upload-zip clean
 
 
 clean:
-	rm -rf $(MYTMP)
+	rm -rf *.tmp
 	rm -f $(ARCHIVE).tgz
 	rm -f $(ARCHIVE).zip
