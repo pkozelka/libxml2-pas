@@ -1,7 +1,7 @@
-{ $Id: GUITestRunner.pas,v 1.2 2002-01-10 14:46:52 ufechner Exp $ }
+{ $Id: GUITestRunner.pas,v 1.3 2002-01-18 22:23:12 ufechner Exp $ }
 {: DUnit: An XTreme testing framework for Delphi programs.
    @author  The DUnit Group.
-   @version $Revision: 1.2 $ 2001/03/08 uberto
+   @version $Revision: 1.3 $ 2001/03/08 uberto
 }
 (*
  * The contents of this file are subject to the Mozilla Public
@@ -326,6 +326,7 @@ end;
 
 procedure OutLog(msg:string='');
 begin
+  application.ProcessMessages;
   myform.ErrorMessageRTF.Lines.Append(msg);
 end;
 
