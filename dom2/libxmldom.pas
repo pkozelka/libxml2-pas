@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.40 2002-01-15 11:27:33 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.41 2002-01-15 13:49:22 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -1763,7 +1763,7 @@ begin
 	if (namespaceURI<>'') then begin
 		uprefix := prefix(qualifiedName);
 		ulocal := localName(qualifiedName);
-		node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(qualifiedName)), nil);
+		node := xmlNewDocNode(requestDocPtr, nil, PChar(ulocal), nil);
 		ns := xmlNewNs(node, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
 		xmlSetNs(node, ns);
 	end else begin
@@ -1783,15 +1783,13 @@ begin
 		uprefix := prefix(qualifiedName);
 		ulocal := localName(qualifiedName);
 		ns := xmlNewNs(FGNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+		attr := xmlNewNsProp(FGNode, ns, PChar(ulocal), nil);
+		attr.doc := requestDocPtr;
 	end else begin
-		ns := nil;
 		ulocal := UTF8Encode(qualifiedName);
+		attr := xmlNewDocProp(requestDocPtr, PChar(ulocal), nil);
 	end;
-	attr := xmlNewNsProp(FGNode, ns, PChar(ulocal), nil); //todo:fix
 	Result := GetDOMObject(attr) as IDomAttr;
-	if attr<>nil then begin
-		FAttrList.Add(attr);
-	end;
 end;
 
 function TGDOMDocument.getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
