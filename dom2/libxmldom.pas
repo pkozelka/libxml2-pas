@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.67 2002-01-20 20:06:02 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.68 2002-01-20 20:20:43 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -622,6 +622,25 @@ begin
   end;
 end;
 
+{ TGDomDocumentBuilderFactory }
+
+constructor TGDOMDocumentBuilderFactory.Create(AFreeThreading : Boolean);
+begin
+  FFreeThreading := AFreeThreading;
+end;
+
+function TGDOMDocumentBuilderFactory.NewDocumentBuilder : IDomDocumentBuilder;
+begin
+  Result := TGDOMDocumentBuilder.Create(FFreeThreading);
+end;
+
+function TGDOMDocumentBuilderFactory.Get_VendorID : DomString;
+begin
+  if FFreeThreading then
+    Result := SLIBXML
+  else
+    Result := SLIBXML;
+end;
 
 { TXDomDocumentBuilder }
 
@@ -659,6 +678,39 @@ end;
 function TGDOMDocumentBuilder.Get_HasAsyncSupport : Boolean;
 begin
   Result := False;
+end;
+
+function TGDOMDocumentBuilder.load(const url: DomString): IDomDocument;
+var
+  doc: TGDOMDocument;
+  ok: boolean;
+begin
+  doc := TGDOMDocument.Create(nil);
+  doc.DomImplementation := Get_DomImplementation;
+  ok := doc.load(url);
+  DomAssert(ok, PARSE_ERR, 'Error while parsing file:'+url);
+  Result := doc;
+end;
+
+function TGDOMDocumentBuilder.newDocument: IDomDocument;
+var
+  doc: TGDOMDocument;
+begin
+  doc := TGDOMDocument.Create(nil);
+  doc.DomImplementation := Get_DomImplementation;
+  Result := doc;
+end;
+
+function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
+var
+  doc: TGDOMDocument;
+  ok: boolean;
+begin
+  doc := TGDOMDocument.Create(nil);
+  doc.DomImplementation := Get_DomImplementation;
+  ok := doc.loadxml(xml);
+  DomAssert(ok, PARSE_ERR, 'Error while parsing xml:'#13+xml);
+  Result := doc;
 end;
 
 { TGDOMInterface }
@@ -708,6 +760,41 @@ begin
 end;
 
 { TGDomeNode }
+
+constructor TGDOMNode.Create(aLibXml2Node: pointer);
+begin
+  inherited Create;
+  FGNode := aLibXml2Node;
+  if not (self is TGDOMDocument) then begin
+    // this node is not a document
+    DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
+    FGNode._private := self;
+    DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
+    // if the node is flying, register it in the owner document
+    if (FGNode.parent=nil) then begin
+      RegisterFlyingNode(FGNode);
+    end;
+    // if this is not the document itself, pretend having a reference to the owner document.
+    // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+//		get_ownerDocument._AddRef;
+  end;
+  Inc(nodecount);
+end;
+
+destructor TGDOMNode.Destroy;
+begin
+  if not (self is TGDOMDocument) then begin
+  // if this is not the document itself, release the pretended reference to the owner document:
+  // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+//		get_ownerDocument._Release;
+  end;
+  if (FGNode<>nil) then begin
+    FGNode._private := nil;
+  end;
+  FChildNodes.Free;
+  Dec(nodecount);
+  inherited Destroy;
+end;
 
 function TGDOMNode.LibXml2NodePtr: xmlNodePtr;
 begin
@@ -1054,39 +1141,56 @@ begin
   else result:=false;
 end;
 
-constructor TGDOMNode.Create(aLibXml2Node: pointer);
+function TGDOMNode.selectNode(const nodePath: WideString): IDOMNode;
+// todo: raise  exceptions
+//       a) if invalid nodePath expression
+//       b) if result type <> nodelist
+//       c) perhaps if nodelist.length > 1 ???
 begin
-  inherited Create;
-  FGNode := aLibXml2Node;
-  if not (self is TGDOMDocument) then begin
-    // this node is not a document
-    DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
-    FGNode._private := self;
-    DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
-    // if the node is flying, register it in the owner document
-    if (FGNode.parent=nil) then begin
-      RegisterFlyingNode(FGNode);
-    end;
-    // if this is not the document itself, pretend having a reference to the owner document.
-    // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-//		get_ownerDocument._AddRef;
-  end;
-  Inc(nodecount);
+  Result := selectNodes(nodePath)[0];
 end;
 
-destructor TGDOMNode.Destroy;
+function TGDOMNode.selectNodes(const nodePath: WideString): IDOMNodeList;
+// todo: raise  exceptions
+//       a) if invalid nodePath expression
+//       b) if result type <> nodelist
+var
+  doc: xmlDocPtr;
+  ctxt: xmlXPathContextPtr;
+  res:  xmlXPathObjectPtr;
+  temp: string;
+  nodetype{,nodecount}: integer;
+  //ok:integer;
 begin
-  if not (self is TGDOMDocument) then begin
-  // if this is not the document itself, release the pretended reference to the owner document:
-  // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-//		get_ownerDocument._Release;
+  temp:=UTF8Encode(nodePath);
+  doc := requestNodePtr.doc;
+  if doc=nil then DomAssert(false, 100);
+  ctxt:=xmlXPathNewContext(doc);
+  ctxt.node:=FGNode;
+//???	{ok:=}xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
+  res:=xmlXPathEvalExpression(pchar(temp),ctxt);
+  if res<>nil then  begin
+    nodetype:=res.type_;
+    case nodetype of
+    XPATH_NODESET:
+      begin
+        nodecount:=res.nodesetval.nodeNr;
+//TODO!!        result:=TGDOMXPathNodeList.Create(res, get_OwnerDocument)
+      end
+    else
+      result:=nil;
+    end;
+    //xmlXPathFreeNodeSetList(res);
+    //xmlXPathFreeObject(res);
+  end else begin
+    result:=nil;
   end;
-  if (FGNode<>nil) then begin
-    FGNode._private := nil;
-  end;
-  FChildNodes.Free;
-  Dec(nodecount);
-  inherited Destroy;
+  xmlXPathFreeContext(ctxt);
+end;
+
+procedure TGDOMNode.set_Prefix(const prefix: DomString);
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
 { TGDOMChildNodeList }
@@ -1136,7 +1240,7 @@ begin
   end;
 end;
 
-{TGDOMAttributes}
+{ TGDOMAttributes }
 
 constructor TGDOMAttributes.Create(aOwnerElement: TGDOMElement);
 begin
@@ -1154,7 +1258,6 @@ begin
 end;
 
 function TGDOMAttributes.get_item(index: Integer): IDOMNode;
-//same as NodeList.get_item
 var
   node: xmlAttrPtr;
   cnt: integer;
@@ -2201,111 +2304,6 @@ end;
 function TGDOMNotation.GetGNotation: xmlNotationPtr;
 begin
   Result := pointer(GNode);
-end;
-
-function TGDOMNode.selectNode(const nodePath: WideString): IDOMNode;
-// todo: raise  exceptions
-//       a) if invalid nodePath expression
-//       b) if result type <> nodelist
-//       c) perhaps if nodelist.length > 1 ???
-begin
-  Result := selectNodes(nodePath)[0];
-end;
-
-function TGDOMNode.selectNodes(const nodePath: WideString): IDOMNodeList;
-// todo: raise  exceptions
-//       a) if invalid nodePath expression
-//       b) if result type <> nodelist
-var
-  doc: xmlDocPtr;
-  ctxt: xmlXPathContextPtr;
-  res:  xmlXPathObjectPtr;
-  temp: string;
-  nodetype{,nodecount}: integer;
-  //ok:integer;
-begin
-  temp:=UTF8Encode(nodePath);
-  doc := requestNodePtr.doc;
-  if doc=nil then DomAssert(false, 100);
-  ctxt:=xmlXPathNewContext(doc);
-  ctxt.node:=FGNode;
-//???	{ok:=}xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
-  res:=xmlXPathEvalExpression(pchar(temp),ctxt);
-  if res<>nil then  begin
-    nodetype:=res.type_;
-    case nodetype of
-    XPATH_NODESET:
-      begin
-        nodecount:=res.nodesetval.nodeNr;
-//TODO!!        result:=TGDOMXPathNodeList.Create(res, get_OwnerDocument)
-      end
-    else
-      result:=nil;
-    end;
-    //xmlXPathFreeNodeSetList(res);
-    //xmlXPathFreeObject(res);
-  end else begin
-    result:=nil;
-  end;
-  xmlXPathFreeContext(ctxt);
-end;
-
-{ TXDomDocumentBuilderFactory }
-
-constructor TGDOMDocumentBuilderFactory.Create(AFreeThreading : Boolean);
-begin
-  FFreeThreading := AFreeThreading;
-end;
-
-function TGDOMDocumentBuilderFactory.NewDocumentBuilder : IDomDocumentBuilder;
-begin
-  Result := TGDOMDocumentBuilder.Create(FFreeThreading);
-end;
-
-function TGDOMDocumentBuilderFactory.Get_VendorID : DomString;
-begin
-  if FFreeThreading then
-    Result := SLIBXML
-  else
-    Result := SLIBXML;
-end;
-
-procedure TGDOMNode.set_Prefix(const prefix: DomString);
-begin
-  DomAssert(false, NOT_SUPPORTED_ERR);
-end;
-
-function TGDOMDocumentBuilder.load(const url: DomString): IDomDocument;
-var
-  doc: TGDOMDocument;
-  ok: boolean;
-begin
-  doc := TGDOMDocument.Create(nil);
-  doc.DomImplementation := Get_DomImplementation;
-  ok := doc.load(url);
-  DomAssert(ok, PARSE_ERR, 'Error while parsing file:'+url);
-  Result := doc;
-end;
-
-function TGDOMDocumentBuilder.newDocument: IDomDocument;
-var
-  doc: TGDOMDocument;
-begin
-  doc := TGDOMDocument.Create(nil);
-  doc.DomImplementation := Get_DomImplementation;
-  Result := doc;
-end;
-
-function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
-var
-  doc: TGDOMDocument;
-  ok: boolean;
-begin
-  doc := TGDOMDocument.Create(nil);
-  doc.DomImplementation := Get_DomImplementation;
-  ok := doc.loadxml(xml);
-  DomAssert(ok, PARSE_ERR, 'Error while parsing xml:'#13+xml);
-  Result := doc;
 end;
 
 initialization
