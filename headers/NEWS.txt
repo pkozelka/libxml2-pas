@@ -4,6 +4,19 @@
 
 - Delphi 5 compatibility completed
 
+libxml2-pas 2.4.24:
+-------------------
+- experimentally implemented alternative way of handling memory (Eric Zurcher)
+- started works on FreePascal compiler compatibility (Brian Grainger)
+
+libxslt-pas 1.0.20:
+-------------------
+libexslt-pas 0.7.11:
+-------------------
+iconv 0.7: 
+----------
+[unchanged]
+
 ********************************************************************
 *************************  OLDER  CHANGES  *************************
 ********************************************************************

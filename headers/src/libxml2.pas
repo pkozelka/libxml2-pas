@@ -257,15 +257,14 @@ initialization
   // but here we need to obtain the addresses of POINTERS to functions. We can
   // get to these addresses (and also those of other data values exported from
   // the DLL) by using GetProcAddress.
-   libHandle := LoadLibrary(LIBXML2_SO);
-   if libHandle <> 0 then
-   begin
-     pXmlFree := pXmlFreeFunc(GetProcAddress(libHandle, 'xmlFree'));
-     pXmlMalloc := pXmlMallocFunc(GetProcAddress(libHandle, 'xmlMalloc'));
-     pXmlRealloc := pXmlReallocFunc(GetProcAddress(libHandle, 'xmlRealloc'));
-     pXmlMemStrdup := pXmlStrdupFunc(GetProcAddress(libHandle, 'xmlMemStrdup'));
-     FreeLibrary(libHandle);
-   end;
+  libHandle := LoadLibrary(LIBXML2_SO);
+  if libHandle <> 0 then begin
+    pXmlFree := pXmlFreeFunc(GetProcAddress(libHandle, 'xmlFree'));
+    pXmlMalloc := pXmlMallocFunc(GetProcAddress(libHandle, 'xmlMalloc'));
+    pXmlRealloc := pXmlReallocFunc(GetProcAddress(libHandle, 'xmlRealloc'));
+    pXmlMemStrdup := pXmlStrdupFunc(GetProcAddress(libHandle, 'xmlMemStrdup'));
+    FreeLibrary(libHandle);
+  end;
 {$ENDIF}
 end.
 
