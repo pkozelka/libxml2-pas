@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.7 2002-02-11 20:15:21 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.8 2002-02-11 20:25:12 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -158,6 +158,17 @@ type
     function  IDomDocumentFragment.get_parentNode = returnNullDomNode;
   end;
 
+  { TLDOMProcessingInstruction class }
+
+  TLDOMProcessingInstruction = class(TLDOMNode, IDomProcessingInstruction)
+  private
+  protected //IDomProcessingInstruction
+    function  IDomProcessingInstruction.get_target = get_nodeName;
+    function  IDomProcessingInstruction.get_data = get_nodeValue;
+    procedure IDomProcessingInstruction.set_data = set_nodeValue;
+  public
+  end;
+
   { TLDOMDocument class }
 
   TLDOMDocument = class(TLDOMNode, IDomDocument, IDomNode)
@@ -235,8 +246,8 @@ var
     TLDOMCDataSection,
     nil, //TGDOMEntityReference,
     nil, //TGDOMEntity,
-    nil, //TGDOMProcessingInstruction,
-    nil, //TGDOMComment,
+    TLDOMProcessingInstruction,
+    TLDOMComment,
     nil, //TGDOMDocument,
     nil, //TGDOMDocumentType,
     TLDOMDocumentFragment,
