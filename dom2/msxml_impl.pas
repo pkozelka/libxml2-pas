@@ -522,6 +522,11 @@ var
 function domCreateImplementation(msIntf : IXMLDOMImplementation)
         : IDomImplementation;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLImplementation;
   if result <> nil then exit;
@@ -530,6 +535,11 @@ end;
 
 function domCreateNodeList(msIntf : IXMLDOMNodeList) : IDomNodeList;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLNodeList;
   if result <> nil then exit;
@@ -538,6 +548,11 @@ end;
 
 function domCreateNamedNodeMap(msIntf : IXMLDOMNamedNodeMap) : IDomNamedNodeMap;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLNamedNodeMap;
   if result <> nil then exit;
@@ -546,6 +561,11 @@ end;
 
 function domCreateElement(msIntf : IXMLDOMElement) : IDomElement;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLElement;
   if result <> nil then exit;
@@ -554,6 +574,11 @@ end;
 
 function domCreateAttribute(msIntf : IXMLDOMAttribute) : IDomAttr;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(msIntf as IUnknown) as TMSXMLAttr;
   if result <> nil then exit;
   result := TMSXMLAttr.create(msIntf);
@@ -567,6 +592,11 @@ end;
 *)
 function domCreateText(msIntf : IXMLDOMCharacterData) : IDomText;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(msIntf as IUnknown) as TMSXMLText;
   if result <> nil then exit;
   result := TMSXMLText.create(msIntf);
@@ -574,6 +604,11 @@ end;
 
 function domCreateCDataSection(msIntf : IXMLDOMCDATASection) : IDomCDataSection;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLCDataSection;
   if result <> nil then exit;
@@ -583,6 +618,11 @@ end;
 function domCreateEntityReference(msIntf : IXMLDOMEntityReference)
         : IDomEntityReference;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLEntityReference;
   if result <> nil then exit;
@@ -591,6 +631,11 @@ end;
 
 function domCreateEntity(msIntf : IXMLDOMEntity) : IDomEntity;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLEntity;
   if result <> nil then exit;
@@ -600,6 +645,11 @@ end;
 function domCreateProcessingInstruction(msIntf : IXMLDOMProcessingInstruction)
         : IDomProcessingInstruction;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLProcessingInstruction;
   if result <> nil then exit;
@@ -608,6 +658,11 @@ end;
 
 function domCreateComment(msIntf : IXMLDOMComment) : IDomComment;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLComment;
   if result <> nil then exit;
@@ -616,6 +671,11 @@ end;
 
 function domCreateDocument(msIntf : IXMLDOMDocument) : IDomDocument;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLDocument;
   if result <> nil then exit;
@@ -624,6 +684,11 @@ end;
 
 function domCreateDocumentType(msIntf : IXMLDOMDocumentType) : IDomDocumentType;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLDocumentType;
   if result <> nil then exit;
@@ -633,6 +698,11 @@ end;
 function domCreateDocumentFragment(msIntf : IXMLDOMDocumentFragment)
         : IDomDocumentFragment;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLDocumentFragment;
   if result <> nil then exit;
@@ -641,6 +711,11 @@ end;
 
 function domCreateNotation(msIntf : IXMLDOMNotation) : IDomNotation;
 begin
+  if msIntf = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   result := gDomWrapperRepository.getWrapper(
           msIntf as IUnknown) as TMSXMLNotation;
   if result <> nil then exit;
@@ -651,6 +726,11 @@ end;
 (* creates a DomNode wrapper for the M$ node bases on the node type*)
 function domCreateNode(msNode : IXMLDOMNode) : IDomNode;
 begin
+  if msNode = nil then
+  begin
+    result := nil;
+    exit;
+  end;
   case msNode.nodeType of
     NODE_ELEMENT :
       result := domCreateElement(msNode as IXMLDOMElement);
@@ -1120,7 +1200,8 @@ var
   msAttr : IXMLDOMAttribute;
   node   : IXMLDOMNode;
 begin
-  node := fMSDomDocument.createNode(NODE_ATTRIBUTE, qualifiedName, namespaceURI);
+  node := fMSDomDocument.createNode(
+          NODE_ATTRIBUTE, qualifiedName, namespaceURI);
   msAttr := node as IXMLDOMAttribute;
   if msAttr = nil then
     result := nil
@@ -1146,8 +1227,8 @@ end;
 function TMSXMLDocument.getElementById(
         const elementId : DomString) : IDomElement;
 begin
-  raise EDomException.create(
-          NOT_SUPPORTED_ERR, 'GetElementById is not supported');
+  result := domCreateElement(
+          fMSDomDocument.nodeFromID(elementId) as IXMLDomElement);
 end;
 
 
