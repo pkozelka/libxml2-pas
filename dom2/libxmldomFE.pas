@@ -2006,11 +2006,9 @@ begin
   ns.free;
   //Get root-node
   root:= xmlNodePtr(FPGdomeDoc);
-
   FAttrList:=TList.Create;
   FNodeList:=TList.Create;
-  //FNsList:=TList.Create;
- //Create root-node as pascal object
+  //Create root-node as pascal object
   inherited create(root,nil);
   inc(doccount);
 end;
@@ -2446,7 +2444,7 @@ end;
 
 procedure TGDOMDocument.set_preserveWhiteSpace(Value: Boolean);
 begin
-  FPreserveWhitespace:=true;
+  FPreserveWhitespace:=Value;
   if value
     then xmlKeepBlanksDefault(1)
     else xmlKeepBlanksDefault(0);
@@ -2457,17 +2455,11 @@ begin
   if value
     then xmlSubstituteEntitiesDefault(1)
     else xmlSubstituteEntitiesDefault(0);
-//  if value
-//    then xmlSubstituteEntitiesDefaultValue^:=1
-//    else xmlSubstituteEntitiesDefaultValue^:=0;
   FResolveExternals:=value;
 end;
 
 procedure TGDOMDocument.set_validate(Value: Boolean);
 begin
-  if value
-    then xmlDoValidityCheckingDefaultValue_Ptr^:=1
-    else xmlDoValidityCheckingDefaultValue_Ptr^:=0;
   Fvalidate:=value;
 end;
 
@@ -2490,8 +2482,10 @@ end;
 
 function TGDOMDocument.load(source: OleVariant): WordBool;
 // Load dom from file
-var fn: string;
-    root: xmlNodePtr;
+var
+  fn: string;
+  ctxt: xmlParserCtxtPtr;
+  root: xmlNodePtr;
 begin
   fn:=source;
   {$ifdef WIN32}
@@ -2500,7 +2494,29 @@ begin
     fn := aUrl;
   {$endif}
   xmlFreeDoc(FPGdomeDoc);
-  FPGdomeDoc:=xmlParseFile(pchar(fn));
+  //FPGdomeDoc:=xmlParseFile(pchar(fn));
+  FPGdomeDoc:=nil;
+  xmlInitParser();
+  ctxt := xmlCreateFileParserCtxt(PChar(fn));
+  if (ctxt <> nil) then begin
+    // validation
+    if Fvalidate then begin
+      ctxt.validate := -1;
+    end else begin
+      ctxt.validate := 0;
+    end;
+    //todo: preserve whitespace
+    //todo: async (separate thread)
+    //todo: resolveExternals
+    xmlParseDocument(ctxt);
+    if (ctxt.wellFormed<>0) then begin
+      FPGdomeDoc := ctxt.myDoc;
+    end else begin
+      xmlFreeDoc(ctxt.myDoc);
+      ctxt.myDoc := nil;
+    end;
+    xmlFreeParserCtxt(ctxt);
+  end;
   if FPGdomeDoc<>nil
     then
       begin
@@ -2518,20 +2534,36 @@ begin
 end;
 
 function TGDOMDocument.loadxml(const Value: DOMString): WordBool;
-// Load dom from file
+// Load dom from string;
 var
   temp: TGdomString;
   root: xmlNodePtr;
+  ctxt: xmlParserCtxtPtr;
 begin
   temp:=TGdomString.create(Value);
   xmlFreeDoc(FPGdomeDoc);
   inherited Destroy;
-  //FPGdomeDoc:=xmlParseMemory(temp.CString,length(temp.CString));
-  //if FresolveExternals
-    //then self.set_resolveExternals(true);
-  //if Fvalidate
-    //then self.set_validate(true);
-  FPGdomeDoc:=xmlParseDoc(temp.CString);
+  FPGdomeDoc:=nil;
+  xmlInitParser();
+  ctxt := xmlCreateDocParserCtxt(temp.CString);
+  if (ctxt <> nil) then begin
+    // validation
+    if Fvalidate then begin
+      ctxt.validate := -1;
+    end else begin
+      ctxt.validate := 0;
+    end;
+    //todo: async (separate thread)
+    //todo: resolveExternals
+    xmlParseDocument(ctxt);
+    if (ctxt.wellFormed<>0) then begin
+      FPGdomeDoc := ctxt.myDoc;
+    end else begin
+      xmlFreeDoc(ctxt.myDoc);
+      ctxt.myDoc := nil;
+    end;
+    xmlFreeParserCtxt(ctxt);
+  end;
   temp.free;
   if FPGdomeDoc<>nil
     then
@@ -2596,7 +2628,6 @@ begin
     22: result:='SaveXMLToDisk_ERR';
     100: result:='LIBXML2_NULL_POINTER_ERR';
     101: result:='INVALID_NODE_SET_ERR';
-    102: result:='PARSE_ERR';
   else
     result:='Unknown error no: '+inttostr(err);
   end;
@@ -3079,6 +3110,7 @@ end;
 constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
 var
   fn: string;
+  ctxt: xmlParserCtxtPtr;
 begin
   FGdomimpl:=GDOMImpl;
   {$ifdef WIN32}
@@ -3086,14 +3118,40 @@ begin
   {$else}
     fn := aUrl;
   {$endif}
-  FPGdomeDoc:=(xmlParseFile(PChar(fn)));
-  if (FPGdomeDoc=nil) then begin
-    checkError(102);
+  //FPGdomeDoc:=(xmlParseFile(PChar(fn)));
+  //Load DOM from file
+  FPGdomeDoc:=nil;
+  xmlInitParser();
+  ctxt := xmlCreateFileParserCtxt(PChar(fn));
+  if (ctxt <> nil) then begin
+    // validation
+    if Fvalidate then begin
+      ctxt.validate := -1;
+    end else begin
+      ctxt.validate := 0;
+    end;
+    if FpreserveWhiteSpace then begin
+      ctxt.space^ := -1;
+    end else begin
+      ctxt.space^ := 0;
+    end;
+    //todo: async (separate thread)
+    //todo: resolveExternals
+    xmlParseDocument(ctxt);
+    if (ctxt.wellFormed<>0) then begin
+      FPGdomeDoc := ctxt.myDoc;
+    end else begin
+      xmlFreeDoc(ctxt.myDoc);
+      ctxt.myDoc := nil;
+    end;
+    xmlFreeParserCtxt(ctxt);
   end;
-  FAttrList:=TList.Create;
-  FNodeList:=TList.Create;
-  inherited create(xmlNodePtr(FPGdomeDoc),nil);
-  inc(doccount);
+  if (FPGdomeDoc<>nil) then begin
+    FAttrList:=TList.Create;
+    FNodeList:=TList.Create;
+    inherited create(xmlNodePtr(FPGdomeDoc),nil);
+    inc(doccount);
+  end;
 end;
 
 procedure TGDOMDocument.removeAttr(attr: xmlAttrPtr);
