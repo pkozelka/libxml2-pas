@@ -1048,7 +1048,7 @@ function TDomNode.cloneNode(deep: boolean): IDomNode;
 var
   node:      xmlNodePtr;
   recursive: integer;
-  ns: xmlNsPtr;
+//never used  ns: xmlNsPtr;
 begin
   result:=nil;
   case integer(fXmlNode.type_) of
@@ -1082,10 +1082,10 @@ begin
         if deep
           then recursive := 1
           else recursive := 0;
-        ns:=fXmlNode.ns; //debug code
+//never used        ns:=fXmlNode.ns; //debug code
         node := xmlCopyNode(fXmlNode, recursive);
         if node <> nil then begin
-          ns:=node.ns;   //debug code
+//never used          ns:=node.ns;   //debug code
           node.doc := fXmlNode.doc;
           node.ns:=xmlCopyNamespace(fXmlNode.ns);
           if node.parent = nil
@@ -1249,9 +1249,9 @@ function TDomNamedNodeMap.get_item(index: integer): IDomNode;
   //same as NodeList.get_item
 var
   node: xmlNodePtr;
-  ns:   xmlNsPtr;
+//never used  ns:   xmlNsPtr;
   i:    integer;
-  NsAttr: IDomAttr;
+//never used  NsAttr: IDomAttr;
 begin
   // not supported for named node map <> attributes yet
   if FOwnerElement=nil then checkError(NOT_SUPPORTED_ERR);
@@ -1274,7 +1274,7 @@ function TDomNamedNodeMap.get_length: integer;
   // same as NodeList.get_length
 var
   node: xmlNodePtr;
-  ns: xmlNsPtr;
+//never used  ns: xmlNsPtr;
   //buff:xmlBufferPtr;
   //dtdtable: pchar;
 begin
@@ -1355,7 +1355,7 @@ var
   sName: String;
 begin
   result:= nil;
-  attr := nil;
+//never used  attr := nil;
   if FOwnerElement=nil then checkError(NOT_SUPPORTED_ERR);
   sName := UTF8Encode(Name);
   attr := xmlHasProp(FOwnerElement, pchar(sName));
@@ -1373,8 +1373,8 @@ function TDomNamedNodeMap.getNamedItemNS(const namespaceURI,
 var
   node:         xmlNodePtr;
   name1, name2: string;
-  NSAttr: IDOMAttr;
-  ns: xmlNsPtr;
+//never used  NSAttr: IDOMAttr;
+//never used  ns: xmlNsPtr;
 begin
   result := nil;
   node := GNamedNodeMap;
@@ -1392,7 +1392,7 @@ function TDomNamedNodeMap.setNamedItemNS(const newItem: IDomNode): IDomNode;
 var
   attr, oldattr, xmlnewAttr: xmlAttrPtr;
   temp, slocalName: string;
-  ns:        xmlNSPtr;
+//never used  ns:        xmlNSPtr;
   namespace: PChar;
   newAttr:   IDomAttr;
   node,node1: xmlNodePtr;
@@ -1449,8 +1449,8 @@ function TDomNamedNodeMap.removeNamedItemNS(const namespaceURI,
 var
   attr: xmlAttrPtr;
   name1, name2: string;
-  ns: xmlNsPtr;
-  NsAttr: IDOMAttr;
+//never used  ns: xmlNsPtr;
+//never used  NsAttr: IDOMAttr;
 begin
   result := nil;
   if FOwnerElement = nil then exit;
@@ -1808,7 +1808,7 @@ var
   sValue: string;
   wLocalName: WideString;
   sLocalName,sPrefix,sNamespaceURI: string;
-  node: xmlNodePtr;
+//never used  node: xmlNodePtr;
 begin
   wLocalName    := localName(qualifiedName);
   sLocalName    := UTF8Encode(wLocalName);
@@ -1825,7 +1825,7 @@ begin
   if qualifiedName <> '' then if not IsXmlName(qualifiedName) then
       checkError(INVALID_CHARACTER_ERR);
   sValue := UTF8Encode(Value);
-  node := xmlElement;
+//never used  node := xmlElement;
   if namespaceURI<>''then begin
     ns := xmlNewNs(nil,PChar(sNamespaceURI),PChar(sPrefix));
     xmlSetNSProp(xmlElement, ns, PChar(sLocalName), PChar(sValue));
@@ -1869,7 +1869,7 @@ var
   node:       xmlNodePtr;
   namespace:  PChar;
   sLocalname: string;
-  ns:xmlNsPtr;
+//never used  ns:xmlNsPtr;
 begin
   result:=nil;
   if newAttr=nil then exit;
@@ -2035,7 +2035,7 @@ function TDomElement.hasAttributeNS(const namespaceURI, localName: DOMString): b
 var
   sNamespaceURI,
   sLocalName:   string;
-  node:         xmlNodePtr;
+//never used  node:         xmlNodePtr;
 begin
   sNamespaceURI := UTF8Encode(namespaceURI);
   sLocalName    := UTF8Encode(localName);
@@ -2347,7 +2347,8 @@ function TDomDocument.createElementNS(const namespaceURI,
   qualifiedName: DOMString): IDomElement;
 var
   AElement:     xmlNodePtr;
-  ns,ns1:       xmlNsPtr;
+//never used  ns1,
+  ns:       xmlNsPtr;
   wlocalName:   widestring;
   sLocalName,
   sNamespaceUri,
@@ -2370,7 +2371,7 @@ begin
     temp := AElement.ns.href;
     temp := AElement.ns.prefix;
     AElement.nsdef := ns;
-    ns1:=AElement.nsDef;
+//never used    ns1:=AElement.nsDef;
   end else begin
     AElement := xmlNewDocNode(fXmlDocPtr, nil, pchar(UTF8Encode(qualifiedName)), nil);
   end;
