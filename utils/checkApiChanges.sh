@@ -44,7 +44,7 @@ cvs -z4 -d $aCvsBase co -r $aReleaseRev -d $MYDIR gnome-xml/include/libxml
 if [ ! -d $MYDIR/CVS ] ; then
 	exit
 fi
-echo Check... differences in revision number...
+echo Check differences in revision number...
 for fn in $aFileList; do
 	echo $fn
 	origfn=$fn
