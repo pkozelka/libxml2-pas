@@ -61,7 +61,8 @@ uses
   idom2,
   libxml2,
   libxslt,
-  sysutils;
+  sysutils,
+  strutils;
 
 const
 
@@ -447,6 +448,7 @@ type
       doctype: IDOMDocumentType); overload;
     constructor Create(GDOMImpl:IDOMImplementation); overload;
     constructor Create(GDOMImpl:IDOMImplementation; aUrl: DomString); overload;
+    constructor Create(GDOMImpl:IDOMImplementation;docnode:xmlNodePtr); overload;
     destructor destroy; override;
   end;
 
@@ -546,7 +548,11 @@ begin
       //change xml_entity_decl to TGDOMEntity
       if nodeType=17
         then nodeType:=6;
+      if nodeType=13
+        then nodeType:=9;
+      //if nodeType<>13 //html
       Result := NodeClasses[nodeType].Create(Node,ADocument)
+        //else Result:=nil;
     end
     else Result := nil;
 end;
@@ -2463,11 +2469,11 @@ begin
   ctxt := xmlCreateDocParserCtxt(temp.CString);
   if (ctxt <> nil) then begin
     // validation
-    if Fvalidate then begin
+    //if Fvalidate then begin
       ctxt.validate := -1;
-    end else begin
-      ctxt.validate := 0;
-    end;
+    //end else begin
+    //  ctxt.validate := 0;
+    //end;
     //todo: async (separate thread)
     //todo: resolveExternals
     xmlParseDocument(ctxt);
@@ -2982,7 +2988,6 @@ end;
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
 begin
   result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
-  (result as IDOMParseOptions).validate:=true;
   (result as IDOMParseOptions).resolveExternals:=true;
   (result as IDOMPersist).loadxml(xml);
 end;
@@ -3291,8 +3296,10 @@ var
   styleNode: xmlNodePtr;
   tempXSL:   xsltStylesheetPtr;
   encoding:  pchar;
-  length:    longInt;
+  length1:    longInt;
   CString:   pchar;
+  len: integer;
+  meta: widestring;
 begin
   doc:=FGNode.doc;
   styleNode:=GetGNode(stylesheet);
@@ -3307,8 +3314,19 @@ begin
   outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
   if outputDoc=nil then exit;
   encoding:=outputDoc.encoding;
-  xmlDocDumpMemoryEnc(outputDoc,CString,@length,encoding);
+  //xmlDocDumpMemoryEnc(outputDoc,CString,@length,encoding);
+  xmlDocDumpMemory(outputDoc,CString,@length1);
   output:=CString;
+  //Cut the leading <xml... > header
+  len:=pos('>',output)+2;
+  output:=copy(output,len,length1-len);
+  if leftstr(output,14)='<!DOCTYPE HTML'
+    then begin
+      //insert the meta tag for html output after the head tag
+      meta:='<META http-equiv="Content-Type" content="text/html; charset='+encoding+'">';
+      len:=pos('<head>',output)+6-1;
+      output:=leftstr(output,len)+meta+rightstr(output,length(output)-len);
+    end;
   xmlFree(CString);
 end;
 
@@ -3322,6 +3340,7 @@ var
   tempXSL:   xsltStylesheetPtr;
   //encoding:  pchar;
   //length:    longInt;
+  node: xmlNodePtr;
 begin
   doc:=FGNode.doc;
   styleNode:=GetGNode(stylesheet);
@@ -3335,7 +3354,13 @@ begin
   (stylesheet.ownerDocument as IDOMInternal).set_FtempXSL(tempXSL);
   outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
   if outputDoc=nil then exit;
-  output:=MakeNode(xmlNodePtr(outputDoc),nil) as IDOMDocument;
+//  if outputDoc.type_=13 then begin
+//    xmlFreeDoc(outputDoc);
+//    output:=nil;
+//    exit; //html
+//  end;
+  output:=TGDOMDocument.Create(nil,xmlNodePtr(outputDoc))
+    as IDOMDocument;
 end;
 
 function TGDOMNode.IsSameNode(node: IDOMNode): boolean;
@@ -3358,6 +3383,18 @@ end;
 procedure TGDOMDocument.set_FtempXSL(tempXSL: xsltStylesheetPtr);
 begin
   FtempXSL:=tempXSL;
+end;
+
+constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation;
+  docnode: xmlNodePtr);
+begin
+  FGdomimpl:=GDOMImpl;
+  FPGdomeDoc:=xmlDocPtr(docnode);
+  FAttrList:=TList.Create;
+  FNodeList:=TList.Create;
+  //Create root-node as pascal object
+  inherited create(docnode,nil);
+  inc(doccount);
 end;
 
 initialization
