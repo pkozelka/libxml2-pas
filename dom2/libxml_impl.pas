@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.1 2002-02-11 00:16:16 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.2 2002-02-11 00:30:04 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -30,7 +30,6 @@ type
   protected
     function  returnNullDomNode: IDomNode;
     function  returnEmptyString: DomString;
-    function  returnChildNodes: IDomNodeList;
     procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: WideString='');
     procedure checkName(aPrefix, aLocalName: String);
     procedure checkNsName(aPrefix, aLocalName, aNamespaceURI: String);
@@ -42,12 +41,12 @@ type
 
   TLDOMNodeClass = class of TLDOMNode;
   TLDOMNode = class(TLDOMObject, IDomNode, ILibXml2Node)
-  protected
+  protected //temporary!
     FGNode: xmlNodePtr;
+    function  returnChildNodes: IDomNodeList;
   private
     FChildNodes: TLDOMChildNodeList; // non-counted reference
     function  isAncestorOrSelf(aNode:xmlNodePtr): boolean; //new
-    function  returnChildNodes: IDomNodeList;
   protected //ILibXml2Node
     function  LibXml2NodePtr: xmlNodePtr;
   protected //IDomNode
@@ -99,21 +98,26 @@ type
   end;
 
   TLDOMDocument = class(TLDOMNode)
+  protected //tmp
+    FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
   private
     FGDOMImpl: IDomImplementation;
-    FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
     function  GetFlyingNodes: TList;
+  protected //IDomDocument
+    function  get_domImplementation: IDomImplementation;
   protected //
     property  FlyingNodes: TList read GetFlyingNodes;
   public
     destructor Destroy; override;
+    property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
   end;
 
   TLDOMDocumentType = class(TLDOMNode)
   end;
 
 //overridable implementations
-  NodeClasses: array[XML_ELEMENT_NODE..XML_ENTITY_DECL] of TLDOMNodeClass = (
+var
+  GlbNodeClasses: array[XML_ELEMENT_NODE..XML_ENTITY_DECL] of TLDOMNodeClass = (
     nil, //TGDOMElement,
     nil, //TGDOMAttr,
     nil, //TGDOMText,
@@ -155,7 +159,6 @@ var
   LDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
 
 function GetDomObject(aNode: pointer): IUnknown;
-const
 var
   obj: TLDOMNode;
   node: xmlNodePtr;
@@ -164,18 +167,18 @@ begin
   if aNode <> nil then begin
     node := xmlNodePtr(aNode);
     if (node._private=nil) then begin
-      ok := (node.type_ >= Low(NodeClasses))
-        and (node.type_ <= High(NodeClasses))
-        and Assigned(NodeClasses[node.type_]);
+      ok := (node.type_ >= Low(GlbNodeClasses))
+        and (node.type_ <= High(GlbNodeClasses))
+        and Assigned(GlbNodeClasses[node.type_]);
       DomAssert1(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [node.type_]), 'GetDomObject()');
-      obj := NodeClasses[node.type_].Create(node); // this assigns node._private
+      obj := GlbNodeClasses[node.type_].Create(node); // this assigns node._private
       // notify the node that it has a wrapper already
     end else begin
       // wrapper is already created, use it
       // first check if there is not a garbage
-      ok := (node.type_ >= Low(XML_ELEMENT_NODE))
-        and (node.type_ <= High(XML_DOCB_DOCUMENT_NODE))
-        and Assigned(NodeClasses[node.type_]);
+      ok := (node.type_ >= Low(GlbNodeClasses))
+        and (node.type_ <= High(GlbNodeClasses))
+        and Assigned(GlbNodeClasses[node.type_]);
       DomAssert1(ok, INVALID_ACCESS_ERR, 'not a DOM wrapper', 'GetDomObject()');
       obj := node._private;
     end;
@@ -267,11 +270,6 @@ end;
 function TLDOMObject.returnEmptyString: DomString;
 begin
   Result := '';
-end;
-
-function TLDOMObject.returnChildNodes: IDomNodeList;
-begin
-  Result := nil;
 end;
 
 function TLDOMObject.returnNullDomNode: IDomNode;
@@ -726,6 +724,14 @@ begin
     FFlyingNodes := TList.Create;
   end;
   Result := FFlyingNodes;
+end;
+
+function TLDOMDocument.get_domImplementation: IDomImplementation;
+begin
+  if FGDOMImpl=nil then begin
+//TODO!    FGDOMImpl := TGDOMImplementation.getInstance(DEFAULT_IMPL_FREE_THREADED);
+  end;
+  Result := FGDOMImpl;
 end;
 
 end.
