@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.61 2002-01-16 22:46:28 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.62 2002-01-16 23:05:15 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -445,47 +445,6 @@ const
 	DEFAULT_IMPL_FREE_THREADED = false;
 	GDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
 
-function GetDomObject(aNode: pointer): IUnknown;
-const
-	NodeClasses: array[XML_ELEMENT_NODE..XML_NOTATION_NODE] of TGDOMNodeClass = (
-		TGDOMElement,
-		TGDOMAttr,
-		TGDOMText,
-		TGDOMCDataSection,
-		TGDOMEntityReference,
-		TGDOMEntity,
-		TGDOMProcessingInstruction,
-		TGDOMComment,
-		TGDOMDocument,
-		TGDOMDocumentType,
-		TGDOMDocumentFragment,
-		TGDOMNotation
-	);
-var
-	obj: TGDOMNode;
-	node: xmlNodePtr;
-	ok: boolean;
-begin
-	if aNode <> nil then begin
-		node := xmlNodePtr(aNode);
-		if (node._private=nil) then begin
-			ok := (node.type_ >= Low(NodeClasses))
-				and (node.type_ <= High(NodeClasses))
-				and Assigned(NodeClasses[node.type_]);
-			Assert(ok, Format('LibXml2 node type "%d" is not supported', [node.type_]));
-			obj := NodeClasses[node.type_].Create(node);
-			// notify the node that it has a wrapper already
-			node._private := obj;
-		end else begin
-			// wrapper is already created, use it
-			obj := node._private;
-		end;
-	end else begin
-		obj := nil;
-	end;
-	Result := obj;
-end;
-
 function ErrorString(err:integer):string;
 begin
 	case err of
@@ -526,6 +485,52 @@ begin
 		aMsg := ErrorString(aErrorCode);
 	end;
 	raise EDOMException.Create(aMsg);
+end;
+
+function GetDomObject(aNode: pointer): IUnknown;
+const
+	NodeClasses: array[XML_ELEMENT_NODE..XML_NOTATION_NODE] of TGDOMNodeClass = (
+		TGDOMElement,
+		TGDOMAttr,
+		TGDOMText,
+		TGDOMCDataSection,
+		TGDOMEntityReference,
+		TGDOMEntity,
+		TGDOMProcessingInstruction,
+		TGDOMComment,
+		TGDOMDocument,
+		TGDOMDocumentType,
+		TGDOMDocumentFragment,
+		TGDOMNotation
+	);
+var
+	obj: TGDOMNode;
+	node: xmlNodePtr;
+	ok: boolean;
+begin
+	if aNode <> nil then begin
+		node := xmlNodePtr(aNode);
+		if (node._private=nil) then begin
+			ok := (node.type_ >= Low(NodeClasses))
+				and (node.type_ <= High(NodeClasses))
+				and Assigned(NodeClasses[node.type_]);
+			DomAssert(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [node.type_]));
+			obj := NodeClasses[node.type_].Create(node);
+			// notify the node that it has a wrapper already
+			node._private := obj;
+		end else begin
+			// wrapper is already created, use it
+			// first check if there is not a garbage
+			ok := (node.type_ >= Low(XML_ELEMENT_NODE))
+				and (node.type_ <= High(XML_DOCB_DOCUMENT_NODE))
+				and Assigned(NodeClasses[node.type_]);
+			DomAssert(ok, INVALID_ACCESS_ERR, 'not a DOM wrapper');
+			obj := node._private;
+		end;
+	end else begin
+		obj := nil;
+	end;
+	Result := obj;
 end;
 
 function GetGNode(const aNode: IDOMNode): xmlNodePtr;
@@ -1069,7 +1074,7 @@ begin
 	if not (self is TGDOMDocument) then begin
 	// if this is not the document itself, release the pretended reference to the owner document:
 	// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-	//	get_ownerDocument._Release;
+//		get_ownerDocument._Release;
 	end;
 	Dec(nodecount);
 	inherited Destroy;
