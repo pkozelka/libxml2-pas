@@ -2128,18 +2128,20 @@ begin
 end;
 
 function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
-//var
-  //AElement: xmlElementPtr;
-  //name1: TGdomString;
+var
+  AAttr: xmlAttrPtr;
+  AElement: xmlNodePtr;
+  name1: TGdomString;
 begin
-  checkError(NOT_SUPPORTED_ERR);
-  {name1:=TGdomString.create(elementID);
-  AElement:=gdome_doc_getElementById(FPGdomeDoc,name1.GetPString, @exc);
-  CheckError(exc);
-	name1.Free;
+  name1:=TGdomString.create(elementID);
+  AAttr:=xmlGetID(FPGdomeDoc,name1.CString);
+  if AAttr<>nil
+    then AElement:=AAttr.parent
+    else AElement:=nil;
+  name1.Free;
   if AElement <> nil
     then result:=TGDOMElement.Create(AElement,self)
-    else result:=nil;}
+    else result:=nil;
 end;
 
 // IDOMParseOptions
