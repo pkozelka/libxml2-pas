@@ -38,7 +38,7 @@ document/IDOMPersist        load                   1             X
 document/IDOMPersist        save                   1             X                                                                
 document/IDOMPersist        loadXML                1             X      
 document/IDOMPersist        xml                    1             X                                                                
-document/IDOMParseOptions   validate               ?                    fe: failure not reported        
+document/IDOMParseOptions   validate               2             X             
 documentType                entities               ?                                                           
 documentType                internalSubset         3             X      
 documentType                name                   3             X      
@@ -115,4 +115,4 @@ Summary:
 43 high priority methods
 all done
 
-93 methods done totally       
+94 methods done totally       
