@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=`../utils/cutver.sh libxml_xmlwin32version.inc`
+VERSION=`grep "_DOTTED_VERSION = '" libxml_xmlwin32version.inc | cut -d\' -f2`
 LIBNAME=libxml2
 PACKAGE=$LIBNAME-pas
 RELEASENAME=$PACKAGE-$VERSION-src
@@ -7,28 +7,51 @@ TAG="`echo $LIBNAME\_$VERSION | tr [:lower:] [:upper:] | sed 's/\./_/g'`"
 MYTMP=./$TAG.tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
 
-TP=$1
+############################################################################
+function queryExtension()
+{
+	case $TERM in
+	cygwin*) EXT=zip ;;
+	*) EXT=tgz ;;
+	esac
+}
+############################################################################
+function createArchive() 
+{
+	queryExtension
+	case "$EXT" in
+	zip)
+		ARCHIVEFILE=$RELEASENAME.$EXT
+		PACKCMD="zip -qr ../$ARCHIVEFILE *"
+	;;
+	tgz)
+		ARCHIVEFILE=$RELEASENAME.$EXT
+		PACKCMD="tar -zcf ../$ARCHIVEFILE *"
+	;;
+	esac
 
-case "$TP" in
-  zip)
-	ARCHIVEFILE=$RELEASENAME.zip
-	CMD="zip -qr ../$ARCHIVEFILE *"
-	;;
-  tgz)
-	ARCHIVEFILE=$RELEASENAME.tgz
-	CMD="tar -zcf ../$ARCHIVEFILE *"
-	;;
-  *)
-  	echo "use one argument: tgz or zip"
-  	exit -1
+	echo "Extracting $LIBNAME-pas from CVS tag $TAG ..."
+	rm -rf $MYTMP
+	cvs -z4 -d $CVSROOT export -r $TAG -d $MYTMP .
+
+	echo "Preparing archive $ARCHIVEFILE ..."
+	rm -f $ARCHIVEFILE
+	cd $MYTMP
+	$PACKCMD
+	cd ..
+}
+############################################################################
+function uploadToSourceForge()
+{
+	ftp-put.sh upload.log upload.sourceforge.net incoming $ARCHIVE.tgz $ARCHIVE.tgz anonymous libxml2-pas@sourceforge.net
+	cat upload.log
+	rm upload.log
+}
+############################################################################
+
+CMD=$1
+case $CMD in
+dist) createArchive ;;
+upload) uploadToSourceForge	;;
+*) echo "Usage: $0 [dist|upload]" ;;
 esac
-
-echo "Extracting $LIBNAME-pas from CVS tag $TAG ..."
-rm -rf $MYTMP
-cvs -z4 -d $CVSROOT export -r $TAG -d $MYTMP .
-
-echo "Preparing archive $ARCHIVEFILE ..."
-rm -f $ARCHIVEFILE
-cd $MYTMP
-$CMD
-cd ..
