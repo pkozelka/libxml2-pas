@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.29 2002-03-03 13:27:03 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.30 2002-03-03 23:32:48 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -65,7 +65,6 @@ type
     fExtensionObj: TLDomNodeExtension;
     fChildNodes: TLDomChildNodeList; // non-counted reference
     function  isAncestorOrSelf(aNode:xmlNodePtr): Boolean; //new
-    function  returnChildNodes: IDomNodeList;
   protected //IUnknown
     function  QueryInterface(const aIID: TGUID; out aObj): HResult; stdcall;
   protected //ILibXml2Node
@@ -111,16 +110,11 @@ type
 
   TLDomAttr = class(TLDomNode, IDomNode, IDomAttr)
   protected //IDomNode
-//    function  IDomNode.get_childNodes = returnChildNodes;
-    function  get_childNodes: IDomNodeList;
     function  IDomNode.get_parentNode = returnNullDomNode;
-//    function  IDomNode.get_firstChild = returnNullDomNode;
-//    function  IDomNode.get_lastChild = returnNullDomNode;
     function  IDomNode.get_previousSibling = returnNullDomNode;
     function  IDomNode.get_nextSibling = returnNullDomNode;
   protected //IDomAttr
     function  IDomAttr.get_name = get_nodeName;
-//    function  IDomAttr.get_childNodes = returnChildNodes;
     function  get_specified: Boolean;
     function  IDomAttr.get_value = get_nodeValue;
     procedure IDomAttr.set_value = set_nodeValue;
@@ -222,10 +216,8 @@ type
 
   TLDomDocumentFragment = class(TLDomNode, IDomDocumentFragment, IDomNode)
   protected //IDomNode
-    function  IDomNode.get_childNodes = returnChildNodes;
     function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomDocumentFragment
-    function  IDomDocumentFragment.get_childNodes = returnChildNodes;
     function  IDomDocumentFragment.get_parentNode = returnNullDomNode;
   end;
 
@@ -235,11 +227,9 @@ type
   private
     fFlyingNodes: TLDomAttributeMap; // non-counted reference
   protected //IDomNode
-    function  IDomNode.get_childNodes = returnChildNodes;
     function  get_attributes: IDomNamedNodeMap;
   protected //IDomElement
     function  IDomElement.get_tagName = get_nodeName;
-    function  IDomElement.get_childNodes = returnChildNodes;
     function  getAttribute(const name: DomString): DomString;
     procedure setAttribute(const name, value: DomString);
     procedure removeAttribute(const name: DomString);
@@ -320,8 +310,6 @@ type
     function  IDomNode.get_nodeValue = returnEmptyString;
     procedure set_nodeValue(const value: DomString);
     function  get_nodeType: DomNodeType;
-//    function  IDomNode.get_childNodes = returnChildNodes;
-    function  get_childNodes: IDomNodeList;
     function  IDomNode.get_parentNode = returnNullDomNode;
     function  IDomNode.get_previousSibling = returnNullDomNode;
     function  IDomNode.get_nextSibling = returnNullDomNode;
@@ -331,7 +319,6 @@ type
     function  IDomNode.get_localName = returnEmptyString;
   protected //IDomDocument
     function  IDomDocument.get_nodeValue = returnEmptyString;
-//    function  IDomDocument.get_childNodes = returnChildNodes;
     function  IDomDocument.get_parentNode = returnNullDomNode;
     function  IDomDocument.get_previousSibling = returnNullDomNode;
     function  IDomDocument.get_nextSibling = returnNullDomNode;
@@ -770,9 +757,18 @@ end;
 
 function TLDomNode.get_childNodes: IDomNodeList;
 begin
-  // classes that need to support childNodes
-  // must redirect this VMT record to returnChildNodes
-  Result := nil;
+  case get_nodeType of
+  TEXT_NODE,
+  COMMENT_NODE,
+  PROCESSING_INSTRUCTION_NODE,
+  CDATA_SECTION_NODE:
+    Result := nil;
+  else
+    if (fChildNodes=nil) then begin
+      TLDomChildNodeList.Create(self); // assigns fChildNodes
+    end;
+    Result := fChildNodes;
+  end;
 end;
 
 function TLDomNode.get_lastChild: IDomNode;
@@ -860,14 +856,14 @@ begin
   XML_CDATA_SECTION_NODE,
   XML_COMMENT_NODE,
   XML_PI_NODE:
-    begin
-      p := xmlNodeGetContent(fMyNode);
-      if (p<>nil) then begin
-        Result := UTF8Decode(p);
-        xmlFree(p);
-      end;
-    end;
+    p := xmlNodeGetContent(fMyNode);
   else
+    p := nil;
+  end;
+  if (p<>nil) then begin
+    Result := UTF8Decode(p);
+    xmlFree(p);
+  end else begin
     Result := '';
   end;
 end;
@@ -1049,14 +1045,6 @@ function TLDomNode.requestNodePtr: xmlNodePtr;
 begin
   DomAssert(fMyNode<>nil, INVALID_ACCESS_ERR, ClassName+'.requestNodePtr: wrapping null node');
   Result := fMyNode;
-end;
-
-function TLDomNode.returnChildNodes: IDomNodeList;
-begin
-  if (fChildNodes=nil) then begin
-    TLDomChildNodeList.Create(self); // assigns fChildNodes
-  end;
-  Result := fChildNodes;
 end;
 
 procedure TLDomNode.set_nodeValue(const value: DomString);
@@ -1309,11 +1297,6 @@ end;
 function TLDomDocument.GetGDoc: xmlDocPtr;
 begin
   Result := xmlDocPtr(fMyNode);
-end;
-
-function TLDomDocument.get_childNodes: IDomNodeList;
-begin
-  Result := returnChildNodes;
 end;
 
 function TLDomDocument.get_doctype: IDomDocumentType;
@@ -1665,11 +1648,6 @@ begin
 end;
 
 { TLDomAttr }
-
-function TLDomAttr.get_childNodes: IDomNodeList;
-begin
-  Result := returnChildNodes;
-end;
 
 function TLDomAttr.get_ownerElement: IDomElement;
 begin
