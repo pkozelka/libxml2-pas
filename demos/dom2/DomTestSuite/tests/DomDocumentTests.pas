@@ -7,15 +7,6 @@ uses
   xDom2,
   DomSetup;
 
-const
-  (* some test xml docs *)
-  XML_VALID_DOC_1 =
-         '<?xml version=''1.0''?>' +
-         '  <!DOCTYPE testDoc [' +
-         '  <!ELEMENT testDoc (#PCDATA)>' +
-         '  ]>' +
-         '  <testDoc>some text</testDoc>';
-
 type
 
   TDomDocumentFundamentalTests = class(TTestCase)
@@ -50,6 +41,8 @@ type
       procedure createElementTest;
       (* converted from: documentCreateElementCaseSensitive.js *)
       procedure createElementCaseSensitiveTest;
+      (* converted from: documentCreateElementDefaultAttr.js *)
+      procedure createElementDefaultAttrTest;
 
   end;
 
@@ -59,6 +52,7 @@ implementation
 
 uses
   SysUtils;
+
 
 procedure TDomDocumentFundamentalTests.setup;
 begin
@@ -308,6 +302,34 @@ begin
 end;
 
 
+(* creates an element and checks if it has a default attribute *)
+procedure TDomDocumentFundamentalTests.createElementDefaultAttrTest;
+const
+  XML_VALID_DOC =
+         '<?xml version=''1.0''?>' +
+         '  <!DOCTYPE address [' +
+         '  <!ELEMENT address (#PCDATA)>' +
+         '  <!ATTLIST address' +
+         '            domestic CDATA #IMPLIED' +
+         '            street CDATA "Yes">' +
+         '  ]>' +
+         '  <address>some text</address>';
+
+  ATTR_NAME = 'street';
+var
+  document : IDomDocument;
+  element  : IDomElement;
+  attrMap  : IDomNamedNodeMap;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  element := document.createElement('address');
+  attrMap := element.attributes;
+  (* because of default attr there should be a default attr street/ Yes *)
+  check(attrMap.length = 1, 'there should be 1 attribute');
+  check(attrMap.item[0].nodeName = ATTR_NAME, 'attr.nodename <> street');
+  check(attrMap.item[0].nodeValue = 'Yes', 'attr.nodeValue <> Yes');
+end;
 
 
 (******************************************************************************)
