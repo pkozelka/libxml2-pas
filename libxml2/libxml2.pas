@@ -168,22 +168,22 @@ begin
 end;
 
 // Delphi memory handling
-procedure DelphiFreeFunc(ptr: pointer);
+procedure DelphiFreeFunc(ptr: pointer); cdecl;
 begin
   FreeMem(ptr);
 end;
 
-function  DelphiMallocFunc(size:size_t):pointer;
+function  DelphiMallocFunc(size:size_t):pointer; cdecl;
 begin
   Result := AllocMem(size);
 end;
 
-function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer;
+function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer; cdecl;
 begin
   Result := ReallocMemory(ptr, size);
 end;
 
-function  DelphiStrdupFunc(str:PChar):Pchar;
+function  DelphiStrdupFunc(str:PChar):Pchar; cdecl;
 var
   sz: integer;
 begin
