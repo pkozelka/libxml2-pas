@@ -26,8 +26,6 @@
     }
 
 
-{$I libxslt_numbersInternals.inc}
-
 {
      XSLT_MAX_SORT:
 

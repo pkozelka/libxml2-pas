@@ -49,6 +49,7 @@ procedure xsltCleanupGlobals; cdecl; external LIBXSLT_SO;
 NOTE: two spaces after $I mean that the file is not yet converted to CVS-SIGN format.
 }
 
+{$I  libxslt_numbersInternals.inc}
 {$I  libxslt_xsltInternals.inc}
 {$I libxslt_transform.inc}
 {$I libxslt_xsltutils.inc}

@@ -62,4 +62,3 @@ procedure xsltRegisterAllElement(ctxt: xsltTransformContextPtr); cdecl; external
  *)
 procedure xslHandleDebugger(cur: xmlNodePtr; node: xmlNodePtr; templ: xsltTemplatePtr; ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
 
-
