@@ -139,15 +139,23 @@ type
   //xmlNodePtrList=xmlNodePtr;
   PGDomeNamedNodeMap=Pointer;
 
-  TGDOMNodeList = class(TGDOMInterface, IDOMNodeList)
+  IDOMNodeListExt = Interface
+  ['{4223A6AA-7934-4013-B5C7-563513F4B750}']
+    procedure AddNode(node:xmlNodePtr);
+  end;
+
+  TGDOMNodeList = class(TGDOMInterface, IDOMNodeList, IDOMNodeListExt)
   private
      FParent: xmlNodePtr;
      FXPathObject: xmlXPathObjectPtr;
      FOwnerDocument: IDOMDocument;
+     FAdditionalNode: xmlNodePtr;
   protected
     { IDOMNodeList }
     function get_item(index: Integer): IDOMNode;
     function get_length: Integer;
+    {IXMLDOMNodeListExt}
+    procedure AddNode(node:xmlNodePtr);
   public
     constructor Create(AParent: xmlNodePtr;ADocument:IDOMDocument); overload;
     constructor Create(AXpathObject: xmlXPathObjectPtr;ADocument:IDOMDocument); overload;
@@ -1086,7 +1094,13 @@ begin
 	inherited Create;
   FParent := AParent;
   FXpathObject := nil;
+  FAdditionalNode:=nil;
   FOwnerDocument := ADocument;
+end;
+
+procedure TGDOMNodeList.AddNode(node: xmlNodePtr);
+begin
+  FAdditionalNode:=node;
 end;
 
 constructor TGDOMNodeList.Create(AXpathObject: xmlXPathObjectPtr;
@@ -1101,6 +1115,7 @@ constructor TGDOMNodeList.Create(AXpathObject: xmlXPathObjectPtr;
 begin
   inherited Create;
   FParent := nil;
+  FAdditionalNode:=nil;
   FXpathObject := AXpathObject;
   FOwnerDocument := ADocument;
 end;
@@ -1120,18 +1135,24 @@ var
 begin
   i:=index;
   node:=nil;
-  if FParent<>nil then begin
-    node:=FParent.children;
-    while (i>0) and (node.next<>nil) do begin
-      dec(i);
-      node:=node.next
+  if (i=0) and (FAdditionalNode<>nil)
+    then node:=FAdditionalNode
+    else begin
+      if FAdditionalNode<>nil
+        then i:=i-1;
+      if FParent<>nil then begin
+        node:=FParent.children;
+        while (i>0) and (node.next<>nil) do begin
+          dec(i);
+          node:=node.next
+        end;
+        if i>0 then checkError(INDEX_SIZE_ERR);
+      end else begin
+          if FXPathObject<>nil
+            then node:=xmlXPathNodeSetItem(FXPathObject.nodesetval,i)
+            else checkError(101);
+      end;
     end;
-    if i>0 then checkError(INDEX_SIZE_ERR);
-  end else begin
-      if FXPathObject<>nil
-        then node:=xmlXPathNodeSetItem(FXPathObject.nodesetval,i)
-        else checkError(101);
-  end;
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
     else result:=nil;
@@ -1151,9 +1172,13 @@ begin
              node:=node.next
            end
       else i:=0;
-    result:=i;
+    if FAdditionalNode=nil
+      then result:=i
+      else result:=i+1;
   end else begin
-    result:=FXPathObject.nodesetval.nodeNr;
+    if FAdditionalNode=nil
+      then result:=FXPathObject.nodesetval.nodeNr
+      else result:=FXPathObject.nodesetval.nodeNr+1;
   end;
 end;
 
@@ -2019,8 +2044,16 @@ begin
 end;
 
 function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList;
+var
+  tmp,tmp1:IDOMNodeList;
+  node:IDOMNode;
 begin
-  result:=(self.get_documentElement as IDOMNodeSelect).selectNodes(tagName);
+  //tmp:=(self as IDOMNodeSelect).selectNodes(tagName);
+  //if tmp<>nil then node:=tmp[0];
+  tmp1:=(self.get_documentElement as IDOMNodeSelect).selectNodes('//'+tagName);
+  //if node<>nil
+    //then (tmp1 as IDOMNodeListExt).AddNode(GetGNode(node));
+  result:=tmp1;
 end;
 
 function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
@@ -2155,10 +2188,21 @@ end;
 
 function TGDOMDocument.getElementsByTagNameNS(const namespaceURI,
   localName: DOMString): IDOMNodeList;
-var docElement:IDOMElement;
+var
+  docElement:IDOMElement;
+  tmp,tmp1:IDOMNodeList;
+  node:IDOMNode;
 begin
-  docElement:=self.get_documentElement;
-  result:=docElement.getElementsByTagNameNS(namespaceURI,localName);
+  if namespaceURI='*' then begin
+    docElement:=self.get_documentElement;
+    tmp1:=(docElement as IDOMNodeSelect).selectNodes('//'+localName);
+    result:=tmp1;
+  end else begin;
+    docElement:=self.get_documentElement;
+    (docElement as IDOMNodeSelect).registerNs('xyz4ct',namespaceURI);
+    tmp1:=(docElement as IDOMNodeSelect).selectNodes('//xyz4ct:'+localName);
+    result:=tmp1;
+  end;
 end;
 
 function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
@@ -2713,7 +2757,8 @@ begin
   if doc=nil then CheckError(100);
   ctxt:=xmlXPathNewContext(doc);
   ctxt.node:=FGNode;
-  {ok:=}xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
+  if (FPrefix<>'') and (FURI<>'')
+  {ok:=}then xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
   res:=xmlXPathEvalExpression(pchar(temp),ctxt);
   if res<>nil then  begin
     nodetype:=res.type_;
