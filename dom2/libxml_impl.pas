@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.3 2002-02-11 19:11:22 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.4 2002-02-11 19:22:40 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -24,7 +24,7 @@ uses
 type
   TLDOMChildNodeList = class;
 
-  { TLDOMObject }
+  { TLDOMObject class }
 
   TLDOMObject = class(TInterfacedObject)
   protected
@@ -37,7 +37,7 @@ type
     function SafeCallException(aExceptObject: TObject; aExceptAddr: Pointer): HRESULT; override;
   end;
 
-  { TLDOMNode }
+  { TLDOMNode class }
 
   TLDOMNodeClass = class of TLDOMNode;
   TLDOMNode = class(TLDOMObject, IDomNode, ILibXml2Node)
@@ -83,7 +83,7 @@ type
     destructor Destroy; override;
   end;
 
-  { TLDOMChildNodeList }
+  { TLDOMChildNodeList class }
 
   TLDOMChildNodeList = class(TLDOMObject, IDomNodeList)
   private
@@ -97,7 +97,9 @@ type
     destructor Destroy; override;
   end;
 
-  TLDOMDocument = class(TLDOMNode)
+  { TLDOMDocument class }
+
+  TLDOMDocument = class(TLDOMNode, IDomNode)
   protected //tmp
     FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
   private
@@ -119,11 +121,22 @@ type
   protected //IDomDocument
     function  get_domImplementation: IDomImplementation;
   protected //
+    constructor Create(aLibXml2Node: pointer); override;
+    (**
+     * On-demand creation of the underlying document.
+     *)
+    function  requestDocPtr: xmlDocPtr;
+    function  requestNodePtr: xmlNodePtr; override;
+    function  GetGDoc: xmlDocPtr;
+    procedure SetGDoc(aNewDoc: xmlDocPtr);
+    property  GDoc: xmlDocPtr read GetGDoc write SetGDoc;
     property  FlyingNodes: TList read GetFlyingNodes;
   public
     destructor Destroy; override;
     property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
   end;
+
+  { TLDOMDocumentType class }
 
   TLDOMDocumentType = class(TLDOMNode)
   end;
@@ -723,8 +736,16 @@ end;
 
 { TLDOMDocument }
 
+constructor TLDOMDocument.Create(aLibXml2Node: pointer);
+begin
+  inherited Create(aLibXml2Node);
+  Inc(GlbDocCount);
+end;
+
 destructor TLDOMDocument.Destroy;
 begin
+  GDoc := nil;
+  //
   Dec(GlbDocCount);
   FFlyingNodes.Free;
   FFlyingNodes := nil;
@@ -737,6 +758,11 @@ begin
     FFlyingNodes := TList.Create;
   end;
   Result := FFlyingNodes;
+end;
+
+function TLDOMDocument.GetGDoc: xmlDocPtr;
+begin
+  Result := xmlDocPtr(FGNode);
 end;
 
 function TLDOMDocument.get_domImplementation: IDomImplementation;
@@ -760,6 +786,97 @@ end;
 function TLDOMDocument.get_ownerDocument: IDomDocument;
 begin
   Result := nil; // required by DOM spec.
+end;
+
+function TLDOMDocument.requestDocPtr: xmlDocPtr;
+begin
+  Result := GetGDoc;
+  if Result<>nil then exit; //the document is already created so we have to use it
+  // otherwise, we create the document, using all the parameters specified so far
+
+  //todo: distinguish empty doc, parsing, and push-parsing cases (for async)
+  Result := xmlNewDoc(XML_DEFAULT_VERSION);
+  SetGDoc(Result);
+end;
+
+function TLDOMDocument.requestNodePtr: xmlNodePtr;
+begin
+  requestDocPtr;
+  Result := FGNode;
+end;
+
+procedure TLDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
+  procedure _DestroyFlyingNodes;
+  var
+    i: integer;
+    node: xmlNodePtr;
+    p: pointer;
+  begin
+    if FFlyingNodes=nil then exit;
+    for i:=FFlyingNodes.Count-1 downto 0 do begin
+      p := FFlyingNodes[i];
+      node := p;
+      if (node._private<>nil) then begin
+        TLDOMNode(node._private).FGNode := nil;
+        node._private := nil;
+      end;
+      case node.type_ of
+      XML_HTML_DOCUMENT_NODE,
+      XML_DOCB_DOCUMENT_NODE,
+      XML_DOCUMENT_NODE:
+        DomAssert(false, -1, 'This node may never be flying');
+      XML_ATTRIBUTE_NODE:
+        begin
+          xmlUnlinkNode(p);
+          xmlFreeProp(p);
+        end;
+      XML_DTD_NODE:
+        begin
+          xmlUnlinkNode(p);
+          xmlFreeDtd(p);
+        end;
+      else
+        xmlUnlinkNode(p);
+        xmlFreeNode(p);
+      end;
+    end;
+  end;
+
+  procedure _ReallocateFlyingNodes;
+  var
+    i: integer;
+    node: xmlNodePtr;
+  begin
+    if FFlyingNodes=nil then exit;
+    for i:=FFlyingNodes.Count-1 downto 0 do begin
+      node := FFlyingNodes[i];
+      case node.type_ of
+      XML_HTML_DOCUMENT_NODE,
+      XML_DOCB_DOCUMENT_NODE,
+      XML_DOCUMENT_NODE:
+        DomAssert(false, -1, 'This node may never be flying');
+      else
+        node.doc := aNewDoc;
+      end;
+    end;
+  end;
+
+var
+  old: xmlDocPtr;
+begin
+  old := GetGDoc;
+  if (aNewDoc<>nil) then begin
+    _ReallocateFlyingNodes;
+    aNewDoc._private := self;
+  end else begin
+// for some strange reason, the following line makes troubles
+		_DestroyFlyingNodes;
+  end;
+  FGNode := xmlNodePtr(aNewDoc);
+  if (old<>nil) then begin
+    old._private := nil;
+    xmlFreeDoc(old);
+  end;
 end;
 
 procedure TLDOMDocument.set_nodeValue(const value: DomString);
