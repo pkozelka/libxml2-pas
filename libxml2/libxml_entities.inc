@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.33] entities.h
+// CVS-SIGN: [1.34] entities.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -35,7 +35,7 @@ type
   xmlEntity = record
     _private : pointer;             { application data  }
     type_ : xmlElementType;         { XML_ENTITY_DECL, must be second !  }
-    name : PxmlChar;                { Attribute name  }
+    name : PxmlChar;                { Entity name  }
     children : ^xmlNode;            (* First child link *)
     last : ^xmlNode;                (* Last child link *)
     parent : ^xmlDtd;               { -> DTD  }
