@@ -22,7 +22,12 @@ interface
 uses libxml2;
 
 const
+{$ifdef WIN32}
 	LIBXSLT_SO = 'libxslt.dll';
+{$endif}
+{$ifdef LINUX}
+	LIBXSLT_SO = 'libxslt.so';
+{$endif}
 
 {$WEAKPACKAGEUNIT}
 
