@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.106] tree.h
+// CVS-SIGN: [1.107] tree.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
