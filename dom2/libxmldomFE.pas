@@ -488,6 +488,7 @@ implementation
 
 function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
 function IsXmlName(const S: wideString): boolean; forward;
+function appendNamespace(element:xmlNodePtr;ns: xmlNsPtr): boolean; forward;
 
 function MakeNode(Node: xmlNodePtr;ADocument:IDOMDocument): IDOMNode;
 const
@@ -1648,8 +1649,7 @@ begin
     if xmlnewAttr.ns<>nil
       then begin
         namespace:=xmlnewAttr.ns.href;
-        node.nsDef:=xmlnewAttr.ns;
-        //xmlSetNs(node,xmlnewAttr.ns);
+        appendNamespace(node,xmlnewAttr.ns);
       end else namespace:='';
     slocalName:=localName(xmlNewattr.name);
     oldattr:=xmlHasNSProp(node,pchar(slocalName),namespace); // already an attribute with this name?
@@ -1673,6 +1673,23 @@ begin
         result:=nil;
       end;
   end;
+end;
+
+function appendNamespace(element:xmlNodePtr;ns: xmlNsPtr):boolean;
+var
+  tmp,last:xmlNsPtr;
+begin
+  result:=false;
+  if element.type_<> Element_Node then exit;
+  tmp:=element.nsDef;
+  while tmp<> nil do begin
+    last:=tmp;
+    tmp:=tmp.next;
+  end;
+  if element.nsDef=nil
+    then element.nsDef:=ns
+    else last.next:=ns;
+  result:=true;
 end;
 
 function TGDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
