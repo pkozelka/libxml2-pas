@@ -57,15 +57,9 @@ end;
 function getEmptyDoc(vendorstr: string): IDomDocument;
 var
   dom: IDomImplementation;
-  docBuilder : IDomDocumentBuilder;
 begin
-  if vendorstr='LIBXML' then begin
-    dom := GetDom(vendorstr);
-    result := dom.createDocument('','',nil);
-  end else begin
-    docBuilder := getDocumentBuilderFactory(vendorstr).NewDocumentBuilder;
-    result := docBuilder.newDocument;
-  end;
+  dom := GetDom(vendorstr);
+  result := dom.createDocument('','',nil);
 end;
 
 function getDoc(filename, vendorstr: string): IDomDocument;
@@ -204,20 +198,16 @@ procedure TestGDom3b(name,vendorstr:string);
     document.documentElement.appendChild(node);
     node := nil;
 
-    if vendorstr = 'MSXML' then begin
-      outLog('element.getElementsByTagNameNS doesn''t work with MSXML');
-    end else begin
-      //p=2
-      nodelist := document.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
-      if nodelist<>nil
-        then test('document.getElementsByTagNameNS (length)',(nodelist.length = 1));
-      nodelist := nil;
-      //p=2
-      nodelist := document.documentElement.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
-      if nodelist <> nil
-        then test('element.getElementsByTagNameNS (length)',(nodelist.length = 1));
-      nodelist := nil;
-    end;
+    //p=2
+    nodelist := document.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
+    if nodelist<>nil
+      then test('document.getElementsByTagNameNS (length)',(nodelist.length = 1));
+    nodelist := nil;
+    //p=2
+    nodelist := document.documentElement.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
+    if nodelist <> nil
+      then test('element.getElementsByTagNameNS (length)',(nodelist.length = 1));
+    nodelist := nil;
 
     //p=2
     nodelist := document.getElementsByTagName('sometag');
@@ -332,16 +322,15 @@ procedure TestGDom3b(name,vendorstr:string);
 
     document:=nil;
     document := getDoc(filename,vendorstr);
-    if vendorstr = 'LIBXML' then begin
-      // supported by LIBXML but not by W3C
-      nodeselect := document.documentElement as IDOMNodeSelect;
-      node := nodeselect.selectNode('sometag/@name');
-      if node <> nil
-        then test('IDOMNodeSelect.selectNode',(node.nodeValue = '1st child of DocumentElement'))
-        else outlog('__ERROR__ IDOMNodeSelect.selectNode => failed');
-      node := nil;
-      nodeselect := nil;
-    end;
+
+    // supported by LIBXML and MSXML but not by W3C
+    nodeselect := document.documentElement as IDOMNodeSelect;
+    node := nodeselect.selectNode('sometag/@name');
+    if node <> nil
+      then test('IDOMNodeSelect.selectNode',(node.nodeValue = '1st child of DocumentElement'))
+      else outlog('__ERROR__ IDOMNodeSelect.selectNode => failed');
+    node := nil;
+    nodeselect := nil;
 
     //p=1
     node := document.documentElement.firstChild.cloneNode(True);
@@ -378,12 +367,12 @@ procedure TestGDom3b(name,vendorstr:string);
       test('node.clone & replace',(node.nodeName = 'sometag')) ;
       node := nil;
 
-      if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
+      //if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
         test('node.isSupported "Core"',(document.documentElement.isSupported('Core','2.0'))) ;
         test('node.isSupported "XML"',(document.documentElement.isSupported('XML','2.0'))) ;
-      end else begin
-        outLog('node.isSupported doesn''t work with MSXML.')
-      end;
+      //end else begin
+      //  outLog('node.isSupported doesn''t work with MSXML.')
+      //end;
 
       //p=2
       outLog('node.normalize => disabled');
@@ -419,21 +408,13 @@ procedure TestGDom3b(name,vendorstr:string);
     node := document.createElement('urgs') as IDOMNode;
     test('node.prefix',(node.prefix = '')) ;
     test('node.namespaceUri',(node.namespaceURI = '')) ;
-    if vendorstr<>'MSXML2_RENTAL_MODEL' then begin
-      test('node.localName',(node.localName = ''));  // see W3C.ORG: if using createElement instead of createElementNS localName has to return null
-    end else begin
-      outLog('node.localName doesn''t work with MSXML.');
-    end;
+    test('node.localName',(node.localName = ''));  // see W3C.ORG: if using createElement instead of createElementNS localName has to return null
     node := nil;
 
     node := document.createElementNS('http://xmlns.4commerce.de/eva','eva:urgs') as IDOMNode;
     test('node.prefix (NS)',(node.prefix = 'eva')) ;
     test('node.namespaceUri (NS)',(node.namespaceURI = 'http://xmlns.4commerce.de/eva')) ;
-    if vendorstr<>'MSXML2_RENTAL_MODEL' then begin
-      test('node.localName (NS)',(node.localName = 'urgs'));
-    end else begin
-      outLog('node.localName doesn''t work with MSXML.');
-    end;
+    test('node.localName (NS)',(node.localName = 'urgs'));
     node := nil;
   end;
 
@@ -518,7 +499,7 @@ begin
       test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
       documenttype := nil;
     end else begin
-        outLog('domImplementation.createDocument (NS) doesn''t work with MSXML.');
+      outLog('domImplementation.createDocument (NS) doesn''t work with MSXML.');
     end;
 
     if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
@@ -542,7 +523,11 @@ begin
       test('documentType.systemId',(documenttype.systemId = 'test'));
       test('documentType.publicId',(documenttype.publicId = 'a'));
       documenttype := nil;
+    end else begin
+      outLog('documentType.systemId doesn''t work with MSXML');
+      outLog('documentType.publicId doesn''t work with MSXML');
     end;
+
 
     // testing character data
 
@@ -708,7 +693,7 @@ begin
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  outLog('Number of tests total:     101');
+  outLog('Number of tests total:     108');
   //outLog('doccount='+inttostr(doccount));
   //outLog('nodecount='+inttostr(nodecount));
   //outLog('elementcount='+inttostr(elementcount));
