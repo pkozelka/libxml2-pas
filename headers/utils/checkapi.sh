@@ -60,57 +60,54 @@ THISPATH=`pwd`
 for fn in $FILELIST ; do
 	cd $THISPATH
 	echo -n "  checking: $fn:  "
-	LINE=`head $fn | grep CVS-REV`
-	if [ "x$LINE" = "x" ]; then
+	revInfo=`head $fn | sed -n '/CVS-REV/{s#.*CVS-REV:\([^:]*\):\([^:]*\):#\1:\2#;p}'`
+	if [ "$revInfo" = "" ]; then
 		echo
 		echo "ERROR: no CVS-REV in $fn" >&2
 		continue
 	fi
-	ORIGFILE=`echo $LINE | cut -d: -f2`
-	ORIGFILENAME=`basename $ORIGFILE`
-	ORIGFILEPATH=`dirname $ORIGFILE`
-	REV=`echo $LINE | cut -d: -f3`
+	origFile=${revInfo%:*}
+	curRev=${revInfo:${#origFile}+1}
 
-	echo "$ORIGFILEPATH/$ORIGFILENAME" >>$TMP/allFiles
-	echo "$ORIGFILEPATH" >>$TMP/allPaths1
-	NEWREV=`getCvsRevision $LOCALROOT/$ORIGFILE`
-	if [ "$NEWREV" = "" ]; then
-		echo "ERROR: file $ORIGFILENAME is not under revision control" >&2
+	origFilePath="${origFile%/*}"
+	origFileName="${origFile:${#origFilePath}+1}"
+	echo "$origFile" >>$TMP/allFiles
+	echo "$origFilePath" >>$TMP/allPaths1
+	newRev=`getCvsRevision $LOCALROOT/$origFile`
+	if [ "$newRev" = "" ]; then
+		echo "ERROR: file $origFileName is not under revision control" >&2
 		continue
 	fi
-	if [ "$REV" = "$NEWREV" ]; then
-		echo "ok, $NEWREV ($ORIGFILE)"
+	if [ "$curRev" = "$newRev" ]; then
+		echo "ok, $newRev ($origFile)"
 		continue
 	fi
-	echo "changed from $REV to $NEWREV - gathering info:"
+	echo "changed from $curRev to $newRev - gathering info:"
 
-# --- Choose the version that fits you: ---
+	s=${origFilePath%/*}
+	dirPrefix=${origFilePath:${#s}+1}
 
-# this version stores the info into complete dir hierarchy, which is cleaner but a bit uncomfortable
-#	TARGETFILE=$TMP/$ORIGFILE
+	TARGETFILE=$TMP/$dirPrefix/$origFileName
 
-# this version is more comfortable - it creates more flat directory structure
-	TARGETFILE=$TMP/`basename $ORIGFILEPATH`/$ORIGFILENAME
-# ---  ---
 	mkdir -p `dirname $TARGETFILE`
 
 	# copy orig. file
-	echo "Copying $ORIGFILENAME to $TARGETFILE"
-	cp $LOCALROOT/$ORIGFILE $TARGETFILE
+	echo "Copying $origFileName to $TARGETFILE"
+	cp $LOCALROOT/$origFile $TARGETFILE
 
 	toPascal $TARGETFILE
 
 	# find the CVSROOT for this file - it is stored with the CVS local copy
-	CVSROOT="`cat $LOCALROOT/$ORIGFILEPATH/CVS/Root`"
+	CVSROOT="`cat $LOCALROOT/$origFilePath/CVS/Root`"
 
 	# get diff
-	cmd="cvs -z4 -d$CVSROOT rdiff -u4 -r $REV -r $NEWREV $ORIGFILE"
+	cmd="cvs -z4 -d$CVSROOT rdiff -u4 -r $REV -r $newRev $origFile"
 	echo "Extracting diff file ($TARGETFILE.diff):"
 	echo "$cmd"
 	$cmd >$TARGETFILE.diff
 
 	# get log entries
-	cmd="cvs -z4 -d$CVSROOT log -N -r$REV:$NEWREV $ORIGFILE"
+	cmd="cvs -z4 -d$CVSROOT log -N -r$curRev:$newRev $origFile"
 	echo "Extracting log file ($TARGETFILE.log):"
 	echo "$cmd"
 	cd $LOCALROOT
