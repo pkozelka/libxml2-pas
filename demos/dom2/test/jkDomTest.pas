@@ -50,7 +50,7 @@ begin
     outLog(name+' -> OK');
     inc(TestsOK);
   end
-  else outLog('__ERROR__ '+name+' => failed ');
+  else outLog('__'+name+' => failed ');
   result := testexpr;
 end;
 
@@ -328,7 +328,7 @@ procedure TestGDom3b(name,vendorstr:string);
     node := nodeselect.selectNode('sometag/@name');
     if node <> nil
       then test('IDOMNodeSelect.selectNode',(node.nodeValue = '1st child of DocumentElement'))
-      else outlog('__ERROR__ IDOMNodeSelect.selectNode => failed');
+      else outlog('__IDOMNodeSelect.selectNode => failed');
     node := nil;
     nodeselect := nil;
 
@@ -462,16 +462,17 @@ begin
   document := getDoc(filename,vendorstr);
   TestNode1(filename,vendorstr);
 
-  if vendorstr<>'LIBXML' then begin
 
-    // testing documenttype
-    documenttype:=document.doctype;
-    test('document.docType',(documenttype <> nil));
-    if vendorstr<>'MSXML2_RENTAL_MODEL' then begin
-      test('documentType.internalSubset',(documenttype.internalSubset = '<!DOCTYPE test SYSTEM "test.dtd">'));
-    end else begin
-      outLog('documentType.internalSubset doesn''t work with MSXML.');
-    end;
+
+  // testing documenttype
+  documenttype:=document.doctype;
+  test('document.docType',(documenttype <> nil));
+  try
+    test('documentType.internalSubset',(documenttype.internalSubset = '<!DOCTYPE test SYSTEM "test.dtd">'));
+  except
+    outLog('__documentType.internalSubset doesn''t work!');
+  end;
+  if vendorstr<>'LIBXML' then begin
     test('documentType.name',(documenttype.name = 'test'));
     namednodemap := documenttype.entities;
     test('documentType.entities',(namednodemap <> nil));
@@ -488,33 +489,34 @@ begin
     test('notation.systemId',((namednodemap[0] as IDOMNotation).systemId = 'program2'));
     namednodemap := nil;
     documenttype:=nil;
+
     // end
     document:=nil;
     document := getDoc(filename,vendorstr);
 
     // testing domimplementation
 
-    if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
+    try
       documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','test');
       test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
       documenttype := nil;
-    end else begin
-      outLog('domImplementation.createDocument (NS) doesn''t work with MSXML.');
+    except
+      outLog('__domImplementation.createDocument (NS) doesn''t work!');
     end;
 
-    if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
+    try
       documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','');
       test('domImplementation.createDocumentType',(documenttype <> nil));
       documenttype := nil;
-    end else begin
-      outLog('domImplementation.createDocumentType doesn''t work with MSXML.');
+    except
+      outLog('__domImplementation.createDocumentType doesn''t work!');
     end;
 
     test('domImplementation.hasFeature',document.domImplementation.hasFeature('CORE','2.0'));
 
     // testing documenttype, part II
 
-    if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
+    try
       documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','a','test');
       test('documentType.name',(documenttype.name = '//xmlns.4commerce.de/eva'));
 
@@ -523,30 +525,31 @@ begin
       test('documentType.systemId',(documenttype.systemId = 'test'));
       test('documentType.publicId',(documenttype.publicId = 'a'));
       documenttype := nil;
-    end else begin
-      outLog('documentType.systemId doesn''t work with MSXML');
-      outLog('documentType.publicId doesn''t work with MSXML');
+    except
+      outLog('__documentType.systemId doesn''t work!');
+      outLog('__documentType.publicId doesn''t work!');
     end;
 
+  end;
 
-    // testing character data
+  // testing character data
 
-    cdata := document.createCDATASection('yyy');
-    test('document.createCDATASection',(cdata <> nil));
-    test('characterData.data (get)',(cdata.data = 'yyy'));
-    test('characterData.length',(cdata.length = 3));
-    cdata.data := 'zzz';
-    test('characterData.data (set)',(cdata.data = 'zzz'));
-    cdata.appendData('aaa');
-    test('characterData.appendData',(cdata.data = 'zzzaaa'));
-    cdata.deleteData(3,3);
-    test('characterData.deleteData',(cdata.data = 'zzz'));
-    cdata.insertData(1,'aaa');
-    test('characterData.insertData',(cdata.data = 'zaaazz'));
-    cdata.replaceData(1,3,'bbb');
-    test('characterData.replaceData',(cdata.data = 'zbbbzz'));
-    cdata := nil;
-
+  cdata := document.createCDATASection('yyy');
+  test('document.createCDATASection',(cdata <> nil));
+  test('characterData.data (get)',(cdata.data = 'yyy'));
+  test('characterData.length',(cdata.length = 3));
+  cdata.data := 'zzz';
+  test('characterData.data (set)',(cdata.data = 'zzz'));
+  cdata.appendData('aaa');
+  test('characterData.appendData',(cdata.data = 'zzzaaa'));
+  cdata.deleteData(3,3);
+  test('characterData.deleteData',(cdata.data = 'zzz'));
+  cdata.insertData(1,'aaa');
+  test('characterData.insertData',(cdata.data = 'zaaazz'));
+  cdata.replaceData(1,3,'bbb');
+  test('characterData.replaceData',(cdata.data = 'zbbbzz'));
+  cdata := nil;
+  if vendorstr<>'LIBXML' then begin
     // testing processingInstruction
 
     processinginstruction := document.createProcessingInstruction('abc','def');
@@ -582,7 +585,7 @@ begin
     node := nil;
     namednodemap := nil;
 
-    if vendorstr <> 'MSXML2_RENTAL_MODEL' then begin
+    try
       namednodemap := document.documentElement.attributes;
       node := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:age') as IDOMNode;
       node.nodeValue := '13';
@@ -594,6 +597,9 @@ begin
       test('namedNodeMap.removeNamedItemNS',(namednodemap.length = 0));
       node := nil;
       namednodemap := nil;
+    except
+      OutLog('__namedNodeMap.getNamedItemNS/setNamedItemNS doesn''t work!');
+      OutLog('__namedNodeMap.removeNamedItemNS doesn''t work!');
     end;
   end;
   // testing element
@@ -693,7 +699,7 @@ begin
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  outLog('Number of tests total:     108');
+  outLog('Number of tests total:     110');
   //outLog('doccount='+inttostr(doccount));
   //outLog('nodecount='+inttostr(nodecount));
   //outLog('elementcount='+inttostr(elementcount));
