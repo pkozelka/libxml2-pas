@@ -179,8 +179,8 @@ function  xmlGetDtdQElementDesc(dtd: xmlDtdPtr; name, prefix: PxmlChar): xmlElem
 function  xmlGetDtdElementDesc(dtd: xmlDtdPtr; name: PxmlChar): xmlElementPtr; cdecl; external LIBXML2_SO;
 function  xmlValidGetValidElements(prev: xmlNodePtr; next: xmlNodePtr; list: PPxmlChar; max: Longint): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidGetPotentialChildren(ctree: xmlElementContentPtr; list: PPxmlChar; len: PLongint; max: Longint): Longint; cdecl; external LIBXML2_SO;
-function  xmlValidateNameValue(value: PxmlChar); cdecl; external LIBXML2_SO;
-function  xmlValidateNamesValue(value: PxmlChar); cdecl; external LIBXML2_SO;
-function  xmlValidateNmtokenValue(value: PxmlChar); cdecl; external LIBXML2_SO;
-function  xmlValidateNmtokensValue(value: PxmlChar); cdecl; external LIBXML2_SO;
+function  xmlValidateNameValue(value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidateNamesValue(value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidateNmtokenValue(value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidateNmtokensValue(value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 
