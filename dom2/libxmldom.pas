@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.44 2002-01-16 10:43:01 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.45 2002-01-16 11:13:50 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -317,6 +317,7 @@ type
 		FpreserveWhiteSpace: boolean; //difficult to support
 		FresolveExternals: boolean;   //difficult to support
 		Fvalidate: boolean;           //check if default is ok
+		FFlyingNodes: TList;          // list of nodes not attached to the document tree
 		FAttrList:TList;
 		FNodeList:TList;
 	protected
@@ -1517,9 +1518,10 @@ end;
 constructor TGDOMDocument.create(GDOMImpl:IDOMImplementation; const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType);
 begin
 //	DomAssert(doctype<>nil, NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
-	FGdomimpl:=GDOMImpl;
 	//Create doc-node as pascal object
-	inherited create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
+	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
+	FGdomimpl:=GDOMImpl;
+	FFlyingNodes := TList.Create;
 	FAttrList:=TList.Create;
 	FNodeList:=TList.Create;
 	inc(doccount);
@@ -1532,9 +1534,10 @@ end;
 
 constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
 begin
-	FGdomimpl:=GDOMImpl;
 	//Create root-node as pascal object
-	inherited create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
+	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
+	FGdomimpl:=GDOMImpl;
+	FFlyingNodes := TList.Create;
 	FAttrList:=TList.Create;
 	FNodeList:=TList.Create;
 	inc(doccount);
@@ -1557,7 +1560,8 @@ begin
 		DomAssert(false, 102);
 	end;
 
-	inherited create(xmlNodePtr(doc));
+	inherited Create(xmlNodePtr(doc));
+	FFlyingNodes := TList.Create;
 	FGdomimpl:=GDOMImpl;
 	FAttrList:=TList.Create;
 	FNodeList:=TList.Create;
@@ -1605,6 +1609,8 @@ begin
 		FGNode := nil;
 	end;
 	Dec(doccount);
+	FFlyingNodes.Free;
+	FFlyingNodes := nil;
 	inherited Destroy;
 end;
 
@@ -2331,15 +2337,62 @@ begin
 end;
 
 procedure TGDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
+	procedure _DestroyFlyingNodes;
+	var
+		i: integer;
+		node: xmlNodePtr;
+		p: pointer;
+	begin
+		for i:=FFlyingNodes.Count-1 downto 0 do begin
+			p := FFlyingNodes[i];
+			node := p;
+			case node.type_ of
+			XML_HTML_DOCUMENT_NODE,
+			XML_DOCB_DOCUMENT_NODE,
+			XML_DOCUMENT_NODE:
+				DomAssert(false, -1, 'This node may never be flying');
+			XML_ATTRIBUTE_NODE:
+				xmlFreeProp(p);
+			XML_DTD_NODE:
+				xmlFreeDtd(p);
+			else
+				xmlFreeNode(p);
+			end;
+		end;
+	end;
+
+	procedure _ReallocateFlyingNodes;
+	var
+		i: integer;
+		node: xmlNodePtr;
+	begin
+		for i:=FFlyingNodes.Count-1 downto 0 do begin
+			node := FFlyingNodes[i];
+			case node.type_ of
+			XML_HTML_DOCUMENT_NODE,
+			XML_DOCB_DOCUMENT_NODE,
+			XML_DOCUMENT_NODE:
+				DomAssert(false, -1, 'This node may never be flying');
+			else
+				node.doc := aNewDoc;
+			end;
+		end;
+	end;
+
 var
 	old: xmlDocPtr;
 begin
 	old := GetGDoc;
 	if (old<>nil) then begin
 		old._private := nil;
+		xmlFreeDoc(old);
+		FGNode := nil;
 	end;
 	if (aNewDoc<>nil) then begin
+		_ReallocateFlyingNodes;
 		aNewDoc._private := self;
+	end else begin
+		_DestroyFlyingNodes;
 	end;
 	FGNode := xmlNodePtr(aNewDoc);
 end;
