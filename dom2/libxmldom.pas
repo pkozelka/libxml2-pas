@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.85 2002-01-27 23:04:53 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.86 2002-01-28 01:49:13 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -113,9 +113,12 @@ type
     function  cloneNode(deep: Boolean): IDomNode;
     procedure normalize;
   protected //IDomNodeSelect
-    function  selectNode(const nodePath: WideString): IDomNode;
-    function  selectNodes(const nodePath: WideString): IDomNodeList;
+    function  selectNode(const nodePath: DomString): IDomNode;
+    function  selectNodes(const nodePath: DomString): IDomNodeList;
     procedure RegisterNS(const prefix,URI: DomString);
+  protected //ready for IDomElement, IDomDocument
+    function  getElementsByTagName(const name: DomString): IDomNodeList;
+    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
   protected
     constructor Create(aLibXml2Node: pointer); virtual;
     function  requestNodePtr: xmlNodePtr; virtual;
@@ -212,13 +215,11 @@ type
     function  getAttributeNode(const name: DomString): IDomAttr;
     function  IDomElement.setAttributeNode = setAttributeNodeNS;
     function  removeAttributeNode(const oldAttr: IDomAttr):IDomAttr;
-    function  getElementsByTagName(const name: DomString): IDomNodeList;
     function  getAttributeNS(const namespaceURI, localName: DomString): DomString;
     procedure setAttributeNS(const namespaceURI, qualifiedName, value: DomString);
     procedure removeAttributeNS(const namespaceURI, localName: DomString);
     function  getAttributeNodeNS(const namespaceURI, localName: DomString): IDomAttr;
     function  setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
-    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
     function  hasAttribute(const name: DomString): Boolean;
     function  hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
   protected
@@ -362,21 +363,19 @@ type
     function  createProcessingInstruction(const target, data: DomString): IDomProcessingInstruction;
     function  createAttribute(const name: DomString): IDomAttr;
     function  createEntityReference(const name: DomString): IDomEntityReference;
-    function  getElementsByTagName(const tagName: DomString): IDomNodeList;
     function  importNode(importedNode: IDomNode; deep: Boolean): IDomNode;
     function  createElementNS(const namespaceURI, qualifiedName: DomString): IDomElement;
     function  createAttributeNS(const namespaceURI, qualifiedName: DomString): IDomAttr;
-    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
     function  getElementById(const elementId: DomString): IDomElement;
   protected //IDomParseOptions
     function  get_async: Boolean;
     function  get_preserveWhiteSpace: Boolean;
     function  get_resolveExternals: Boolean;
     function  get_validate: Boolean;
-    procedure set_async(Value: Boolean);
-    procedure set_preserveWhiteSpace(Value: Boolean);
-    procedure set_resolveExternals(Value: Boolean);
-    procedure set_validate(Value: Boolean);
+    procedure set_async(aValue: Boolean);
+    procedure set_preserveWhiteSpace(aValue: Boolean);
+    procedure set_resolveExternals(aValue: Boolean);
+    procedure set_validate(aValue: Boolean);
   protected //IDomPersist
     function  get_xml: DomString;
     function  asyncLoadState: Integer;
@@ -854,6 +853,26 @@ begin
   Result := '';
 end;
 
+function TGDOMNode.getElementsByTagName(const name: DomString): IDomNodeList;
+begin
+  if name='*' then begin
+    Result := selectNodes('.//*');
+  end else begin
+    Result := selectNodes('.//'+name);
+  end;
+end;
+
+function TGDOMNode.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
+begin
+  RegisterNs('xyz4ct', namespaceURI);
+  if localName='*' then begin
+    Result := selectNodes('.//xyz4ct:'+localName);
+  end else begin
+    Result := selectNodes('.//xyz4ct:'+localName);
+  end;
+  //todo: more generic code
+end;
+
 function TGDOMNode.get_nodeName: DomString;
 begin
   case FGNode.type_ of
@@ -1185,7 +1204,7 @@ begin
   else Result:=false;
 end;
 
-function TGDOMNode.selectNode(const nodePath: WideString): IDomNode;
+function TGDOMNode.selectNode(const nodePath: DomString): IDomNode;
 // todo: raise  exceptions
 //       a) if invalid nodePath expression
 //       b) if Result type <> nodelist
@@ -1207,9 +1226,9 @@ begin
 	xmlXPathFreeObject(rv);
 end;
 
-function TGDOMNode.selectNodes(const nodePath: WideString): IDomNodeList;
+function TGDOMNode.selectNodes(const nodePath: DomString): IDomNodeList;
 begin
-  Result := TGDOMXPathNodeList.Create(self, nodePath);
+  Result := TGDOMXPathNodeList.Create(self, UTF8Encode(nodePath));
 end;
 
 procedure TGDOMNode.set_Prefix(const prefix: DomString);
@@ -1493,11 +1512,6 @@ begin
   RegisterFlyingNode(xmlNodePtr(attr));
 end;
 
-function TGDOMElement.getElementsByTagName(const name: DomString): IDomNodeList;
-begin
-  Result:=selectNodes(name);
-end;
-
 function TGDOMElement.getAttributeNS(const namespaceURI, localName: DomString): DomString;
 var
   p: PxmlChar;
@@ -1581,13 +1595,6 @@ begin
   end else begin
     Result := nil;
   end;
-end;
-
-function TGDOMElement.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
-begin
-  //todo: more generic code
-  RegisterNs('xyz4ct',namespaceURI);
-  Result:=selectNodes('xyz4ct:'+localName);
 end;
 
 function TGDOMElement.hasAttribute(const name: DomString): Boolean;
@@ -1721,13 +1728,6 @@ begin
   Result := GetDOMObject(node) as IDomEntityReference;
 end;
 
-function TGDOMDocument.getElementsByTagName(const tagName: DomString): IDomNodeList;
-begin
-  //todo: restrict tagName to QNAME production
-  //todo: selectNodes must work also directly at docnode
-  Result := (get_documentElement as IDomNodeSelect).selectNodes(tagName);
-end;
-
 function TGDOMDocument.importNode(importedNode: IDomNode; deep: Boolean): IDomNode;
 var
   recurse: integer;
@@ -1845,14 +1845,6 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
-function TGDOMDocument.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
-var
-  docElement: IDomElement;
-begin
-  docElement := get_documentElement;
-  Result := docElement.getElementsByTagNameNS(namespaceURI,localName);
-end;
-
 function TGDOMDocument.getElementById(const elementId: DomString): IDomElement;
 var
   attr: xmlAttrPtr;
@@ -1867,42 +1859,42 @@ end;
 
 function TGDOMDocument.get_async: Boolean;
 begin
-  Result:=FAsync;
+  Result := FAsync;
 end;
 
 function TGDOMDocument.get_preserveWhiteSpace: Boolean;
 begin
-  Result:=FPreserveWhiteSpace;
+  Result := FPreserveWhiteSpace;
 end;
 
 function TGDOMDocument.get_resolveExternals: Boolean;
 begin
-  Result:=FResolveExternals;
+  Result := FResolveExternals;
 end;
 
 function TGDOMDocument.get_validate: Boolean;
 begin
-  Result:=FValidate;
+  Result := FValidate;
 end;
 
-procedure TGDOMDocument.set_async(Value: Boolean);
+procedure TGDOMDocument.set_async(aValue: Boolean);
 begin
-  FAsync:=true;
+  FAsync := aValue;
 end;
 
-procedure TGDOMDocument.set_preserveWhiteSpace(Value: Boolean);
+procedure TGDOMDocument.set_preserveWhiteSpace(aValue: Boolean);
 begin
-  FPreserveWhitespace:=true;
+  FPreserveWhitespace := aValue;
 end;
 
-procedure TGDOMDocument.set_resolveExternals(Value: Boolean);
+procedure TGDOMDocument.set_resolveExternals(aValue: Boolean);
 begin
-  FResolveExternals:=true;
+  FResolveExternals := aValue;
 end;
 
-procedure TGDOMDocument.set_validate(Value: Boolean);
+procedure TGDOMDocument.set_validate(aValue: Boolean);
 begin
-  Fvalidate:=true;
+  Fvalidate := aValue;
 end;
 
 function TGDOMDocument.get_xml: DomString;
@@ -1927,18 +1919,36 @@ end;
 function TGDOMDocument.load(source: OleVariant): Boolean;
 var
   fn: String;
-  newdoc: xmlDocPtr;
+  ctxt: xmlParserCtxtPtr;
 begin
 {$ifdef WIN32}
   fn := StringReplace(UTF8Encode(source), '\', '\\', [rfReplaceAll]);
 {$else}
   fn := source;
 {$endif}
-  newdoc := xmlParseFile(pchar(fn));
-  Result := newdoc<>nil;
-  if Result then begin
-    GDoc := newdoc;
+  xmlInitParser();
+  ctxt := xmlCreateFileParserCtxt(PChar(fn));
+  if (ctxt = nil) then exit;
+
+  // validation
+  if Fvalidate then begin
+    ctxt.validate := -1;
+  end else begin
+    ctxt.validate := 0;
   end;
+  //todo: preserve whitespace
+  //todo: async (separate thread)
+  //todo: resolveExternals
+  xmlParseDocument(ctxt);
+  if (ctxt.wellFormed<>0) then begin
+    GDoc := ctxt.myDoc;
+    Result := true;
+  end else begin
+    xmlFreeDoc(ctxt.myDoc);
+    ctxt.myDoc := nil;
+    Result := false;
+  end;
+  xmlFreeParserCtxt(ctxt);
 end;
 
 function TGDOMDocument.loadFromStream(const stream: TStream): Boolean;
