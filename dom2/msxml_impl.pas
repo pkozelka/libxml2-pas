@@ -487,23 +487,34 @@ type
   (*
    * Some sort of memory manager that keeps a link between M$ COM interfaces
    * and the Dom wrappers. It is used to get from a M$ interface to the wrapper
-   * (if there is already a wrapper created)
+   * (if there is already a wrapper created).
+   * It is not optimized for speed. It internally uses a TList whereas a map
+   * would faster. TList is chosen to minimize dependecies. 
   *)
   TDomWrapperRepository = class(Tobject)
     private
+      (* keeps a list of wrapper (wrappers for M$ COM interfaces) objects *)
       fWrapperList : TList;
+      (* keeps a list if M$ DOM interface pointers (pointers not interfaces) *)
       fMsIntfList  : TList;
 
     public
       constructor create;
       destructor destroy; override;
 
+      (* register a M$ interface -> wrapper mapping *)
       procedure registerWrapper(msIntf : IUnknown; wrapper : TObject);
+      (* remove a M$ interface -> wrapper mapping *)
       procedure deRegisterWrapper(msIntf : IUnknown);
+      (* gets the wrapper object associated with the M$ interface *)
       function  getWrapper(msIntf : IUnknown) : TObject;
   end;
 
 var
+  (*
+   * Global 'memory manager' managing M$ Dom interfaces -> wrapper
+   * objects mapping
+  *)
   gDomWrapperRepository : TDomWrapperRepository;
 
 
@@ -637,7 +648,7 @@ begin
 end;
 
 
-(* creates a DomNode wrapper for the M$ node *)
+(* creates a DomNode wrapper for the M$ node bases on the node type*)
 function domCreateNode(msNode : IXMLDOMNode) : IDomNode;
 begin
   case msNode.nodeType of
