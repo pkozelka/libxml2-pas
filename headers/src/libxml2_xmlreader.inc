@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.7:
+// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.9:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -21,7 +21,15 @@ type
     XML_PARSER_VALIDATE,      // = 3
     XML_PARSER_SUBST_ENTITIES // = 4
   );
-  
+
+  xmlParserSeverities = (
+    DUMMY__XML_PARSER_SEVERITY_0,
+    XML_PARSER_SEVERITY_VALIDITY_WARNING, // 1
+    XML_PARSER_SEVERITY_VALIDITY_ERROR,   // 2
+    XML_PARSER_SEVERITY_WARNING,          // 3
+    XML_PARSER_SEVERITY_ERROR             // 4
+  );
+
   xmlTextReader = record end;
   xmlTextReaderPtr = ^xmlTextReader;
 
@@ -85,4 +93,17 @@ function xmlTextReaderSetParserProp(reader: xmlTextReaderPtr; prop: Longint; val
 function xmlTextReaderGetParserProp(reader: xmlTextReaderPtr; prop: Longint): Longint; cdecl; external LIBXML2_SO;
 function xmlTextReaderCurrentNode(reader: xmlTextReaderPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
 function xmlTextReaderCurrentDoc(reader: xmlTextReaderPtr): xmlDocPtr; cdecl; external LIBXML2_SO;
+
+(*
+ * Error handling extensions
+ *)
+type
+  xmlTextReaderLocatorPtr = Pointer;
+  xmlTextReaderErrorFunc = procedure(arg: Pointer; msg: Pchar; severity: xmlParserSeverities; locator: xmlTextReaderLocatorPtr); cdecl;
+
+function xmlTextReaderLocatorLineNumber(locator: xmlTextReaderLocatorPtr): Longint; cdecl; external LIBXML2_SO;
+{ int xmlTextReaderLocatorLinePosition(xmlTextReaderLocatorPtr locator); }
+function xmlTextReaderLocatorBaseURI(locator: xmlTextReaderLocatorPtr): PxmlChar; cdecl; external LIBXML2_SO;
+procedure xmlTextReaderSetErrorHandler(reader: xmlTextReaderPtr; f: xmlTextReaderErrorFunc; var arg: Pointer); cdecl; external LIBXML2_SO;
+procedure xmlTextReaderGetErrorHandler(reader: xmlTextReaderPtr; f: PxmlTextReaderErrorFunc; var arg: Pointer); cdecl; external LIBXML2_SO;
 

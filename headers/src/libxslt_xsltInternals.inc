@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltInternals.h:1.74:
+// CVS-REV:libxslt/libxslt/xsltInternals.h:1.75:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -470,6 +470,7 @@ function  xsltDecimalFormatGetByName(sheet: xsltStylesheetPtr; name: PxmlChar): 
 function  xsltParseStylesheetProcess(ret: xsltStylesheetPtr; doc: xmlDocPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
 procedure xsltParseStylesheetOutput(style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
 function  xsltParseStylesheetDoc(doc: xmlDocPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+function xsltParseStylesheetImportedDoc(doc: xmlDocPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
 function  xsltLoadStylesheetPI(doc: xmlDocPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
 procedure xsltNumberFormat(ctxt: xsltTransformContextPtr; data: xsltNumberDataPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
 function  xsltFormatNumberConversion(self: xsltDecimalFormatPtr; format: PxmlChar; number: double; result: PPxmlChar): TxmlXPathError; cdecl; external LIBXSLT_SO;

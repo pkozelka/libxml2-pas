@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/globals.h:1.8:
+// CVS-REV:gnome-xml/include/libxml/globals.h:1.10:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -23,6 +23,9 @@
  *)
 
 type
+  xmlRegisterNodeFunc = procedure (node: xmlNodePtr); cdecl;
+  xmlDeregisterNodeFunc = procedure (node: xmlNodePtr); cdecl;
+
   xmlGlobalStatePtr = ^xmlGlobalState;
   xmlGlobalState = record
     xmlParserVersion: ^Char;
@@ -50,9 +53,14 @@ type
     xmlSaveNoEmptyTags: Longint;
     xmlIndentTreeOutput: Longint;
     xmlTreeIndentString: PChar;
+    xmlRegisterNodeDefaultValue: xmlRegisterNodeFunc;
+    xmlDeregisterNodeDefaultValue: xmlDeregisterNodeFunc;
   end;
 
 procedure xmlInitializeGlobalState(gs: xmlGlobalStatePtr); cdecl; external LIBXML2_SO;
+function xmlRegisterNodeDefault(func: xmlRegisterNodeFunc): xmlRegisterNodeFunc; cdecl; external LIBXML2_SO;
+function xmlDeregisterNodeDefault(func: xmlDeregisterNodeFunc): xmlDeregisterNodeFunc; cdecl; external LIBXML2_SO;
+
 (*
  * In general the memory allocation entry points are not kept
  * thread specific but this can be overridden by LIBXML_THREAD_ALLOC_ENABLED
@@ -361,4 +369,27 @@ in define line 302 *)
 {$else}
 in declaration at line 305 *)
 {$ENDIF}
+
+//[pk] function __xmlRegisterNodeDefaultValue:^xmlRegisterNodeFunc; cdecl; external LIBXML2_SO;
+{$IFDEF LIBXML_THREAD_ENABLED}
+(* error
+#define xmlRegisterNodeDefaultValue \
+in define line 345 *)
+(* error
+(*(__xmlRegisterNodeDefaultValue()))
+{$ELSE}
+in declaration at line 348 *)
+{$ENDIF}
+
+//[pk] function __xmlDeregisterNodeDefaultValue:^xmlDeregisterNodeFunc; cdecl; external LIBXML2_SO;
+{$IFDEF LIBXML_THREAD_ENABLED}
+(* error
+#define xmlDeregisterNodeDefaultValue \
+in define line 353 *)
+(* error
+(*(__xmlDeregisterNodeDefaultValue()))
+{$ELSE}
+in declaration at line 356 *)
+{$ENDIF}
+
 
