@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.31 2002-03-08 09:14:16 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.32 2002-04-16 21:09:31 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -253,10 +253,8 @@ type
 
   TLDomEntity = class(TLDomNode, IDomNode, IDomEntity)
   protected //IDomNode
-    function  IDomNode.get_parentNode = returnNullDomNode;
     function  get_nodeType: DomNodeType;
   protected //IDomEntity
-    function  IDomEntity.get_parentNode = returnNullDomNode;
     function  get_publicId: DomString;
     function  get_systemId: DomString;
     function  get_notationName: DomString;
