@@ -1,11 +1,9 @@
-$Id: TODO.txt,v 1.1 2002-04-25 18:00:35 pkozelka Exp $
+$Id: TODO.txt,v 1.2 2002-05-01 21:13:11 pkozelka Exp $
 libxslt-pas: libxslt header header translation for Pascal
 
 TODO
 ====
 (sorted by importance):
-- make release process compatible with libxml part
-- translate remaining libxslt files
 - translate also libxeslt files
 - add examples
 - complete testsuite for DUnit (skeleton should be generated from libxml2-api.xml
@@ -14,7 +12,9 @@ TODO
 - use libxslt-api.xml to check completeness of translation
 - automate updates of inline doc (comments) - create a script
 - generate actually defined(==turned on) DEFINE switches from the source
-- add JEDI info template
 
 DONE
 ====
+- make release process compatible with libxml part
+- translate remaining libxslt files
+- add JEDI info template

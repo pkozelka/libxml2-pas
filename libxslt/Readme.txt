@@ -1,7 +1,7 @@
 Delphi-Headers for libxslt
 ==========================
-Libxml2 is a low-level library for the work with xml-documents.
-libxml2-pas is translation of the header files into Pascal language.
+libxslt is a low-level library for the work with xml-documents.
+libxslt-pas is translation of the header files into Pascal language.
 
 AUTHORS
 -------
@@ -10,7 +10,7 @@ Petr Kozelka <pkozelka@email.cz>    - completed the translations and converted f
 
 VERSION COMPLIANCE
 ------------------
-Please look into file 'libxml_xsltwin32version.inc' for value of constant LIBXSLT_DOTTED_VERSION.
+Please look into file 'libxml_xsltwin32config.inc' for value of constant LIBXSLT_DOTTED_VERSION.
 
 WHAT YOU FIND IN THIS PACKAGE
 -----------------------------
