@@ -37,13 +37,22 @@ shift 3
 aFileList=$@
 
 MYDIR=REV-$aReleaseRev.tmp
-echo Reading C headers from "$aReleaseRev" revision...
 rm -rf $MYDIR
-cvs -z4 -d $aCvsBase co -r $aReleaseRev -d $MYDIR gnome-xml/include/libxml
+if [ -e ../../../gnome.org/gnome-xml/include/libxml/CVS/Entries ] ; then
+	echo Reading C headers from local, hopefuly up-to-date, revision...
+	cp -rf ../../../gnome.org/gnome-xml/include/libxml $MYDIR
+else
+	echo Reading C headers from "$aReleaseRev" revision...
+	cvs -z4 -d $aCvsBase co -r $aReleaseRev -d $MYDIR gnome-xml/include/libxml
+fi
 
 if [ ! -d $MYDIR/CVS ] ; then
 	exit
 fi
+
+grep -v "$MYDIR" CVS/Entries > CVS/Entries.tmp
+mv CVS/Entries.tmp CVS/Entries
+
 echo Check differences in revision number...
 for fn in $aFileList; do
 	echo $fn
@@ -52,8 +61,9 @@ for fn in $aFileList; do
 	LINE=`head -1 $origfn`
 	REV=`echo $LINE | sed 's/[^[]*\[\([^]]*\).*/\1/'`
 	FILENAME=`echo $LINE | sed 's/[^]]*\][[:space:]]*\(.*\)[:space:]*$/\1/'`
-
-	ENTRY=`grep "/$FILENAME/" $MYDIR/CVS/Entries`
+	DIRNAME=`dirname $FILENAME`
+	FILENAME=`basename $FILENAME`
+	ENTRY=`grep "/$FILENAME/" $MYDIR/$DIRNAME/CVS/Entries`
 	NEWREV=`echo $ENTRY | sed 's/\/\([^\/]*\)\/\([^\/]*\).*/\2/'`
 	CHGDATE=`echo $ENTRY | sed 's/\/\([^\/]*\)\/\([^\/]*\)\/\([^\/]*\).*/\3/'`
 
@@ -61,21 +71,19 @@ for fn in $aFileList; do
 		echo "    NOT FOUND IN CVS ENTRIES"
 	else
 		if [ X$REV != X$NEWREV ] ; then
-			echo "    $FILENAME revision changed from $REV to $NEWREV"
+			echo "    $DIRNAME/$FILENAME revision changed from $REV to $NEWREV"
 			echo "         (modification date: $CHGDATE)"
-			cmd="cvs -z4 -d$aCvsBase rdiff -r $REV -r $aReleaseRev $aCvsRepos/$FILENAME"
-			echo "    Extracting diff file ($MYDIR/$FILENAME.diff):"
+			cmd="cvs -z4 -d$aCvsBase rdiff -r $REV -r $aReleaseRev $aCvsRepos/$DIRNAME/$FILENAME"
+			echo "    Extracting diff file ($MYDIR/$DIRNAME/$FILENAME.diff):"
 			echo "    $cmd"
-			$cmd >$MYDIR/$FILENAME.diff
-			echo "    Extracting log file ($MYDIR/$FILENAME.log)..."
-			cvs -z4 -d$aCvsBase log -N -r$REV:$aReleaseRev $MYDIR/$FILENAME >$MYDIR/$FILENAME.log
+			$cmd >$MYDIR/$DIRNAME/$FILENAME.diff
+			echo "    Extracting log file ($MYDIR/$DIRNAME/$FILENAME.log)..."
+			cvs -z4 -d$aCvsBase log -N -r$REV:$aReleaseRev $MYDIR/$DIRNAME/$FILENAME >$MYDIR/$DIRNAME/$FILENAME.log
 		else
-			rm $MYDIR/$FILENAME
+			rm $MYDIR/$DIRNAME/$FILENAME
 		fi
 	fi
 done
 
 echo "Removing CVS info from $MYDIR"
 rm -rf $MYDIR/CVS
-grep -v "$MYDIR" CVS/Entries > CVS/Entries.tmp
-mv CVS/Entries.tmp CVS/Entries
