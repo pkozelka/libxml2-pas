@@ -24,5 +24,5 @@
 {$IFDEF VER_NOT_YET} {$DEFINE HAS_SO_VARS} {$ENDIF}
 
 // Do we have C-like enumerations, i.e. with the option to assign direct values to individual constants ?
-{$IFDEF VER140} {-$DEFINE HAS_CENUM} {$ENDIF}
+{$IFDEF VER140} {$DEFINE HAS_CENUM} {$ENDIF}
 
