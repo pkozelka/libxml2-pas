@@ -212,7 +212,7 @@ type
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF8F-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-	IXMLDOMImplementation = interface(IDispatch)
+	IXMLDOMImplementation = interface(IUnknown)
 		['{2933BF8F-7B36-11D2-B20E-00C04F983E60}']
 		function  hasFeature(const feature: WideString; const version: WideString): WordBool; safecall;
 	end;
@@ -222,7 +222,7 @@ type
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF80-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-	IXMLDOMNode = interface(IDispatch)
+	IXMLDOMNode = interface(IUnknown)
 		['{2933BF80-7B36-11D2-B20E-00C04F983E60}']
 		function  Get_nodeName: WideString; safecall;
 		function  Get_nodeValue: OleVariant; safecall;
@@ -288,7 +288,7 @@ type
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF82-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-	IXMLDOMNodeList = interface(IDispatch)
+	IXMLDOMNodeList = interface(IUnknown)
 		['{2933BF82-7B36-11D2-B20E-00C04F983E60}']
 		function  Get_item(index: Integer): IXMLDOMNode; safecall;
 		function  Get_length: Integer; safecall;
@@ -305,7 +305,7 @@ type
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF83-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-	IXMLDOMNamedNodeMap = interface(IDispatch)
+	IXMLDOMNamedNodeMap = interface(IUnknown)
 		['{2933BF83-7B36-11D2-B20E-00C04F983E60}']
 		function  getNamedItem(const name: WideString): IXMLDOMNode; safecall;
 		function  setNamedItem(const newItem: IXMLDOMNode): IXMLDOMNode; safecall;
@@ -509,7 +509,7 @@ type
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {3EFAA426-272F-11D2-836F-0000F87A7782}
 // *********************************************************************//
-	IXMLDOMParseError = interface(IDispatch)
+	IXMLDOMParseError = interface(IUnknown)
 		['{3EFAA426-272F-11D2-836F-0000F87A7782}']
 		function  Get_errorCode: Integer; safecall;
 		function  Get_url: WideString; safecall;
