@@ -4,12 +4,24 @@ interface
 
 uses
   SysUtils, Classes, TestFrameWork, libxmldom, xdom2, Dialogs, msxml_impl,
-  ActiveX,GUITestRunner,StrUtils,jkDomTest;
+  ActiveX,GUITestRunner,StrUtils,jkDomTest, ComObj;
 
 const
   datapath='L:\@Demos\Open_xdom\Data\';  //set to the directory with test.xml
   xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
   xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
+  xmlstr2 = '<?xml version="1.0" encoding="iso-8859-1"?>'+
+            '<!DOCTYPE root ['+
+            '<!ELEMENT root (test*)>'+
+            '<!ELEMENT test (#PCDATA)>'+
+            '<!ATTLIST test name CDATA #IMPLIED>'+
+            '<!ENTITY ct "4 commerce technologies">'+
+            '<!NOTATION type2 SYSTEM "program2">'+
+            '<!ENTITY FOO2 SYSTEM "file.type2" NDATA type2>'+
+            ']>'+
+            '<root />';
+
+type EUnknownDomVendor = Exception;
 
 type TTestDOM2Methods = class(TTestCase)
   private
@@ -28,9 +40,6 @@ type TTestDOM2Methods = class(TTestCase)
     procedure CreateAttributeNS;
     procedure TestDocCount;
     procedure TestElementByID;
-    procedure jkTestDocument;
-    procedure jkTestElement;
-    procedure jkNamedNodemap;
     procedure append_100_attributes_with_different_namespaces;
   end;
 
@@ -69,6 +78,9 @@ type TTestMemoryLeaks = class(TTestCase)
     procedure CreateDocumentFragment10000Times;
     procedure CreateTextNode10000Times;
     procedure AppendElement10000Times;
+    procedure jkTestDocument;
+    procedure jkTestElement;
+    procedure jkNamedNodemap;
   end;
 
 type TSimpleTests = class(TTestCase)
@@ -83,13 +95,16 @@ type TSimpleTests = class(TTestCase)
     comment: IDOMComment;
     pci: IDOMProcessingInstruction;
     docfrag: IDOMDocumentFragment;
+    ent: IDOMEntity;
     entref: IDOMEntityReference;
     select: IDOMNodeSelect;
+    nnmap: IDOMNamedNodeMap;
     nsuri: string;
     prefix: string;
     name: string;
     data: string;
     function getFqname: string;
+    function myIsSameNode(node1,node2: IDOMNode): boolean;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -137,6 +152,9 @@ type TSimpleTests = class(TTestCase)
     procedure ownerElement;
     procedure selectNodes;
     procedure selectNodes2;
+    procedure namedNodeMap;
+    procedure namedNodeMapNS;
+    procedure persist;
     property fqname: string read getFqname;
   end;
 
@@ -476,7 +494,7 @@ begin
   outlog(getCont(temp));
 end;
 
-procedure TTestDOM2Methods.jkTestDocument;
+procedure TTestMemoryLeaks.jkTestDocument;
 var
   TestSet: integer;
   TestsOK: integer;
@@ -493,7 +511,7 @@ begin
   end;
 end;
 
-procedure TTestDOM2Methods.jkTestElement;
+procedure TTestMemoryLeaks.jkTestElement;
 var
   TestSet: integer;
   TestsOK: integer;
@@ -528,7 +546,7 @@ begin
   end;
 end;
 
-procedure TTestDOM2Methods.jkNamedNodemap;
+procedure TTestMemoryLeaks.jkNamedNodemap;
 var
   TestSet: integer;
   TestsOK: integer;
@@ -552,6 +570,7 @@ begin
   elem := doc.createElement(name);
   doc.documentElement.appendChild(elem);
   check(doc.documentElement.hasChildNodes, 'is false');
+  check(myIsSameNode(elem,doc.documentElement.firstChild) ,'wrong node');
 end;
 
 procedure TSimpleTests.attributes;
@@ -589,23 +608,31 @@ begin
     check(node <> nil, 'is nil');
     check(node.nodeName = name+IntToStr(i), 'wrong nodeName');
     check(node.nodeType = ELEMENT_NODE, 'wrong noodeType');
-    check(node.parentNode.nodeName = doc.documentElement.nodeName, 'wrong parentNode');
+    check(myIsSameNode(node.parentNode,doc.documentElement), 'wrong parentNode');
     node := doc.documentElement.childNodes[i];
     check(node <> nil, 'is nil');
     check(node.nodeName = name+IntToStr(i), 'wrong nodeName');
     check(node.nodeType = ELEMENT_NODE, 'wrong noodeType');
-    check(node.parentNode.nodeName = doc.documentElement.nodeName, 'wrong parentNode');
+    check(myIsSameNode(node.parentNode,doc.documentElement), 'wrong parentNode');
   end;
 end;
 
 procedure TSimpleTests.cloneNode;
 begin
   elem := doc.createElement(name);
+  node := doc.createElement('child');
+  elem.appendChild(node);
   doc.documentElement.appendChild(elem);
+  node := elem.cloneNode(False);
+  check(node <> nil, 'is nil');
+  check(node.nodeName = name, 'wrong nodeName');
+  check(node.nodeType = ELEMENT_NODE, 'wrong nodeType');
+  check(not node.hasChildNodes, 'is true');
   node := elem.cloneNode(True);
   check(node <> nil, 'is nil');
   check(node.nodeName = name, 'wrong nodeName');
   check(node.nodeType = ELEMENT_NODE, 'wrong nodeType');
+  check(node.hasChildNodes, 'is false');
 end;
 
 procedure TSimpleTests.CreateAttribute;
@@ -624,8 +651,12 @@ begin
     check(False, 'no exception raised');
   except
     on E: Exception do begin
-      if E is EDomException then begin
-        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      if domvendor = 'LIBXML' then begin
+        if E is EDomException then begin
+          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+        end;
+      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+        check(E is EOleException, 'wrong exception raised');
       end;
     end;
   end;
@@ -700,8 +731,12 @@ begin
     check(False, 'no exception raised');
   except
     on E: Exception do begin
-      if E is EDomException then begin
-        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      if domvendor = 'LIBXML' then begin
+        if E is EDomException then begin
+          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+        end;
+      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+        check(E is EOleException, 'wrong exception raised');
       end;
     end;
   end;
@@ -741,8 +776,12 @@ begin
     check(False, 'no exception raised');
   except
     on E: Exception do begin
-      if E is EDomException then begin
-        check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+      if domvendor = 'LIBXML' then begin
+        if E is EDomException then begin
+          check((E as EDomException).code = INVALID_CHARACTER_ERR, 'wrong exception raised');
+        end;
+      end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+        check(E is EOleException, 'wrong exception raised');
       end;
     end;
   end;
@@ -762,9 +801,20 @@ begin
 end;
 
 procedure TSimpleTests.docType;
+//var i: integer;
 begin
   // there's no DTD !
   check(doc.docType = nil, 'not nil');
+  // load xml with dtd
+  (doc as IDOMPersist).loadxml(xmlstr2);
+  check(doc.docType <> nil, 'is nil');
+  check(doc.docType.entities.length = 1, 'wrong entities length');
+  ent := doc.docType.entities[0] as IDOMEntity;
+  // to be continued ...
+  {
+  i := doc.docType.notations.length;
+  ShowMessage(IntToStr(i));
+  }
 end;
 
 procedure TSimpleTests.document;
@@ -808,7 +858,7 @@ begin
   check(node <> nil, 'is nil');
   check(node.nodeName = name+'0', 'wrong nodeName');
   check(node.nodeType = ELEMENT_NODE, 'wrong nodeType');
-  check(node.parentNode.nodeName = elem.nodeName, 'wrong parentNode');
+  check(myIsSameNode(node.parentNode,elem), 'wrong parentNode');
   check(node.ownerDocument = doc, 'wrong ownerDocument');
 end;
 
@@ -968,7 +1018,7 @@ begin
   node := doc.documentElement.firstChild;
   check(node.nodeName = name+'1', 'wrong nodeName');
   check(node.nodeType = ELEMENT_NODE, 'wrong nodeType');
-  check(node.parentNode.nodeName = doc.documentElement.nodeName, 'wrong parentNode');
+  check(myIsSameNode(node.parentNode,doc.documentElement), 'wrong parentNode');
   check(node.ownerDocument = doc, 'wrong ownerDocument');
 end;
 
@@ -994,8 +1044,83 @@ begin
   check(node <> nil, 'is nil');
   check(node.nodeName = name+'9', 'wrong nodeName');
   check(node.nodeType = ELEMENT_NODE, 'wrong nodeType');
-  check(node.parentNode.nodeName = elem.nodeName, 'wrong parentNode');
+  check(myIsSameNode(node.parentNode,elem), 'wrong parentNode');
   check(node.ownerDocument = doc, 'wrong ownerDocument');
+end;
+
+function TSimpleTests.myIsSameNode(node1, node2: IDOMNode): boolean;
+begin
+  if domvendor = 'LIBXML' then begin
+    result := IsSameNode(node1,node2);
+  end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+    result := (node1.nodeName = node2.nodeName);
+  end else begin
+    raise EUnknownDomVendor.Create(domvendor+' is unknown.');
+  end;
+end;
+
+procedure TSimpleTests.namedNodeMap;
+begin
+  nnmap := doc.documentElement.attributes;
+  check(nnmap <> nil, 'is nil');
+  check(nnmap.length = 0, 'wrong length');
+  // set a namedItem
+  attr := doc.createAttribute(name);
+  attr.value := data;
+  nnmap.setNamedItem(attr);
+  check(nnmap.length = 1, 'wrong length');
+  check(myIsSameNode(nnmap.getNamedItem(name),attr),'wrong node');
+  check(nnmap.getNamedItem(name).nodeValue = data, 'wrong nodeValue');
+  // set a namedItem with the same name as before
+  attr := doc.createAttribute(name);
+  attr.value := data;
+  nnmap.setNamedItem(attr);
+  check(nnmap.length = 1, 'wrong length');
+  // set a namedItem with a different name
+  attr := doc.createAttribute('snake');
+  attr.value := 'python';
+  nnmap.setNamedItem(attr);
+  check(nnmap.length = 2, 'wrong length');
+  check(myIsSameNode(nnmap.getNamedItem('snake'),attr),'wrong node');
+  check(nnmap.getNamedItem('snake').nodeValue = 'python', 'wrong nodeValue');
+  nnmap.removeNamedItem(name);
+  check(nnmap.length = 1, 'wrong length');
+  check(nnmap.item[0].nodeName = 'snake', 'wrong nodeName');
+  attr := nil;
+  attr := nnmap.namedItem['snake'] as IDOMAttr;
+  check(attr.value = 'python', 'wrong value');
+end;
+
+procedure TSimpleTests.namedNodeMapNS;
+begin
+  nnmap := doc.documentElement.attributes;
+  check(nnmap <> nil, 'is nil');
+  check(nnmap.length = 0, 'wrong length');
+  // set a namedItem
+  attr := doc.createAttributeNS(nsuri,fqname);
+  attr.value := data;
+  nnmap.setNamedItemNS(attr);
+  check(nnmap.length = 1, 'wrong length');
+  check(myIsSameNode(nnmap.getNamedItemNS(nsuri,name),attr),'wrong node');
+  check(nnmap.getNamedItemNS(nsuri,name).nodeValue = data, 'wrong nodeValue');
+  // set a namedItem with the same name as before
+  attr := doc.createAttributeNS(nsuri,fqname);
+  attr.value := data;
+  nnmap.setNamedItemNS(attr);
+  check(nnmap.length = 1, 'wrong length');
+  // set a namedItem with a different name
+  attr := doc.createAttributeNS(nsuri,prefix+':snake');
+  attr.value := 'python';
+  nnmap.setNamedItemNS(attr);
+  check(nnmap.length = 2, 'wrong length');
+  check(myIsSameNode(nnmap.getNamedItemNS(nsuri,'snake'),attr),'wrong node');
+  check(nnmap.getNamedItemNS(nsuri,'snake').nodeValue = 'python', 'wrong nodeValue');
+  nnmap.removeNamedItemNS(nsuri,name);
+  check(nnmap.length = 1, 'wrong length');
+  check(nnmap.item[0].localName = 'snake', 'wrong localName');
+  attr := nil;
+  attr := nnmap.namedItem['snake'] as IDOMAttr;
+  check(attr.value = 'python', 'wrong value');
 end;
 
 procedure TSimpleTests.nextSibling;
@@ -1028,6 +1153,7 @@ begin
     text := doc.createTextNode(data+IntToStr(i));
     doc.documentElement.appendChild(text);
   end;
+  //check(doc.documentElement.firstChild.nodeValue = data+'0', 'wrong nodeValue');
   for i := 0 to doc.documentElement.childNodes.length-1 do begin
     node := doc.documentElement.childNodes[i];
     if node.nodeType = TEXT_NODE then tmp := tmp + node.nodeValue;
@@ -1056,7 +1182,53 @@ begin
   elem := doc.createElement(name);
   elem.setAttributeNode(attr);
   doc.documentElement.appendChild(elem);
-  //check(IsSameNode(attr.ownerElement,elem), 'wrong ownerElement');
+  check(myIsSameNode(attr.ownerElement,elem) , 'wrong ownerElement');
+end;
+
+procedure TSimpleTests.persist;
+var
+  sl: TStrings;
+  tmp: string;
+begin
+  // get a textual representation of the dom
+  data := (doc as IDOMPersist).xml;
+  // save the dom to a file and load it as a textfile
+  (doc as IDOMPersist).save('temp.xml');
+  sl := TSTringList.Create;
+  sl.LoadFromFile('temp.xml');
+  tmp := sl.Text;
+  // adjust contents of the textfile
+  if domvendor = 'LIBXML' then begin
+    // libxml xml-method adds LF
+    tmp := AdjustLineBreaks(tmp,tlbsLF);
+  end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+    // ms save-method saves the encoding-attribute
+    // but ms xml-method doesn't hides it
+    // ms xml-method adds CRLF
+    tmp := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
+  end else begin
+    raise EUnknownDomVendor.Create('unknown dom vendor '+domvendor);
+  end;
+  // compare the textual representation of the dom to the contents of the textfile
+  check(data = tmp, 'wrong content');
+  // load the dom from a textfile
+  (doc as IDOMPersist).load('temp.xml');
+  // get a textual representation of the dom
+  tmp := (doc as IDOMPersist).xml;
+  // adjust the textual representation of the dom
+  if domvendor = 'LIBXML' then begin
+    // libxml xml-method adds LF
+    tmp := AdjustLineBreaks(tmp,tlbsLF);
+  end else if domvendor = 'MSXML2_RENTAL_MODEL' then begin
+    // ms save-method saves the encoding-attribute
+    // but ms xml-method doesn't hides it
+    // ms xml-method adds CRLF
+    tmp := StringReplace(tmp,' encoding="iso-8859-1"','',[rfReplaceAll]);
+  end else begin
+    raise EUnknownDomVendor.Create('unknown dom vendor '+domvendor);
+  end;
+  // compare the old textual representation of the dom with the new loaded
+  check(data = tmp, 'wrong content');
 end;
 
 procedure TSimpleTests.previousSibling;
@@ -1153,7 +1325,6 @@ begin
   check(nodelist.length = n*3, '2 wrong length');
   nodelist := select.selectNodes('//*');
   check(nodelist.length = n*4+1, '3 wrong length');
-  //ShowMessage(IntToStr(nodelist.length));
   nodelist := select.selectNodes('*/*');
   check(nodelist.length = n, '4 wrong length');
   nodelist := select.selectNodes('*/child');
@@ -1220,11 +1391,14 @@ begin
   pci := nil;
   docfrag := nil;
   entref := nil;
+  ent := nil;
   select := nil;
+  nnmap := nil;
   doc := nil;
   impl := nil;
   inherited;
 end;
+
 
 initialization
   RegisterTest('', TTestDom2Methods.Suite);

@@ -330,8 +330,6 @@ begin
   attr:=nil;
   attr := document.createAttribute('rrrVX');  //ok
   attr.value:='hase';  //OK
-  // the following line causes a memory leak;
-  // TODO: check the reason
   attr := element.setAttributeNode(attr);
   //does it overwrite the value of an existing attribute?
   test('element.getAttributeNode/setAttributeNode3',(attr.value='hund'));
@@ -344,8 +342,8 @@ begin
 
   //to do:
   //add a test, where the attribute das exist, before setAttribute is called
-  element := document.createElement('ttt');
   if dom2 then begin
+    element := document.createElement('ttt');
     attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:loop');
     attr := element.setAttributeNodeNS(attr);
     attr := nil;
