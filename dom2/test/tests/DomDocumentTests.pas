@@ -716,6 +716,7 @@ begin
   document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
           parse(XML_VALID_DOC);
   nodeList := document.getElementsByTagNameNS('*', '*');
+  check(nodeList <> nil, 'nodeList = nil');
   check(nodeList.length = 6, 'nodeList.length <> 6');
 end;
 
@@ -744,6 +745,7 @@ begin
   document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
           parse(XML_VALID_DOC);
   nodeList := document.getElementsByTagName('info');
+  check(nodeList <> nil, 'nodeList = nil');
   check(nodeList.length = 5, 'nodeList.length <> 5');
 end;
 
@@ -779,6 +781,7 @@ begin
   document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
           parse(XML_VALID_DOC);
   nodeList := document.getElementsByTagNameNS('*', 'info');
+  check(nodeList <> nil, 'nodeList = nil');
   check(nodeList.length = 6, 'nodeList.length <> 6');
   //XXX TODO: check the order of elements
 end;
@@ -808,6 +811,7 @@ begin
   document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
           parse(XML_VALID_DOC);
   nodeList := document.getElementsByTagName('*');
+  check(nodeList <> nil, 'nodeList = nil');
   check(nodeList.length = 7, 'nodeList.length <> 7');
   check(nodeList.item[0].nodeName = 'address', 'nodeName <> address');
   check(nodeList.item[1].nodeName = 'street', 'nodeName <> street');
@@ -841,6 +845,7 @@ begin
   document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
           parse(XML_VALID_DOC);
   nodeList := document.getElementsByTagName('info');
+  check(nodeList <> nil, 'nodeList = nil');
   element := nodeList.item[2] as IDomElement;
   textNode := element.firstChild as IDomText;
   check(textNode.nodeValue = '3', 'textNode.nodeValue <> ''3''');

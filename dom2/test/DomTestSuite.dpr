@@ -1,4 +1,4 @@
-program DomTestSuiteProject;
+program DomTestSuite;
 
 (*
  * TestSuit for xDom2
@@ -32,13 +32,20 @@ program DomTestSuiteProject;
  * the provisions above, a recipient may use your version of this file under
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
-*)
+ *)
 
+{$IFDEF TEXTTESTRUNNER}
+{$APPTYPE CONSOLE}
+{$ENDIF}
 
 uses
   Forms,
   TestFrameWork,
+{$IFDEF TEXTTESTRUNNER}
+  TextTestRunner,
+{$ELSE}
   GUITestRunner,
+{$ENDIF}
   Main in 'Main.pas',
   domSetup in 'domSetup.pas',
   DomDocumentTests in 'tests\DomDocumentTests.pas',
@@ -48,5 +55,6 @@ uses
 
 begin
   Application.Initialize;
-  GUITestRunner.RunRegisteredTests;
+  RunRegisteredTests;
 end.
+

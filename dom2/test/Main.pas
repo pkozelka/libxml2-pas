@@ -11,8 +11,8 @@ uses
   TestFrameWork,
   DomSetup,
   libxmldom,
-  libxmldomFE,
-  msxml_impl,
+//  libxmldomFE,
+//  msxml_impl,
 
   (* add new tests to uses class *)
   DomImplementationTests,
