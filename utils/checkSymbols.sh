@@ -26,7 +26,10 @@ rm PASSYMBOLS.tmp
 #grep -v " DATA" libxml2.def | grep '^[[:space:]][[:alpha:]]' | sed "s/ //g" | sed "s/[[:space:]]*\([[:alnum:]]*\).*/\1/" | sort -u >DLLSYMBOLS.txt
 
 # libxml2.def.src version
+cvs -d:pserver:anonymous@anoncvs.gnome.org:/cvs/gnome export -d EXPORT -r HEAD gnome-xml/win32/dsp/libxml2.def.src
+mv EXPORT/libxml2.def.src .
 grep -v " DATA" libxml2.def.src | grep '^[[:space:]][[:alnum:]]*$' | sed "s/ //g" | sed "s/[[:space:]]*\([[:alnum:]]*\).*/\1/" | sort -u >DLLSYMBOLS.txt
+rm -rf EXPORT
 
 # DUMPBIN version - shows variables
 #grep '^[[:space:]]\{6,\}[[:digit:]]\{1,\}[[:space:]]\{1,\}[[:digit:]]' libxml2.dll.txt \
