@@ -165,7 +165,8 @@ type
 		function  IXMLDOMAttribute.Get_value = Get_nodeValue;
 		procedure IXMLDOMAttribute.Set_value = Set_nodeValue;
 	protected //DOM2
-		//todo: function Get_ownerElement: IXMLDOMElement;
+		function  Get_ownerElement: IXMLDOMElement; safecall;
+		function  Get_parentNode: IXMLDOMNode; safecall;
 	end;
 
 	TXMLDOMEntityReference = class(TXMLDOMNode)
@@ -1414,6 +1415,18 @@ end;
 function TXMLDOMNotation.Get_systemId: OleVariant;
 begin
 	Result := UTF8Decode(FPtr.notation.SystemID);
+end;
+
+{ TXMLDOMAttribute }
+
+function TXMLDOMAttribute.Get_ownerElement: IXMLDOMElement;
+begin
+	Result := GetDOMObject(FPtr.node.parent) as IXMLDOMElement;
+end;
+
+function TXMLDOMAttribute.Get_parentNode: IXMLDOMNode;
+begin
+	Result := nil;
 end;
 
 end.
