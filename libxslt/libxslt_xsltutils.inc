@@ -1,136 +1,159 @@
+// CVS-SIGN: [1.28] libxslt/utils.h
 {
-    ------------------------------------------------------------------------------
-    Translated into pascal with help of h2pas utility from the FreePascal project.
-    Copyright for the header translation:
-        4commerce technologies AG
-        Kamerbalken 10-14
-        22525 Hamburg, Germany
-    Published under a double license:
-    a) the GNU Library General Public License: 
-       http://www.gnu.org/copyleft/lgpl.html
-    b) the Mozilla Public License:
-       http://www.mozilla.org/MPL/MPL-1.1.html
-    Please send corrections to: ufechner@4commerce.de
-    ------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Uwe Fechner <ufechner@4commerce.de> - 4commerce technologies AG
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
-  {
-     xsltutils.h: interfaces for the utilities module of the XSLT engine
+(*
+ * xsltutils.h: interfaces for the utilities module of the XSLT engine.
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
 
-     See Copyright for the status of this software.
-
-     daniel@veillard.com
-    }
-
-  {
-     TODO:
-
-     macro to flag unimplemented blocks
-    }
-{$define XSLT_TODO}
-(* error
-    xsltGenericError(xsltGenericErrorContext,
-(* error
-	    "Unimplemented block at %s:%d\n",
- in declarator_list *)
-
-(* error
+(**
+ * TODO:
+ *
+ * Macro to flag unimplemented blocks.
+ *)
+{-macro-
+#define XSLT_TODO 							\
+    xsltGenericError(xsltGenericErrorContext,				\
+      "Unimplemented block at %s: %d\n",				\
             __FILE__, __LINE__);
- in declarator_list *)
-  {
-		 STRANGE:
-
-     macro to flag that a problem was detected internally
-    }
-{$define XSLT_STRANGE}
-(* error
-    xsltGenericError(xsltGenericErrorContext,
-(* error
-	    "Internal error at %s:%d\n",
- in declarator_list *)
-
-(* error
+}
+(**
+ * STRANGE:
+ *
+ * Macro to flag that a problem was detected internally.
+ *)
+{-macro-
+#define XSLT_STRANGE 							\
+    xsltGenericError(xsltGenericErrorContext,				\
+      "Internal error at %s: %d\n",				\
             __FILE__, __LINE__);
- in declarator_list *)
-  {
-     IS_XSLT_ELEM:
+}
+(**
+ * IS_XSLT_ELEM:
+ *
+ * Checks that the element pertains to XSLT namespace.
+ *)
+{-macro-todo
+#define IS_XSLT_ELEM(n)							\
+    (((n) != NULL) && ((n)->ns != NULL) &&				\
+     (xmlStrEqual((n)->ns->href, XSLT_NAMESPACE)))
+}
+(**
+ * IS_XSLT_NAME:
+ *
+ * Checks the value of an element in XSLT namespace.
+ *)
+{-macro-todo
+#define IS_XSLT_NAME(n, val)						\
+    (xmlStrEqual((n)->name, (const xmlChar *) (val)))
+}
+(**
+ * IS_XSLT_REAL_NODE:
+ *
+ * Check that a node is a 'real' one: document, element, text or attribute.
+ *)
+{$IFDEF LIBXML_DOCB_ENABLED}
+{-macro-todo
+#define IS_XSLT_REAL_NODE(n)						\
+    (((n) != NULL) &&							\
+     (((n)->type == XML_ELEMENT_NODE) ||				\
+      ((n)->type == XML_TEXT_NODE) ||					\
+      ((n)->type == XML_ATTRIBUTE_NODE) ||				\
+      ((n)->type == XML_DOCUMENT_NODE) ||				\
+      ((n)->type == XML_HTML_DOCUMENT_NODE) ||				\
+      ((n)->type == XML_DOCB_DOCUMENT_NODE)))
+}
+{$ELSE}
+{-macro-todo
+#define IS_XSLT_REAL_NODE(n)						\
+    (((n) != NULL) &&							\
+     (((n)->type == XML_ELEMENT_NODE) ||				\
+      ((n)->type == XML_TEXT_NODE) ||					\
+      ((n)->type == XML_ATTRIBUTE_NODE) ||				\
+      ((n)->type == XML_DOCUMENT_NODE) ||				\
+      ((n)->type == XML_HTML_DOCUMENT_NODE)))
+}
+{$ENDIF}
+(*
+ * Our own version of namespaced atributes lookup.
+ *)
+function xsltGetNsProp(node: xmlNodePtr; const name, namespace: PxmlChar): PxmlChar; cdecl; external LIBXSLT_SO;
 
-     Checks that the element pertains to XSLt namespace
-    }
-(* error
-#define IS_XSLT_ELEM(n)
-in define line 51 *)
-(* error
-    (((n) != NULL) && ((n)->ns != NULL) &&
-    {
-       IS_XSLT_NAME:
-
-       Checks the value of an element in XSLT namespace
-			}
-in define line 60 *)
-(* error
-    (xmlStrEqual((n)->name, (const xmlChar *)
-    {
-       IS_XSLT_REAL_NODE:
-
-       check that a node is a 'real' one: document, element, text or attribute
-      }
-
-
-(* error
-    (((n) != NULL) &&
-{$else}
-in define line 78 *)
-(* error
-    (((n) != NULL) &&
-{$endif}
-    {
-       Our own version of namespaced atributes lookup
-      }
-in declaration at line 92 *)
-    {
-       XSLT specific error and debug reporting functions
-      }
-(* error
+(*
+ * XSLT specific error and debug reporting functions.
+ *)
+{todo
 LIBXSLT_PUBLIC extern xmlGenericErrorFunc xsltGenericError;
-in declaration at line 97 *)
-(* error
 LIBXSLT_PUBLIC extern void *xsltGenericErrorContext;
-in declaration at line 98 *)
-(* error
 LIBXSLT_PUBLIC extern xmlGenericErrorFunc xsltGenericDebug;
-in declaration at line 99 *)
-(* error
 LIBXSLT_PUBLIC extern void *xsltGenericDebugContext;
-in declaration at line 100 *)
-
-procedure xsltPrintErrorContext(ctxt:xsltTransformContextPtr; style:xsltStylesheetPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
-procedure xsltMessage(ctxt:xsltTransformContextPtr; node:xmlNodePtr; inst:xmlNodePtr);cdecl;external LIBXSLT_SO;
-//procedure xsltSetGenericErrorFunc(ctx:Pvoid; handler:xmlGenericErrorFunc);cdecl;external LIBXSLT_SO;
-//procedure xsltSetGenericDebugFunc(ctx:Pvoid; handler:xmlGenericErrorFunc);cdecl;external LIBXSLT_SO;
-
-{
-	Sorting
 }
-procedure xsltDocumentSortFunction(list:xmlNodeSetPtr);cdecl;external LIBXSLT_SO;
-procedure xsltDoSortFunction(ctxt:xsltTransformContextPtr; sorts:PxmlNodePtr; nbsorts:longint);cdecl;external LIBXSLT_SO;
+procedure xsltPrintErrorContext(ctxt: xsltTransformContextPtr; style: xsltStylesheetPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
+procedure xsltMessage(ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr); cdecl; external LIBXSLT_SO;
+procedure xsltSetGenericErrorFunc(ctx: Pointer; handler: xmlGenericErrorFunc); cdecl; external LIBXSLT_SO;
+procedure xsltSetGenericDebugFunc(ctx: Pointer; handler: xmlGenericErrorFunc); cdecl; external LIBXSLT_SO;
 
-{
-	QNames handling
-}
-function xsltGetQNameURI(node:xmlNodePtr; name:PPxmlChar):PxmlChar;cdecl;external LIBXSLT_SO;
+(*
+ * Sorting.
+ *)
+procedure xsltDocumentSortFunction(list: xmlNodeSetPtr); cdecl; external LIBXSLT_SO;
+procedure xsltDoSortFunction(ctxt: xsltTransformContextPtr; sorts: PxmlNodePtr; nbsorts: Longint); cdecl; external LIBXSLT_SO;
 
-{
-	Output, reuse libxml I/O buffers
-}
-function  xsltSaveResultTo(buf:xmlOutputBufferPtr; result:xmlDocPtr; style:xsltStylesheetPtr):longint;cdecl;external LIBXSLT_SO;
-function  xsltSaveResultToFilename(URI:Pchar; result:xmlDocPtr; style:xsltStylesheetPtr; compression:longint):longint;cdecl;external LIBXSLT_SO;
-function  xsltSaveResultToFile(var file_:TextFile; result:xmlDocPtr; style:xsltStylesheetPtr):longint;cdecl;external LIBXSLT_SO;
-function  xsltSaveResultToFd(fd:longint; result:xmlDocPtr; style:xsltStylesheetPtr):longint;cdecl;external LIBXSLT_SO;
+(*
+ * QNames handling.
+ *)
+function xsltGetQNameURI(node: xmlNodePtr; name: PPxmlChar): PxmlChar; cdecl; external LIBXSLT_SO;
 
-{
-	profiling
-}
-procedure xsltSaveProfiling(ctxt:xsltTransformContextPtr; var output:TextFile);cdecl;external LIBXSLT_SO;
-function  xsltTimestamp:longint;cdecl;external LIBXSLT_SO;
-procedure xsltCalibrateAdjust(delta:longint);cdecl;external LIBXSLT_SO;
+(*
+ * Output, reuse libxml I/O buffers.
+ *)
+function  xsltSaveResultTo(buf: xmlOutputBufferPtr; result: xmlDocPtr; style: xsltStylesheetPtr): Longint; cdecl; external LIBXSLT_SO;
+function  xsltSaveResultToFilename(URI: Pchar; result: xmlDocPtr; style: xsltStylesheetPtr; compression: Longint): Longint; cdecl; external LIBXSLT_SO;
+function  xsltSaveResultToFile(var file_: TextFile; result: xmlDocPtr; style: xsltStylesheetPtr): Longint; cdecl; external LIBXSLT_SO;
+function  xsltSaveResultToFd(fd: Longint; result: xmlDocPtr; style: xsltStylesheetPtr): Longint; cdecl; external LIBXSLT_SO;
+
+(*
+ * Profiling.
+ *)
+procedure xsltSaveProfiling(ctxt: xsltTransformContextPtr; output: PLibXml2File); cdecl; external LIBXSLT_SO;
+function  xsltTimestamp: Longint; cdecl; external LIBXSLT_SO;
+procedure xsltCalibrateAdjust(delta: Longint); cdecl; external LIBXSLT_SO;
+
+const
+  XSLT_TIMESTAMP_TICS_PER_SEC = 100000;
+
+  (*
+   * Hooks for the debugger.
+   *)
+type
+  xsltDebugStatusCodes = Longint;
+const
+  XSLT_DEBUG_NONE         = 0; (* no debugging allowed *)
+  XSLT_DEBUG_INIT         = 1;
+  XSLT_DEBUG_STEP         = 2;
+  XSLT_DEBUG_STEPOUT      = 3;
+  XSLT_DEBUG_NEXT         = 4;
+  XSLT_DEBUG_STOP         = 5;
+  XSLT_DEBUG_CONT         = 6;
+  XSLT_DEBUG_RUN          = 7;
+  XSLT_DEBUG_RUN_RESTART  = 8;
+  XSLT_DEBUG_QUIT         = 9;
+
+//[pk] LIBXSLT_PUBLIC extern int xslDebugStatus;
+type
+  xsltHandleDebuggerCallback = procedure(cur, node: xmlNodePtr; templ: xsltTemplatePtr; ctxt: xsltTransformContextPtr); cdecl;
+  xsltAddCallCallback = function(templ: xsltTemplatePtr; source: xmlNodePtr): Longint; cdecl;
+  xsltDropCallCallback = procedure;
+
+function  xsltSetDebuggerCallbacks(no: Longint; block: Pointer): Longint; cdecl; external LIBXSLT_SO;
+function  xslAddCall(templ: xsltTemplatePtr; source: xmlNodePtr): Longint; cdecl; external LIBXSLT_SO;
+procedure xslDropCall; cdecl; external LIBXSLT_SO;
 

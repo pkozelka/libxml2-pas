@@ -44,24 +44,27 @@ const
 {
 	Global cleanup function
 }
-procedure xsltCleanupGlobals;cdecl;external LIBXSLT_SO;
+procedure xsltCleanupGlobals; cdecl; external LIBXSLT_SO;
+{
+NOTE: two spaces after $I mean that the file is not yet converted to CVS-SIGN format.
+}
 
-{$I libxslt_xsltInternals.inc}
+{$I  libxslt_xsltInternals.inc}
 {$I libxslt_transform.inc}
 {$I libxslt_xsltutils.inc}
-{$I libxslt_attributes.inc}
+{$I  libxslt_attributes.inc}
 {$I libxslt_documents.inc}
 
-{$I libxslt_extensions.inc}
+{$I  libxslt_extensions.inc}
 {$I libxslt_extra.inc}
-{$I libxslt_functions.inc}
-{$I libxslt_keys.inc}
-{$I libxslt_namespaces.inc}
-{$I libxslt_pattern.inc}
-{$I libxslt_preproc.inc}
-{$I libxslt_templates.inc}
-{$I libxslt_imports.inc}
-{$I libxslt_variables.inc}
+{$I  libxslt_functions.inc}
+{$I  libxslt_keys.inc}
+{$I  libxslt_namespaces.inc}
+{$I  libxslt_pattern.inc}
+{$I  libxslt_preproc.inc}
+{$I  libxslt_templates.inc}
+{$I  libxslt_imports.inc}
+{$I  libxslt_variables.inc}
 
 {TODO: $I libxslt_numbersInternals.inc}
 {TODO: $I libxslt_win32config.inc}
@@ -74,5 +77,7 @@ procedure xsltCleanupGlobals;cdecl;external LIBXSLT_SO;
 implementation
 
 end.
+
+
 
 
