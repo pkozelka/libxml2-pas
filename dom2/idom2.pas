@@ -45,6 +45,17 @@ uses
 const
 
   (*
+   * URI for prefix "xml"
+   *)
+  XML_NAMESPACE_URI   = 'http://www.w3.org/XML/1998/namespace';
+  (*
+   * URI for prefix "xmlns" and namespace node declarations
+   *)
+  XMLNS_NAMESPACE_URI = 'http://www.w3.org/2000/xmlns/';
+
+
+  
+  (*
    * If index or size is negative, or greater than the allowed value
   *)
   INDEX_SIZE_ERR = 1;
