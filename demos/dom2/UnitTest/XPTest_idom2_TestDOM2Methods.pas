@@ -5,7 +5,6 @@ interface
 uses
   TestFrameWork,
   TestExtensions,
-  libxmldom,
   idom2,
   idom2_ext,
   SysUtils,

@@ -10,8 +10,12 @@ implementation
 uses
   TestFrameWork,
   DomSetup,
-  libxmldom,
   msxml_impl,
+  {$ifdef FE}
+    libxmldomFE,
+  {$else}
+    libxmldom,
+  {$endif}
 
   (* add new tests to uses class *)
 
