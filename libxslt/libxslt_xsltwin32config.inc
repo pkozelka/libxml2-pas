@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.21] libxslt/xsltwin32config.h
+// CVS-SIGN: [1.22] libxslt/xsltwin32config.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -20,21 +20,21 @@ const
    *
    * the version string like "1.2.3"
    *)
-  LIBXSLT_DOTTED_VERSION = '1.0.15';
+  LIBXSLT_DOTTED_VERSION = '1.0.17';
 
   (**
    * LIBXSLT_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBXSLT_VERSION = 10015;
+  LIBXSLT_VERSION = 10017;
 
   (**
    * LIBXSLT_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-  LIBXSLT_VERSION_STRING = '10015';
+  LIBXSLT_VERSION_STRING = '10017';
 
 (**
  * WITH_XSLT_DEBUG:
