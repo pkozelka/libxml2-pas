@@ -187,7 +187,7 @@ type
   end;
 
 
-  TMSXMLNode = class(TInterfacedObject, IDomNode, IDomNodeSelect, IMSXMLExtDomNode)
+  TMSXMLNode = class(TInterfacedObject, IDomNode, IDomNodeSelect, IMSXMLExtDomNode, IDomNodeEx)
     private
       fMSDomNode : IXMLDOMNode;
 
@@ -228,9 +228,11 @@ type
       function  isSupported(
               const feature : DomString;
               const version : DomString) : Boolean;
-    function selectNode(const nodePath: WideString): IDOMNode;
-    function selectNodes(const nodePath: WideString): IDOMNodeList;
+    function selectNode(const nodePath: WideString): IDomNode;
+    function selectNodes(const nodePath: WideString): IDomNodeList;
     procedure registerNS(const prefix : DomString; const uri : DomString);
+    procedure transformNode(const stylesheet: IDomNode; var output: WideString); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
   end;
 
 
@@ -2295,6 +2297,25 @@ begin
 
 end;
 
+procedure TMSXMLNode.transformNode(const stylesheet: IDomNode;
+  var output: WideString);
+var
+  msStylesheet: ixmldomnode;
+begin
+  msStylesheet:=(stylesheet as IMSXMLExtDomNode).getOrgInterface;
+  output := fMSDomNode.transformNode(msStylesheet);
+end;
+
+procedure TMSXMLNode.transformNode(const stylesheet: IDomNode;
+  var output: IDomDocument);
+var
+  msStylesheet,node: ixmldomnode;
+begin
+  msStylesheet:=(stylesheet as IMSXMLExtDomNode).getOrgInterface;
+  node:=(output as IMSXMLExtDomNode).getOrgInterface;
+  fMSDomNode.transformNodeToObject(msStylesheet, node);
+end;
+
 initialization
   CoInitialize(nil);
   {register non-threading aware factory}
@@ -2304,3 +2325,4 @@ initialization
   {create the global 'memory manager' managing all wrappers}
   gDomWrapperRepository := TDomWrapperRepository.create;
 end.
+
