@@ -29,7 +29,7 @@ type
    * Callback called when a validity error is found. This is a message
    * oriented function similar to an *printf function.
    *)
-  xmlValidityErrorFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} {[pk] varargs;} {$ENDIF}
+  xmlValidityErrorFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF HAS_TVA} varargs; {$ENDIF}
   (**
    * xmlValidityWarningFunc:
    * @ctx:  an xmlValidCtxtPtr validity error context
@@ -39,7 +39,7 @@ type
    * Callback called when a validity warning is found. This is a message
    * oriented function similar to an *printf function.
    *)
-  xmlValidityWarningFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} {[pk] varargs;} {$ENDIF}
+  xmlValidityWarningFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF HAS_TVA} varargs; {$ENDIF}
 
   (**
    * xmlValidCtxt:

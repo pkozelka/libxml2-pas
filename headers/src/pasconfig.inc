@@ -12,4 +12,10 @@
 // Do we have deprecation directive ?
 {$IFDEF VER140} {$DEFINE HAS_DEPR} {$ENDIF}
 
+// Do we have varargs directive for procedures and functions ?
+{$IFDEF VER140} {$DEFINE HAS_VA} {$ENDIF}
+
+// Do we have varargs directive for functional types ?
+{$IFDEF VER_NOT_YET} {$DEFINE HAS_TVA} {$ENDIF}
+
 

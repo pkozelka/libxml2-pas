@@ -115,7 +115,7 @@ type
    * Signature of the function to use when there is an error and
    * no parsing or validity context available.
    *)
-  xmlGenericErrorFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} {[pk] varargs;} {$ENDIF}
+  xmlGenericErrorFunc = procedure(ctx: Pointer; msg: PChar); cdecl; {$IFDEF HAS_TVA} varargs; {$ENDIF}
   // note: the above modifier is commented because this syntax is not supported.
   //TODO: report it to Borland!
 (*
@@ -129,10 +129,10 @@ procedure xmlInitGenericErrorDefaultFunc(var handler: xmlGenericErrorFunc); cdec
  * Default message routines used by SAX and Valid context for error
  * and warning reporting.
  *)
-procedure xmlParserError(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} varargs; {$ENDIF} external LIBXML2_SO; 
-procedure xmlParserWarning(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} varargs; {$ENDIF} external LIBXML2_SO;
-procedure xmlParserValidityError(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} varargs; {$ENDIF} external LIBXML2_SO;
-procedure xmlParserValidityWarning(ctx: Pointer; msg: PChar); cdecl; {$IFDEF VER140} varargs; {$ENDIF} external LIBXML2_SO;
-procedure xmlParserPrintFileInfo(input: xmlParserInputPtr); cdecl; {$IFDEF VER140} varargs; {$ENDIF} external LIBXML2_SO;
-procedure xmlParserPrintFileContext(input: xmlParserInputPtr); cdecl; {$IFDEF VER140} varargs; {$ENDIF} external LIBXML2_SO;
+procedure xmlParserError(ctx: Pointer; msg: PChar); cdecl; {$IFDEF HAS_VA} varargs; {$ENDIF} external LIBXML2_SO;
+procedure xmlParserWarning(ctx: Pointer; msg: PChar); cdecl; {$IFDEF HAS_VA} varargs; {$ENDIF} external LIBXML2_SO;
+procedure xmlParserValidityError(ctx: Pointer; msg: PChar); cdecl; {$IFDEF HAS_VA} varargs; {$ENDIF} external LIBXML2_SO;
+procedure xmlParserValidityWarning(ctx: Pointer; msg: PChar); cdecl; {$IFDEF HAS_VA} varargs; {$ENDIF} external LIBXML2_SO;
+procedure xmlParserPrintFileInfo(input: xmlParserInputPtr); cdecl; {$IFDEF HAS_VA} varargs; {$ENDIF} external LIBXML2_SO;
+procedure xmlParserPrintFileContext(input: xmlParserInputPtr); cdecl; {$IFDEF HAS_VA} varargs; {$ENDIF} external LIBXML2_SO;
 
