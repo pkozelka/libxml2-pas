@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.59 2002-01-16 21:29:02 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.60 2002-01-16 21:39:28 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -78,6 +78,7 @@ type
 	TGDOMNode = class(TGDOMInterface, IDOMNode, ILibXml2Node, IDOMNodeSelect)
 	private
 		FGNode: xmlNodePtr;
+		function  noDomNode: IDomNode;
 	protected //IXMLDOMNodeRef
 		function  LibXml2NodePtr: xmlNodePtr;
 	protected //IDOMNode
@@ -165,7 +166,6 @@ type
 	private
 		//ns:
 		function  GetGAttribute: xmlAttrPtr;
-		function  noDomNode: IDomNode;
 	protected //IDomNode
 		function  IDomNode.get_nodeValue = get_value;
 		procedure IDomNode.set_nodeValue = set_value;
@@ -269,22 +269,28 @@ type
 	end;
 
 	{ TGDOMNotation }
-	TGDOMNotation = class(TGDOMNode, IDOMNotation)
+	TGDOMNotation = class(TGDOMNode,
+		IDomNode,
+		IDomNotation)
 	private
 		function GetGNotation: xmlNotationPtr;
-	protected
-		{ IDOMNotation }
+	protected //IDomNode
+		function  IDomNode.get_parentNode = noDomNode;
+	protected //IDomNotation
 		function get_publicId: DOMString;
 		function get_systemId: DOMString;
 	public
 		property GNotation: xmlNotationPtr read GetGNotation;
 	end;
 
-	TGDOMEntity = class(TGDOMNode, IDOMEntity)
+	TGDOMEntity = class(TGDOMNode,
+    IDomNode,
+		IDomEntity)
 	private
 		function GetGEntity: xmlEntityPtr;
-	protected
-		{ IDOMEntity }
+	protected //IDomNode
+		function  IDomNode.get_parentNode = noDomNode;
+	protected //IDomEntity
 		function get_publicId: DOMString;
 		function get_systemId: DOMString;
 		function get_notationName: DOMString;
@@ -308,9 +314,10 @@ type
 	end;
 
 	TGDOMDocument = class(TGDOMNode,
-		IDOMDocument,
-		IDOMParseOptions,
-		IDOMPersist)
+		IDomNode,
+		IDomDocument,
+		IDomParseOptions,
+		IDomPersist)
 	private
 		FGDOMImpl: IDOMImplementation;
 		FAsync: boolean;              //for compatibility, not really supported
@@ -319,7 +326,10 @@ type
 		Fvalidate: boolean;           //check if default is ok
 		FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
 	protected //IDomNode
-		function  get_ownerDocument: IDOMDocument; override;
+		function  get_ownerDocument: IDomDocument; override;
+		function  IDomNode.get_parentNode = noDomNode;
+		function  IDomNode.get_previousSibling = noDomNode;
+		function  IDomNode.get_nextSibling = noDomNode;
 	protected //IDomDocument
 		function  get_doctype: IDOMDocumentType;
 		function  get_domImplementation: IDOMImplementation;
@@ -371,7 +381,11 @@ type
 
 	{ TMSDOMDocumentFragment }
 
-	TGDOMDocumentFragment = class(TGDOMNode, IDOMDocumentFragment)
+	TGDOMDocumentFragment = class(TGDOMNode,
+		IDomNode,
+		IDomDocumentFragment)
+	protected //IDomNode
+		function  IDomNode.get_parentNode = noDomNode;
 	end;
 
 	TGDOMDocumentBuilderFactory = class(TInterfacedObject,
@@ -677,6 +691,15 @@ begin
 end;
 
 { TGDomeNode }
+
+(**
+ * This function implements null return value for all the traversal functions
+ * where null is required by DOM spec. in Attr interface
+ *)
+function TGDOMNode.noDomNode: IDOMNode;
+begin
+	Result := nil;
+end;
 
 function TGDOMNode.LibXml2NodePtr: xmlNodePtr;
 begin
@@ -1298,15 +1321,6 @@ end;
 function TGDOMAttr.get_value: DOMString;
 begin
 	Result := UTF8Decode(xmlNodeListGetString(FGNode.doc, FGNode.children, 1));
-end;
-
-(**
- * This function implements null return value for all the traversal functions
- * where null is required by DOM spec. in Attr interface
- *)
-function TGDOMAttr.noDomNode: IDOMNode;
-begin
-	Result := nil;
 end;
 
 procedure TGDOMAttr.set_value(const attributeValue: DOMString);
