@@ -29,12 +29,13 @@ procedure xmlDebugDumpEntities(var aOutput: TextFile; doc:xmlDocPtr);cdecl;exter
 procedure xmlLsOneNode(var aOutput: TextFile; node:xmlNodePtr);cdecl;external LIBXML2_SO;
 function  xmlBoolToText(boolval: longint): PChar; cdecl;external LIBXML2_SO;
 
-{
-	The XML shell related structures and functions
-}
+(****************************************************************
+ *								                                              *
+ *	 The XML shell related structures and functions		          *
+ *								                                              *
+ ****************************************************************)
 
 type
-
   (**
    * xmlShellReadlineFunc:
    * @prompt:  a string prompt

@@ -195,13 +195,13 @@ type
 
   xmlAttributeType =  Longint;
 
-	(**
+  (**
    * xmlAttributeDefault:
    * a DTD Attribute default definition
    *)
   xmlAttributeDefault =  Longint;
 
-	(**
+  (**
    * xmlEnumeration:
    * list structure used when there is an enumeration in DTDs
    *)
@@ -211,7 +211,7 @@ type
     name : PxmlChar;                { Enumeration name  }
   end;
 
-	(**
+  (**
    * xmlAttribute:
    * an Attribute declaration in a DTD
    *)
@@ -235,19 +235,19 @@ type
     elem : PxmlChar;                { Element holding the attribute  }
   end;
 
-	(**
+  (**
    * xmlElementContentType:
    * Possible definitions of element content types
    *)
   xmlElementContentType =  Longint;
 
-	(**
+  (**
    * xmlElementContentOccur:
    * Possible definitions of element content occurences
    *)
   xmlElementContentOccur =  Longint;
 
-	(**
+  (**
    * xmlElementContent:
    * an XML Element content as stored after parsing an element definition
    * in a DTD.
@@ -263,13 +263,13 @@ type
     prefix: PxmlChar;               { prefix }
   end;
 
-	(**
+  (**
    * xmlElementTypeVal:
    * the differnt possibility for an element content type
    *)
   xmlElementTypeVal =  Longint;
 
-	(**
+  (**
    * xmlElement:
    * an XML Element declaration from a DTD
    *)
@@ -291,7 +291,7 @@ type
   end;
 
   xmlNsType = xmlElementType;
-	(**
+  (**
    * xmlNs:
    *
    * An XML namespace.
@@ -309,7 +309,7 @@ type
     prefix : PxmlChar;              { prefix for the namespace  }
   end;
 
-	(**
+  (**
    * xmlDtd:
    *
    * An XML DtD, as defined by <!DOCTYPE ... There is actually one for
@@ -335,7 +335,7 @@ type
     pentities : pointer;          	{ Hash table for param entities if any  }
   end;
 
-	(**
+  (**
    * xmlAttr:
    * A attribute on an XML node.
    *)
@@ -355,7 +355,7 @@ type
     atype : xmlAttributeType;       { the attribute type if validating  }
   end;
 
-	(**
+  (**
    * xmlID:
    * An XML ID instance.
    *)
@@ -366,7 +366,7 @@ type
     attr : xmlAttrPtr;              { The attribut holding it  }
   end;
 
-	(**
+  (**
    * xmlRef:
    * An XML IDREF instance.
    *)
@@ -377,7 +377,7 @@ type
     attr : xmlAttrPtr;              { The attribut holding it  }
   end;
 
-	(**
+  (**
    * xmlBufferAllocationScheme:
    *
    * A buffer allocation scheme can be defined to either match exactly the
@@ -386,7 +386,7 @@ type
 
   xmlBufferAllocationScheme =  Longint;
 
-	(**
+  (**
    * xmlBuffer:
    * A buffer structure
    *)
@@ -398,7 +398,7 @@ type
     alloc: xmlBufferAllocationScheme; { The realloc method  }
   end;
 
-	(**
+  (**
    * xmlNode:
    * A node in an XML tree.
    *)
@@ -423,7 +423,7 @@ type
     nsDef : xmlNsPtr;               { namespace definitions on this node  }
   end;
 
-	(**
+  (**
    * xmlDoc:
    * An XML document.
    *)
@@ -451,7 +451,7 @@ type
     charset : longint;              { encoding of the in-memory content - actually an xmlCharEncoding  }
   end;
 
-	(**
+  (**
    * Variables.
    *)
 (* TODO: translate somehow

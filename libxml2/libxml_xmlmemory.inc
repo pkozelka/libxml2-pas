@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.23] xmlmemory.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 
 (*
@@ -50,8 +50,8 @@ type
    *
    * Signature for a free() implementation
    *)
-	xmlFreeFunc = procedure(ptr: pointer); cdecl;
-	PxmlFreeFunc = ^xmlFreeFunc;
+  xmlFreeFunc = procedure(ptr: pointer); cdecl;
+  PxmlFreeFunc = ^xmlFreeFunc;
 
   (**
    * xmlMallocFunc:
@@ -61,8 +61,8 @@ type
    *
    * Returns a pointer to the newly allocated block or NULL in case of error
    *)
-	xmlMallocFunc = function (size:size_t):pointer; cdecl;
-	PxmlMallocFunc = ^xmlMallocFunc;
+  xmlMallocFunc = function (size:size_t):pointer; cdecl;
+  PxmlMallocFunc = ^xmlMallocFunc;
 
   (**
    * xmlReallocFunc:
@@ -73,8 +73,8 @@ type
    *
    * Returns a pointer to the newly reallocated block or NULL in case of error
    *)
-	xmlReallocFunc = function (ptr:pointer; size:size_t):pointer; cdecl;
-	PxmlReallocFunc = ^xmlReallocFunc;
+  xmlReallocFunc = function (ptr:pointer; size:size_t):pointer; cdecl;
+  PxmlReallocFunc = ^xmlReallocFunc;
 
   (**
    * xmlStrdupFunc:
@@ -84,8 +84,8 @@ type
    *
    * Returns the copy of the string or NULL in case of error
    *)
-	xmlStrdupFunc = function (str:PChar):PChar; cdecl;
-	PxmlStrdupFunc = ^xmlStrdupFunc;
+  xmlStrdupFunc = function (str:PChar):PChar; cdecl;
+  PxmlStrdupFunc = ^xmlStrdupFunc;
 
   (*
    * The 4 interfaces used for all memory handling within libxml

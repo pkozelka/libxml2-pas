@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.34] xmlIO.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 
 (*
@@ -30,7 +30,7 @@ type
    *
    * Returns 1 if yes and 0 if another Input module should be used
    *)
-	xmlInputMatchCallback = function (filename: PChar):longint;cdecl;
+  xmlInputMatchCallback = function (filename: PChar):longint;cdecl;
 
   (**
    * xmlInputOpenCallback:
@@ -40,7 +40,7 @@ type
    *
    * Returns an Input context or NULL in case or error
    *)
-	xmlInputOpenCallback  = function (filename:Pchar): pointer;cdecl;
+  xmlInputOpenCallback  = function (filename:Pchar): pointer;cdecl;
 
   (**
    * xmlInputReadCallback:
@@ -52,7 +52,7 @@ type
    *
    * Returns the number of bytes read or -1 in case of error
    *)
-	xmlInputReadCallback  = function (context: pointer; buffer: PChar; len: integer):longint;cdecl;
+  xmlInputReadCallback  = function (context: pointer; buffer: PChar; len: integer):longint;cdecl;
 
   (**
    * xmlInputCloseCallback:
@@ -62,17 +62,17 @@ type
    *
    * Returns 0 or -1 in case of error
    *)
-	xmlInputCloseCallback = function (context: pointer): longint;
+  xmlInputCloseCallback = function (context: pointer): longint;
 
-	xmlParserInputBufferPtr = ^xmlParserInputBuffer;
-	xmlParserInputBuffer = record
-		context : pointer;
-		readcallback : xmlInputReadCallback;
-		closecallback : xmlInputCloseCallback;
-		encoder : xmlCharEncodingHandlerPtr; { I18N conversions to UTF-8  }
-		buffer : xmlBufferPtr;          { Local buffer encoded in UTF-8  }
-		raw : xmlBufferPtr;             { if encoder != NULL buffer for raw input  }
-	end;
+  xmlParserInputBufferPtr = ^xmlParserInputBuffer;
+  xmlParserInputBuffer = record
+    context : pointer;
+    readcallback : xmlInputReadCallback;
+    closecallback : xmlInputCloseCallback;
+    encoder : xmlCharEncodingHandlerPtr; { I18N conversions to UTF-8  }
+    buffer : xmlBufferPtr;          { Local buffer encoded in UTF-8  }
+    raw : xmlBufferPtr;             { if encoder != NULL buffer for raw input  }
+  end;
 
   (*
    * Those are the functions and datatypes for the library output
@@ -88,7 +88,7 @@ type
    *
    * Returns 1 if yes and 0 if another Output module should be used
    *)
-	xmlOutputMatchCallback = function (const filename: PChar): integer;
+  xmlOutputMatchCallback = function (const filename: PChar): integer;
 
   (**
    * xmlOutputOpenCallback:
@@ -98,7 +98,7 @@ type
    *
    * Returns an Output context or NULL in case or error
    *)
-	xmlOutputOpenCallback  = function (filename:Pchar):pointer;cdecl;
+  xmlOutputOpenCallback  = function (filename:Pchar):pointer;cdecl;
 
   (**
    * xmlOutputWriteCallback:
@@ -110,7 +110,7 @@ type
    *
    * Returns the number of bytes written or -1 in case of error
    *)
-	xmlOutputWriteCallback = function (context: pointer; buffer: PChar; len: longint): longint; cdecl;
+  xmlOutputWriteCallback = function (context: pointer; buffer: PChar; len: longint): longint; cdecl;
 
   (**
    * xmlOutputCloseCallback:
@@ -120,19 +120,19 @@ type
    *
    * Returns 0 or -1 in case of error
    *)
-	xmlOutputCloseCallback = function (context: pointer): longint; cdecl;
+  xmlOutputCloseCallback = function (context: pointer): longint; cdecl;
 
 
-	xmlOutputBufferPtr = ^xmlOutputBuffer;
-	xmlOutputBuffer = record
-		context : pointer;
-		writecallback : xmlOutputWriteCallback;
-		closecallback : xmlOutputCloseCallback;
-		encoder : xmlCharEncodingHandlerPtr; { I18N conversions to UTF-8  }
-		buffer : xmlBufferPtr;          { Local buffer encoded in UTF-8 or ISOLatin  }
-		conv : xmlBufferPtr;            { if encoder != NULL buffer for output  }
-		written : longint;              { total number of byte written  }
-	end;
+  xmlOutputBufferPtr = ^xmlOutputBuffer;
+  xmlOutputBuffer = record
+    context : pointer;
+    writecallback : xmlOutputWriteCallback;
+    closecallback : xmlOutputCloseCallback;
+    encoder : xmlCharEncodingHandlerPtr; { I18N conversions to UTF-8  }
+    buffer : xmlBufferPtr;          { Local buffer encoded in UTF-8 or ISOLatin  }
+    conv : xmlBufferPtr;            { if encoder != NULL buffer for output  }
+    written : longint;              { total number of byte written  }
+  end;
 
 (*
  * Interfaces for input

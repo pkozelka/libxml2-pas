@@ -5,17 +5,16 @@
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
 }
-{
-	threads.c: set of generic threading related routines
-
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
-
-{
-	xmlMutex are a simple mutual exception locks
-}
+(**
+ * threads.c: set of generic threading related routines 
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
+(*
+ * xmlMutex are a simple mutual exception locks
+ *)
 type
 	xmlMutex = pointer;
 	xmlMutexPtr = ^xmlMutex;
@@ -25,9 +24,9 @@ procedure xmlMutexLock(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
 procedure xmlMutexUnlock(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
 procedure xmlFreeMutex(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
 
-{
-	xmlRMutex are reentrant mutual exception locks
-}
+(*
+ * xmlRMutex are reentrant mutual exception locks
+ *)
 type
 	xmlRMutex = pointer;
 	xmlRMutexPtr = ^xmlRMutex;
@@ -37,9 +36,9 @@ procedure xmlRMutexLock(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
 procedure xmlRMutexUnlock(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
 procedure xmlFreeRMutex(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
 
-{
-	Library wide APIs
-}
+(*
+ * Library wide APIs
+ *)
 procedure xmlInitThreads;cdecl;external LIBXML2_SO;
 procedure xmlLockLibrary;cdecl;external LIBXML2_SO;
 procedure xmlUnlockLibrary;cdecl;external LIBXML2_SO;

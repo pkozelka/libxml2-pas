@@ -1,17 +1,17 @@
 // CVS-SIGN: [1.16] SAX.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
-{
-	SAX.h : Default SAX handler interfaces.
-
-	See Copyright for the status of this software.
-
-	Daniel Veillard <daniel@veillard.com>
-}
+(*
+ * SAX.h : Default SAX handler interfaces.
+ *
+ * See Copyright for the status of this software.
+ *
+ * Daniel Veillard <daniel@veillard.com>
+ *)
 
 function  getPublicId(ctx:pointer):PxmlChar;cdecl;external LIBXML2_SO;
 function  getSystemId(ctx:pointer):PxmlChar;cdecl;external LIBXML2_SO;

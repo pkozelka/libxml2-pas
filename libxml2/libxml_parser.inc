@@ -1,25 +1,25 @@
 // CVS-SIGN: [1.73] parser.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
-{
-	parser.h : Interfaces, constants and types related to the XML parser.
-
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
+(*
+ * parser.h : Interfaces, constants and types related to the XML parser.
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
 
 const
-	(**
-	 * XML_DEFAULT_VERSION:
-	 *
-	 * The default version of XML used: 1.0
-	 *)
-	XML_DEFAULT_VERSION = '1.0';
+  (**
+   * XML_DEFAULT_VERSION:
+   *
+   * The default version of XML used: 1.0
+   *)
+  XML_DEFAULT_VERSION = '1.0';
 
 type
   (**
@@ -28,7 +28,7 @@ type
    *
    * Callback for freeing some parser input allocations
    *)
-	xmlParserInputDeallocate = procedure (p1: PxmlChar);
+  xmlParserInputDeallocate = procedure (p1: PxmlChar);
 
   (**
    * xmlParserInput:
@@ -40,24 +40,24 @@ type
    * external entities - in which case we use the buf structure for
    * progressive reading and I18N conversions to the internal UTF-8 format.
    *)
-	xmlParserInputPtr = ^xmlParserInput;
-	xmlParserInput = record
-  	{ Input buffer  }
-		buf : xmlParserInputBufferPtr;  { UTF-8 encoded buffer  }
-		filename : Pchar;               { The file analyzed, if any  }
-		directory : Pchar;              { the directory/base of the file  }
-		base : PxmlChar;                { Base of the array to parse  }
-		cur : PxmlChar;                 { Current char being parsed  }
-		_end : PxmlChar;                { end of the array to parse  }
-		length : longint;               { length if known  }
-		line : longint;                 { Current line  }
-		col : longint;                  { Current column  }
-		consumed : longint;             { How many xmlChars already consumed  }
-		free : xmlParserInputDeallocate;{ function to deallocate the base  }
-		encoding : PxmlChar;            { the encoding string for entity  }
-		version : PxmlChar;             { the version string for entity  }
-		standalone : longint;           { Was that entity marked standalone  }
-	end;
+  xmlParserInputPtr = ^xmlParserInput;
+  xmlParserInput = record
+    (* Input buffer *)
+    buf : xmlParserInputBufferPtr;  { UTF-8 encoded buffer  }
+    filename : Pchar;               { The file analyzed, if any  }
+    directory : Pchar;              { the directory/base of the file  }
+    base : PxmlChar;                { Base of the array to parse  }
+    cur : PxmlChar;                 { Current char being parsed  }
+    _end : PxmlChar;                { end of the array to parse  }
+    length : longint;               { length if known  }
+    line : longint;                 { Current line  }
+    col : longint;                  { Current column  }
+    consumed : longint;             { How many xmlChars already consumed  }
+    free : xmlParserInputDeallocate;{ function to deallocate the base  }
+    encoding : PxmlChar;            { the encoding string for entity  }
+    version : PxmlChar;             { the version string for entity  }
+    standalone : longint;           { Was that entity marked standalone  }
+  end;
 
   (**
    * xmlParserInputState:
@@ -66,25 +66,25 @@ type
    * The recursive one use the state info for entities processing
    *)
 type
-	xmlParserInputState =  Longint;
+  xmlParserInputState =  Longint;
 const
-	XML_PARSER_EOF = -(1);             { nothing is to be parsed }
-	XML_PARSER_START = 0;              { nothing has been parsed }
-	XML_PARSER_MISC = 1;               { Misc  before int subset }
-	XML_PARSER_PI = 2;                 { Within a processing instruction }
-	XML_PARSER_DTD = 3;                { within some DTD content }
-	XML_PARSER_PROLOG = 4;             { Misc  after internal subset }
-	XML_PARSER_COMMENT = 5;            { within a comment }
-	XML_PARSER_START_TAG = 6;          { within a start tag }
-	XML_PARSER_CONTENT = 7;            { within the content }
-	XML_PARSER_CDATA_SECTION = 8;      { within a CDATA section }
-	XML_PARSER_END_TAG = 9;            { within a closing tag }
-	XML_PARSER_ENTITY_DECL = 10;       { within an entity declaration }
-	XML_PARSER_ENTITY_VALUE = 11;      { within an entity value in a decl }
-	XML_PARSER_ATTRIBUTE_VALUE = 12;   { within an attribute value }
-	XML_PARSER_SYSTEM_LITERAL = 13;    { within a SYSTEM value }
-	XML_PARSER_EPILOG = 14;            { the Misc  after the last end tag }
-	XML_PARSER_IGNORE = 15;            { within an IGNORED section }
+  XML_PARSER_EOF = -(1);             { nothing is to be parsed }
+  XML_PARSER_START = 0;              { nothing has been parsed }
+  XML_PARSER_MISC = 1;               { Misc  before int subset }
+  XML_PARSER_PI = 2;                 { Within a processing instruction }
+  XML_PARSER_DTD = 3;                { within some DTD content }
+  XML_PARSER_PROLOG = 4;             { Misc  after internal subset }
+  XML_PARSER_COMMENT = 5;            { within a comment }
+  XML_PARSER_START_TAG = 6;          { within a start tag }
+  XML_PARSER_CONTENT = 7;            { within the content }
+  XML_PARSER_CDATA_SECTION = 8;      { within a CDATA section }
+  XML_PARSER_END_TAG = 9;            { within a closing tag }
+  XML_PARSER_ENTITY_DECL = 10;       { within an entity declaration }
+  XML_PARSER_ENTITY_VALUE = 11;      { within an entity value in a decl }
+  XML_PARSER_ATTRIBUTE_VALUE = 12;   { within an attribute value }
+  XML_PARSER_SYSTEM_LITERAL = 13;    { within a SYSTEM value }
+  XML_PARSER_EPILOG = 14;            { the Misc  after the last end tag }
+  XML_PARSER_IGNORE = 15;            { within an IGNORED section }
 
   (**
    * XML_DETECT_IDS:
@@ -92,7 +92,7 @@ const
    * Bit in the loadsubset context field to tell to do ID/REFs lookups
    * Use it to initialize xmlLoadExtDtdDefaultValue
    *)
-	XML_DETECT_IDS = 2;
+  XML_DETECT_IDS = 2;
 
   (**
    * XML_COMPLETE_ATTRS:
@@ -101,10 +101,10 @@ const
    * elements attributes lists with the ones defaulted from the DTDs
    * Use it to initialize xmlLoadExtDtdDefaultValue
    *)
-	XML_COMPLETE_ATTRS = 4;
+  XML_COMPLETE_ATTRS = 4;
 
 type
-	xmlSAXHandlerPtr = ^xmlSAXHandler;
+  xmlSAXHandlerPtr = ^xmlSAXHandler;
   (**
    * xmlParserNodeInfo:
    *
@@ -112,22 +112,22 @@ type
    * place in the file they were detected.
    * NOTE: This is off by default and not very well tested.
    *)
-	xmlParserNodeInfoPtr = ^xmlParserNodeInfo;
-	xmlParserNodeInfo = record
-		node : xmlNodePtr;
-  	{ Position & line # that text that created the node begins & ends on  }
-		begin_pos : dword;
-		begin_line : dword;
-		end_pos : dword;
-		end_line : dword;
-	end;
+  xmlParserNodeInfoPtr = ^xmlParserNodeInfo;
+  xmlParserNodeInfo = record
+    node : xmlNodePtr;
+    { Position & line # that text that created the node begins & ends on  }
+    begin_pos : dword;
+    begin_line : dword;
+    end_pos : dword;
+    end_line : dword;
+  end;
 
-	xmlParserNodeInfoSeqPtr = ^xmlParserNodeInfoSeq;
-	xmlParserNodeInfoSeq = record
-		maximum : dword;
-		length : dword;
-		buffer : ^xmlParserNodeInfo;
-	end;
+  xmlParserNodeInfoSeqPtr = ^xmlParserNodeInfoSeq;
+  xmlParserNodeInfoSeq = record
+    maximum : dword;
+    length : dword;
+    buffer : ^xmlParserNodeInfo;
+  end;
 
   (**
    * xmlParserCtxt:
@@ -141,81 +141,81 @@ type
    *      takes as the only argument the parser context pointer, so migrating
    *      to a state based parser for progressive parsing shouldn't be too hard.
    *)
-	xmlParserCtxtPtr = ^xmlParserCtxt;
-	xmlParserCtxt = record
-		sax : xmlSAXHandlerPtr;               { The SAX handler  }
-		userData : pointer;                   { For SAX interface only, used by DOM build  }
-		myDoc : xmlDocPtr;                    { the document being built  }
-		wellFormed : longint;                 { is the document well formed  }
-		replaceEntities : longint;            { shall we replace entities ?  }
-		version : PxmlChar;                   { the XML version string  }
-		encoding : PxmlChar;                  { the declared encoding, if any  }
-		standalone : longint;                 { standalone document  }
-		html : longint;                       { an HTML(1)/Docbook(2) document  }
-		{ Input stream stack  }
-		input : xmlParserInputPtr;            { Current input stream  }
-		inputNr : longint;                    { Number of current input streams  }
-		inputMax : longint;                   { Max number of input streams  }
-		{ stack of inputs  }
-		inputTab : ^xmlParserInputPtr;        { Node analysis stack only used for DOM building  }
-		node : xmlNodePtr;                    { Current parsed Node  }
-		nodeNr : longint;                     { Depth of the parsing stack  }
-		nodeMax : longint;                    { Max depth of the parsing stack  }
-		nodeTab : ^xmlNodePtr;                { array of nodes  }
-		record_info : longint;                { Whether node info should be kept  }
-		node_seq : xmlParserNodeInfoSeq;      { info about each node parsed  }
-		errNo : longint;                      { error code  }
-		hasExternalSubset : longint;          { reference and external subset  }
-		hasPErefs : longint;                  { the internal subset has PE refs  }
-		external_ : longint;                  { are we parsing an external entity  }
-		valid : longint;                      { is the document valid  }
-		validate : longint;                   { shall we try to validate ?  }
-		vctxt : xmlValidCtxt;                 { The validity context  }
-		instate : xmlParserInputState;        { current type of input  }
-		token : longint;                      { next char look-ahead  }
-		directory : Pchar;                    { the data directory  }
-		{ Node name stack  }
-		name : PxmlChar;                      { Current parsed Node  }
-		nameNr : longint;                     { Depth of the parsing stack  }
-		nameMax : longint;                  	{ Max depth of the parsing stack  }
-		nameTab : ^PxmlChar;                  { array of nodes  }
-		nbChars : longint;                    { number of xmlChar processed  }
-		checkIndex : longint;                 { used by progressive parsing lookup  }
-		keepBlanks : longint;                 { ugly but ...  }
-		disableSAX : longint;                 { SAX callbacks are disabled  }
-		inSubset : longint;                   { Parsing is in int 1/ext 2 subset  }
-		intSubName : PxmlChar;                { name of subset  }
-		extSubURI : PxmlChar;                 { URI of external subset  }
-		extSubSystem : PxmlChar;              { SYSTEM ID of external subset  }
-		{ xml:space values  }
-		space : Plongint;                     { Should the parser preserve spaces  }
-		spaceNr : longint;                    { Depth of the parsing stack  }
-		spaceMax : longint;                   { Max depth of the parsing stack  }
-		spaceTab : Plongint;                  { array of space infos  }
-		depth : longint;                      { to prevent entity substitution loops  }
-		entity : xmlParserInputPtr;           { used to check entities boundaries  }
-		charset : longint;                    { encoding of the in-memory content - actually an xmlCharEncoding  }
-		nodelen : longint;                    { Those two fields are there to  }
-		nodemem : longint;                    { Speed up large node parsing  }
-		pedantic : longint;                   { signal pedantic warnings  }
-		_private : pointer;                   { For user data, libxml won't touch it  }
-		loadsubset : longint;                 { should the external subset be loaded  }
-		linenumbers : longint;                { set line number in element content }
-		catalogs : pointer;                   { document's own catalog }
-	end;
+  xmlParserCtxtPtr = ^xmlParserCtxt;
+  xmlParserCtxt = record
+    sax : xmlSAXHandlerPtr;               { The SAX handler  }
+    userData : pointer;                   { For SAX interface only, used by DOM build  }
+    myDoc : xmlDocPtr;                    { the document being built  }
+    wellFormed : longint;                 { is the document well formed  }
+    replaceEntities : longint;            { shall we replace entities ?  }
+    version : PxmlChar;                   { the XML version string  }
+    encoding : PxmlChar;                  { the declared encoding, if any  }
+    standalone : longint;                 { standalone document  }
+    html : longint;                       { an HTML(1)/Docbook(2) document  }
+    (* Input stream stack *)
+    input : xmlParserInputPtr;            { Current input stream  }
+    inputNr : longint;                    { Number of current input streams  }
+    inputMax : longint;                   { Max number of input streams  }
+    (* stack of inputs *)
+    inputTab : ^xmlParserInputPtr;        { Node analysis stack only used for DOM building  }
+    node : xmlNodePtr;                    { Current parsed Node  }
+    nodeNr : longint;                     { Depth of the parsing stack  }
+    nodeMax : longint;                    { Max depth of the parsing stack  }
+    nodeTab : ^xmlNodePtr;                { array of nodes  }
+    record_info : longint;                { Whether node info should be kept  }
+    node_seq : xmlParserNodeInfoSeq;      { info about each node parsed  }
+    errNo : longint;                      { error code  }
+    hasExternalSubset : longint;          { reference and external subset  }
+    hasPErefs : longint;                  { the internal subset has PE refs  }
+    external_ : longint;                  { are we parsing an external entity  }
+    valid : longint;                      { is the document valid  }
+    validate : longint;                   { shall we try to validate ?  }
+    vctxt : xmlValidCtxt;                 { The validity context  }
+    instate : xmlParserInputState;        { current type of input  }
+    token : longint;                      { next char look-ahead  }
+    directory : Pchar;                    { the data directory  }
+    (* Node name stack *)
+    name : PxmlChar;                      { Current parsed Node  }
+    nameNr : longint;                     { Depth of the parsing stack  }
+    nameMax : longint;                  	{ Max depth of the parsing stack  }
+    nameTab : ^PxmlChar;                  { array of nodes  }
+    nbChars : longint;                    { number of xmlChar processed  }
+    checkIndex : longint;                 { used by progressive parsing lookup  }
+    keepBlanks : longint;                 { ugly but ...  }
+    disableSAX : longint;                 { SAX callbacks are disabled  }
+    inSubset : longint;                   { Parsing is in int 1/ext 2 subset  }
+    intSubName : PxmlChar;                { name of subset  }
+    extSubURI : PxmlChar;                 { URI of external subset  }
+    extSubSystem : PxmlChar;              { SYSTEM ID of external subset  }
+    (* xml:space values *)
+    space : Plongint;                     { Should the parser preserve spaces  }
+    spaceNr : longint;                    { Depth of the parsing stack  }
+    spaceMax : longint;                   { Max depth of the parsing stack  }
+    spaceTab : Plongint;                  { array of space infos  }
+    depth : longint;                      { to prevent entity substitution loops  }
+    entity : xmlParserInputPtr;           { used to check entities boundaries  }
+    charset : longint;                    { encoding of the in-memory content - actually an xmlCharEncoding  }
+    nodelen : longint;                    { Those two fields are there to  }
+    nodemem : longint;                    { Speed up large node parsing  }
+    pedantic : longint;                   { signal pedantic warnings  }
+    _private : pointer;                   { For user data, libxml won't touch it  }
+    loadsubset : longint;                 { should the external subset be loaded  }
+    linenumbers : longint;                { set line number in element content }
+    catalogs : pointer;                   { document's own catalog }
+  end;
 
   (**
    * xmlSAXLocator:
    *
    * a SAX Locator.
    *)
-	xmlSAXLocatorPtr = ^xmlSAXLocator;
-	xmlSAXLocator = record
-		getPublicId : function (ctx:pointer):PxmlChar;cdecl;
-		getSystemId : function (ctx:pointer):PxmlChar;
-		getLineNumber : function (ctx:pointer):longint;
-		getColumnNumber : function (ctx:pointer):longint;
-	end;
+  xmlSAXLocatorPtr = ^xmlSAXLocator;
+  xmlSAXLocator = record
+    getPublicId : function (ctx:pointer):PxmlChar;cdecl;
+    getSystemId : function (ctx:pointer):PxmlChar;
+    getLineNumber : function (ctx:pointer):longint;
+    getColumnNumber : function (ctx:pointer):longint;
+  end;
 
   (**
    * resolveEntitySAXFunc:
@@ -232,7 +232,7 @@ type
    *
    * Returns the xmlParserInputPtr if inlined or NULL for DOM behaviour.
    *)
-	resolveEntitySAXFunc         = function  (ctx: pointer; publicId, systemId: PxmlChar):xmlParserInputPtr; cdecl;
+  resolveEntitySAXFunc         = function  (ctx: pointer; publicId, systemId: PxmlChar):xmlParserInputPtr; cdecl;
 
   (**
    * internalSubsetSAXFunc:
@@ -244,7 +244,7 @@ type
    * Callback on internal subset declaration.
    *)
 
-	internalSubsetSAXFunc        = procedure (ctx: pointer; name, ExternalID, SystemID: PxmlChar); cdecl;
+  internalSubsetSAXFunc        = procedure (ctx: pointer; name, ExternalID, SystemID: PxmlChar); cdecl;
   (**
    * externalSubsetSAXFunc:
    * @ctx:  the user data (XML parser context)
@@ -254,7 +254,7 @@ type
    *
    * Callback on external subset declaration.
    *)
-	externalSubsetSAXFunc        = procedure (ctx: pointer; name, ExternalID, SystemID: PxmlChar); cdecl;
+  externalSubsetSAXFunc        = procedure (ctx: pointer; name, ExternalID, SystemID: PxmlChar); cdecl;
 
   (**
    * getEntitySAXFunc:
@@ -265,7 +265,7 @@ type
    *
    * Returns the xmlEntityPtr if found.
    *)
-	getEntitySAXFunc             = function  (ctx: pointer; name: PxmlChar): xmlEntityPtr; cdecl;
+  getEntitySAXFunc             = function  (ctx: pointer; name: PxmlChar): xmlEntityPtr; cdecl;
 
   (**
    * getParameterEntitySAXFunc:
@@ -276,7 +276,7 @@ type
    *
    * Returns the xmlEntityPtr if found.
    *)
-	getParameterEntitySAXFunc    = function  (ctx: pointer; name: PxmlChar): xmlEntityPtr; cdecl;
+  getParameterEntitySAXFunc    = function  (ctx: pointer; name: PxmlChar): xmlEntityPtr; cdecl;
 
   (**
    * entityDeclSAXFunc:
@@ -289,7 +289,7 @@ type
    *
    * An entity definition has been parsed
    *)
-	entityDeclSAXFunc            = procedure (ctx: pointer; name: PxmlChar; aEntityType: integer; publicID, systemID, content: PxmlChar); cdecl;
+  entityDeclSAXFunc            = procedure (ctx: pointer; name: PxmlChar; aEntityType: integer; publicID, systemID, content: PxmlChar); cdecl;
 
   (**
    * notationDeclSAXFunc:
@@ -300,7 +300,7 @@ type
    *
    * What to do when a notation declaration has been parsed.
    *)
-	notationDeclSAXFunc          = procedure (ctx: pointer; name: PxmlChar; publicID, systemID: PxmlChar); cdecl;
+  notationDeclSAXFunc          = procedure (ctx: pointer; name: PxmlChar; publicID, systemID: PxmlChar); cdecl;
 
   (**
    * attributeDeclSAXFunc:
@@ -314,7 +314,7 @@ type
    *
    * An attribute definition has been parsed
    *)
-	attributeDeclSAXFunc         = procedure (ctx: pointer; elem, name: PxmlChar; aType, def: integer; defaultValue: PxmlChar; tree: xmlEnumerationPtr); cdecl;
+  attributeDeclSAXFunc         = procedure (ctx: pointer; elem, name: PxmlChar; aType, def: integer; defaultValue: PxmlChar; tree: xmlEnumerationPtr); cdecl;
 
   (**
    * elementDeclSAXFunc:
@@ -325,7 +325,7 @@ type
    *
    * An element definition has been parsed
    *)
-	elementDeclSAXFunc           = procedure (ctx: pointer; name: PxmlChar; aType: integer; content: xmlElementContentPtr); cdecl;
+  elementDeclSAXFunc           = procedure (ctx: pointer; name: PxmlChar; aType: integer; content: xmlElementContentPtr); cdecl;
 
   (**
    * unparsedEntityDeclSAXFunc:
@@ -337,7 +337,7 @@ type
    *
    * What to do when an unparsed entity declaration is parsed
    *)
-	unparsedEntityDeclSAXFunc    = procedure (ctx: pointer; name: PxmlChar; publicID, systemID, notationName: PxmlChar); cdecl;
+  unparsedEntityDeclSAXFunc    = procedure (ctx: pointer; name: PxmlChar; publicID, systemID, notationName: PxmlChar); cdecl;
 
   (**
    * setDocumentLocatorSAXFunc:
@@ -347,7 +347,7 @@ type
    * Receive the document locator at startup, actually xmlDefaultSAXLocator
    * Everything is available on the context, so this is useless in our case.
    *)
-	setDocumentLocatorSAXFunc    = procedure (ctx: pointer; loc: xmlSAXLocator); cdecl;
+  setDocumentLocatorSAXFunc    = procedure (ctx: pointer; loc: xmlSAXLocator); cdecl;
 
   (**
    * startDocumentSAXFunc:
@@ -355,7 +355,7 @@ type
    *
    * called when the document start being processed.
    *)
-	startDocumentSAXFunc         = procedure (ctx: pointer); cdecl;
+  startDocumentSAXFunc         = procedure (ctx: pointer); cdecl;
 
   (**
    * endDocumentSAXFunc:
@@ -363,7 +363,7 @@ type
    *
    * called when the document end has been detected.
    *)
-	endDocumentSAXFunc           = procedure (ctx: pointer); cdecl;
+  endDocumentSAXFunc           = procedure (ctx: pointer); cdecl;
 
   (**
    * startElementSAXFunc:
@@ -373,7 +373,7 @@ type
    *
    * called when an opening tag has been processed.
    *)
-	startElementSAXFunc          = procedure (ctx: pointer; name: PxmlChar; atts: PPxmlChar); cdecl;
+  startElementSAXFunc          = procedure (ctx: pointer; name: PxmlChar; atts: PPxmlChar); cdecl;
 
   (**
    * endElementSAXFunc:
@@ -382,7 +382,7 @@ type
    *
    * called when the end of an element has been detected.
    *)
-	endElementSAXFunc            = procedure (ctx: pointer; name: PxmlChar); cdecl;
+  endElementSAXFunc            = procedure (ctx: pointer; name: PxmlChar); cdecl;
 
   (**
    * attributeSAXFunc:
@@ -395,7 +395,7 @@ type
    * DOM subtree and past it in a new xmlAttr element added to
    * the element.
    *)
-	attributeSAXFunc             = procedure (ctx: pointer; name, value: PxmlChar); cdecl;
+  attributeSAXFunc             = procedure (ctx: pointer; name, value: PxmlChar); cdecl;
 
   (**
    * referenceSAXFunc:
@@ -404,7 +404,7 @@ type
    *
    * called when an entity reference is detected.
    *)
-	referenceSAXFunc             = procedure (ctx: pointer; name: PxmlChar); cdecl;
+  referenceSAXFunc             = procedure (ctx: pointer; name: PxmlChar); cdecl;
 
   (**
    * charactersSAXFunc:
@@ -414,7 +414,7 @@ type
    *
    * receiving some chars from the parser.
    *)
-	charactersSAXFunc            = procedure (ctx: pointer; ch: PxmlChar; len: integer); cdecl;
+  charactersSAXFunc            = procedure (ctx: pointer; ch: PxmlChar; len: integer); cdecl;
 
   (**
    * ignorableWhitespaceSAXFunc:
@@ -425,7 +425,7 @@ type
    * receiving some ignorable whitespaces from the parser.
    * UNUSED: by default the DOM building will use characters
    *)
-	ignorableWhitespaceSAXFunc   = procedure (ctx: pointer; ch: PxmlChar; len: integer); cdecl;
+  ignorableWhitespaceSAXFunc   = procedure (ctx: pointer; ch: PxmlChar; len: integer); cdecl;
 
   (**
    * processingInstructionSAXFunc:
@@ -435,7 +435,7 @@ type
    *
    * A processing instruction has been parsed.
    *)
-	processingInstructionSAXFunc = procedure (ctx: pointer; target, data: PxmlChar); cdecl;
+  processingInstructionSAXFunc = procedure (ctx: pointer; target, data: PxmlChar); cdecl;
 
   (**
    * commentSAXFunc:
@@ -444,7 +444,7 @@ type
    *
    * A comment has been parsed.
    *)
-	commentSAXFunc               = procedure (ctx: pointer; value: PxmlChar); cdecl;
+  commentSAXFunc               = procedure (ctx: pointer; value: PxmlChar); cdecl;
 
   (**
    * cdataBlockSAXFunc:
@@ -454,7 +454,7 @@ type
    *
    * called when a pcdata block has been parsed
    *)
-	cdataBlockSAXFunc            = procedure (ctx: pointer; value: PxmlChar; len: integer); cdecl;
+  cdataBlockSAXFunc            = procedure (ctx: pointer; value: PxmlChar; len: integer); cdecl;
 
   (**
    * warningSAXFunc:
@@ -464,7 +464,7 @@ type
    *
    * Display and format a warning messages, callback
    *)
-	warningSAXFunc               = procedure (ctx: pointer; msg: PxmlChar); cdecl; //varargs;
+  warningSAXFunc               = procedure (ctx: pointer; msg: PxmlChar); cdecl; //varargs;
 
   (**
    * errorSAXFunc:
@@ -474,7 +474,7 @@ type
    *
    * Display and format an error messages, callback
    *)
-	errorSAXFunc                 = procedure (ctx: pointer; msg: PxmlChar); cdecl; //varargs;
+  errorSAXFunc                 = procedure (ctx: pointer; msg: PxmlChar); cdecl; //varargs;
 
   (**
    * fatalErrorSAXFunc:
@@ -484,7 +484,7 @@ type
    *
    * Display and format fatal error messages, callback
    *)
-	fatalErrorSAXFunc            = procedure (ctx: pointer; msg: PxmlChar); cdecl; //varargs;
+  fatalErrorSAXFunc            = procedure (ctx: pointer; msg: PxmlChar); cdecl; //varargs;
 
   (**
    * isStandaloneSAXFunc:
@@ -494,7 +494,7 @@ type
    *
    * Returns 1 if true
    *)
-	isStandaloneSAXFunc          = function  (ctx: pointer): integer; cdecl;
+  isStandaloneSAXFunc          = function  (ctx: pointer): integer; cdecl;
 
   (**
    * hasInternalSubsetSAXFunc:
@@ -504,7 +504,7 @@ type
    *
    * Returns 1 if true
    *)
-	hasInternalSubsetSAXFunc     = function  (ctx: pointer): integer; cdecl;
+  hasInternalSubsetSAXFunc     = function  (ctx: pointer): integer; cdecl;
 
   (**
    * hasExternalSubsetSAXFunc:
@@ -514,7 +514,7 @@ type
    *
    * Returns 1 if true
    *)
-	hasExternalSubsetSAXFunc     = function  (ctx: pointer): integer; cdecl;
+  hasExternalSubsetSAXFunc     = function  (ctx: pointer): integer; cdecl;
 
 
   (**
@@ -523,36 +523,36 @@ type
    * a SAX handler is bunch of callbacks called by the parser when processing
    * of the input generate data or structure informations.
    *)
-	xmlSAXHandler = record
-		internalSubset : internalSubsetSAXFunc;
-		isStandalone : isStandaloneSAXFunc;
-		hasInternalSubset : hasInternalSubsetSAXFunc;
-		hasExternalSubset : hasExternalSubsetSAXFunc;
-		resolveEntity : resolveEntitySAXFunc;
-		getEntity : getEntitySAXFunc;
-		entityDecl : entityDeclSAXFunc;
-		notationDecl : notationDeclSAXFunc;
-		attributeDecl : attributeDeclSAXFunc;
-		elementDecl : elementDeclSAXFunc;
-		unparsedEntityDecl : unparsedEntityDeclSAXFunc;
-		setDocumentLocator : setDocumentLocatorSAXFunc;
-		startDocument : startDocumentSAXFunc;
-		endDocument : endDocumentSAXFunc;
-		startElement : startElementSAXFunc;
-		endElement : endElementSAXFunc;
-		reference : referenceSAXFunc;
-		characters : charactersSAXFunc;
-		ignorableWhitespace : ignorableWhitespaceSAXFunc;
-		processingInstruction : processingInstructionSAXFunc;
-		comment : commentSAXFunc;
-		warning : warningSAXFunc;
-		error : errorSAXFunc;
-		fatalError : fatalErrorSAXFunc;
-		getParameterEntity : getParameterEntitySAXFunc;
-		cdataBlock : cdataBlockSAXFunc;
-		externalSubset : externalSubsetSAXFunc;
-		initialized: integer;
-	end;
+  xmlSAXHandler = record
+    internalSubset : internalSubsetSAXFunc;
+    isStandalone : isStandaloneSAXFunc;
+    hasInternalSubset : hasInternalSubsetSAXFunc;
+    hasExternalSubset : hasExternalSubsetSAXFunc;
+    resolveEntity : resolveEntitySAXFunc;
+    getEntity : getEntitySAXFunc;
+    entityDecl : entityDeclSAXFunc;
+    notationDecl : notationDeclSAXFunc;
+    attributeDecl : attributeDeclSAXFunc;
+    elementDecl : elementDeclSAXFunc;
+    unparsedEntityDecl : unparsedEntityDeclSAXFunc;
+    setDocumentLocator : setDocumentLocatorSAXFunc;
+    startDocument : startDocumentSAXFunc;
+    endDocument : endDocumentSAXFunc;
+    startElement : startElementSAXFunc;
+    endElement : endElementSAXFunc;
+    reference : referenceSAXFunc;
+    characters : charactersSAXFunc;
+    ignorableWhitespace : ignorableWhitespaceSAXFunc;
+    processingInstruction : processingInstructionSAXFunc;
+    comment : commentSAXFunc;
+    warning : warningSAXFunc;
+    error : errorSAXFunc;
+    fatalError : fatalErrorSAXFunc;
+    getParameterEntity : getParameterEntitySAXFunc;
+    cdataBlock : cdataBlockSAXFunc;
+    externalSubset : externalSubsetSAXFunc;
+    initialized: integer;
+  end;
 
   (**
    * xmlExternalEntityLoader:
@@ -564,7 +564,7 @@ type
    *
    * Returns the entity input parser
    *)
-	xmlExternalEntityLoader = function (URL, ID: PChar; context: xmlParserCtxtPtr): xmlParserInputPtr;
+  xmlExternalEntityLoader = function (URL, ID: PChar; context: xmlParserCtxtPtr): xmlParserInputPtr;
 
 (*
  * Global variables: just the default SAX interface tables and XML
@@ -587,21 +587,21 @@ LIBXML_DLL_IMPORT extern int xmlSubstituteEntitiesDefaultValue;
 LIBXML_DLL_IMPORT extern int xmlGetWarningsDefaultValue;
 *)
 
-{
-	Init/Cleanup
-}
+(*
+ * Init/Cleanup
+ *)
 procedure xmlInitParser;cdecl;external LIBXML2_SO;
 procedure xmlCleanupParser;cdecl;external LIBXML2_SO;
 
-{
-	Input functions
-}
+(*
+ * Input functions
+ *)
 function  xmlParserInputRead(aIn:xmlParserInputPtr; len:longint):longint;cdecl;external LIBXML2_SO;
 function  xmlParserInputGrow(aIn:xmlParserInputPtr; len:longint):longint;cdecl;external LIBXML2_SO;
 
-{
-	xmlChar handling
-}
+(*
+ * xmlChar handling
+ *)
 function  xmlStrdup(cur:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
 function  xmlStrndup(cur:PxmlChar; len:longint):PxmlChar;cdecl;external LIBXML2_SO;
 function  xmlCharStrndup(cur:Pchar; len:longint):PxmlChar;cdecl;external LIBXML2_SO;
@@ -619,9 +619,9 @@ function  xmlStrlen(str:PxmlChar):longint;cdecl;external LIBXML2_SO;
 function  xmlStrcat(cur:PxmlChar; add:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
 function  xmlStrncat(cur:PxmlChar; add:PxmlChar; len:longint):PxmlChar;cdecl;external LIBXML2_SO;
 
-{
-	Basic parsing Interfaces
-}
+(*
+ * Basic parsing Interfaces
+ *)
 function  xmlParseDoc(cur:PxmlChar):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlParseMemory(buffer:PChar; size:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlParseFile(filename:PChar):xmlDocPtr;cdecl;external LIBXML2_SO;
@@ -658,54 +658,54 @@ function  xmlParseBalancedChunkMemory(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_
 function  xmlParseExternalEntity(doc:xmlDocPtr; sax:xmlSAXHandlerPtr; user_data:pointer; depth:longint; URL:PxmlChar; ID:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
 function  xmlParseCtxtExternalEntity(ctx:xmlParserCtxtPtr; URL:PxmlChar; ID:PxmlChar; lst:PxmlNodePtr):longint;cdecl;external LIBXML2_SO;
 
-{
-	SAX initialization routines
-}
+(*
+ * SAX initialization routines
+ *)
 (* these are in libxml_SAX.inc
 procedure xmlDefaultSAXHandlerInit;cdecl;external LIBXML2_SO;
 procedure htmlDefaultSAXHandlerInit;cdecl;external LIBXML2_SO;
 *)
 
-{
-	Parser contexts handling.
-}
+(*
+ * Parser contexts handling.
+ *)
 procedure xmlInitParserCtxt(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
 procedure xmlClearParserCtxt(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
 procedure xmlFreeParserCtxt(ctxt:xmlParserCtxtPtr);cdecl;external LIBXML2_SO;
 procedure xmlSetupParserForBuffer(ctxt:xmlParserCtxtPtr; buffer:PxmlChar; filename:Pchar);cdecl;external LIBXML2_SO;
 function  xmlCreateDocParserCtxt(cur:PxmlChar):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 
-{
-	Reading/setting optional parsing features.
-}
+(*
+ * Reading/setting optional parsing features.
+ *)
 function  xmlGetFeaturesList(len:Plongint; result:PPchar):longint;cdecl;external LIBXML2_SO;
 function  xmlGetFeature(ctxt:xmlParserCtxtPtr; name:Pchar; result:pointer):longint;cdecl;external LIBXML2_SO;
 function  xmlSetFeature(ctxt:xmlParserCtxtPtr; name:Pchar; value:pointer):longint;cdecl;external LIBXML2_SO;
 
-{
-	Interfaces for the Push mode
-}
+(*
+ * Interfaces for the Push mode
+ *)
 function  xmlCreatePushParserCtxt(sax:xmlSAXHandlerPtr; user_data:pointer; chunk:Pchar; size:longint; filename:Pchar):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 function  xmlParseChunk(ctxt:xmlParserCtxtPtr; chunk:Pchar; size:longint; terminate:longint):longint;cdecl;external LIBXML2_SO;
 
-{
-	Special I/O mode
-}
+(*
+ * Special I/O mode
+ *)
 function  xmlCreateIOParserCtxt(sax:xmlSAXHandlerPtr; user_data:pointer; ioread:xmlInputReadCallback; ioclose:xmlInputCloseCallback; ioctx:pointer; enc:xmlCharEncoding):xmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 function  xmlNewIOInputStream(ctxt:xmlParserCtxtPtr; input:xmlParserInputBufferPtr; enc:xmlCharEncoding):xmlParserInputPtr;cdecl;external LIBXML2_SO;
 
-{
-	Node infos
-}
+(*
+ * Node infos
+ *)
 function  xmlParserFindNodeInfo(ctxt:xmlParserCtxtPtr; node:xmlNodePtr):xmlParserNodeInfoPtr;cdecl;external LIBXML2_SO;
 procedure xmlInitNodeInfoSeq(seq:xmlParserNodeInfoSeqPtr);cdecl;external LIBXML2_SO;
 procedure xmlClearNodeInfoSeq(seq:xmlParserNodeInfoSeqPtr);cdecl;external LIBXML2_SO;
 function  xmlParserFindNodeInfoIndex(seq:xmlParserNodeInfoSeqPtr; node:xmlNodePtr):dword;cdecl;external LIBXML2_SO;
 procedure xmlParserAddNodeInfo(ctxt:xmlParserCtxtPtr; info:xmlParserNodeInfoPtr);cdecl;external LIBXML2_SO;
 
-{
-	External entities handling actually implemented in xmlIO
-}
+(*
+ * External entities handling actually implemented in xmlIO
+ *)
 procedure xmlSetExternalEntityLoader(f:xmlExternalEntityLoader);cdecl;external LIBXML2_SO;
 function  xmlGetExternalEntityLoader:xmlExternalEntityLoader;cdecl;external LIBXML2_SO;
 function  xmlLoadExternalEntity(URL:Pchar; ID:Pchar; context:xmlParserCtxtPtr):xmlParserInputPtr;cdecl;external LIBXML2_SO;

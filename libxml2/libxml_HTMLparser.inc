@@ -5,13 +5,13 @@
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
 }
-{
-	HTMLparser.h : inf=terface for an HTML 4.0 non-verifying parser
-
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
+(*
+ * HTMLparser.h : interface for an HTML 4.0 non-verifying parser
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
 
 type
   (*

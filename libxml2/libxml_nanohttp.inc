@@ -5,14 +5,13 @@
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
 }
-{
-	nanohttp.c: minimalist HTTP implementation to fetch external LIBXML2_SO subsets.
-
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
-
+(*
+ * nanohttp.c: minimalist HTTP implementation to fetch external subsets.
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
 procedure xmlNanoHTTPInit;cdecl;external LIBXML2_SO;
 procedure xmlNanoHTTPCleanup;cdecl;external LIBXML2_SO;
 procedure xmlNanoHTTPScanProxy(URL:Pchar);cdecl;external LIBXML2_SO;

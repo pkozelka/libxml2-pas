@@ -1,35 +1,35 @@
 // CVS-SIGN: [1.9] xpointer.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
-{
-   xpointer.h : API to handle XML Pointers
-  
-   World Wide Web Consortium Working Draft 03-March-1998 
-   http://www.w3.org/TR/1998/WD-xptr-19980303
-  
-   See Copyright for the status of this software.
-  
-   daniel@veillard.com
-}
+(*
+ * xpointer.h : API to handle XML Pointers
+ *
+ * World Wide Web Consortium Working Draft 03-March-1998
+ * http://www.w3.org/TR/1998/WD-xptr-19980303
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
 
 type
-	{
-		 A Location Set
-	}
-	xmlLocationSetPtr = ^xmlLocationSet;
-	xmlLocationSet = record
-		locNr : longint;                { number of locations in the set  }
-		locMax : longint;               { size of the array as allocated  }
-		locTab : PxmlXPathObjectPtr;    { array of locations  }
-	end;
+  (*
+   * A Location Set
+   *)
+  xmlLocationSetPtr = ^xmlLocationSet;
+  xmlLocationSet = record
+    locNr : longint;                { number of locations in the set  }
+    locMax : longint;               { size of the array as allocated  }
+    locTab : PxmlXPathObjectPtr;    { array of locations  }
+  end;
 
-{
-	Handling of location sets
-}
+(*
+ * Handling of location sets
+ *)
 function  xmlXPtrLocationSetCreate(val:xmlXPathObjectPtr):xmlLocationSetPtr;cdecl;external LIBXML2_SO;
 procedure xmlXPtrFreeLocationSet(obj:xmlLocationSetPtr);cdecl;external LIBXML2_SO;
 function  xmlXPtrLocationSetMerge(val1:xmlLocationSetPtr; val2:xmlLocationSetPtr):xmlLocationSetPtr;cdecl;external LIBXML2_SO;
@@ -47,9 +47,9 @@ function  xmlXPtrWrapLocationSet(val:xmlLocationSetPtr):xmlXPathObjectPtr;cdecl;
 procedure xmlXPtrLocationSetDel(cur:xmlLocationSetPtr; val:xmlXPathObjectPtr);cdecl;external LIBXML2_SO;
 procedure xmlXPtrLocationSetRemove(cur:xmlLocationSetPtr; val:longint);cdecl;external LIBXML2_SO;
 
-{
-	Functions
-}
+(*
+ * Functions
+ *)
 function  xmlXPtrNewContext(doc:xmlDocPtr; here:xmlNodePtr; origin:xmlNodePtr):xmlXPathContextPtr;cdecl;external LIBXML2_SO;
 function  xmlXPtrEval(str:PxmlChar; ctx:xmlXPathContextPtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
 procedure xmlXPtrRangeToFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXML2_SO;
