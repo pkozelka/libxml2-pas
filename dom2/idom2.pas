@@ -882,6 +882,7 @@ type
     property documentElement : IDomElement read get_DocumentElement;
   end;
 
+{$ifdef WITHOUT_IDOM_EXPERIMENTAL}
 
   (****************************************************************************
    ***   the following interfaces are not part of the official DOM specs    ***
@@ -964,7 +965,7 @@ type
     function selectNodes(const nodePath : DomString) : IDomNodeList;
     procedure registerNs(const prefix : DomString; const uri : DomString);
   end;
-	
+
   IDomNodeEx = interface(IDomNode)
     ['{17D937A2-C6EE-448F-8530-221D744AC083}']
     { Property Acessors }
@@ -979,10 +980,16 @@ type
     //property xml: DOMString read get_xml;
   end;
 
+{$endif} // WITHOUT_IDOM_EXPERIMENTAL
+
+  (****************************************************************************
+   *   following interfaces are not part of the DOM spec. but are needed to   *
+   *   maintain vendor independence in an easy way.                           *
+   ****************************************************************************)
 
   (*
    * Defines the interface to obtain DOM Document instances.
-  *)
+   *)
   IDomDocumentBuilder = interface
     ['{92724EDA-8951-4E46-8415-84221EAE0044}']
     {property setters/getters}
@@ -1010,12 +1017,12 @@ type
      * @Param XML The xml to parse
      * @Returns The newly created document
      * @Raises DomException
-    *)
+     *)
     function  parse(const xml : DomString) : IDomDocument;
 
     (*
      * Loads and parses XML from url and returns a new document.
-    *)
+     *)
     function load(const url : DomString) : IDomDocument;
 
     property domImplementation : IDomImplementation read get_DomImplementation;
