@@ -15,45 +15,17 @@ compile-cygwin:
 compile-linux-gnu:
 	dcc $(DCCOPTS) $(LIBNAME).pas
 
+dist:
+	./mkrelease dist
+upload:
+	./mkrelease upload
+
 checkapi:
 	../utils/checkApiChanges.sh :pserver:anonymous@anoncvs.gnome.org:/cvs/gnome gnome-xml/include/libxml HEAD *.inc
 
-cvsexport: clean
-	make $(I_VERSION) i-cvsexport
-
-i-cvsexport:
-	cvs -z4 -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
-
-tgz:
-	make $(I_VERSION) i-tgz\
-
-i-tgz:
-	cd $(MYTMP);tar -zcf ../$(ARCHIVE).tgz *;cd ..
-
-zip:
-	make $(I_VERSION) i-zip
-
-i-zip:
-	cd $(MYTMP);zip -rq ../$(ARCHIVE).zip *;cd ..
-
-upload-tgz:
-	ftp-put.sh upload.log upload.sourceforge.net incoming $(ARCHIVE).tgz $(ARCHIVE).tgz anonymous libxml2-pas@sourceforge.net; cat upload.log; rm upload.log
-
-upload-zip:
-	make $(I_VERSION) i-upload-zip
-
-i-upload-zip:
-	ftp-put.sh upload.log upload.sourceforge.net incoming $(ARCHIVE).zip $(ARCHIVE).zip anonymous libxml2-pas@sourceforge.net; cat upload.log; rm upload.log
-
-utgz: cvsexport tgz upload-tgz clean
-	echo "TGZ uploaded"
-
-uzip: cvsexport zip upload-zip clean
-	echo "ZIP uploaded"
-
-
 clean:
 	echo "Cleaning"
+	rm -f *.dcu
 	rm -rf *.tmp
 	rm -f $(ARCHIVE).tgz
 	rm -f $(ARCHIVE).zip
