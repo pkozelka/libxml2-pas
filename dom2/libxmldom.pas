@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.63 2002-01-17 13:00:54 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.64 2002-01-18 22:12:03 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -515,9 +515,8 @@ begin
         and (node.type_ <= High(NodeClasses))
         and Assigned(NodeClasses[node.type_]);
       DomAssert(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [node.type_]));
-      obj := NodeClasses[node.type_].Create(node);
+      obj := NodeClasses[node.type_].Create(node); // this assigns node._private
       // notify the node that it has a wrapper already
-      node._private := obj;
     end else begin
       // wrapper is already created, use it
       // first check if there is not a garbage
@@ -1057,6 +1056,7 @@ begin
   if not (self is TGDOMDocument) then begin
     // this node is not a document
     DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
+    FGNode._private := self;
     DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
     // if the node is flying, register it in the owner document
     if (FGNode.parent=nil) then begin
@@ -1075,6 +1075,9 @@ begin
   // if this is not the document itself, release the pretended reference to the owner document:
   // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
 //		get_ownerDocument._Release;
+  end;
+  if (FGNode<>nil) then begin
+    FGNode._private := nil;
   end;
   Dec(nodecount);
   inherited Destroy;
