@@ -43,11 +43,11 @@ const
  * is insignifiant and being able to run xsltpoc -v is useful. On
  * by default
  *)
-{$IF True}
+{$IFDEF ALWAYS_TRUE}
 {$define WITH_XSLT_DEBUG}
-{$IFEND}
+{$ENDIF}
 
-{$IF False}
+{$IFDEF ALWAYS_FALSE}
 (**
  * DEBUG_MEMORY:
  *
@@ -65,7 +65,7 @@ const
  * been configured with --with-debug-mem too
  *)
 {$define DEBUG_MEMORY_LOCATION}
-{$IFEND}
+{$ENDIF}
 
 (**
  * ATTRIBUTE_UNUSED:

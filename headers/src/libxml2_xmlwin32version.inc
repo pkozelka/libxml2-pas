@@ -55,7 +55,7 @@ const
 
 //TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20423);
 
-{$IF False}
+{$IFDEF ALWAYS_FALSE}
 
 (**
  * WITH_TRIO:
@@ -71,124 +71,124 @@ const
  * defined if the trio support should not be configured in
  *)
 {$DEFINE WITHOUT_TRIO}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_THREAD_ENABLED:
  *
  * Whether the thread support is configured in
  *)
-{$IF false}
+{$IFDEF ALWAYS_FALSE}
 {$DEFINE LIBXML_THREAD_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_FTP_ENABLED:
  *
  * Whether the FTP support is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_FTP_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_HTTP_ENABLED:
  *
  * Whether the HTTP support is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_HTTP_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_HTML_ENABLED:
  *
  * Whether the HTML support is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_HTML_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_CATALOG_ENABLED:
  *
  * Whether the Catalog support is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_CATALOG_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_DOCB_ENABLED:
  *
  * Whether the SGML Docbook support is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_DOCB_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_XPATH_ENABLED:
  *
  * Whether XPath is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_XPATH_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_XPTR_ENABLED:
  *
  * Whether XPointer is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_XPTR_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_C14N_ENABLED:
  *
  * Whether the Canonicalization support is configured in
  *)
-{$IF False}
+{$IFDEF ALWAYS_FALSE}
 {$DEFINE LIBXML_C14N_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_XINCLUDE_ENABLED:
  *
  * Whether XInclude is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_XINCLUDE_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_ICONV_ENABLED:
  *
  * Whether iconv support is available
  *)
-{$IF false}
+{$IFDEF ALWAYS_FALSE}
 {$DEFINE LIBXML_ICONV_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_DEBUG_ENABLED:
  *
  * Whether Debugging module is configured in
  *)
-{$IF true}
+{$IFDEF ALWAYS_TRUE}
 {$DEFINE LIBXML_DEBUG_ENABLED}
-{$IFEND}
+{$ENDIF}
 
 (**
  * DEBUG_MEMORY_LOCATION:
  *
  * Whether the memory debugging is configured in
  *)
-{$IF false}
+{$IFDEF ALWAYS_FALSE}
 {$DEFINE DEBUG_MEMORY_LOCATION}
-{$IFEND}
+{$ENDIF}
 
 (**
  * LIBXML_DLL_IMPORT:
@@ -231,8 +231,10 @@ const
  * iconv.
  *)
 {$IFDEF _MSC_VER}
-{$IF (defined(LIBXML_ICONV_ENABLED) and not defined(LIBXML2_COMPILING_MSCCDEF))}
+{$IFDEF LIBXML_ICONV_ENABLED)}
+{$IFNDEF LIBXML2_COMPILING_MSCCDEF}
 (** unsupported pragma#pragma comment(lib, "iconv.lib")*)
-{$IFEND}
+{$ENDIF}
+{$ENDIF}
 {$ENDIF}
 

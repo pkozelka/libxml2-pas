@@ -5,6 +5,8 @@
 
 {$MINENUMSIZE 4}
 {$ASSERTIONS OFF}
+{$DEFINE ALWAYS_TRUE}
+{$UNDEF ALWAYS_FALSE}
 
 // Memory alignment
 {$IFDEF VER140} {$ALIGN 4} {$ELSE} {$ALIGN ON} {$ENDIF}
@@ -18,4 +20,6 @@
 // Do we have varargs directive for functional types ?
 {$IFDEF VER_NOT_YET} {$DEFINE HAS_TVA} {$ENDIF}
 
+// Can we use global variables from shared modules ?
+{$IFDEF VER_NOT_YET} {$DEFINE HAS_SO_VARS} {$ENDIF}
 

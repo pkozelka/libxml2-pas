@@ -39,7 +39,7 @@ function  xsltGetTemplate(ctxt: xsltTransformContextPtr; node: xmlNodePtr; style
 procedure xsltFreeTemplateHashes(style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
 procedure xsltCleanupTemplates(style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
 
-{$IF False}
+{$IFDEF ALWAYS_FALSE}
 function  xsltMatchPattern(ctxt: xsltTransformContextPtr; node: xmlNodePtr; pattern: PxmlChar): Longint; cdecl; external LIBXSLT_SO;
-{$IFEND}
+{$ENDIF}
 
