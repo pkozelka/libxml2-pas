@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.32 2002-04-16 21:09:31 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.33 2002-05-02 23:40:15 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -500,7 +500,7 @@ begin
       ok := (node.type_ >= Low(GlbNodeClasses))
         and (node.type_ <= High(GlbNodeClasses))
         and Assigned(GlbNodeClasses[node.type_]);
-      DomAssert1(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [node.type_]), 'GetDomObject()');
+      DomAssert1(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [Integer(node.type_)]), 'GetDomObject()');
       obj := GlbNodeClasses[node.type_].Create(node); // this assigns node._private
     end else begin
       // wrapper is already created, use it
