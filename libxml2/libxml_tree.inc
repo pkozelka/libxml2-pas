@@ -51,6 +51,7 @@ const
 		Actually this had diverged a bit, and now XML_DOCUMENT_TYPE_NODE should
 		be deprecated to use an XML_DTD_NODE.
 	}
+	//[pk] note: all these constants are declared unconditionally, as it makes more sense
 	XML_ELEMENT_NODE       = 1;
 	XML_ATTRIBUTE_NODE     = 2;
 	XML_TEXT_NODE          = 3;
@@ -71,9 +72,7 @@ const
 	XML_NAMESPACE_DECL     = 18;
 	XML_XINCLUDE_START     = 19;
 	XML_XINCLUDE_END       = 20;
-{$ifdef LIBXML_DOCB_ENABLED}
 	XML_DOCB_DOCUMENT_NODE = 21;
-{$endif}
 
 type
 	{
@@ -459,7 +458,7 @@ function  xmlCreateIntSubset(doc:xmlDocPtr; name:PxmlChar; ExternalID:PxmlChar; 
 function  xmlNewDtd(doc:xmlDocPtr; name:PxmlChar; ExternalID:PxmlChar; SystemID:PxmlChar):xmlDtdPtr;cdecl;external LIBXML2_SO;
 function  xmlGetIntSubset(doc:xmlDocPtr):xmlDtdPtr;cdecl;external LIBXML2_SO;
 procedure xmlFreeDtd(cur:xmlDtdPtr);cdecl;external LIBXML2_SO;
-function  xmlNewGlobalNs(doc:xmlDocPtr; href:PxmlChar; prefix:PxmlChar):xmlNsPtr;cdecl;external LIBXML2_SO;
+function  xmlNewGlobalNs(doc:xmlDocPtr; href:PxmlChar; prefix:PxmlChar):xmlNsPtr;cdecl;external LIBXML2_SO; {$ifdef VER140} deprecated; {$endif}
 function  xmlNewNs(node:xmlNodePtr; href:PxmlChar; prefix:PxmlChar):xmlNsPtr;cdecl;external LIBXML2_SO;
 procedure xmlFreeNs(cur:xmlNsPtr);cdecl;external LIBXML2_SO;
 procedure xmlFreeNsList(cur:xmlNsPtr);cdecl;external LIBXML2_SO;
