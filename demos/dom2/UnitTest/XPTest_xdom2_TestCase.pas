@@ -7,7 +7,8 @@ uses
   ActiveX,GUITestRunner,StrUtils,jkDomTest;
 
 const
-  datapath='L:\@Demos\Open_xdom\Data\';  //set to the directory with test.xml
+  //datapath='L:\@Demos\Open_xdom\Data';  //set to the directory with test.xml
+  datapath='P:\dom2\data';
   xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
   xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
 
@@ -31,7 +32,7 @@ type TTestDOM2Methods = class(TTestCase)
     procedure TestElementByID;
     procedure jkTestDocument;
     procedure jkTestElement;
-    procedure jkNamedNodemap;
+    procedure TreeWalker;
     procedure append_100_attributes_with_different_namespaces;
   end;
 
@@ -378,7 +379,7 @@ begin
   end;
   temp:=(doc as IDOMPersist).xml;
   temp:=getCont(temp);
-  OutLog(temp);
+  //OutLog(temp);
   ok:=false;
   if temp='<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>'
     then ok:=true;
@@ -423,12 +424,13 @@ var
   TestsOK: integer;
   i,j: integer;
 begin
+  assert(directoryExists(datapath),'Wrong Path to data directory!');
   TestSet:=0;
   for j:=1 to 50 do begin
     for i:=1 to 100 do begin
-      TestsOK:=TestDocument(datapath+'test.xml',domvendor,TestSet);
+      TestsOK:=TestDocument(datapath+'\test.xml',domvendor,TestSet);
       //OutLog('Passed OK: '+inttostr(TestsOK));
-      Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!')); //15
+      Check((TestsOK >= 15),(inttostr(1-TestsOK)+' Tests failed!')); //15
     end;
     OutLog('Passed OK: '+inttostr(j*100));
   end;
@@ -440,13 +442,14 @@ var
   TestsOK: integer;
   i,j: integer;
 begin
+  assert(directoryExists(datapath),'Wrong Path to data directory!');
   TestSet:=0;
   for j:=1 to 50 do begin
     for i:=1 to 100 do begin
-      TestsOK:=TestElement0(datapath+'test.xml',domvendor,TestSet);
-      //OutLog('Passed OK: '+inttostr(TestsOK));
+      TestsOK:=TestElement0(datapath+'\test.xml',domvendor,TestSet);
       Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!'));
     end;
+    //OutLog('Passed OK: '+inttostr(TestsOK));
     OutLog('Passed OK: '+inttostr(j*100));
   end;
 end;
@@ -469,21 +472,63 @@ begin
   end;
 end;
 
-procedure TTestDOM2Methods.jkNamedNodemap;
-var
-  TestSet: integer;
-  TestsOK: integer;
-  i,j: integer;
-begin
-  TestSet:=0;
-  for j:=1 to 50 do begin
-    for i:=1 to 1 do begin
-      TestsOK:=TestNamedNodemap(datapath+'test.xml',domvendor,TestSet);
-      //OutLog('Passed OK: '+inttostr(TestsOK));
-      Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!')); //15
+procedure TTestDOM2Methods.TreeWalker;
+// a simple tree-walker
+var node: IDomNode;
+    filename: string;
+    doc: IDomDocument;
+    dom: IDomImplementation;
+    FDomPersist: IDomPersist;
+    ok: boolean;
+    i: integer;
+  function NextNode(node: IDomNode): IDomNode;
+  // a helper function for the tree-walker
+    function NextDownNode(node: IDomNode): IDomNode;
+    begin
+      node:=node.parentNode;
+      if node<>nil then
+        if node.nextSibling<> nil
+          then node:=node.nextSibling
+          else node:=NextDownNode(node);
+      result:=node
     end;
-    OutLog('Passed OK: '+inttostr(j*100));
+  begin
+    if node.hasChildNodes {and (node.firstChild.nodeType<>Text_Node)}
+      then node:=node.firstChild
+      else if node.nextSibling<> nil
+        then node:=node.nextSibling
+        else node:=NextDownNode(node);
+    result:=node;
   end;
+
+begin //TreeWalker
+  filename:=datapath+'\events.xml';
+  dom:=getDom(domvendor);
+  doc:=dom.createDocument('','',nil);
+  //the following option is default for libxml2, but not for msdom
+  (doc as IDomParseOptions).preserveWhiteSpace:=true;
+  FDomPersist:=doc as IDomPersist;
+  ok:=FDomPersist.load(filename);
+  if ok then
+    begin
+      outLog('Parsed file ok!');
+      node:=doc.documentElement as IDOMNode;
+      if node=nil
+        then outLog('No root element!')
+        else outLog('Name of documentElement: '+node.nodeName);
+      i:=0;
+      //while-loop
+      while (node<>nil) do begin
+        //outLog(node.nodeName);
+        node:=NextNode(node);
+        inc(i);
+      end;
+      outLog('NodeCount: '+inttostr(i));
+      //outLog('Traversed tree!');
+      Check(i=356,'Wrong node count!');
+    end;
+  FDomPersist:=nil;
+  doc:=nil;
 end;
 
 initialization
