@@ -10,10 +10,7 @@ Uwe Fechner <ufechner@4commerce.de>	-  original header translations
 
 VERSION COMPLIANCE
 ------------------
-This set of units was written for libxslt version 2.4.11. However, 
-translations of some API functions might be missing. To see, which 
-parts of the header translations aren't done yet, look at undone.txt
-
+(unknown)
 
 WHAT YOU FIND IN THIS PACKAGE
 -----------------------------
