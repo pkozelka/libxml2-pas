@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.87 2002-01-28 01:53:17 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.88 2002-01-28 21:39:43 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -769,10 +769,25 @@ begin
 end;
 
 function TGDOMImplementation.hasFeature(const feature, version: DomString): Boolean;
+const
+  FEATURES: array [1..5, 1..2] of string = (
+    ('CORE', '2.0'),
+    ('CORE', ''),
+    ('XML', '2.0'),
+    ('XML', '1.0'),
+    ('XML', ''));
+var
+  i: integer;
+  fea: string;
+  ver: string;
 begin
-  if (uppercase(feature) ='CORE') and (version = '2.0')
-    then Result:=true
-    else Result:=false;
+  Result := true;
+  fea := UpperCase(feature);
+  ver := UpperCase(version);
+  for i:=Low(FEATURES) to High(FEATURES) do begin
+    if (fea=FEATURES[i][1]) and (ver=FEATURES[i][2]) then exit;
+  end;
+  Result := false;
 end;
 
 function TGDOMImplementation.createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
