@@ -1462,15 +1462,32 @@ end;
 
 procedure TGDOMElement.removeAttribute(const name: DOMString);
 var
-  attr: xmlAttrPtr;
+  oldattr,oldattr1,attr,xmlNewAttr: xmlAttrPtr;
   name1: TGdomString;
 begin
   name1:=TGdomString.create(name);
-  attr := xmlHasProp(xmlNodePtr(GElement), name1.CString);
-
-  name1.free;
-  if attr <> nil
-    then xmlRemoveProp(attr);
+  oldattr := xmlHasProp(xmlNodePtr(GElement), name1.CString);
+  name1.Free;
+  if oldAttr<>nil then begin
+    xmlnewAttr:=oldAttr                       ;     // Get the libxml2-Attribute
+    node:=xmlNodePtr(GElement);
+    oldattr1:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
+    if oldattr1<>nil then begin
+      attr:=node.properties;                         // if not, then oldattr=nil
+      if attr=oldattr1
+        then node.properties:=nil
+        else begin
+           while attr.next <> oldattr1 do begin
+             attr:=attr.next
+           end;
+           attr.next:=nil;
+        end;
+      if oldattr<>nil
+        then begin
+          xmlFreeProp(oldattr);
+        end
+    end;
+  end
 end;
 
 function TGDOMElement.getAttributeNode(const name: DOMString): IDOMAttr;
@@ -2279,8 +2296,8 @@ end;
 procedure TGDOMDocument.set_validate(Value: Boolean);
 begin
   if value
-    then xmlDoValidityCheckingDefaultValue^:=1
-    else xmlDoValidityCheckingDefaultValue^:=0;
+    then xmlDoValidityCheckingDefaultValue_Ptr^:=1
+    else xmlDoValidityCheckingDefaultValue_Ptr^:=0;
   Fvalidate:=value;
 end;
 
