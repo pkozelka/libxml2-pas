@@ -1,4 +1,5 @@
-{ [1.21] xmlwin32version.h
+// CVS-SIGN: [1.21] xmlwin32version.h
+{
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
@@ -48,9 +49,9 @@ const
    Macro to check that the libxml version in use is compatible with
    the version the software has been compiled against
   }
-(* error 
+(*todo
 #define LIBXML_TEST_VERSION xmlCheckVersion(20412);
-in declaration at line 52 *)
+*)
 {$if 0}
     { 
        WITH_TRIO:

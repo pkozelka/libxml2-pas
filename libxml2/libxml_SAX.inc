@@ -1,4 +1,5 @@
-{ [1.16] SAX.h
+// CVS-SIGN: [1.16] SAX.h
+{
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>

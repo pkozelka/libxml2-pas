@@ -1,4 +1,5 @@
-{ [1.8] nanoftp.h
+// CVS-SIGN: [1.8] nanoftp.h
+{
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>

@@ -1,4 +1,5 @@
-{ [1.17] catalog.h
+// CVS-SIGN: [1.17] catalog.h
+{
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>

@@ -1,4 +1,5 @@
-{ [1.23] encoding.h
+// CVS-SIGN: [1.23] encoding.h
+{
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
