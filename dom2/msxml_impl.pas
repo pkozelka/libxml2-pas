@@ -638,7 +638,7 @@ function TMSXMLImplementation.hasFeature(
         const version : DomString) : Boolean;
 begin
   //todo: check version of msdom installed
-  if (feature ='CORE') and (version = '2.0')
+  if (uppercase(feature) ='CORE') and (version = '2.0')
     then result:=true
     else result:=false;
 end;
