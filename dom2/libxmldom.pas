@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.82 2002-01-27 21:59:42 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.83 2002-01-27 22:15:53 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -498,7 +498,7 @@ begin
   if (aLocation<>'') then begin
     aMsg := 'in class '+aLocation+': '+aMsg;
   end;
-  raise EDOMException.Create(aMsg);
+  raise EDOMException.Create(aErrorCode, aMsg);
 end;
 
 function GetDomObject(aNode: pointer): IUnknown;
