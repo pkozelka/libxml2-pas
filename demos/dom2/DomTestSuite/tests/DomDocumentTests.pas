@@ -170,10 +170,10 @@ begin
   malformedName := 'prefix::local';
   try
     attr := document.createAttributeNS(namespaceURI, malformedName);
-    fail('EDomException NAMESPACE_ERR should have been thrown');
+    fail('EDomException NAMESPACE_ERR should have been thrown for attribute name='+malformedName);
   except
     on e : EDomException do
-      check(e.code = NAMESPACE_ERR, 'NAMESPACE_ERR should have been thrown');
+      check(e.code = NAMESPACE_ERR, 'NAMESPACE_ERR should have been thrown for attribute name='+malformedName);
   end;
 end;
 
