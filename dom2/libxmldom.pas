@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.42 2002-01-15 14:16:46 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.43 2002-01-16 09:16:28 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -655,8 +655,6 @@ begin
 end;
 
 function TGDOMNode.get_nodeValue: DOMString;
-var
-	p: PChar;
 begin
 	case FGNode.type_ of
 	XML_ATTRIBUTE_NODE,
@@ -666,9 +664,7 @@ begin
 	XML_COMMENT_NODE,
 	XML_PI_NODE:
 		begin
-			p := xmlNodeGetContent(FGNode);
-			Result := UTF8Decode(p);
-			xmlFree(p);
+			Result := UTF8Decode(xmlNodeGetContent(FGNode));
 		end;
 	else
 		Result := '';
