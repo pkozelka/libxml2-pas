@@ -20,7 +20,7 @@ uses
 {$IFDEF LINUX}
 {
   Unit "libc" does not need to be used explicitly as it is part of the System unit.
-  And, it is better to NOT present it here, because otherwise it would not be 
+  And, it is better to NOT present it here, because otherwise it would not be
   possible to compile the unit standalone or in a package.
 }
 {$ENDIF}
@@ -206,22 +206,22 @@ end;
 
 {$IFDEF USE_PASCAL_MM}
 // Delphi memory handling
-procedure DelphiFreeFunc(ptr: Pointer); cdecl;
+procedure PascalFreeFunc(ptr: Pointer); cdecl;
 begin
   FreeMem(ptr);
 end;
 
-function DelphiMallocFunc(size: size_t): Pointer; cdecl;
+function PascalMallocFunc(size: size_t): Pointer; cdecl;
 begin
   Result := AllocMem(size);
 end;
 
-function DelphiReallocFunc(ptr: Pointer; size: size_t): Pointer; cdecl;
+function PascalReallocFunc(ptr: Pointer; size: size_t): Pointer; cdecl;
 begin
   Result := ReallocMemory(ptr, size);
 end;
 
-function DelphiStrdupFunc(str: PChar): PChar; cdecl;
+function PascalStrdupFunc(str: PChar): PChar; cdecl;
 var
   sz: Integer;
 begin
@@ -241,7 +241,7 @@ end;
 initialization
 {$IFDEF USE_PASCAL_MM}
   // setup Delphi memory handler
-  xmlMemSetup(@DelphiFreeFunc, @DelphiMallocFunc, @DelphiReallocFunc, @DelphiStrdupFunc);
+  xmlMemSetup(@PascalFreeFunc, @PascalMallocFunc, @PascalReallocFunc, @PascalStrdupFunc);
 {$ELSE}
   // The Delphi 'external' directive can only be used for functions and procedures,
   // but here we need to obtain the addresses of POINTERS to functions. We can
