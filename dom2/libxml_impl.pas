@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.25 2002-02-27 19:53:48 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.26 2002-02-27 20:14:18 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -61,12 +61,11 @@ type
   TLDomNodeClass = class of TLDomNode;
   TLDomNode = class(TLDomObject, IDomNode, ILibXml2Node)
   private
+    fMyNode: xmlNodePtr;
     fExtensionObj: TLDomNodeExtension;
-    FGNode: xmlNodePtr;
-    function  returnChildNodes: IDomNodeList;
-  private
-    FChildNodes: TLDomChildNodeList; // non-counted reference
+    fChildNodes: TLDomChildNodeList; // non-counted reference
     function  isAncestorOrSelf(aNode:xmlNodePtr): Boolean; //new
+    function  returnChildNodes: IDomNodeList;
   protected //IUnknown
     function  QueryInterface(const aIID: TGUID; out aObj): HResult; stdcall;
   protected //ILibXml2Node
@@ -103,7 +102,7 @@ type
   protected
     constructor Create(aLibXml2Node: pointer); virtual;
   public
-    property  GNode: xmlNodePtr read FGNode;
+    property  MyNode: xmlNodePtr read fMyNode;
     destructor Destroy; override;
     function  requestNodePtr: xmlNodePtr; virtual;
   end;
@@ -131,7 +130,7 @@ type
 
   TLDomAttributeMap = class(TLDomObject, IDomNamedNodeMap)
   private
-    FOwnerElement: TLDomElement; // non-counted reference
+    fOwnerElement: TLDomElement; // non-counted reference
   protected //IDomNamedNodeMap
     function get_item(index: Integer): IDomNode;
     function get_length: Integer;
@@ -151,7 +150,7 @@ type
 
   TLDomChildNodeList = class(TLDomObject, IDomNodeList)
   private
-    FOwnerNode: TLDomNode; // non-counted reference
+    fOwnerNode: TLDomNode; // non-counted reference
   protected //IDomNodeList
     function get_item(index: Integer): IDomNode;
     function get_length: Integer;
@@ -226,7 +225,7 @@ type
 
   TLDomElement = class(TLDomNode, IDomElement, IDomNode)
   private
-    FAttributes: TLDomAttributeMap; // non-counted reference
+    fFlyingNodes: TLDomAttributeMap; // non-counted reference
   protected //IDomNode
     function  IDomNode.get_childNodes = returnChildNodes;
     function  get_attributes: IDomNamedNodeMap;
@@ -300,9 +299,9 @@ type
   TLDomDocumentClass = class of TLDomDocument;
   TLDomDocument = class(TLDomNode, IDomDocument, IDomNode)
   protected //tmp
-    FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
+    fFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
   private
-    FGDOMImpl: IDomImplementation;
+    fMyImplementation: IDomImplementation;
     function  GetFlyingNodes: TList;
   protected //IDomNode
     function  get_nodeName: DomString;
@@ -359,7 +358,7 @@ type
     destructor Destroy; override;
     function  requestNodePtr: xmlNodePtr; override;
 
-    property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
+    property  DomImplementation: IDomImplementation read get_domImplementation write fMyImplementation; // internal mean to 'setup' implementation
   end;
 
   { TLDomDocumentType class }
@@ -503,10 +502,9 @@ begin
         and Assigned(GlbNodeClasses[node.type_]);
       DomAssert1(ok, INVALID_ACCESS_ERR, Format('LibXml2 node type "%d" is not supported', [node.type_]), 'GetDomObject()');
       obj := GlbNodeClasses[node.type_].Create(node); // this assigns node._private
-      // notify the node that it has a wrapper already
     end else begin
       // wrapper is already created, use it
-      // first check if there is not a garbage
+      // first check if it is not a garbage
       ok := (node.type_ >= Low(GlbNodeClasses))
         and (node.type_ <= High(GlbNodeClasses))
         and Assigned(GlbNodeClasses[node.type_]);
@@ -669,19 +667,19 @@ end;
 constructor TLDomNode.Create(aLibXml2Node: pointer);
 begin
   inherited Create;
-  FGNode := aLibXml2Node;
+  fMyNode := aLibXml2Node;
   if not (self is TLDomDocument) then begin
     // this node is not a document
     DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TLDomNode.Create: Cannot wrap null node');
-    FGNode._private := self;
+    fMyNode._private := self;
 
     if not (self is TLDomDocumentType) then begin
-      DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TLDomNode.Create: Cannot wrap node not attached to any document');
+      DomAssert(fMyNode.doc<>nil, INVALID_ACCESS_ERR, 'TLDomNode.Create: Cannot wrap node not attached to any document');
     end;
-    if (FGNode.doc<>nil) then begin
+    if (fMyNode.doc<>nil) then begin
       // if the node is flying, register it in the owner document
-      if (FGNode.parent=nil) then begin
-        RegisterFlyingNode(FGNode);
+      if (fMyNode.parent=nil) then begin
+        RegisterFlyingNode(fMyNode);
       end;
       // if this is not the document itself, pretend having a reference to the owner document.
       // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
@@ -698,21 +696,21 @@ end;
 destructor TLDomNode.Destroy;
 begin
   if not (self is TLDomDocument) then begin
-    if (FGNode.doc<>nil) then begin
+    if (fMyNode.doc<>nil) then begin
       // if this is not the document itself, release the pretended reference to the owner document:
       // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
       get_ownerDocument._Release;
     end;
   end;
-  if (FGNode<>nil) then begin
-    FGNode._private := nil;
+  if (fMyNode<>nil) then begin
+    fMyNode._private := nil;
   end;
   //destroy extension object
   if (fExtensionObj<>nil) then begin
     fExtensionObj.Free;
     fExtensionObj := nil;
   end;
-  FChildNodes.Free;
+  fChildNodes.Free;
   Dec(GlbNodeCount);
   inherited Destroy;
 end;
@@ -748,10 +746,10 @@ end;
 
 function TLDomNode.get_firstChild: IDomNode;
 begin
-  if FGNode=nil then begin
+  if fMyNode=nil then begin
     Result := nil;
   end else begin
-    Result := GetDOMObject(FGNode.children) as IDomNode;
+    Result := GetDOMObject(fMyNode.children) as IDomNode;
   end;
 end;
 
@@ -764,36 +762,36 @@ end;
 
 function TLDomNode.get_lastChild: IDomNode;
 begin
-  if FGNode=nil then begin
+  if fMyNode=nil then begin
     Result := nil;
   end else begin
-    Result := GetDOMObject(FGNode.last) as IDomNode;
+    Result := GetDOMObject(fMyNode.last) as IDomNode;
   end;
 end;
 
 function TLDomNode.get_localName: DomString;
 begin
   Result := '';
-  case FGNode.type_ of
+  case fMyNode.type_ of
   XML_ELEMENT_NODE,
   XML_ATTRIBUTE_NODE:
     // this is neccessary, because according to the dom2
     // specification localName has to be nil for nodes,
     // that don't have a namespace
-    if (FGNode.ns <> nil) then begin
-      Result := UTF8Decode(FGNode.name);
+    if (fMyNode.ns <> nil) then begin
+      Result := UTF8Decode(fMyNode.name);
     end;
   end;
 end;
 
 function TLDomNode.get_namespaceURI: DomString;
 begin
-  case FGNode.type_ of
+  case fMyNode.type_ of
   XML_ELEMENT_NODE,
   XML_ATTRIBUTE_NODE:
     begin
-      if FGNode.ns=nil then exit;
-      Result := UTF8Decode(FGNode.ns.href);
+      if fMyNode.ns=nil then exit;
+      Result := UTF8Decode(fMyNode.ns.href);
     end;
   else
     Result := '';
@@ -802,12 +800,12 @@ end;
 
 function TLDomNode.get_nextSibling: IDomNode;
 begin
-  Result := GetDOMObject(FGNode.next) as IDomNode;
+  Result := GetDOMObject(fMyNode.next) as IDomNode;
 end;
 
 function TLDomNode.get_nodeName: DomString;
 begin
-  case FGNode.type_ of
+  case fMyNode.type_ of
   XML_HTML_DOCUMENT_NODE,
   XML_DOCB_DOCUMENT_NODE,
   XML_DOCUMENT_NODE:
@@ -818,30 +816,30 @@ begin
     Result := '#document-fragment';
   XML_TEXT_NODE,
   XML_COMMENT_NODE:
-    Result := '#'+UTF8Decode(FGNode.name);
+    Result := '#'+UTF8Decode(fMyNode.name);
   XML_ELEMENT_NODE,
   XML_ATTRIBUTE_NODE:
     begin
-      Result := UTF8Decode(FGNode.name);
-      if (FGNode.ns<>nil) and (FGNode.ns.prefix<>nil) then begin
-        Result := UTF8Decode(FGNode.ns.prefix)+':'+Result;
+      Result := UTF8Decode(fMyNode.name);
+      if (fMyNode.ns<>nil) and (fMyNode.ns.prefix<>nil) then begin
+        Result := UTF8Decode(fMyNode.ns.prefix)+':'+Result;
       end;
     end;
   else
-    Result := UTF8Decode(FGNode.name);
+    Result := UTF8Decode(fMyNode.name);
   end;
 end;
 
 function TLDomNode.get_nodeType: DomNodeType;
 begin
-  Result := DomNodeType(FGNode.type_);
+  Result := DomNodeType(fMyNode.type_);
 end;
 
 function TLDomNode.get_nodeValue: DomString;
 var
   p: PxmlChar;
 begin
-  case FGNode.type_ of
+  case fMyNode.type_ of
   XML_ATTRIBUTE_NODE,
   XML_TEXT_NODE,
   XML_CDATA_SECTION_NODE,
@@ -849,7 +847,7 @@ begin
   XML_COMMENT_NODE,
   XML_PI_NODE:
     begin
-      p := xmlNodeGetContent(FGNode);
+      p := xmlNodeGetContent(fMyNode);
       if (p<>nil) then begin
         Result := UTF8Decode(p);
         xmlFree(p);
@@ -862,33 +860,33 @@ end;
 
 function TLDomNode.get_ownerDocument: IDomDocument;
 begin
-  if FGNode=nil then begin
+  if fMyNode=nil then begin
     Result := nil;
   end else begin
-    Result := GetDOMObject(FGNode.doc) as IDomDocument;
+    Result := GetDOMObject(fMyNode.doc) as IDomDocument;
   end;
 end;
 
 function TLDomNode.get_parentNode: IDomNode;
 begin
-  Result := GetDOMObject(FGNode.parent) as IDomNode
+  Result := GetDOMObject(fMyNode.parent) as IDomNode
 end;
 
 function TLDomNode.get_prefix: DomString;
 begin
-  case FGNode.type_ of
+  case fMyNode.type_ of
   XML_ELEMENT_NODE,
   XML_ATTRIBUTE_NODE:
     begin
-      if FGNode.ns=nil then exit;
-      Result := UTF8Decode(FGNode.ns.prefix);
+      if fMyNode.ns=nil then exit;
+      Result := UTF8Decode(fMyNode.ns.prefix);
     end;
   end;
 end;
 
 function TLDomNode.get_previousSibling: IDomNode;
 begin
-  Result := GetDOMObject(FGNode.prev) as IDomNode;
+  Result := GetDOMObject(fMyNode.prev) as IDomNode;
 end;
 
 function TLDomNode.hasAttributes: Boolean;
@@ -899,8 +897,8 @@ end;
 function TLDomNode.hasChildNodes: Boolean;
 begin
   Result := False;
-  if FGNode=nil then exit;
-  if FGNode.children=nil then exit;
+  if fMyNode=nil then exit;
+  if fMyNode.children=nil then exit;
   Result := True;
 end;
 
@@ -925,18 +923,18 @@ begin
   DomAssert((newChild.nodeType in CHILD_TYPES), HIERARCHY_REQUEST_ERR, 'insertBefore: newChild cannot be inserted, nodetype = '+IntToStr(get_nodeType));
   DomAssert(not IsReadOnlyNode(requestNodePtr), NO_MODIFICATION_ALLOWED_ERR);
   if (requestNodePtr.type_=XML_DOCUMENT_NODE) and (newChild.nodeType = ELEMENT_NODE) then begin
-    DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR, 'insertBefore: document already has a documentElement');
+    DomAssert((xmlDocGetRootElement(xmlDocPtr(fMyNode))=nil), HIERARCHY_REQUEST_ERR, 'insertBefore: document already has a documentElement');
   end;
 
   child := GetGNode(newChild);
   DomAssert(not IsAncestorOrSelf(child), HIERARCHY_REQUEST_ERR);
-  DomAssert(child.doc=FGNode.doc, WRONG_DOCUMENT_ERR, 'insertBefore: cannot insert a node from other document');
+  DomAssert(child.doc=fMyNode.doc, WRONG_DOCUMENT_ERR, 'insertBefore: cannot insert a node from other document');
   DomAssert(not IsReadOnlyNode(child.parent), NO_MODIFICATION_ALLOWED_ERR, 'insertBefore: modification not allowed here');
 
   UnregisterFlyingNode(child);
   if (refChild=nil) then begin
     xmlUnlinkNode(child);
-    node := xmlAddChild(FGNode, child);
+    node := xmlAddChild(fMyNode, child);
   end else begin
     node := xmlAddPrevSibling(GetGNode(refChild), child);
   end;
@@ -947,7 +945,7 @@ function TLDomNode.isAncestorOrSelf(aNode: xmlNodePtr): Boolean;
 var
   node: xmlNodePtr;
 begin
-  node := FGNode;
+  node := fMyNode;
   Result := True;
   while (node<>nil) do begin
     if (node=aNode) then exit;
@@ -963,7 +961,7 @@ end;
 
 function TLDomNode.LibXml2NodePtr: xmlNodePtr;
 begin
-  Result := FGNode;
+  Result := fMyNode;
 end;
 
 (**
@@ -974,7 +972,7 @@ var
   node,next,new_next: xmlNodePtr;
   nodeType: integer;
 begin
-  node:=FGNode.children;
+  node:=fMyNode.children;
   next:=nil;
   while node<>nil do begin
     nodeType:=node.type_;
@@ -1035,21 +1033,21 @@ end;
 
 function TLDomNode.requestNodePtr: xmlNodePtr;
 begin
-  DomAssert(FGNode<>nil, INVALID_ACCESS_ERR, ClassName+'.requestNodePtr: wrapping null node');
-  Result := FGNode;
+  DomAssert(fMyNode<>nil, INVALID_ACCESS_ERR, ClassName+'.requestNodePtr: wrapping null node');
+  Result := fMyNode;
 end;
 
 function TLDomNode.returnChildNodes: IDomNodeList;
 begin
-  if (FChildNodes=nil) then begin
-    TLDomChildNodeList.Create(self); // assigns FChildNodes
+  if (fChildNodes=nil) then begin
+    TLDomChildNodeList.Create(self); // assigns fChildNodes
   end;
-  Result := FChildNodes;
+  Result := fChildNodes;
 end;
 
 procedure TLDomNode.set_nodeValue(const value: DomString);
 begin
-  case FGNode.type_ of
+  case fMyNode.type_ of
   XML_ATTRIBUTE_NODE,
   XML_TEXT_NODE,
   XML_CDATA_SECTION_NODE,
@@ -1057,7 +1055,7 @@ begin
   XML_COMMENT_NODE,
   XML_PI_NODE:
     begin
-      xmlNodeSetContent(FGNode, PChar(UTF8Encode(value)));
+      xmlNodeSetContent(fMyNode, PChar(UTF8Encode(value)));
     end;
   else
     DomAssert(false, NO_MODIFICATION_ALLOWED_ERR);
@@ -1075,16 +1073,16 @@ constructor TLDomChildNodeList.Create(aOwnerNode: TLDomNode);
 begin
   inherited Create;
   DomAssert(aOwnerNode<>nil, HIERARCHY_REQUEST_ERR, 'Child list must have a parent');
-  FOwnerNode := aOwnerNode;
-  FOwnerNode.FChildNodes := self;
-  FOwnerNode._AddRef; //as long as the list exists, its owner must exist too
+  fOwnerNode := aOwnerNode;
+  fOwnerNode.fChildNodes := self;
+  fOwnerNode._AddRef; //as long as the list exists, its owner must exist too
 end;
 
 destructor TLDomChildNodeList.Destroy;
 begin
-  FOwnerNode.FChildNodes := nil;
-  FOwnerNode._Release;
-  FOwnerNode := nil;
+  fOwnerNode.fChildNodes := nil;
+  fOwnerNode._Release;
+  fOwnerNode := nil;
   inherited Destroy;
 end;
 
@@ -1094,7 +1092,7 @@ var
   cnt: integer;
 begin
   DomAssert(index>=0, INDEX_SIZE_ERR);
-  node := FOwnerNode.requestNodePtr.children;
+  node := fOwnerNode.requestNodePtr.children;
   cnt := 0;
   while (cnt<index) do begin
     if (node=nil) then begin
@@ -1111,7 +1109,7 @@ var
   node: xmlNodePtr;
 begin
   Result := 0;
-  node := FOwnerNode.GNode.children;
+  node := fOwnerNode.MyNode.children;
   while (node<>nil) do begin
     Inc(Result);
     node := node.next;
@@ -1255,9 +1253,9 @@ begin
   GDoc := nil;
   //
   Dec(GlbDocCount);
-  FFlyingNodes.Free;
-  FFlyingNodes := nil;
-  FGDOMImpl := nil;
+  fFlyingNodes.Free;
+  fFlyingNodes := nil;
+  fMyImplementation := nil;
   inherited Destroy;
 end;
 
@@ -1275,15 +1273,15 @@ end;
 
 function TLDomDocument.GetFlyingNodes: TList;
 begin
-  if FFlyingNodes=nil then begin
-    FFlyingNodes := TList.Create;
+  if fFlyingNodes=nil then begin
+    fFlyingNodes := TList.Create;
   end;
-  Result := FFlyingNodes;
+  Result := fFlyingNodes;
 end;
 
 function TLDomDocument.GetGDoc: xmlDocPtr;
 begin
-  Result := xmlDocPtr(FGNode);
+  Result := xmlDocPtr(fMyNode);
 end;
 
 function TLDomDocument.get_doctype: IDomDocumentType;
@@ -1304,10 +1302,10 @@ end;
 
 function TLDomDocument.get_domImplementation: IDomImplementation;
 begin
-  if FGDOMImpl=nil then begin
-    FGDOMImpl := TLDomImplementation.Create(TLDomDocumentClass(GlbNodeClasses[XML_DOCUMENT_NODE])); //todo: ??? default class, global instance ???
+  if fMyImplementation=nil then begin
+    fMyImplementation := TLDomImplementation.Create(TLDomDocumentClass(GlbNodeClasses[XML_DOCUMENT_NODE])); //todo: ??? default class, global instance ???
   end;
-  Result := FGDOMImpl;
+  Result := fMyImplementation;
 end;
 
 function TLDomDocument.get_nodeName: DomString;
@@ -1421,7 +1419,7 @@ end;
 function TLDomDocument.requestNodePtr: xmlNodePtr;
 begin
   requestDocPtr;
-  Result := FGNode;
+  Result := fMyNode;
 end;
 
 procedure TLDomDocument.SetGDoc(aNewDoc: xmlDocPtr);
@@ -1431,12 +1429,12 @@ procedure TLDomDocument.SetGDoc(aNewDoc: xmlDocPtr);
     node: xmlNodePtr;
     p: pointer;
   begin
-    if FFlyingNodes=nil then exit;
-    for i:=FFlyingNodes.Count-1 downto 0 do begin
-      p := FFlyingNodes[i];
+    if fFlyingNodes=nil then exit;
+    for i:=fFlyingNodes.Count-1 downto 0 do begin
+      p := fFlyingNodes[i];
       node := p;
       if (node._private<>nil) then begin
-        TLDomNode(node._private).FGNode := nil;
+        TLDomNode(node._private).fMyNode := nil;
         node._private := nil;
       end;
       case node.type_ of
@@ -1466,9 +1464,9 @@ procedure TLDomDocument.SetGDoc(aNewDoc: xmlDocPtr);
     i: integer;
     node: xmlNodePtr;
   begin
-    if FFlyingNodes=nil then exit;
-    for i:=FFlyingNodes.Count-1 downto 0 do begin
-      node := FFlyingNodes[i];
+    if fFlyingNodes=nil then exit;
+    for i:=fFlyingNodes.Count-1 downto 0 do begin
+      node := fFlyingNodes[i];
       case node.type_ of
       XML_HTML_DOCUMENT_NODE,
       XML_DOCB_DOCUMENT_NODE,
@@ -1491,7 +1489,7 @@ begin
 // for some strange reason, the following line makes troubles
 		_DestroyFlyingNodes;
   end;
-  FGNode := xmlNodePtr(aNewDoc);
+  fMyNode := xmlNodePtr(aNewDoc);
   if (old<>nil) then begin
     old._private := nil;
     xmlFreeDoc(old);
@@ -1507,7 +1505,7 @@ end;
 
 procedure TLDomCharacterData.appendData(const data: DomString);
 begin
-  xmlNodeAddContent(FGNode, PChar(UTF8Encode(data)));
+  xmlNodeAddContent(fMyNode, PChar(UTF8Encode(data)));
 end;
 
 procedure TLDomCharacterData.deleteData(offset, count: Integer);
@@ -1609,7 +1607,7 @@ end;
 
 function TLDomDocumentType.GetGDocumentType: xmlDtdPtr;
 begin
-  Result := xmlDtdPtr(GNode);
+  Result := xmlDtdPtr(MyNode);
 end;
 
 { TLDomNotation }
@@ -1628,7 +1626,7 @@ end;
 
 function TLDomAttr.get_ownerElement: IDomElement;
 begin
-  Result := GetDOMObject(FGNode.parent) as IDomElement;
+  Result := GetDOMObject(fMyNode.parent) as IDomElement;
 end;
 
 function TLDomAttr.get_specified: Boolean;
@@ -1644,16 +1642,16 @@ constructor TLDomAttributeMap.Create(aOwnerElement: TLDomElement);
 begin
   inherited Create;
   DomAssert(aOwnerElement<>nil, HIERARCHY_REQUEST_ERR, 'Attribute list must have an owner element');
-  FOwnerElement := aOwnerElement;
-  FOwnerElement.FAttributes := self;
-  FOwnerElement._AddRef; //as long as the map exists, its owner must exist too
+  fOwnerElement := aOwnerElement;
+  fOwnerElement.fFlyingNodes := self;
+  fOwnerElement._AddRef; //as long as the map exists, its owner must exist too
 end;
 
 destructor TLDomAttributeMap.Destroy;
 begin
-  FOwnerElement.FAttributes := nil;
-  FOwnerElement._Release;
-  FOwnerElement := nil;
+  fOwnerElement.fFlyingNodes := nil;
+  fOwnerElement._Release;
+  fOwnerElement := nil;
   inherited destroy;
 end;
 
@@ -1663,7 +1661,7 @@ var
   cnt: integer;
 begin
   DomAssert(index>=0, INDEX_SIZE_ERR);
-  node := FOwnerElement.requestNodePtr.properties;
+  node := fOwnerElement.requestNodePtr.properties;
   cnt := 0;
   while (cnt<index) do begin
     if (node=nil) then begin
@@ -1680,7 +1678,7 @@ var
   node: xmlAttrPtr;
 begin
   Result := 0;
-  node := FOwnerElement.GNode.properties;
+  node := fOwnerElement.MyNode.properties;
   while (node<>nil) do begin
     Inc(Result);
     node := node.next;
@@ -1689,32 +1687,32 @@ end;
 
 function TLDomAttributeMap.getNamedItem(const name: DomString): IDomNode;
 begin
-  Result := FOwnerElement.getAttributeNode(name);
+  Result := fOwnerElement.getAttributeNode(name);
 end;
 
 function TLDomAttributeMap.getNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
 begin
-  Result := FOwnerElement.getAttributeNodeNS(namespaceURI, localName);
+  Result := fOwnerElement.getAttributeNodeNS(namespaceURI, localName);
 end;
 
 function TLDomAttributeMap.removeNamedItem(const name: DomString): IDomNode;
 begin
-  Result := FOwnerElement.removeAttributeNode(FOwnerElement.getAttributeNode(name) as IDomAttr);
+  Result := fOwnerElement.removeAttributeNode(fOwnerElement.getAttributeNode(name) as IDomAttr);
 end;
 
 function TLDomAttributeMap.removeNamedItemNS(const namespaceURI, localName: DomString): IDomNode;
 begin
-  Result := FOwnerElement.removeAttributeNode(FOwnerElement.getAttributeNodeNS(namespaceURI, localName) as IDomAttr);
+  Result := fOwnerElement.removeAttributeNode(fOwnerElement.getAttributeNodeNS(namespaceURI, localName) as IDomAttr);
 end;
 
 function TLDomAttributeMap.setNamedItem(const newItem: IDomNode): IDomNode;
 begin
-  Result := FOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
+  Result := fOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
 end;
 
 function TLDomAttributeMap.setNamedItemNS(const newItem: IDomNode): IDomNode;
 begin
-  Result := FOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
+  Result := fOwnerElement.setAttributeNodeNS(newItem as IDomAttr);
 end;
 
 { TLDomElement }
@@ -1733,17 +1731,17 @@ end;
 
 function TLDomElement.get_attributes: IDomNamedNodeMap;
 begin
-  if (FAttributes=nil) then begin
-    TLDomAttributeMap.Create(self); // assigns FAttributes
+  if (fFlyingNodes=nil) then begin
+    TLDomAttributeMap.Create(self); // assigns fFlyingNodes
   end;
-  Result := FAttributes;
+  Result := fFlyingNodes;
 end;
 
 function TLDomElement.getAttribute(const name: DomString): DomString;
 var
   p: PxmlChar;
 begin
-  p := xmlGetProp(FGNode,PChar(UTF8Encode(name)));
+  p := xmlGetProp(fMyNode,PChar(UTF8Encode(name)));
   Result := UTF8Decode(p);
   xmlFree(p);
 end;
@@ -1752,7 +1750,7 @@ function TLDomElement.getAttributeNode(const name: DomString): IDomAttr;
 var
   attr: xmlAttrPtr;
 begin
-  attr := xmlHasProp(FGNode, PChar(UTF8Encode(name)));
+  attr := xmlHasProp(fMyNode, PChar(UTF8Encode(name)));
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
@@ -1760,7 +1758,7 @@ function TLDomElement.getAttributeNodeNS(const namespaceURI, localName: DomStrin
 var
   attr: xmlAttrPtr;
 begin
-  attr := xmlHasNSProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
+  attr := xmlHasNSProp(fMyNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
@@ -1768,26 +1766,26 @@ function TLDomElement.getAttributeNS(const namespaceURI, localName: DomString): 
 var
   p: PxmlChar;
 begin
-  p := xmlGetNSProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
+  p := xmlGetNSProp(fMyNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI)));
   Result := UTF8Decode(p);
   xmlFree(p);
 end;
 
 function TLDomElement.hasAttribute(const name: DomString): Boolean;
 begin
-  Result := xmlHasProp(FGNode, PChar(UTF8Encode(name)))<>nil;
+  Result := xmlHasProp(fMyNode, PChar(UTF8Encode(name)))<>nil;
 end;
 
 function TLDomElement.hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
 begin
-  Result := (nil<>xmlHasNsProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI))));
+  Result := (nil<>xmlHasNsProp(fMyNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI))));
 end;
 
 procedure TLDomElement.removeAttribute(const name: DomString);
 var
   attr: xmlAttrPtr;
 begin
-  attr := xmlHasProp(FGNode, PChar(UTF8Encode(name)));
+  attr := xmlHasProp(fMyNode, PChar(UTF8Encode(name)));
   if attr <> nil then begin
     xmlUnlinkNode(xmlNodePtr(attr));
     RegisterFlyingNode(xmlNodePtr(attr));
@@ -1812,7 +1810,7 @@ var
 begin
   uns := UTF8Encode(localName);
   ulocal := UTF8Encode(namespaceURI);
-  attr := xmlHasNsProp(FGNode, PChar(uns), PChar(ulocal));
+  attr := xmlHasNsProp(fMyNode, PChar(uns), PChar(ulocal));
   if (attr <> nil) then begin
     xmlUnlinkNode(xmlNodePtr(attr));
     RegisterFlyingNode(xmlNodePtr(attr));
@@ -1821,13 +1819,13 @@ end;
 
 procedure TLDomElement.setAttribute(const name, value: DomString);
 begin
-  xmlSetProp(FGNode, PChar(UTF8Encode(name)), PChar(UTF8Encode(value)));
+  xmlSetProp(fMyNode, PChar(UTF8Encode(name)), PChar(UTF8Encode(value)));
 end;
 
 function TLDomElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
 begin
   if newAttr<>nil then begin
-    Result := GetDomObject(xmlSetPropNode(FGNode, xmlAttrPtr(GetGNode(newAttr)))) as IDomAttr;
+    Result := GetDomObject(xmlSetPropNode(fMyNode, xmlAttrPtr(GetGNode(newAttr)))) as IDomAttr;
   end else begin
     Result := nil;
   end;
@@ -1839,8 +1837,8 @@ var
   ns: xmlNsPtr;
 begin
   SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
-  ns := xmlNewNs(FGNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
-  xmlSetNSProp(FGNode, ns, PChar(ulocal), PChar(UTF8Encode(value)));
+  ns := xmlNewNs(fMyNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+  xmlSetNSProp(fMyNode, ns, PChar(ulocal), PChar(UTF8Encode(value)));
 end;
 
 { TLDomImplementation }
@@ -1875,7 +1873,7 @@ var
   doc: TLDomDocument;
 begin
   doc := fDocumentClass.Create(nil);
-  doc.FGDOMImpl := self;
+  doc.fMyImplementation := self;
   Result := doc;
   if (doctype<>nil) then begin
     DomAssert(doctype.ownerDocument=nil, WRONG_DOCUMENT_ERR, 'doctype already belongs to another document');
@@ -1899,7 +1897,7 @@ var
   doc: TLDomDocument;
 begin
   doc := fDocumentClass.Create(nil);
-  doc.FGDOMImpl := self;
+  doc.fMyImplementation := self;
   doc.load(url);
   Result := doc;
 end;
@@ -1909,7 +1907,7 @@ var
   doc: TLDomDocument;
 begin
   doc := fDocumentClass.Create(nil);
-  doc.FGDOMImpl := self;
+  doc.fMyImplementation := self;
   doc.parse(xml);
   Result := doc;
 end;
