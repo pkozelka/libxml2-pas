@@ -20,21 +20,21 @@ const
    *
    * the version string like "1.2.3"
    *)
-  LIBXSLT_DOTTED_VERSION = '1.0.24';
+  LIBXSLT_DOTTED_VERSION = '1.0.32';
 
   (**
    * LIBXSLT_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBXSLT_VERSION = 1002024;
+  LIBXSLT_VERSION = 1002032;
 
   (**
    * LIBXSLT_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-  LIBXSLT_VERSION_STRING = '10024';
+  LIBXSLT_VERSION_STRING = '10032';
 
 (**
  * WITH_XSLT_DEBUG:

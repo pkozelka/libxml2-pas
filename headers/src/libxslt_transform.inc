@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/transform.h:1.23:
+// CVS-REV:libxslt/libxslt/transform.h:1.24:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -55,7 +55,7 @@ procedure xsltChoose(ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlN
 procedure xsltIf(ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
 procedure xsltForEach(ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
 procedure xsltRegisterAllElement(ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
-
+function  xsltCopyTextString(ctxt: xsltTransformContextPtr; target: xmlNodePtr; _string: PxmlChar; noescape: Longint): xmlNodePtr; cdecl; external LIBXSLT_SO;
 (*
  * Hook for the debugger if activated.
  *)

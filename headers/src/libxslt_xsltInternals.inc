@@ -413,17 +413,30 @@ type
     profTab: PLongint;                           (* the profile template stack *)
     _private: Pointer;                           (* user defined data *)
 
-    extrasNr: Longint;		                       (* the number of extras used *)
+    extrasNr: Longint;		                     (* the number of extras used *)
     extrasMax: Longint;                          (* the number of extras allocated *)
     extras: xsltRuntimeExtraPtr;                 (* extra per runtime informations *)
 
     styleList: xsltDocumentPtr;                  (* the stylesheet docs list *)
     sec: Pointer;                                (* the security preferences if any *)
 
-    error: xmlGenericErrorFunc;		               (* a specific error handler *)
+    error: xmlGenericErrorFunc;		             (* a specific error handler *)
     errctx: Pointer;                             (* context for the error handler *)
 
     sortfunc: xsltSortFunc;                      (* a ctxt specific sort routine *) 
+
+	(*
+	 * handling of temporary Result Value Tree
+	 *)
+    tmpRVT: xmlDocPtr;
+    persistRVT: xmlDocPtr;
+    ctxtflags: Longint;
+    (*
+     * Speed optimization when coalescing text nodes
+     *)
+    lasttext : PxmlChar;                         (* last text node content *)
+    lasttsize: DWORD;                            (* last text node size *)
+    lasttuse: DWORD;                             (* last text node use *)
   end;
 
 (**
@@ -478,3 +491,10 @@ procedure xsltParseTemplateContent(style: xsltStylesheetPtr; templ: xmlNodePtr);
 function  xsltAllocateExtra(style: xsltStylesheetPtr): Longint; cdecl; external LIBXSLT_SO;
 function  xsltAllocateExtraCtxt	(ctxt: xsltTransformContextPtr): Longint; cdecl; external LIBXSLT_SO;
 
+(*
+ * Extra functions for Result Value Trees
+ *)
+function  xsltCreateRVT(ctxt: xsltTransformContextPtr): xmlDocPtr; cdecl; external LIBXSLT_SO;
+function  xsltRegisterTmpRVT(ctxt: xsltTransformContextPtr; RVT: xmlDocPtr): Longint; cdecl; external LIBXSLT_SO;
+function  xsltRegisterPersistRVT(ctxt: xsltTransformContextPtr; RVT: xmlDocPtr): Longint; cdecl; external LIBXSLT_SO;
+procedure xsltFreeRVTs(ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
