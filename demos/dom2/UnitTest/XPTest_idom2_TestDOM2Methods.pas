@@ -34,10 +34,10 @@ type
     select: IDomNodeSelect;
     nnmap: IDomNamedNodeMap;
     nsuri: string;
-    prefix: string;
-    Name: string;
-    Data: string;
-    function getFqname: string;
+    prefix: WideString;
+    Name: WideString;
+    Data: WideString;
+    function getFqname: WideString;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -98,8 +98,9 @@ type
     procedure documentFragment;
     procedure element;
     procedure nsdecl;
-    procedure unicode;
-    property fqname: string read getFqname;
+    procedure unicode_TextNodeValue;
+    procedure unicode_NodeName;
+    property fqname: WideString read getFqname;
 
   end;
 
@@ -120,9 +121,9 @@ begin
   doc := impl.createDocument('', '', nil);
   (doc as IDomPersist).loadxml('<?xml version="1.0" encoding="iso-8859-1"?><root />');
   nsuri := 'http://ns.4commerce.de';
-  prefix := 'ct';
-  Name := 'test';
-  Data := 'Dies ist ein Beispiel-Text.';
+  prefix := 'ct'+getUnicodeStr(1);
+  Name := 'test'+getUnicodeStr(1);
+  Data := 'Dies ist ein Beispiel-Text.'+getUnicodeStr(1);
 end;
 
 procedure TTestDom2Methods.TearDown;
@@ -641,10 +642,10 @@ begin
   check(nodelist.length = n, 'wrong length');
 end;
 
-function TTestDom2Methods.getFqname: string;
+function TTestDom2Methods.getFqname: WideString;
 begin
-  if prefix = '' then Result := Name 
-  else Result := prefix + ':' + Name;
+  if prefix = '' then result := Name
+  else result := prefix + ':' + Name;
 end;
 
 procedure TTestDom2Methods.hasAttribute;
@@ -787,7 +788,8 @@ begin
   attr.Value := Data;
   nnmap.setNamedItemNS(attr);
   check(nnmap.length = 1, 'wrong length');
-  check(myIsSameNode(nnmap.getNamedItemNS(nsuri, Name), attr), 'wrong node');
+  node := nnmap.getNamedItemNS(nsuri, Name);
+  check(myIsSameNode(node,attr), 'wrong node');
   check(nnmap.getNamedItemNS(nsuri, Name).nodeValue = Data, 'wrong nodeValue');
   // set a namedItem with the same name as before
   attr := doc.createAttributeNS(nsuri, fqname);
@@ -832,7 +834,7 @@ const
   n = 10;
 var
   i:   integer;
-  tmp: string;
+  tmp: WideString;
 begin
   // normalize summarizes text-nodes
   for i := 0 to n - 1 do begin
@@ -985,21 +987,33 @@ begin
     attr.namespaceURI + '"');
 end;
 
-procedure TTestDOM2Methods.unicode;
+procedure TTestDOM2Methods.unicode_TextNodeValue;
   // this test appends a text node with greek and coptic unicode characters
 var
   ws: widestring;
-  tmp: string;
   ok: boolean;
 begin
-  ws:=getUnicodeStr;
+  ws := getUnicodeStr;
   text := doc.createTextNode(ws);
-  ws:='';
+  ws := '';
   doc.documentElement.appendChild(text);
   ws := doc.documentElement.firstChild.nodeValue;
   ok := WideSameStr(ws,getUnicodeStr);
-  //ShowMessage('"'+ws+'"'+CRLF+'"'+getUnicodeStr+'"');
-  //check(Length(ws) = Length(getUnicodeStr), 'different length');
+  check(ok, 'incorrect unicode handling');
+end;
+
+procedure TTestDOM2Methods.unicode_NodeName;
+  // this test appends a node with a name containing unicode characters
+var
+  ws: WideString;
+  ok: boolean;
+begin
+  ws := getUnicodeStr(1);
+  node := doc.createElement(ws);
+  doc.documentElement.appendChild(node);
+  ws := '';
+  ws := doc.documentElement.firstChild.nodeName;
+  ok := WideSameStr(ws,getUnicodeStr(1));
   check(ok, 'incorrect unicode handling');
 end;
 

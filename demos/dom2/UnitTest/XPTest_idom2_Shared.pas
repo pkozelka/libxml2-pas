@@ -102,28 +102,35 @@ function domvendor: string;
 function myIsSameNode(node1, node2: IDomNode): boolean;
 function Unify(xml: string; removeEncoding: boolean = True): string;
 function StrCompare(str1, str2: WideString): integer;
-function getUnicodeStr: WideString;
+function getUnicodeStr(mode: integer = 0): WideString;
 
 var
   datapath: string = '';
 
 implementation
 
-function getUnicodeStr: WideString;
-  // this function return an unicode string with (all) greek and coptic characters
+function getUnicodeStr(mode: integer = 0): WideString;
+  // this function returns an unicode string
 var
   i: integer;
-  c: WideChar;
 begin
   result := '';
-  for i := $0370 to $03FF do begin
-    case i of
-      $0370..$0373,$0376..$0379,$037B..$037D,$037F..$0383,
-      $038B,$038D,$03A2,$03CF,$03D8,$03D9,$03F6..$03FF: // exclude undefined
-    else
-      c := WideChar(i);
-      result := result + c;
-    end;
+  case mode of
+    0: begin
+         // return an unicode string with all defined greek and coptic characters
+         for i := $0370 to $03FF do begin
+           case i of
+             $0370..$0373,$0376..$0379,$037B..$037D,$037F..$0383,
+             $038B,$038D,$03A2,$03CF,$03D8,$03D9,$03F6..$03FF: // exclude undefined
+           else
+             result := result + WideChar(i);
+           end;
+         end;
+       end;
+    1: begin
+         // return an unicode string that is save for tag names
+         result := result + WideChar($0391)+WideChar($0392)+WideChar($0395);
+       end;
   end;
 end;
 

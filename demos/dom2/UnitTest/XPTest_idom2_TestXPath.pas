@@ -4,7 +4,7 @@ interface
 
 uses
   TestFrameWork,
-  libxmldom,
+  //libxmldom,
   idom2,
   SysUtils,
   domSetup,
