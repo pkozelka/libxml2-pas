@@ -93,12 +93,6 @@ procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePt
 // xmlIO.h
 function  xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
 
-// Delphi memory handling
-procedure DelphiFreeFunc(ptr: pointer); cdecl;
-function  DelphiMallocFunc(size:size_t):pointer; cdecl;
-function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer; cdecl;
-function  DelphiStrdupFunc(str:PChar):Pchar; cdecl;
-
 type
   (**
   * This interface is intended for libxml2 wrappers. It provides a way
