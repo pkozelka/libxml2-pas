@@ -46,9 +46,6 @@ const
 					| [#x10000-#x10FFFF]
 	any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
 }
-var
-  xmlDoValidityCheckingDefaultValue_PTR: ^longint; //[pk] DEPRECATED, TEMPORARY
-  xmlSubstituteEntitiesDefaultValue_PTR: ^longint; //[pk] DEPRECATED, TEMPORARY
 
 function  IS_CHAR(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsChar';
 {
