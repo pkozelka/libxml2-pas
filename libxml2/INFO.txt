@@ -40,9 +40,9 @@ Email=pkozelka@email.cz
 
 [Converters]
 Converter1="Petr Kozelka";pkozelka@email.cz;http://kozelka.hyperlink.cz
-Converter2="Uwe Fechner";ufechner@4commerce.de;http://www.4commerce.de
+Converter2="Uwe Fechner";ufechner@4commerce.de;http://www.stud.fernuni-hagen.de/q5597331/xml-suite.htm
 
 [Testers]
 Tester1="Petr Kozelka";pkozelka@email.cz;http://kozelka.hyperlink.cz
-Tester2="Uwe Fechner";ufechner@4commerce.de;http://www.4commerce.de
+Tester2="Uwe Fechner";ufechner@4commerce.de;http://www.stud.fernuni-hagen.de/q5597331/xml-suite.htm
 Tester3="Martijn Brinkers";m.brinkers@pobox.com;http://sourceforge.net/projects/libxml2-pas

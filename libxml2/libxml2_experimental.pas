@@ -1,4 +1,4 @@
-//$Id: libxml2_experimental.pas,v 1.1 2002-01-31 14:11:33 pkozelka Exp $
+//$Id: libxml2_experimental.pas,v 1.2 2002-02-15 11:32:37 pkozelka Exp $
 unit libxml2_experimental;
 (**
  * Title:        libxml2 experimental unit
@@ -36,7 +36,8 @@ var
   s: String;
 begin
   SetLength(s, 10000);
-  SetLength(s, xmlFormatMessage(PChar(s), @msg));
+  s := msg;
+//  SetLength(s, xmlFormatMessage(PChar(s), @msg));
   if Assigned(myErrH) then begin
     myErrH(s);
   end;
