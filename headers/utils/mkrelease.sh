@@ -54,6 +54,13 @@ function copyCommonSourcesToDist()
 	cp $HEADERS_DIR/$d/birds.* $DIST/$d
 	cp $HEADERS_DIR/$d/*.dpr $DIST/$d
 
+	d="demos/demo1"
+	mkdir -p $DIST/$d
+	cp $HEADERS_DIR/$d/Makefile $DIST/$d
+	cp $HEADERS_DIR/$d/README-*.txt $DIST/$d
+	cp $HEADERS_DIR/$d/*.xml $HEADERS_DIR/$d/*.xsl $DIST/$d
+	cp $HEADERS_DIR/$d/*.pas $HEADERS_DIR/$d/*.dpr $DIST/$d
+
 
 	# prepare JEDI info file
 sed -f - $HEADERS_DIR/INFO.txt.template > $DIST/INFO.txt <<EOF
