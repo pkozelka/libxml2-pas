@@ -246,7 +246,7 @@ type
     function hasAttributeNS(const namespaceURI, localName: DOMString): WordBool;
     procedure normalize;
   public
-    constructor Create(AElement: xmlElementPtr;ADocument:IDOMDocument;freenode:boolean=false);
+    constructor Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
     destructor destroy; override;
     property GElement: xmlElementPtr read GetGElement;
   end;
@@ -516,6 +516,18 @@ function libxmlStringToString(libstring:pchar):String;
       end
       else result:='';
   end;
+
+(*
+function TGDOMImplementationFactory.DOMImplementation: IDOMImplementation;
+begin
+  Result := TGDOMImplementation.Create;
+end;
+
+function TGDOMImplementationFactory.Description: String;
+begin
+  Result := SLIBXML;
+end;
+*)
 
 (*
  *  TXDomDocumentBuilder
@@ -1563,7 +1575,7 @@ begin
   inherited normalize;
 end;
 
-constructor TGDOMElement.Create(AElement: xmlElementPtr;ADocument:IDOMDocument;freenode:boolean=false);
+constructor TGDOMElement.Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
 begin
   inc(elementcount);
   inherited create(xmlNodePtr(AElement),ADocument,freenode);
@@ -1630,10 +1642,11 @@ end;
 
 function TGDOMDocument.get_documentElement: IDOMElement;
 var
-  root1:xmlElementPtr;
-  FGRoot: TGDOMElement;
+	root1:xmlNodePtr;
+//	exc: GdomeException;
+	FGRoot: TGDOMElement;
 begin
-  root1:=xmlElementPtr(xmlDocGetRootElement(FPGdomeDoc));
+  root1:= xmlDocGetRootElement(FPGdomeDoc);
   if root1<>nil
     then FGRoot:=TGDOMElement.create(root1,self)
     else FGRoot:=nil;
@@ -1648,10 +1661,10 @@ end;
 function TGDOMDocument.createElement(const tagName: DOMString): IDOMElement;
 var
   name1: TGdomString;
-  AElement: xmlElementPtr;
+	AElement: xmlNodePtr;
 begin
   name1:=TGdomString.create(tagName);
-  AElement:=xmlElementPtr(xmlNewDocNode(FPGdomeDoc,nil,name1.CString,nil));
+  AElement:=xmlNewDocNode(FPGdomeDoc,nil,name1.CString,nil);
   name1.free;
   if AElement<>nil
     then result:=TGDOMElement.Create(AElement,self,true)
@@ -1835,11 +1848,11 @@ gdome_xml_doc_importNode (GdomeDocument *self, GdomeNode *importedNode, GdomeBoo
 function TGDOMDocument.createElementNS(const namespaceURI,
   qualifiedName: DOMString): IDOMElement;
 var
-  AElement: xmlElementPtr;
+	AElement: xmlNodePtr;
   ns: TGDOMNamespace;
 begin
   ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName);
-  AElement:=xmlElementPtr(xmlNewDocNode(FPGdomeDoc,ns.NS,ns.localName.CString,nil));
+  AElement:=xmlNewDocNode(FPGdomeDoc,ns.NS,ns.localName.CString,nil);
   ns.free;
   if AElement<>nil
     then result:=TGDOMElement.Create(AElement,self)
@@ -1952,11 +1965,12 @@ function TGDOMDocument.load(source: OleVariant): WordBool;
 var filename: string;
     root: xmlNodePtr;
 begin
-  filename:=source;
-  xmlFreeDoc(FPGdomeDoc);
-  inherited Destroy;
-  FPGdomeDoc:=xmlParseFile(pchar(filename));
-  if FPGdomeDoc<>nil
+//  filename:=StringReplace(source, '\', '/', [rfReplaceAll]);
+	filename:=source;
+	xmlFreeDoc(FPGdomeDoc);
+//	inherited Destroy;
+	FPGdomeDoc:=xmlParseFile(pchar(filename));
+	if FPGdomeDoc<>nil
     then
       begin
         root:= xmlNodePtr(FPGdomeDoc);
@@ -2071,6 +2085,16 @@ begin
     result:=false;
 end;
 
+function canAppendNode(priv,newPriv:xmlNodePtr): boolean;
+//var
+//	new_type: integer;
+begin
+//ToDo:
+//Finish the translation from C
+//	if newPriv<>nil
+//		then new_type:=newPriv.type_;
+	result:=true;
+end;
 
 { TGdomString }
 
@@ -2369,7 +2393,7 @@ function TGDOMNode.selectNode(const nodePath: WideString): IDOMNode;
 //       b) if result type <> nodelist
 //       c) perhaps if nodelist.length > 1 ???
 begin
-  result:=selectNodes(nodePath)[0];
+	result:=selectNodes(nodePath)[0];
 end;
 
 function TGDOMNode.selectNodes(const nodePath: WideString): IDOMNodeList;
@@ -2377,32 +2401,37 @@ function TGDOMNode.selectNodes(const nodePath: WideString): IDOMNodeList;
 //       a) if invalid nodePath expression
 //       b) if result type <> nodelist
 var
-  doc: xmlDocPtr;
-  ctxt: xmlXPathContextPtr;
-  res:  xmlXPathObjectPtr;
-  temp: string;
-  nodetype{,nodecount}: integer;
-  //ok:integer;
+	doc: xmlDocPtr;
+	ctxt: xmlXPathContextPtr;
+	res:  xmlXPathObjectPtr;
+	temp: string;
+	nodetype{,nodecount}: integer;
+	//ok:integer;
 begin
-  temp:=UTF8Encode(nodePath);
-  doc:=FGNode.doc;
-  if doc=nil then CheckError(100);
-  ctxt:=xmlXPathNewContext(doc);
-  ctxt.node:=FGNode;
-  {ok:=}xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
-  res:=xmlXPathEvalExpression(pchar(temp),ctxt);
-  if res<>nil then  begin
-    nodetype:=res.type_;   //1 = nodeset
-    if nodetype = XPATH_NODESET
-    then begin
-      //nodecount:=res.nodesetval.nodeNr;
-      result:=TGDOMNodeList.Create(res,FOwnerDocument)
-    end
-    else result:=nil;
-    //xmlXPathFreeNodeSetList(res);
-    //xmlXPathFreeObject(res);
-    xmlXPathFreeContext(ctxt);
-  end else result:=nil;
+	temp:=UTF8Encode(nodePath);
+	doc:=FGNode.doc;
+	if doc=nil then CheckError(100);
+	ctxt:=xmlXPathNewContext(doc);
+	ctxt.node:=FGNode;
+	{ok:=}xmlXPathRegisterNs(ctxt,pchar(FPrefix),pchar(FURI));
+	res:=xmlXPathEvalExpression(pchar(temp),ctxt);
+	if res<>nil then  begin
+		nodetype:=res.type_;
+		case nodetype of
+		XPATH_NODESET:
+			begin
+				nodecount:=res.nodesetval.nodeNr;
+				result:=TGDOMNodeList.Create(res,FOwnerDocument)
+			end
+		else
+			result:=nil;
+		end;
+		//xmlXPathFreeNodeSetList(res);
+		//xmlXPathFreeObject(res);
+	end else begin
+		result:=nil;
+	end;
+	xmlXPathFreeContext(ctxt);
 end;
 
 (*
@@ -2410,12 +2439,12 @@ end;
 *)
 constructor TGDOMDocumentBuilderFactory.Create(AFreeThreading : Boolean);
 begin
-  FFreeThreading := AFreeThreading;
+	FFreeThreading := AFreeThreading;
 end;
 
 function TGDOMDocumentBuilderFactory.NewDocumentBuilder : IDomDocumentBuilder;
 begin
-  Result := TGDOMDocumentBuilder.Create(FFreeThreading);
+	Result := TGDOMDocumentBuilder.Create(FFreeThreading);
 end;
 
 function TGDOMDocumentBuilderFactory.Get_VendorID : DomString;
@@ -2490,20 +2519,26 @@ var
   root:xmlNodePtr;
   fn: string;
 begin
-  FGdomimpl:=GDOMImpl;
-  FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
-  //Get root-node
-  fn := UTF8Encode(aUrl);
-  root:= xmlNodePtr(xmlParseFile(PChar(fn)));
-  if (root=nil) then begin
-    checkError(102);
-  end;
-  //Create root-node as pascal object
-  inherited create(root,nil);
-  inc(doccount);
+	FGdomimpl:=GDOMImpl;
+	FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
+	//Get root-node
+{$ifdef WIN32}
+	fn := UTF8Encode(StringReplace(aUrl, '\', '\\', [rfReplaceAll]));
+{$else}
+	fn := aUrl;
+{$endif}
+	root:= xmlNodePtr(xmlParseFile(PChar(fn)));
+	if (root=nil) then begin
+		checkError(102);
+	end;
+	//Create root-node as pascal object
+	inherited create(root,nil);
+	//self._Release;
+	inc(doccount);
 end;
 
 initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
 finalization
 end.
+
