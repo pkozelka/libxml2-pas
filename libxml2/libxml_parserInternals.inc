@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.45] parserInternals.h
+// CVS-SIGN: [1.46] parserInternals.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -242,13 +242,13 @@ function  xmlParseEnumerationType(ctxt: xmlParserCtxtPtr): xmlEnumerationPtr; cd
 function  xmlParseEnumeratedType(ctxt: xmlParserCtxtPtr; var tree: xmlEnumerationPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlParseAttributeType(ctxt: xmlParserCtxtPtr; var tree: xmlEnumerationPtr): Longint; cdecl; external LIBXML2_SO;
 procedure xmlParseAttributeListDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
-function  xmlParseElementMixedContentDecl(ctxt: xmlParserCtxtPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
+function  xmlParseElementMixedContentDecl(ctxt: xmlParserCtxtPtr; inputchk: xmlParserInputPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
 {$IFDEF VMS}
 function  xmlParseElementChildrenContentD(ctxt: xmlParserCtxtPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
 const
   xmlParseElementChildrenContentDecl = xmlParseElementChildrenContentD;
 {$ELSE}
-function  xmlParseElementChildrenContentDecl(ctxt: xmlParserCtxtPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
+function  xmlParseElementChildrenContentDecl(ctxt: xmlParserCtxtPtr; inputchk: xmlParserInputPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
 {$ENDIF}
 function  xmlParseElementContentDecl(ctxt: xmlParserCtxtPtr; name: PxmlChar; var result: xmlElementContentPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlParseElementDecl(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;

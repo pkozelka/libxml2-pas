@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.32] valid.h
+// CVS-SIGN: [1.33] valid.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -159,6 +159,7 @@ function  xmlGetRefs(doc: xmlDocPtr; ID: PxmlChar): xmlListPtr; cdecl; external 
 function  xmlValidateRoot(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateElementDecl(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlElementPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidNormalizeAttributeValue(doc: xmlDocPtr; elem: xmlNodePtr; name: PxmlChar; value: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlValidCtxtNormalizeAttributeValue(xmlValidCtxtPtr ctxt; doc: xmlDocPtr; elem: xmlNodePtr; name, value: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlValidateAttributeDecl(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; attr: xmlAttributePtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateAttributeValue(aType: xmlAttributeType; value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateNotationDecl(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; nota: xmlNotationPtr): Longint; cdecl; external LIBXML2_SO;
