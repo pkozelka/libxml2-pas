@@ -14,9 +14,9 @@ unit jkDomTest;
    4commerce technologies AG
         Kamerbalken 10-14
         22525 Hamburg, Germany
-	
+
     Published under a double license:
-    a) the GNU Library General Public License: 
+    a) the GNU Library General Public License:
        http://www.gnu.org/copyleft/lgpl.html
     b) the Mozilla Public License:
        http://www.mozilla.org/MPL/MPL-1.1.html
@@ -32,6 +32,10 @@ function TestGDom3(name,vendorstr:string;TestSet:integer):double;
 function getDoc(filename,vendorstr: string;TestSet:integer=0): IDOMDocument;
 function getEmptyDoc(vendorstr: string): IDomDocument;
 function test(name: string; testexpr: boolean): boolean;
+
+// Call this function 10000 times for stability test
+procedure TestDocument(filename,vendorstr:string;testset: integer);
+procedure TestElement0(filename,vendorstr:string;TestSet: integer);
 
 implementation
 
@@ -94,142 +98,68 @@ begin
   if ok then result := doc else result := nil;
 end;
 
-procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
-// shall Test every Method of GDOM2
-  procedure TestElement(document: IDOMDocument;vendorstr:string);
-    var
-      element: IDOMElement;
-      attr: IDOMAttr;
-      nodelist: IDOMNodeList;
-  begin
-    element := document.documentElement;
-    test('element.tagName',(element.tagName = 'test')) ;
+procedure TestDocument(filename,vendorstr:string;testset: integer);
+var
+  element: IDOMElement;
+  nodelist: IDOMNodeList;
+  dom: IDOMImplementation;
+  cdata: IDOMCDATASection;
+  comment: IDOMComment;
+  documentfragment: IDOMDocumentFragment;
+  entityreference: IDOMEntityReference;
+  processinginstruction: IDOMProcessingInstruction;
+  text: IDOMText;
+  attr: IDOMAttr;
+  node: IDOMNode;
+  dom2: boolean;
+  document: IDOMDocument;
+begin
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+  document := getDoc(filename,vendorstr,TestSet);
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+  test('document',(document <> nil));
+  if document=nil then exit;
 
-    element := nil;
-    element := document.createElement('eee');
-    attr := document.createAttribute('rrr');
-    attr := element.setAttributeNode(attr);
-    attr := nil;
-    attr := document.createAttribute('rrrVX');
-    attr.value:='hund';
-    attr := element.setAttributeNode(attr);
-    attr := nil;
-    attr := element.getAttributeNode('rrr');
-    test('element.getAttributeNode/setAttributeNode',(attr <> nil));
-    attr := nil;
-    attr := element.getAttributeNode('rrrVX');
-    test('element.getAttributeNode/setAttributeNode2',(attr.value='hund'));
-    attr:=nil;
-    attr := document.createAttribute('rrrVX');
-    attr.value:='hase';
-    attr := element.setAttributeNode(attr);
-    test('element.getAttributeNode/setAttributeNode3',(attr.value='hund'));
-    attr:=nil;
-    attr := element.getAttributeNode('rrrVX');
-    test('element.getAttributeNode/setAttributeNode4',(attr.value='hase'));
-    attr:=nil;
-    attr := nil;
-    element := nil;
+  //p=1
+  element := document.documentElement;
+  test('document.documentElement',(element <> nil));
+  element := nil;
 
-    //to do:
-    //add a test, where the attribute das exist, before setAttribute is called
-    element := document.createElement('ttt');
-    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:loop');
-    attr := element.setAttributeNodeNS(attr);
-    attr := nil;
-    attr := element.getAttributeNodeNS('http://xmlns.4commerce.de/eva','loop');
-    test('element.getAttributeNodeNS/setAttributeNodeNS',(attr <> nil));
-    attr := nil;
-    element := nil;
-    attr := document.createAttribute('loop');
-    element := document.createElement('iii');
-    attr := element.setAttributeNode(attr);
-    attr := nil;
-    test('element.setAttributeNode',(element.hasAttribute('loop')));
-    element.removeAttributeNS('http://xmlns.4commerce.de/eva','loop');
-    test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
-    element := nil;
-    // setAttributeNodeNS
-    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:loop');
-    element := document.createElement('iii');
-    attr := element.setAttributeNodeNS(attr);
-    attr := nil;
-    test('element.setAttributeNodeNS2',(element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
-    element.removeAttributeNS('http://xmlns.4commerce.de/eva','loop');
-    test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
-    element := nil;
-    element := document.documentElement;
-    nodelist := element.getElementsByTagName('sometag');
-    test('element.getElementsByTagName',(nodelist <> nil));
-    test('element.getElementsByTagName (length)',(nodelist.length = 1));
-    nodelist := nil;
-    element := nil;
-    attr := document.createAttribute('nop');
-    element := document.createElement('hub');
-    try
-      attr := element.setAttributeNode(attr);
-      attr := element.getAttributeNode('nop');
-      attr := element.removeAttributeNode(attr);
-      test('element.removeAttributeNode',(not element.hasAttribute('hub')));
-    except
-      outLog('__element.removeAttributeNode doesn''t work!');
-    end;
-    attr := nil;
-    element := nil;
-  end;
+  //p=1
+  node := document.createElement('abc');
+  test('document.createElement',(node <> nil)) ;
+  test('document.createElement (nodeName)',(node.nodeName = 'abc')) ;
 
-  procedure TestDocument(document: IDOMDocument;vendorstr:string);
-  var
-    element: IDOMElement;
-    nodelist: IDOMNodeList;
-    dom: IDOMImplementation;
-    cdata: IDOMCDATASection;
-    comment: IDOMComment;
-    documentfragment: IDOMDocumentFragment;
-    entityreference: IDOMEntityReference;
-    processinginstruction: IDOMProcessingInstruction;
-    text: IDOMText;
-    attr: IDOMAttr;
-    node: IDOMNode;
-  begin
-    test('document',(document <> nil));
-    if document=nil then exit;
-
-    //p=1
-    element := document.documentElement;
-    test('document.documentElement',(element <> nil));
-    element := nil;
-
-    //p=1
-    node := document.createElement('abc');
-    test('document.createElement',(node <> nil)) ;
-    test('document.createElement (nodeName)',(node.nodeName = 'abc')) ;
-
+  if dom2 then begin
     //p=1
     node := document.createElementNS('http://xmlns.4commerce.de/eva','eva:abc1');
     test('document.createElementNS',(node <> nil)) ;
     test('document.createElementNS (nodeName)',(node.nodeName = 'eva:abc1')) ;
+  end;
 
-    //p=1
-    attr := document.createAttribute('name');
-    test('document.createAttribute',(attr <> nil)) ;
-    test('document.createAttribute (name)',(attr.name ='name')) ;
+  //p=1
+  attr := document.createAttribute('name');
+  test('document.createAttribute',(attr <> nil)) ;
+  test('document.createAttribute (name)',(attr.name ='name')) ;
 
-    //p=1
+  //p=1
+  if dom2 then begin
     attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');
     test('document.createAttributeNS',(attr <> nil)) ;
     test('document.createAttributeNS (name)',(attr.name ='eva:name1')) ;
+  end;
 
-    //p=1
-    text := document.createTextNode('eee');
-    test('document.createTextNode',(text <> nil));
-    test('document.createTextNode (data)',(text.data ='eee'));
-    text := nil;
+  //p=1
+  text := document.createTextNode('eee');
+  test('document.createTextNode',(text <> nil));
+  test('document.createTextNode (data)',(text.data ='eee'));
+  text := nil;
 
-    document.documentElement.appendChild(node);
-    node := nil;
+  document.documentElement.appendChild(node);
+  node := nil;
 
-    //p=2
+  //p=2
+  if dom2 then begin
     nodelist := document.getElementsByTagNameNS('http://xmlns.4commerce.de/eva','abc1');
     if nodelist<>nil
       then test('document.getElementsByTagNameNS (length)',(nodelist.length = 1))
@@ -241,57 +171,155 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
       then test('element.getElementsByTagNameNS (length)',(nodelist.length = 1))
       else outLog('__element.getElementsByTagNameNS (length) doesn''t work');
     nodelist := nil;
-
-    //p=2
-    nodelist := document.getElementsByTagName('sometag');
-    if nodelist <> nil then begin
-      test('document.getElementsByTagName',(nodelist <> nil));
-      test('document.getElementsByTagName (length)',(nodelist.length = 1)) ;
-    end else begin
-      outLog('__document.getElementsByTagName doesn''t work!');
-    end;
-    nodelist := nil;
-
-    //p=2
-    dom := document.domImplementation;
-    test('document.domImplementation',(dom <> nil)) ;
-    dom := nil;
-
-    //p=2
-    cdata := document.createCDATASection('zzz');
-    test('document.createCDATASection',(cdata <> nil));
-    cdata := nil;
-
-    //p=2
-    try
-      comment := document.createComment('xxx');
-      test('document.createComment',(comment <> nil));
-      comment := nil;
-    except
-      outLog('document.createComment doesn''t work!');
-    end;
-
-    //p=3
-    try
-      processinginstruction := document.createProcessingInstruction('qqq','www');
-      test('document.createProcessingInstruction',(processinginstruction <> nil));
-      processinginstruction := nil;
-    except
-      outLog('document.createProcessingInstruction doesn''t work!');
-    end;
-
-    //p=3
-    documentfragment := document.createDocumentFragment;
-    test('document.createDocumentFragment',(documentfragment <> nil));
-    documentfragment := nil;
-
-    if vendorstr<>'LIBXML' then begin
-      //p=3
-      entityreference := document.createEntityReference('iii');
-      test('document.createEntityReference',(entityreference <> nil));
-      entityreference := nil;
-    end;
   end;
+
+  //p=2
+  nodelist := document.getElementsByTagName('sometag');
+  if nodelist <> nil then begin
+    test('document.getElementsByTagName',(nodelist <> nil));
+    test('document.getElementsByTagName (length)',(nodelist.length = 1)) ;
+  end else begin
+    outLog('__document.getElementsByTagName doesn''t work!');
+  end;
+  nodelist := nil;
+
+  //p=2
+  dom := document.domImplementation;
+  test('document.domImplementation',(dom <> nil)) ;
+  dom := nil;
+
+  //p=2
+  cdata := document.createCDATASection('zzz');
+  test('document.createCDATASection',(cdata <> nil));
+  cdata := nil;
+
+  //p=2
+  try
+    comment := document.createComment('xxx');
+    test('document.createComment',(comment <> nil));
+    comment := nil;
+  except
+    outLog('__document.createComment doesn''t work!');
+  end;
+
+  //p=3
+  try
+    processinginstruction := document.createProcessingInstruction('qqq','www');
+    test('document.createProcessingInstruction',(processinginstruction <> nil));
+    processinginstruction := nil;
+  except
+    outLog('__document.createProcessingInstruction doesn''t work!');
+  end;
+
+  //p=3
+  documentfragment := document.createDocumentFragment;
+  test('document.createDocumentFragment',(documentfragment <> nil));
+  documentfragment := nil;
+
+  if vendorstr<>'LIBXML' then begin
+    //p=3
+    entityreference := document.createEntityReference('iii');
+    test('document.createEntityReference',(entityreference <> nil));
+    entityreference := nil;
+  end else begin
+    outLog('__document.createEntityReference doesn''t work!');
+  end;
+
+end;
+
+procedure TestElement0(filename,vendorstr:string;TestSet: integer);
+var
+  document:IDOMDocument;
+  element: IDOMElement;
+  attr: IDOMAttr;
+  nodelist: IDOMNodeList;
+  dom2: boolean;
+begin
+  document := getDoc(filename,vendorstr,TestSet);
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+  element := document.documentElement;
+  test('element.tagName',(element.tagName = 'test')) ;
+
+  element := nil;
+  element := document.createElement('eee');
+  attr := document.createAttribute('rrr');
+  attr := element.setAttributeNode(attr);
+  attr := nil;
+  attr := document.createAttribute('rrrVX');
+  attr.value:='hund';
+  attr := element.setAttributeNode(attr);
+  attr := nil;
+  attr := element.getAttributeNode('rrr');
+  test('element.getAttributeNode/setAttributeNode',(attr <> nil));
+  attr := nil;
+  attr := element.getAttributeNode('rrrVX');
+  test('element.getAttributeNode/setAttributeNode2',(attr.value='hund'));
+  attr:=nil;
+  attr := document.createAttribute('rrrVX');
+  attr.value:='hase';
+  attr := element.setAttributeNode(attr);
+  test('element.getAttributeNode/setAttributeNode3',(attr.value='hund'));
+  attr:=nil;
+  attr := element.getAttributeNode('rrrVX');
+  test('element.getAttributeNode/setAttributeNode4',(attr.value='hase'));
+  attr:=nil;
+  attr := nil;
+  element := nil;
+
+  //to do:
+  //add a test, where the attribute das exist, before setAttribute is called
+  element := document.createElement('ttt');
+  if dom2 then begin
+    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:loop');
+    attr := element.setAttributeNodeNS(attr);
+    attr := nil;
+    attr := element.getAttributeNodeNS('http://xmlns.4commerce.de/eva','loop');
+    test('element.getAttributeNodeNS/setAttributeNodeNS',(attr <> nil));
+    attr := nil;
+    element := nil;
+  end;
+  attr := document.createAttribute('loop');
+  element := document.createElement('iii');
+  attr := element.setAttributeNode(attr);
+  attr := nil;
+  test('element.setAttributeNode',(element.hasAttribute('loop')));
+  if dom2 then begin
+    element.removeAttributeNS('http://xmlns.4commerce.de/eva','loop');
+    test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
+    element := nil;
+    // setAttributeNodeNS
+    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:loop');
+    element := document.createElement('iii');
+    attr := element.setAttributeNodeNS(attr);
+    attr := nil;
+    test('element.setAttributeNodeNS2',(element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
+    element.removeAttributeNS('http://xmlns.4commerce.de/eva','loop');
+    test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
+  end;
+  element := nil;
+  element := document.documentElement;
+  nodelist := element.getElementsByTagName('sometag');
+  test('element.getElementsByTagName',(nodelist <> nil));
+  test('element.getElementsByTagName (length)',(nodelist.length = 1));
+  nodelist := nil;
+  element := nil;
+  attr := document.createAttribute('nop');
+  element := document.createElement('hub');
+  try
+    attr := element.setAttributeNode(attr);
+    attr := element.getAttributeNode('nop');
+    attr := element.removeAttributeNode(attr);
+    test('element.removeAttributeNode',(not element.hasAttribute('hub')));
+  except
+    outLog('__element.removeAttributeNode doesn''t work!');
+  end;
+  attr := nil;
+  element := nil;
+end;
+
+
+procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
+// shall Test every Method of GDOM2
 
   procedure TestNode1(filename,vendorstr:string);
   var
@@ -300,7 +328,9 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     i: integer;
     document: IDOMDocument;
     temp: string;
+    dom2: boolean;
   begin
+    if (testset and 512) = 512 then dom2:=true else dom2:=false;
     document:=nil;
     document := getDoc(filename,vendorstr);
     node := document.documentElement as IDOMNode;
@@ -425,6 +455,7 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
           Break;
         end;
       end;
+      childnode:=document.importNode(childnode,false);
       node.firstChild.appendChild(childnode);
       //node.firstChild.appendChild(childnode);
       for i := 0 to node.firstChild.childNodes.length-1 do begin
@@ -444,10 +475,14 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     end;
   end;
 
-  procedure TestNode2(document: IDOMDocument;vendorstr:string);
+  procedure TestNode2(filename,vendorstr:string);
   var
     node: IDOMNode;
+    dom2: boolean;
+    document: IDOMDocument;
   begin
+    document := getDoc(filename,vendorstr);
+    if (testset and 512) = 512 then dom2:=true else dom2:=false;
     node := document.createElement('urgs') as IDOMNode;
     test('node.prefix',(node.prefix = '')) ;
     test('node.namespaceUri',(node.namespaceURI = '')) ;
@@ -461,43 +496,14 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     node := nil;
   end;
 
+procedure TestDocType(filename,vendorstr:string);
 var
-  filename: string;
-  FDomPersist: IDOMPersist;
-  document: IDOMDocument;
-  element: IDOMElement;
-  node,node1: IDOMNode;
-  attlist: IDOMNamedNodeMap;
-  namednodemap: IDOMNamedNodeMap;
-  attr: IDOMAttr;
-  cdata: IDOMCDATASection;
-  documentElement: IDOMNode;
-  processinginstruction: IDOMProcessingInstruction;
-  text: IDOMText;
-  documenttype: IDOMDocumentType;
-  stringlist: TStringList;
-  temp: string;
+    document: IDOMDocument;
+    documentType: IDOMDocumentType;
+    namedNodeMap: IDOMNamedNodeMap;
+    temp: string;
 begin
-  // init
-
-  Form1.Memo1.Lines.Clear;
-  TestsOK:=0; //Number of passed Tests
-  stringlist := TStringList.Create;
-  filename := '..\data\'+name;
-  document := getDoc(filename,vendorstr,TestSet);
-
-  // testing document
-  TestDocument(document,vendorstr);
-  if document=nil then exit;
-
-  // testing element
-  TestElement(document,vendorstr);
-
-  // testing node, part 1
-  document:=nil;
   document := getDoc(filename,vendorstr);
-  TestNode1(filename,vendorstr);
-
   // testing documenttype
   documenttype:=document.doctype;
   test('document.docType',(documenttype <> nil));
@@ -526,30 +532,9 @@ begin
   end;
   // end
   document:=nil;
-  document := getDoc(filename,vendorstr);
-
-  // testing domimplementation
-
-  try
-    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','test');
-    test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
-    documenttype := nil;
-  except
-    outLog('__domImplementation.createDocument (NS) doesn''t work!');
-  end;
-
-  try
-    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','');
-    test('domImplementation.createDocumentType',(documenttype <> nil));
-    documenttype := nil;
-  except
-    outLog('__domImplementation.createDocumentType doesn''t work!');
-  end;
-
-  test('domImplementation.hasFeature',document.domImplementation.hasFeature('CORE','2.0'));
 
   // testing documenttype, part II
-
+  document := getDoc(filename,vendorstr);
   try
     documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','a','test');
     test('documentType.name',(documenttype.name = 'http://xmlns.4commerce.de/eva'));
@@ -563,9 +548,40 @@ begin
     outLog('__documentType.systemId doesn''t work!');
     outLog('__documentType.publicId doesn''t work!');
   end;
+end;
 
+procedure TestDomImpl(filename,vendorstr:string);
+var
+  document: IDOMDocument;
+  documentType: IDOMDocumentType;
+begin
+  document := getDoc(filename,vendorstr);
+  try
+    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','test');
+    test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
+    documenttype := nil;
+  except
+    outLog('__domImplementation.createDocument (NS) doesn''t work!');
+  end;
+  try
+    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','');
+    test('domImplementation.createDocumentType',(documenttype <> nil));
+    documenttype := nil;
+  except
+    outLog('__domImplementation.createDocumentType doesn''t work!');
+  end;
+  test('domImplementation.hasFeature',document.domImplementation.hasFeature('CORE','2.0'));
+end;
+
+procedure TestCDATA_PI_Text(filename,vendorstr:string);
+var
+  document: IDOMDocument;
+  cdata: IDOMCDataSection;
+  processingInstruction: IDOMProcessingInstruction;
+  text: IDOMText;
+begin
   // testing character data
-
+  document := getDoc(filename,vendorstr);
   cdata := document.createCDATASection('yyy');
   test('document.createCDATASection',(cdata <> nil));
   test('characterData.data (get)',(cdata.data = 'yyy'));
@@ -581,7 +597,7 @@ begin
   cdata.replaceData(1,3,'bbb');
   test('characterData.replaceData',(cdata.data = 'zbbbzz'));
   cdata := nil;
- 
+
   // testing processingInstruction
 
   processinginstruction := document.createProcessingInstruction('abc','def');
@@ -591,6 +607,7 @@ begin
   //test pi.setdata
   processinginstruction := nil;
 
+  // testing text
   try
     // testing text
     text := document.createTextNode('blabla');
@@ -600,8 +617,19 @@ begin
   except
     OutLog('__text.splitText doesn''t work!');
   end;
+end;
 
-  // testing namedNodeMap
+procedure TestNamedNodemap(filename,vendorstr:string);
+var
+  document: IDOMDocument;
+  documentElement: IDOMElement;
+  namedNodeMap: IDOMNamedNodeMap;
+  node,node1: IDOMNode;
+  dom2: boolean;
+  len: integer;
+begin
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+  document := getDoc(filename,vendorstr);
   documentElement:= document.documentElement;
   namednodemap := documentElement.attributes;
   if namednodemap<>nil
@@ -613,13 +641,19 @@ begin
   node := namednodemap.setNamedItem(node);
   node := nil;
 
+  len:= namednodemap.length;
   node := namednodemap.getNamedItem('age');
   test('namedNodeMap.getNamedItem/setNamedItem',(node.nodeValue = '13'));
 
   node1 := document.createAttribute('sex') as IDOMNode;
-  node1.nodeValue:='male';
-  node1.nodeName;
+  node1.nodeValue:='female';
   node1 := namednodemap.setNamedItem(node1);
+  len:= namednodemap.length;
+
+  node1 := document.createAttribute('sex') as IDOMNode;
+  node1.nodeValue:='male';
+  node1 := namednodemap.setNamedItem(node1);
+  len:= namednodemap.length;
   if node1<> nil
     then begin
       test('namedNodeMap.setNamedItemII',(namedNodeMap[1].nodeValue = 'male'));
@@ -631,23 +665,36 @@ begin
   test('namedNodeMap.removeNamedItem',(namednodemap.length = 0));
   node := nil;
   namednodemap := nil;
-  try
-    namednodemap := document.documentElement.attributes;
-    node := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:age') as IDOMNode;
-    node.nodeValue := '13';
-    node := namednodemap.setNamedItemNS(node);
-    node := nil;
-    node := namednodemap.getNamedItemNS('http://xmlns.4commerce.de/eva','age');
-    test('namedNodeMap.getNamedItemNS/setNamedItemNS',(node.nodeValue = '13'));
-    node := namednodemap.removeNamedItemNS('http://xmlns.4commerce.de/eva','age');
-    test('namedNodeMap.removeNamedItemNS',(namednodemap.length = 0));
-    node := nil;
-    namednodemap := nil;
-  except
-    OutLog('__namedNodeMap.getNamedItemNS/setNamedItemNS doesn''t work!');
-    OutLog('__namedNodeMap.removeNamedItemNS doesn''t work!');
-  end;
-  // testing element
+  if dom2 then
+    try
+      namednodemap := document.documentElement.attributes;
+      node := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:age') as IDOMNode;
+      node.nodeValue := '13';
+      node := namednodemap.setNamedItemNS(node);
+      node := nil;
+      node := namednodemap.getNamedItemNS('http://xmlns.4commerce.de/eva','age');
+      test('namedNodeMap.getNamedItemNS/setNamedItemNS',(node.nodeValue = '13'));
+      node := namednodemap.removeNamedItemNS('http://xmlns.4commerce.de/eva','age');
+      test('namedNodeMap.removeNamedItemNS',(namednodemap.length = 0));
+      node := nil;
+      namednodemap := nil;
+    except
+      OutLog('__namedNodeMap.getNamedItemNS/setNamedItemNS doesn''t work!');
+      OutLog('__namedNodeMap.removeNamedItemNS doesn''t work!');
+    end;
+end;
+
+procedure TestElement1(filename,vendorstr:string);
+var
+  document: IDOMDocument;
+  element:  IDOMElement;
+  attlist:  IDOMNamedNodeMap;
+  node:     IDOMNode;
+  attr:     IDOMAttr;
+  dom2:  boolean;
+begin
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+  document := getDoc(filename,vendorstr);
   element := document.documentElement.firstChild as IDOMElement;
   test('element-interface of Node',(element <> nil));
   test('element.tagName',(element.tagName = 'sometag'));
@@ -658,15 +705,19 @@ begin
   test('element.getAttribute/setAttribute',(element.getAttribute('test') = 'hallo welt'));
   element := nil;
 
-  element := document.documentElement.firstChild as IDOMElement;
-  element.setAttributeNS('http://xmlns.4commerce.de/eva','eva:sulze','wabbelig');
-  test('element.getAttributeNS/setAttributeNS',(element.getAttributeNS('http://xmlns.4commerce.de/eva','sulze') = 'wabbelig'));
+  if dom2 then begin
+    element := document.documentElement.firstChild as IDOMElement;
+    element.setAttributeNS('http://xmlns.4commerce.de/eva','eva:sulze','wabbelig');
+    test('element.getAttributeNS/setAttributeNS',(element.getAttributeNS('http://xmlns.4commerce.de/eva','sulze') = 'wabbelig'));
+  end;
 
   element := nil;
   attlist := document.documentElement.firstChild.attributes;
 
   test('namedNodeMap',(attlist <> nil)) ;
-  test('namedNodeMap.length',(attlist.length = 3)) ;
+  if dom2
+    then test('namedNodeMap.length',(attlist.length = 3))
+    else test('namedNodeMap.length',(attlist.length = 2)) ;
   test('namedNodeMap.item[i]',(attlist.item[0].nodeName = 'name')) ;
   attlist := document.documentElement.firstChild.attributes;
   node := attlist.item[0];
@@ -686,37 +737,94 @@ begin
   test('element.removeAttribute',(not element.hasAttribute('name'))) ;
   element := nil;
 
-  attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');
-  element := document.documentElement;
-  element.setAttributeNodeNS(attr);
-  attr := nil;
+  if dom2 then begin
+    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');
+    element := document.documentElement;
+    element.setAttributeNodeNS(attr);
+    attr := nil;
 
-  test('element.hasAttributeNS/setAttributeNodeNS',element.hasAttributeNS('http://xmlns.4commerce.de/eva','name1'));
-  element := nil;
+    test('element.hasAttributeNS/setAttributeNodeNS',element.hasAttributeNS('http://xmlns.4commerce.de/eva','name1'));
+    element := nil;
+  end;
+end;
 
-  // testing node, part 2
-  //document:=nil;
-  //document := getDoc(filename,vendorstr);
-  TestNode2(document,vendorstr);
+var
+  filename: string;
+  FDomPersist: IDOMPersist;
+  document: IDOMDocument;
+  element: IDOMElement;
+  node: IDOMNode;
+  attlist: IDOMNamedNodeMap;
+  documentElement: IDOMNode;
+  stringlist: TStringList;
+  temp: string;
+  dom2: boolean;
+begin
+  // init
 
-  document.documentElement.setAttributeNS('http://xmlns.4commerce.de/eva','eva:test','huhu');
+  Form1.Memo1.Lines.Clear;
+  TestsOK:=0; //Number of passed Tests
+  stringlist := TStringList.Create;
+  filename := '..\data\'+name;
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+
+  // testing document
+  if (testset and 2) = 2
+     then TestDocument(filename,vendorstr,testset);
+
+  // testing element
+  if (testset and 4) = 4
+    then begin
+      TestElement0(filename,vendorstr,testset);
+      TestElement1(filename,vendorstr);
+    end;
+
+  // testing node, part 1
+  if (testset and 8) = 8
+    then begin
+      TestNode1(filename,vendorstr);
+      if dom2
+        then TestNode2(filename,vendorstr);
+    end;
+
+  // testing documentType
+  if (testset and 16) = 16
+    then TestDocType(filename,vendorstr);
+
+  // testing domImpl
+  if (testset and 32) =32
+    then TestDomImpl(filename,vendorstr);
+
+  // testing domImpl
+  if (testset and 64) =64
+    then TestCDATA_PI_Text(filename,vendorstr);
+
+  // testing namedNodeMap
+  if (testset and 128) =128
+    then TestNamedNodemap(filename,vendorstr);
+
+
+  //document.documentElement.setAttributeNS('http://xmlns.4commerce.de/eva','eva:test','huhu');
 
   // testing IDOMPersist
+  if (testset and 256) =256 then begin
+    document := nil;
+    document := getDoc(filename,vendorstr,TestSet);
+    FDomPersist := document as IDomPersist;
+    FDomPersist.save('..\data\saved.xml');
+    //todo: test .xml with large xml-file
+    //outLog(FDomPersist.xml);
+    FDomPersist:=nil;
 
-  FDomPersist := document as IDomPersist;
-  FDomPersist.save('..\data\saved.xml');
-  //todo: test .xml with large xml-file
-  //outLog(FDomPersist.xml);
-  FDomPersist:=nil;
-
-  document := getEmptyDoc(vendorstr);
-  (document as IDOMParseOptions).validate := False;
-  //(document as IDomPersist).loadxml('<?xml version="1.0" encoding="iso-8859-1"?><aaa />');
-  (document as IDomPersist).loadxml('<?xml version="1.0" ?><aaa />');
-  IF document.documentElement<>nil
-    then test('IDOMPersist.loadxml',(document.documentElement.nodeName = 'aaa'))
-    else outLog('__ERROR__ IDOMPersist.loadxml => failed');
-  document := nil;
+    document := getEmptyDoc(vendorstr);
+    (document as IDOMParseOptions).validate := False;
+    //(document as IDomPersist).loadxml('<?xml version="1.0" encoding="iso-8859-1"?><aaa />');
+    (document as IDomPersist).loadxml('<?xml version="1.0" ?><aaa />');
+    IF document.documentElement<>nil
+      then test('IDOMPersist.loadxml',(document.documentElement.nodeName = 'aaa'))
+      else outLog('__ERROR__ IDOMPersist.loadxml => failed');
+    document := nil;
+  end;
 
 
   // --- end of tests, beautify results ---
@@ -738,16 +846,44 @@ begin
 end;
 
 function TestGDom3(name,vendorstr:string;TestSet:integer):double;
-var testCount: integer;
+var
+  testCount: integer;
+  dom2: boolean;
 begin
   StartTimer;
   TestGdom3b(name,vendorstr,TestSet);
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  testCount:=115;
+  //testCount:=115-22-13-16-24-6-14-3-11-5-1;
+  testCount:=0;
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+
   if (TestSet and 1) = 1
     then inc(testCount);
+  if (TestSet and 2) = 2
+    then if dom2
+      then testCount:=testCount+22
+      else testCount:=testCount+18;
+  if (TestSet and 4) = 4
+    then if dom2
+      then testCount:=testCount+13+16
+      else testCount:=testCount+13+16-6;
+  if (TestSet and 8) = 8
+    then if dom2
+      then testCount:=testCount+25+6
+      else testCount:=testCount+25;
+  if (TestSet and 16) = 16
+    then testCount:=testCount+14;
+  if (TestSet and 32) = 32
+    then testCount:=testCount+3;
+  if (TestSet and 64) = 64
+    then testCount:=testCount+11;
+  if (TestSet and 128) = 128
+    then testCount:=testCount+5;
+  if (TestSet and 256) = 256
+    then testCount:=testCount+1;
+
   outLog('Number of tests total:    '+inttostr(TestCount));
   //outLog('doccount='+inttostr(doccount));
   //outLog('nodecount='+inttostr(nodecount));

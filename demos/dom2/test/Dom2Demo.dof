@@ -41,7 +41,7 @@ MaxStackSize=1048576
 ImageBase=4194304
 ExeDescription=
 [Directories]
-OutputDir=P:\dom2\@Program
+OutputDir=P:\dom2\Program
 UnitOutputDir=P:\dom2\@Compiled
 PackageDLLOutputDir=
 PackageDCPOutputDir=
@@ -56,6 +56,10 @@ HostApplication=
 Launcher=
 UseLauncher=0
 DebugCWD=
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
 [Version Info]
 IncludeVerInfo=0
 AutoIncBuild=0
@@ -102,8 +106,9 @@ Item1=P:\demos_dom2_test\@Compiled
 Item2=P:\dom2_demo\@Compiled
 Item3=P:\libxml_test4\@Compiled
 [HistoryLists\hlOutputDirectorry]
-Count=4
-Item0=P:\dom2\@Program
-Item1=P:\demos_dom2_test\Program
-Item2=P:\dom2_demo\Program
-Item3=P:\libxml_test4\Program
+Count=5
+Item0=P:\dom2\Program
+Item1=P:\dom2\@Program
+Item2=P:\demos_dom2_test\Program
+Item3=P:\dom2_demo\Program
+Item4=P:\libxml_test4\Program

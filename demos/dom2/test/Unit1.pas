@@ -27,6 +27,20 @@ type
     Button1: TButton;
     Test1: TCheckBox;
     Label2: TLabel;
+    Test2: TCheckBox;
+    Test3: TCheckBox;
+    Test4: TCheckBox;
+    Test5: TCheckBox;
+    Test6: TCheckBox;
+    Test7: TCheckBox;
+    Test8: TCheckBox;
+    Test9: TCheckBox;
+    dom2: TCheckBox;
+    TestDocument5000: TButton;
+    Button3: TButton;
+    Button5: TButton;
+    Button8: TButton;
+    Button10: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -38,6 +52,9 @@ type
     procedure Button9Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
+    procedure TestDocument5000Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button10Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -111,13 +128,29 @@ begin
   EnableOutput.Checked:=true;
   TestSet:=0;
   if Test1.Checked then TestSet:=1;
+  if Test2.Checked then TestSet:=TestSet+2;
+  if Test3.Checked then TestSet:=TestSet+4;
+  if Test4.Checked then TestSet:=TestSet+8;
+  if Test5.Checked then TestSet:=TestSet+16;
+  if Test6.Checked then TestSet:=TestSet+32;
+  if Test7.Checked then TestSet:=TestSet+64;
+  if Test8.Checked then TestSet:=TestSet+128;
+  if Test9.Checked then TestSet:=TestSet+256;
+  if dom2.Checked then TestSet:=TestSet+512;
   TestGDom3('test.xml',GetVendorStr,TestSet);
 end;
 
 procedure TForm1.Button8Click(Sender: TObject);
 begin
-  OutLog('Disabled!');
-  //Native2;
+  test1.Checked:=true;
+  test2.Checked:=true;
+  test3.Checked:=true;
+  test4.Checked:=true;
+  test5.Checked:=true;
+  test6.Checked:=true;
+  test7.Checked:=true;
+  test8.Checked:=true;
+  test9.Checked:=true;
 end;
 
 function GetVendorStr: string;
@@ -135,6 +168,15 @@ begin
   EnableOutput.Checked:=false;
   TestSet:=0;
   if Test1.Checked then TestSet:=1;
+  if Test2.Checked then TestSet:=TestSet+2;
+  if Test3.Checked then TestSet:=TestSet+4;
+  if Test4.Checked then TestSet:=TestSet+8;
+  if Test5.Checked then TestSet:=TestSet+16;
+  if Test6.Checked then TestSet:=TestSet+32;
+  if Test7.Checked then TestSet:=TestSet+64;
+  if Test8.Checked then TestSet:=TestSet+128;
+  if Test9.Checked then TestSet:=TestSet+256;
+  if dom2.Checked then TestSet:=TestSet+512;
   time:=0;
   OutDebugLog('Start!');
   for i:=1 to 100 do
@@ -173,6 +215,65 @@ begin
   for i:=1 to 100 do
     time:=time+TestDom2(Combobox1.Text,GetVendorStr);
   outDebugLog('Everage time: '+format('%8.1f',[time*1000/100])+' ms');
+end;
+
+procedure TForm1.TestDocument5000Click(Sender: TObject);
+var
+  testset: integer;
+  i,j: integer;
+begin
+  Memo1.lines.Clear;
+  EnableOutput.Checked:=false;
+  TestSet:=0;
+  if Test1.Checked then TestSet:=1;
+  if Test2.Checked then TestSet:=TestSet+2;
+  if Test3.Checked then TestSet:=TestSet+4;
+  if Test4.Checked then TestSet:=TestSet+8;
+  if Test5.Checked then TestSet:=TestSet+16;
+  if Test6.Checked then TestSet:=TestSet+32;
+  if Test7.Checked then TestSet:=TestSet+64;
+  if Test8.Checked then TestSet:=TestSet+128;
+  if Test9.Checked then TestSet:=TestSet+256;
+  for i:=1 to 100 do begin
+    for j:=1 to 100 do TestDocument('..\data\test.xml',GetVendorStr,TestSet);
+    OutDebugLog('Passed OK: '+inttostr(i*100));
+  end;
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+var
+  testset: integer;
+  i,j: integer;
+begin
+  Memo1.lines.Clear;
+  EnableOutput.Checked:=false;
+  TestSet:=0;
+  if Test1.Checked then TestSet:=1;
+  if Test2.Checked then TestSet:=TestSet+2;
+  if Test3.Checked then TestSet:=TestSet+4;
+  if Test4.Checked then TestSet:=TestSet+8;
+  if Test5.Checked then TestSet:=TestSet+16;
+  if Test6.Checked then TestSet:=TestSet+32;
+  if Test7.Checked then TestSet:=TestSet+64;
+  if Test8.Checked then TestSet:=TestSet+128;
+  if Test9.Checked then TestSet:=TestSet+256;
+  for i:=1 to 100 do begin
+    for j:=1 to 100 do TestElement0('..\data\test.xml',GetVendorStr,TestSet);
+    OutDebugLog('Passed OK: '+inttostr(i*100));
+  end;
+end;
+
+procedure TForm1.Button10Click(Sender: TObject);
+begin
+  test1.Checked:=false;
+  test2.Checked:=false;
+  test3.Checked:=false;
+  test4.Checked:=false;
+  test5.Checked:=false;
+  test6.Checked:=false;
+  test7.Checked:=false;
+  test8.Checked:=false;
+  test9.Checked:=false;
 end;
 
 end.
