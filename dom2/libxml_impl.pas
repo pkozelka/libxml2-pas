@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.9 2002-02-11 20:34:50 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.10 2002-02-11 20:41:34 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -255,7 +255,16 @@ type
 
   { TLDOMDocumentType class }
 
-  TLDOMDocumentType = class(TLDOMNode)
+  TLDOMDocumentType = class(TLDOMNode, IDomDocumentType, IDomNode)
+  private
+    function GetGDocumentType: xmlDtdPtr;
+  protected //IDomDocumentType
+    function IDomDocumentType.get_name = get_nodeName;
+    function get_entities: IDomNamedNodeMap;
+    function get_notations: IDomNamedNodeMap;
+    function get_publicId: DomString;
+    function get_systemId: DomString;
+    function get_internalSubset: DomString;
   end;
 
 //overridable implementations
@@ -270,14 +279,14 @@ var
     TLDOMProcessingInstruction,
     TLDOMComment,
     nil, //TGDOMDocument,
-    nil, //TGDOMDocumentType,
+    TLDOMDocumentType,
     TLDOMDocumentFragment,
     nil, //TGDOMNotation,
     nil, //TGDOMDocument,
-    nil, //TGDOMDocumentType,
+    TLDOMDocumentType,
     nil,
     nil,
-    nil //TGDOMEntity
+    TLDOMEntity
   );
 
 
@@ -1257,6 +1266,43 @@ end;
 function TLDOMEntity.get_systemId: DomString;
 begin
   DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+{ TLDOMDocumentType }
+
+function TLDOMDocumentType.get_entities: IDomNamedNodeMap;
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+function TLDOMDocumentType.get_internalSubset: DomString;
+var
+  buff: xmlBufferPtr;
+begin
+  buff := xmlBufferCreate();
+  xmlNodeDump(buff,nil,xmlNodePtr(GetGDocumentType),0,0);
+  Result := UTF8Decode(buff.content);
+  xmlBufferFree(buff);
+end;
+
+function TLDOMDocumentType.get_notations: IDomNamedNodeMap;
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+function TLDOMDocumentType.get_publicId: DomString;
+begin
+  Result := UTF8Decode(GetGDocumentType.ExternalID);
+end;
+
+function TLDOMDocumentType.get_systemId: DomString;
+begin
+  Result := UTF8Decode(GetGDocumentType.SystemID);
+end;
+
+function TLDOMDocumentType.GetGDocumentType: xmlDtdPtr;
+begin
+  Result := xmlDtdPtr(GNode);
 end;
 
 end.
