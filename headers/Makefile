@@ -9,4 +9,4 @@ bin:
 	utils/mkrelease.sh bin
 	
 checkapi:
-	utils/checkapi.sh $(GNOMECVSROOT) src/*.inc
+	utils/checkapi.sh $(GNOMECVSROOT) src/lib*.inc
