@@ -1,3 +1,4 @@
+#!/bin/sh
 # Uploads a file to the 'incoming' dir at sourceforge upload ftp server
 #
 # Args:
