@@ -111,8 +111,8 @@ type
   xmlRefTablePtr = ^xmlRefTable;
 
 (* Allocate/Release Validation Contexts *)
-function  xmlNewValidCtxt: xmlValidCtxtPtr;
-procedure xmlFreeValidCtxt(validCtxtPtr: xmlValidCtxtPtr); 
+function  xmlNewValidCtxt: xmlValidCtxtPtr; cdecl; external LIBXML2_SO;
+procedure xmlFreeValidCtxt(validCtxtPtr: xmlValidCtxtPtr); cdecl; external LIBXML2_SO; 
 
 (* Notation *)
 function  xmlAddNotationDecl(ctxt: xmlValidCtxtPtr; dtd: xmlDtdPtr; name: PxmlChar; PublicID: PxmlChar; SystemID: PxmlChar): xmlNotationPtr; cdecl; external LIBXML2_SO;
