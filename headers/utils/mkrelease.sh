@@ -171,21 +171,21 @@ function compile()
 
 	if $CYGWIN; then
 		prepareWin32Src
-		archName=$HEADERS_DIR/libxml2-pas-$LIBXML_VER-$DV.zip
+		archName=libxml2-pas-$LIBXML_VER-$DV.zip
 		pack="zip -qr "
 	else
 		prepareLinuxSrc
-		archName=$HEADERS_DIR/libxml2-pas-$LIBXML_VER-$DV.tgz
-		pack="tar -zcf $HEADERS_DIR/libxml2-pas-$LIBXML_VER-$DV.tgz "
+		archName=libxml2-pas-$LIBXML_VER-$DV.tgz
+		pack="tar zcf "
 	fi
 	for fn in *.pas libxml2_pas.dpk; do
 		echo "Compiling $fn:"
 		$DCC -H -Q -N. -E. $fn | grep -i 'error\|warning\|hint'
 	done
 	rm -f libxml2_pas.dcu $archName
-	cp *.dcp *.bpl *.dcu *.so $DIST/lib
+	mv -f *.dcp *.bpl *.dcu *.so $DIST/lib 2>/dev/null
 	cd $DIST
-	$pack $archName lib
+	$pack $HEADERS_DIR/$archName lib *.txt COPYING*
 	cd $pwd
 }
 
