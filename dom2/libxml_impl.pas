@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.14 2002-02-12 00:18:04 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.15 2002-02-12 00:21:22 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -379,9 +379,6 @@ var
 
 //temporarily exposed:
 function  GetDomObject(aNode: pointer): IUnknown;
-function  GetGNode(const aNode: IDomNode): xmlNodePtr;
-procedure RegisterFlyingNode(aNode: xmlNodePtr);
-procedure UnregisterFlyingNode(aNode: xmlNodePtr);
 
 implementation
 
