@@ -1602,7 +1602,6 @@ end;
 function TMSXMLElement.getElementsByTagNameNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomNodeList;
-var  msNodeList : IXMLDOMNodeList;
 begin
   (fMSElement.ownerDocument as IXMLDomDocument2).setProperty('SelectionNamespaces',
     'xmlns:xyz4ct='''+namespaceURI+'''');

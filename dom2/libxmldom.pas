@@ -339,7 +339,9 @@ type
 
   IDomInternal = interface
     ['{E9D505C3-D354-4D19-807A-8B964E954C09}']
+
     {managing the list of nodes and attributes, that must be freed manually}
+
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
@@ -996,8 +998,6 @@ begin
 end;
 
 destructor TGDOMNode.destroy;
-var
-  attr:xmlAttrPtr;
 begin
   // Nodes, created with documentCreateXXX, must
   // be freed manually, if they were not appended
@@ -1422,11 +1422,9 @@ end;
 
 function TGDOMElement.setAttributeNode(const newAttr: IDOMAttr):IDOMAttr;
 var
-  attr,xmlnewAttr,oldattr: xmlAttrPtr;
-  value:pchar;
-  temp: string;
-  node: xmlNodePtr;
-  ok: integer;
+	attr,xmlnewAttr,oldattr: xmlAttrPtr;
+	temp: string;
+	node: xmlNodePtr;
 begin
   if newAttr<>nil then begin
     xmlnewAttr:=xmlAttrPtr(GetGNode(newAttr));     // Get the libxml2-Attribute
@@ -1457,16 +1455,13 @@ end;
 
 function TGDOMElement.removeAttributeNode(const oldAttr: IDOMAttr):IDOMAttr;
 var
-  attr,xmlnewAttr,oldattr1: xmlAttrPtr;
-  value:pchar;
-  temp: string;
-  node: xmlNodePtr;
-  ok: integer;
+	attr,xmlnewAttr,oldattr1: xmlAttrPtr;
+	node: xmlNodePtr;
 begin
-  if oldAttr<>nil then begin
-    xmlnewAttr:=xmlAttrPtr(GetGNode(oldAttr));     // Get the libxml2-Attribute
-    node:=xmlNodePtr(GElement);
-    oldattr1:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
+	if oldAttr<>nil then begin
+		xmlnewAttr:=xmlAttrPtr(GetGNode(oldAttr));     // Get the libxml2-Attribute
+		node:=xmlNodePtr(GElement);
+		oldattr1:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
     if oldattr1<>nil then begin
       attr:=node.properties;                         // if not, then oldattr=nil
       if attr=oldattr1
@@ -2613,21 +2608,36 @@ end;
 
 procedure TGDOMDocument.removeAttr(attr: xmlAttrPtr);
 begin
+
   if attr<>nil
+
     then FAttrList.Remove(attr);
+
 end;
+
+
 
 procedure TGDOMDocument.appendAttr(attr: xmlAttrPtr);
 begin
+
   if attr<>nil
+
     then FAttrList.add(attr);
+
 end;
+
+
 
 procedure TGDOMDocument.appendNode(node: xmlNodePtr);
 begin
+
   if node<>nil
+
     then FNodeList.add(node);
+
 end;
+
+
 
 initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
