@@ -27,8 +27,8 @@ document                    createProcessingInstr. 3
 document                    createTextNode         1             X                                                                
 document                    documentElement        1             X                                                                
 document                    getElementByID         2                    jk: not able to test now                              
-document                    getElementsByTagName   2                                                                             
-document                    getElementsByTagNameNS 2                                                                             
+document                    getElementsByTagName   2             X                                                                
+document                    getElementsByTagNameNS 2             X                                                                
 document                    importNode             2                   
 document                    domImplementation      2             X                                                                 
 document                    docType                2             X         
@@ -51,7 +51,7 @@ element                     getAttributeNS         1             X
 element                     getAttributeNode       1             X                                                               
 element                     getAttributeNodeNS     1             X                                                               
 element                     getElementsByTagName   2             X                                                               
-element                     getElementsByTagNameNS 2                                                                             
+element                     getElementsByTagNameNS 2             X                                                                
 element                     hasAttribute           1             X                                                                
 element                     hasAttributeNS         1             X                                                                
 element                     normalize              2             X      more tests neccessary                                                                
@@ -67,13 +67,13 @@ entity                      notationName           3
 entity                      publicID               3                   
 entity                      systemID               3                   
 namedNodeMap                getNamedItem           3             X                                                                
-namedNodeMap                getNamedItemNS         3                                                                             
+namedNodeMap                getNamedItemNS         3             X                                                                
 namedNodeMap                item                   3             X                                                                
 namedNodeMap                length                 3             X                                                                
-namedNodeMap                removeNamedItem        3                                                                             
-namedNodeMap                removeNamedItemNS      3                                                                             
+namedNodeMap                removeNamedItem        3             X                                                                
+namedNodeMap                removeNamedItemNS      3             X                                                                
 namedNodeMap                setNamedItem           3             X                                                                
-namedNodeMap                setNamedItemNS         3                                                                             
+namedNodeMap                setNamedItemNS         3             X                                                                
 node                        OwnerDocument          2             X                                                                
 node                        appendChild            1             X                                                                
 node                        attributes             1             X                                                                
@@ -112,4 +112,4 @@ Summary:
 43 high priority methods
 all done
 
-78 methods done totally       
+84 methods done totally       
