@@ -278,6 +278,14 @@ function  xmlXPathNewContext(doc:xmlDocPtr):xmlXPathContextPtr;cdecl;external LI
 procedure xmlXPathFreeContext(ctxt:xmlXPathContextPtr);cdecl;external LIBXML2_SO;
 
 {
+from xmlXpathInternals
+}
+//int		   xmlXPathRegisterNs		(xmlXPathContextPtr ctxt,
+//						 const xmlChar *prefix,
+//						 const xmlChar *ns_uri);
+function xmlXPathRegisterNs(ctxt:xmlXPathContextPtr;prefix,ns_uri:PxmlChar):longint;cdecl;external LIBXML2_SO;
+
+{
 	Evaluation functions.
 }
 function  xmlXPathEval(str:PxmlChar; ctxt:xmlXPathContextPtr):xmlXPathObjectPtr;cdecl;external LIBXML2_SO;
