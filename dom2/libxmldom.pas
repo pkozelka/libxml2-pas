@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.103 2002-01-31 21:18:33 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.104 2002-02-07 21:01:49 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -128,7 +128,7 @@ type
   protected //IDomNodeSelect
     function  selectNode(const nodePath: DomString): IDomNode;
     function  selectNodes(const nodePath: DomString): IDomNodeList;
-    procedure RegisterNS(const prefix,URI: DomString);
+    procedure RegisterNS(const prefix, namespaceURI: DomString);
   protected //IDomOutput
     function  get_xml: DomString;
   protected //ready for IDomElement, IDomDocument
@@ -1205,9 +1205,14 @@ begin
   xmlBufferFree(buf);
 end;
 
-procedure TGDOMNode.RegisterNS(const prefix, URI: DomString);
+procedure TGDOMNode.RegisterNS(const prefix, namespaceURI: DomString);
+//var uprefix, uuri: String;
 begin
-//todo
+//  uprefix := UTF8Encode(prefix);
+//  uuri := UTF8Encode(namespaceURI);
+//  checkNsName(uprefix, 'test', uuri);
+//  xmlXPathRegisterNs(ctxt, uprefix, uuri);
+//  xmlXPathRegisteredNsCleanup(ctxt);
 end;
 
 function TGDOMNode.isAncestorOrSelf(aNode: xmlNodePtr): boolean;
@@ -2073,17 +2078,27 @@ procedure TGDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
     for i:=FFlyingNodes.Count-1 downto 0 do begin
       p := FFlyingNodes[i];
       node := p;
-      node._private := nil;
+      if (node._private<>nil) then begin
+        TGDOMNode(node._private).FGNode := nil;
+        node._private := nil;
+      end;
       case node.type_ of
       XML_HTML_DOCUMENT_NODE,
       XML_DOCB_DOCUMENT_NODE,
       XML_DOCUMENT_NODE:
         DomAssert(false, -1, 'This node may never be flying');
       XML_ATTRIBUTE_NODE:
-        xmlFreeProp(p);
+        begin
+          xmlUnlinkNode(p);
+          xmlFreeProp(p);
+        end;
       XML_DTD_NODE:
-        xmlFreeDtd(p);
+        begin
+          xmlUnlinkNode(p);
+          xmlFreeDtd(p);
+        end;
       else
+        xmlUnlinkNode(p);
         xmlFreeNode(p);
       end;
     end;
@@ -2117,7 +2132,7 @@ begin
     aNewDoc._private := self;
   end else begin
 // for some strange reason, the following line makes troubles
-//		_DestroyFlyingNodes;
+		_DestroyFlyingNodes;
   end;
   FGNode := xmlNodePtr(aNewDoc);
   if (old<>nil) then begin
