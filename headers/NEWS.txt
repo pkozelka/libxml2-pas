@@ -1,15 +1,16 @@
 ********************************************************************
 *************************  LATEST CHANGES  *************************
 ********************************************************************
-libxml2-pas 2.4.30:
+libxml2-pas 2.5.2:
 -------------------
 - translated new file: xmlreader.h
+- translated new file: relaxng.h
 
-libxslt-pas 1.0.23:
+libxslt-pas 1.0.24:
 -------------------
 - translated new file: security.h
 
-libexslt-pas 0.7.14:
+libexslt-pas 0.7.15:
 -------------------
 [unchanged]
 

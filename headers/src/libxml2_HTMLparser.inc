@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/HTMLparser.h:1.27:
+// CVS-REV:gnome-xml/include/libxml/HTMLparser.h:1.28:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -28,19 +28,26 @@ type
   htmlNodePtr = xmlNodePtr;
 
   (*
-   * Internal description of an HTML element.
+   * Internal description of an HTML element, representing HTML 4.01
+   * and XHTML 1.0 (which share the same structure).
    *)
   htmlElemDescPtr = ^htmlElemDesc;
   htmlElemDesc = record
-    name: PChar;                    { The tag name  }
-    startTag: Char;                 { Whether the start tag can be implied  }
-    endTag: Char;                   { Whether the end tag can be implied  }
-    saveEndTag: Char;               { Whether the end tag should be saved  }
-    empty: Char;                    { Is this an empty element ?  }
-    depr: Char;                     { Is this a deprecated element ?  }
-    dtd: Char;                      { 1: only in Loose DTD, 2: only Frameset one  }
-    isinline: Char;                 { is this a block 0 or inline 1 element  }
-    desc: PChar;                    { the description  }
+    name: PChar;                    (* The tag name *)
+    startTag: Char;                 (* Whether the start tag can be implied *)
+    endTag: Char;                   (* Whether the end tag can be implied *)
+    saveEndTag: Char;               (* Whether the end tag should be saved *)
+    empty: Char;                    (* Is this an empty element ? *)
+    depr: Char;                     (* Is this a deprecated element ? *)
+    dtd: Char;                      (* 1: only in Loose DTD, 2: only Frameset one *)
+    isinline: Char;                 (* is this a block 0 or inline 1 element *)
+    desc: PChar;                    (* the description *)
+    subelts : ^PChar;               (* allowed sub-elements of this element *)
+    defaultsubelt : PChar;          (* subelement for suggested auto-repair
+                                       if necessary or NULL *)
+    attrs_opt : ^PChar;             (* Optional Attributes *)
+    attrs_depr : ^PChar;            (* Additional deprecated attributes *)
+    attrs_req : ^PChar;             (* Required attributes *)
   end;
 
   (*
@@ -48,9 +55,9 @@ type
    *)
   htmlEntityDescPtr = ^htmlEntityDesc;
   htmlEntityDesc = record
-    value: DWORD;                   { the UNICODE value for the character  }
-    name: PChar;                    { The entity name  }
-    desc: PChar;                    { the description  }
+    value: DWORD;                   (* the UNICODE value for the character *)
+    name: PChar;                    (* The entity name *)
+    desc: PChar;                    (* the description *)
   end;
 
 (*
@@ -80,4 +87,29 @@ function  htmlHandleOmittedElem(val: Longint): Longint; cdecl; external LIBXML2_
 procedure htmlFreeParserCtxt(ctxt: htmlParserCtxtPtr); cdecl; external LIBXML2_SO;
 function  htmlCreatePushParserCtxt(sax: htmlSAXHandlerPtr; user_data: Pointer; chunk: PChar; size: Longint; filename: PChar; enc: xmlCharEncoding): htmlParserCtxtPtr; cdecl; external LIBXML2_SO;
 function  htmlParseChunk(ctxt: htmlParserCtxtPtr; chunk: PChar; size: Longint; terminate: Longint): Longint; cdecl; external LIBXML2_SO;
+(* NRK/Jan2003: further knowledge of HTML structure
+ *)
+
+
+type
+  htmlStatus = Integer;
+const
+  HTML_NA           = 0;    (* something we don't check at all *)
+  HTML_INVALID      = $1;
+  HTML_DEPRECATED   = $2;
+  HTML_VALID        = $4;
+  HTML_REQUIRED     = $c;   (* VALID bit set so ( & HTML_VALID ) is TRUE *)
+(* Using htmlElemDesc rather than name here, to emphasise the fact
+   that otherwise there's a lookup overhead
+*)
+function htmlAttrAllowed(_para1: PhtmlElemDesc; _para2: PxmlChar; _para3: Longint): htmlStatus; cdecl; external LIBXML2_SO;
+function htmlElementAllowedHere(_para1: PhtmlElemDesc; _para2: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function htmlElementStatusHere(_para1: PhtmlElemDesc; _para2: PhtmlElemDesc): htmlStatus; cdecl; external LIBXML2_SO;
+function htmlNodeStatus(_para1: htmlNodePtr; _para2: Longint): htmlStatus; cdecl; external LIBXML2_SO;
+{TODO: translate macros
+#define htmlDefaultSubelement(elt) elt->defaultsubelt
+#define htmlElementAllowedHereDesc(parent,elt) \
+	htmlElementAllowedHere((parent), (elt)->name)
+#define htmlRequiredAttrs(elt) (elt)->attrs_req
+}
 

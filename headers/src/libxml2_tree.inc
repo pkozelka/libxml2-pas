@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.118:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.119:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -571,6 +571,7 @@ function  xmlCopyNamespaceList(cur: xmlNsPtr): xmlNsPtr; cdecl; external LIBXML2
  *)
 function  xmlSetProp(node: xmlNodePtr; name: PxmlChar; value: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
 function  xmlGetProp(node: xmlNodePtr; name: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlGetNoNsProp(node: xmlNodePtr; name: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlHasProp(node: xmlNodePtr; name: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
 function  xmlHasNsProp(node: xmlNodePtr; name: PxmlChar; nameSpace: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
 function  xmlSetNsProp(node: xmlNodePtr; ns: xmlNsPtr; name: PxmlChar; value: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
