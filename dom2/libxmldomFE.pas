@@ -502,6 +502,9 @@ begin
   if Node <> nil
     then begin
       nodeType:=Node.type_;
+      //change xml_entity_decl to TGDOMEntity
+      if nodeType=17
+        then nodeType:=6;
       Result := NodeClasses[nodeType].Create(Node,ADocument)
     end
     else Result := nil;
@@ -663,6 +666,8 @@ begin
       Result := '#cdata-section';
     XML_DOCUMENT_FRAG_NODE:
       Result := '#document-fragment';
+    XML_ENTITY_DECL:
+      Result:= '#text';
     XML_TEXT_NODE,
     XML_COMMENT_NODE:
       Result := '#'+UTF8Decode(FGNode.name);
@@ -1688,6 +1693,7 @@ var
   tmp,last:xmlNsPtr;
 begin
   result:=false;
+  last:=nil;
   if element.type_<> Element_Node then exit;
   tmp:=element.nsDef;
   while tmp<> nil do begin
@@ -1769,7 +1775,6 @@ constructor TGDOMDocument.create(
                const namespaceURI, qualifiedName: DOMString;
                doctype: IDOMDocumentType);
 var
-  name2: TGdomString;
   root:xmlNodePtr;
   ns: TGDOMNamespace;
   alocalName: widestring;
@@ -1999,18 +2004,17 @@ begin
 end;
 
 function TGDOMDocument.createEntityReference(const name: DOMString): IDOMEntityReference;
-//var
-  //name1: TGdomString;
-  //AEntityReference: PGdomeEntityReference;
+var
+  name1: TGdomString;
+  AEntityReference: xmlNodePtr;
 begin
-  checkError(NOT_SUPPORTED_ERR);
-  {name1:=TGdomString.create(name);
-  AEntityReference:=gdome_doc_createEntityReference(FPGdomeDoc,name1.GetPString,@exc);
-  CheckError(exc);
+  //checkError(NOT_SUPPORTED_ERR);
+  name1:=TGdomString.create(name);
+  AEntityReference:=xmlNewReference(FPGdomeDoc,name1.CString);
   name1.free;
   if AEntityReference<>nil
-    then result:=TGDOMEntityReference.Create(xmlNodePtr(AEntityReference),self)
-    else result:=nil;}
+    then result:=TGDOMEntityReference.Create(AEntityReference,self)
+    else result:=nil;
 end;
 
 function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList;
@@ -2100,7 +2104,17 @@ var
   AElement: xmlNodePtr;
   ns: TGDOMNamespace;
   temp:string;
+  alocalName:widestring;
 begin
+  alocalName:=localName(qualifiedName);
+  if (prefix(qualifiedName)='xml') and (namespaceURI<>'http://www.w3.org/XML/1998/namespace')
+    then checkError(NAMESPACE_ERR);
+  if (((Pos(':',alocalName))>0)
+    or ((length(namespaceURI))=0) and ((Pos(':',qualifiedName))>0))
+      then checkError(NAMESPACE_ERR);
+  if qualifiedName<>''
+    then if not IsXmlName(qualifiedName)
+      then checkError(INVALID_CHARACTER_ERR);
   ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName,self);
   AElement:=xmlNewDocNode(FPGdomeDoc,ns.NS,ns.localName.CString,nil);
   temp:=AElement.ns.href;
@@ -2199,12 +2213,21 @@ end;
 
 procedure TGDOMDocument.set_resolveExternals(Value: Boolean);
 begin
-  FResolveExternals:=true;
+  if value
+    then xmlSubstituteEntitiesDefault(1)
+    else xmlSubstituteEntitiesDefault(0);
+//  if value
+//    then xmlSubstituteEntitiesDefaultValue^:=1
+//    else xmlSubstituteEntitiesDefaultValue^:=0;
+  FResolveExternals:=value;
 end;
 
 procedure TGDOMDocument.set_validate(Value: Boolean);
 begin
-  Fvalidate:=true;
+  if value
+    then xmlDoValidityCheckingDefaultValue^:=1
+    else xmlDoValidityCheckingDefaultValue^:=0;
+  Fvalidate:=value;
 end;
 
 // IDOMPersist
@@ -2263,6 +2286,10 @@ begin
   xmlFreeDoc(FPGdomeDoc);
   inherited Destroy;
   //FPGdomeDoc:=xmlParseMemory(temp.CString,length(temp.CString));
+  //if FresolveExternals
+    //then self.set_resolveExternals(true);
+  //if Fvalidate
+    //then self.set_validate(true);
   FPGdomeDoc:=xmlParseDoc(temp.CString);
   temp.free;
   if FPGdomeDoc<>nil
@@ -2638,19 +2665,14 @@ var
   name1,name3: TGdomString;
   prefix: string;
   alocalName: string;
-  temp: integer;
 begin
   FOwnerDoc:=OwnerDoc;
   name1:=TGdomString.create(namespaceURI);
   prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
-  //IF length(prefix)=0
-    //then checkError(NAMESPACE_ERR);
   FqualifiedName:=TGdomString.create(qualifiedName);
   alocalName:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
     length(qualifiedName)-length(prefix)-1));
   localName:=TGdomString.create(alocalname);
-  temp:=(Pos(':',alocalName));
-
   name3:=TGdomString.create(prefix);
   ns := xmlNewNs(node, name1.CString, name3.CString);
   name1.free;
@@ -2753,6 +2775,7 @@ function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
 begin
   result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
   (result as IDOMParseOptions).validate:=true;
+  (result as IDOMParseOptions).resolveExternals:=true;
   (result as IDOMPersist).loadxml(xml);
 end;
 
@@ -2798,8 +2821,6 @@ end;
 
 constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation; aUrl: DomString);
 var
-  root:xmlNodePtr;
-  tmp: xmlNodePtr;
   fn: string;
 begin
   FGdomimpl:=GDOMImpl;
