@@ -60,15 +60,22 @@ type
 {$I libxml_nanohttp.inc}
 {$I libxml_uri.inc}
 
+procedure xmlFree(str: PxmlChar); overload;
+procedure xmlFree(cur: xmlNodePtr);cdecl;external LIBXML2_SO name 'xmlFreeNode'; overload;
+procedure xmlFree(cur: xmlDocPtr);cdecl;external LIBXML2_SO name 'xmlFreeDoc'; overload;
+procedure xmlFree(cur: xmlDtdPtr);cdecl;external LIBXML2_SO name 'xmlFreeDtd'; overload;
+procedure xmlFree(uri: xmlURIPtr);cdecl;external LIBXML2_SO name 'xmlFreeURI'; overload;
+procedure xmlFree(cur: xmlAttrPtr);cdecl;external LIBXML2_SO name 'xmlFreeProp'; overload;
+procedure xmlFree(cur: xmlNsPtr);cdecl;external LIBXML2_SO name 'xmlFreeNs'; overload;
+
 implementation
 
 {$I libxml_xpath_IMPL.inc}
 
+procedure xmlFree(str: PxmlChar);
+begin
+	FreeMem(PChar(str));
+end;
+
 end.
-
-
-
-
-
-
 
