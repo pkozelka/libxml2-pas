@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.79 2002-01-21 22:15:37 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.80 2002-01-23 09:58:56 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -328,7 +328,7 @@ type
   end;
 
   { TGDOMDocument }
-  
+
   TGDOMDocument = class(TGDOMNode, IDomDocument, IDomParseOptions, IDomPersist, IDomNode)
   private
     FGDOMImpl: IDomImplementation;
@@ -630,6 +630,27 @@ begin
   if (idx>0) then begin
     doc.FlyingNodes.Delete(idx);
   end;
+end;
+
+(**
+ * [ This function will later be submitted in C to xml@gnome.org
+ *   Note that order-preserving implementation will have to be posted.
+ *   ]
+ * Sets an existing attribute node into an element property list.
+ * Returns the previous attribute or NULL.
+ *)
+function xmlSetPropNode(elem: xmlNodePtr; attr: xmlAttrPtr): xmlAttrPtr;
+begin
+  if (attr.ns=nil) then begin
+    Result := xmlHasProp(elem, attr.name);
+  end else begin
+    Result := xmlHasNsProp(elem, attr.name, attr.ns.href);
+  end;
+  if (Result<>nil) then begin
+    xmlUnlinkNode(xmlNodePtr(Result));
+  end;
+  xmlAddChild(elem, xmlNodePtr(attr));
+  elem.nsDef := attr.ns; //DIRTY  
 end;
 
 { TGDomDocumentBuilderFactory }
@@ -1434,7 +1455,7 @@ var
 begin
   attr := xmlHasProp(FGNode, PChar(UTF8Encode(name)));
   if attr <> nil then begin
-    xmlRemoveProp(attr);
+    xmlUnlinkNode(xmlNodePtr(attr));
     RegisterFlyingNode(xmlNodePtr(attr));
   end;
 end;
@@ -1486,14 +1507,13 @@ procedure TGDOMElement.removeAttributeNS(const namespaceURI, localName: DomStrin
 var
   attr: xmlAttrPtr;
   uns, ulocal: String;
-  ok: integer;
 begin
   uns := UTF8Encode(localName);
   ulocal := UTF8Encode(namespaceURI);
-  attr := xmlHasNSProp(FGNode, PChar(uns), PChar(ulocal));
+  attr := xmlHasNsProp(FGNode, PChar(uns), PChar(ulocal));
   if (attr <> nil) then begin
-    ok:=xmlRemoveProp(attr);
-    DomAssert(ok=0, 103); //???
+    xmlUnlinkNode(xmlNodePtr(attr));
+    RegisterFlyingNode(xmlNodePtr(attr));
   end;
 end;
 
@@ -1507,12 +1527,16 @@ begin
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
+{$define EXPERIMENTAL}
 function TGDOMElement.setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
 var
   attr, newa, olda: xmlAttrPtr;
 begin
   if newAttr<>nil then begin
     newa := xmlAttrPtr(GetGNode(newAttr));
+{$ifdef EXPERIMENTAL}
+    xmlSetPropNode(FGNode, newa);
+{$else}
     if (newa.ns=nil) then begin
       olda := xmlHasProp(FGNode, newa.name);
     end else begin
@@ -1540,6 +1564,7 @@ begin
       UnregisterFlyingNode(xmlNodePtr(newa));
       Result := GetDomObject(olda) as IDomAttr;
     end;
+{$endif}
   end else begin
     Result := nil;
   end;
