@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xpathInternals.h:1.32:
+// CVS-REV:gnome-xml/include/libxml/xpathInternals.h:1.33:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -443,6 +443,7 @@ function  xmlXPathNewNodeSetList(val: xmlNodeSetPtr): xmlXPathObjectPtr; cdecl; 
 function  xmlXPathWrapNodeSet(val: xmlNodeSetPtr): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
 function  xmlXPathWrapExternal(val: Pointer): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
 function  xmlXPathEqualValues(ctxt: xmlXPathParserContextPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlXPathNotEqualValues(ctxt: xmlXPathParserContextPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlXPathCompareValues(ctxt: xmlXPathParserContextPtr; inf: Longint; strict: Longint): Longint; cdecl; external LIBXML2_SO;
 procedure xmlXPathValueFlipSign(ctxt: xmlXPathParserContextPtr); cdecl; external LIBXML2_SO;
 procedure xmlXPathAddValues(ctxt: xmlXPathParserContextPtr); cdecl; external LIBXML2_SO;

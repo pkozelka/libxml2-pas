@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/c14n.h:1.1:
+// CVS-REV:gnome-xml/include/libxml/c14n.h:1.2:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -41,7 +41,17 @@
  *    ctxt->replaceEntities = 1;
  *    ...
  *)
+
+
 function  xmlC14NDocSaveTo (doc: xmlDocPtr; nodes: xmlNodeSetPtr; exclusive: Longint; inclusive_ns_prefixes: PPxmlChar; with_comments: Longint; buf: xmlOutputBufferPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlC14NDocDumpMemory (doc: xmlDocPtr; nodes: xmlNodeSetPtr; exclusive: Longint; inclusive_ns_prefixes: PPxmlChar; with_comments: Longint; doc_txt_ptr: PPxmlChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlC14NDocSave (doc: xmlDocPtr; nodes: xmlNodeSetPtr; exclusive: Longint; inclusive_ns_prefixes: PPxmlChar; with_comments: Longint; filename: PChar; compression: Longint): Longint; cdecl; external LIBXML2_SO;
+
+(**
+ * This is the core C14N function
+ *)
+type
+  xmlC14NIsVisibleCallback = function (user_data: Pointer; node: xmlNodePtr; parent: xmlNodePtr): Longint; cdecl;
+
+function xmlC14NExecute(doc: xmlDocPtr; is_visible_callback: xmlC14NIsVisibleCallback; user_data: Pointer; exclusive: Longint; inclusive_ns_prefixes: PPxmlChar; with_comments: Longint; buf: xmlOutputBufferPtr): Longint; cdecl; external LIBXML2_SO;
 

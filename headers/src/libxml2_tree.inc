@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.110:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.111:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -285,6 +285,7 @@ type
     nodetype: xmlNsType;            (* global or local  *)
     href: PxmlChar;                 (* URL for the namespace  *)
     prefix: PxmlChar;               (* prefix for the namespace  *)
+    _private: Pointer;              (* application data *)
   end;
 
   (**

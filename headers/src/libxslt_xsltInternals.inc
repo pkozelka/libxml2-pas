@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltInternals.h:1.66:
+// CVS-REV:libxslt/libxslt/xsltInternals.h:1.67:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,14 +30,17 @@ const
    * XSLT_PAT_NO_PRIORITY:
    *
    * Specific value for pattern without priority expressed.
-  *)
+   *)
   XSLT_PAT_NO_PRIORITY = -(12345789);
 
   (**
    * xsltRuntimeExtra:
    *
    * Extra information added to the transformation context.
-  *)
+   *)
+/// #define XSLT_RUNTIME_EXTRA_LST(ctxt, nr) (ctxt)->extras[(nr)].info
+/// #define XSLT_RUNTIME_EXTRA_FREE(ctxt, nr) (ctxt)->extras[(nr)].deallocate
+/// #define XSLT_RUNTIME_EXTRA(ctxt, nr) (ctxt)->extras[(nr)].val
 
 type
   xsltStylesheetPtr=^xsltStylesheet;
@@ -67,7 +70,7 @@ type
    * xsltDecimalFormat:
    *
    * Data structure of decimal-format.
-  *)
+   *)
   xsltDecimalFormatPtr = ^xsltDecimalFormat;
   xsltDecimalFormat = record
     next: xsltDecimalFormatPtr;                  (* chained list *)
@@ -91,7 +94,7 @@ type
    * xsltDocument:
    *
    * Data structure associated to a parsed document.
-  *)
+   *)
   xsltDocumentPtr = ^xsltDocument;
   xsltDocument = record
     next: xsltDocumentPtr;                       (* documents are kept in a chained list *)
@@ -107,7 +110,7 @@ type
    *
    * The in-memory structure corresponding to element precomputed data,
    * designed to be extended by extension implementors.
-  *)
+   *)
   xsltElemPreCompPtr = ^xsltElemPreComp;
 
   (**
@@ -119,7 +122,7 @@ type
    *
    * Signature of the function associated to elements part of the
    * stylesheet language like xsl: if or xsl: apply-templates.
-  *)
+   *)
   xsltTransformFunction = procedure(ctxt: xsltTransformContextPtr; node, inst: xmlNodePtr; comp: xsltElemPreCompPtr); cdecl;
 
   xsltStyleType = (
@@ -151,7 +154,7 @@ type
    * @comp: the #xsltElemPreComp to free up
    *
    * Deallocates an #xsltElemPreComp structure.
-  *)
+   *)
   xsltElemPreCompDeallocator = procedure(comp: xsltElemPreCompPtr); cdecl;
 
   (**
@@ -159,7 +162,7 @@ type
    *
    * The in-memory structure corresponding to element precomputed data,
    * designed to be extended by extension implementors.
-  *)
+   *)
   xsltElemPreComp = record
     next: xsltElemPreCompPtr;                    (* chained list *)
     type_: xsltStyleType;                        (* type of the element *)
@@ -174,7 +177,7 @@ type
    *
    * The in-memory structure corresponding to XSLT stylesheet constructs
    * precomputed data.
-  *)
+   *)
   xsltStylePreCompPtr = ^xsltStylePreComp;
   xsltStylePreComp = record
     next: xsltElemPreCompPtr;                    (* chained list *)
@@ -183,7 +186,7 @@ type
     inst: xmlNodePtr;                            (* the instruction *)
     (*
      * Pre computed values
-    *)
+     *)
     stype: PxmlChar;                             (* sort *)
     has_stype: Longint;                          (* sort *)
     number: Longint;                             (* sort *)
@@ -214,7 +217,7 @@ type
   (*
    * The in-memory structure corresponding to an XSLT Variable
    * or Param.
-  *)
+   *)
   xsltStackElemPtr = ^xsltStackElem;
   xsltStackElem = record
     next: xsltStackElemPtr;                      (* chained list *)
@@ -243,7 +246,7 @@ type
     docList: xsltDocumentPtr;                    (* the include document list *)
     (*
      * General data on the style sheet document.
-    *)
+     *)
     doc: xmlDocPtr;                              (* the parsed XML stylesheet *)
     stripSpaces: xmlHashTablePtr;                (* the hash table of the strip-space and
                                                     preserve space elements *)
@@ -251,11 +254,11 @@ type
     cdataSection: xmlHashTablePtr;               (* the hash table of the cdata-section *)
     (*
      * Global variable or parameters.
-    *)
+     *)
     variables: xsltStackElemPtr;                 (* linked list of param and variables *)
     (*
      * Template descriptions.
-    *)
+     *)
     templates: xsltTemplatePtr;                  (* the ordered list of templates *)
     templatesHash: Pointer;                      (* hash table or wherever compiled templates
                                                         informations are stored *)
@@ -269,24 +272,24 @@ type
     commentMatch: Pointer;                       (* template based on comment() *)
     (*
      * Namespace aliases.
-    *)
+     *)
     nsAliases: xmlHashTablePtr;                  (* the namespace alias hash tables *)
     (*
      * Attribute sets.
-    *)
+     *)
     attributeSets: xmlHashTablePtr;              (* the attribute sets hash tables *)
     (*
      * Namespaces.
-    *)
+     *)
     nsHash: xmlHashTablePtr;                     (* the set of namespaces in use *)
     nsDefs: Pointer;                             (* the namespaces defined *)
     (*
      * Key definitions.
-    *)
+     *)
     keys: Pointer;                               (* key definitions *)
     (*
      * Output related stuff.
-    *)
+     *)
     method: PxmlChar;                            (* the output method *)
     methodURI: PxmlChar;                         (* associated namespace if any *)
     version: PxmlChar;                           		(* version string *)
@@ -294,7 +297,7 @@ type
     omitXmlDeclaration: Longint;                 (* omit-xml-declaration = "yes" | "no" *)
     (*
      * Number formatting.
-    *)
+     *)
     decimalFormat: xsltDecimalFormatPtr;
     standalone: Longint;                         (* standalone = "yes" | "no" *)
     doctypePublic: PxmlChar;                     (* doctype-public string *)
@@ -303,7 +306,7 @@ type
     mediaType: PxmlChar;                         (* media-type string *)
     (*
      * Precomputed blocks.
-    *)
+     *)
     preComps: xsltElemPreCompPtr;                (* list of precomputed blocks *)
     warnings: Longint;                           (* number of warnings found at compilation *)
     errors: Longint;                             (* number of errors found at compilation *)
@@ -314,14 +317,14 @@ type
     _private: Pointer;                           (* user defined data *)
     (*
      * Extensions.
-    *)
+     *)
     extInfos: xmlHashTablePtr;                   (* the extension data *)
     extrasNr: Longint;                           (* the number of extras required *)
   end;
 
   (*
    * The in-memory structure corresponding to an XSLT Transformation.
-  *)
+   *)
   xsltOutputType = (
     XSLT_OUTPUT_XML = 0,
     XSLT_OUTPUT_HTML,
@@ -348,7 +351,7 @@ type
     varsBase: Longint;                           (* the var base for current templ *)
     (*
      * Extensions
-    *)
+     *)
     extFunctions: xmlHashTablePtr;               (* the extension functions *)
     extElements: xmlHashTablePtr;                (* the extension elements *)
     extInfos: xmlHashTablePtr;                   (* the extension data *)
@@ -365,7 +368,7 @@ type
     state: xsltTransformState;                   (* the current state *)
     (*
      * Global variables
-    *)
+     *)
     globalVars: xmlHashTablePtr;                 (* the global variables and params *)
     inst: xmlNodePtr;                            (* the instruction in the stylesheet *)
     xinclude: Longint;                           (* should XInclude be processed *)
