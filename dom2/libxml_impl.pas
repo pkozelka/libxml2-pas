@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.24 2002-02-25 22:18:25 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.25 2002-02-27 19:53:48 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -376,6 +376,21 @@ type
     function get_internalSubset: DomString;
   end;
 
+  { TLDomElementDecl class }
+
+  TLDomElementDecl = class(TLDomNode, IDomNode)
+  private
+  protected
+  end;
+
+  { TLDomAttributeDecl class }
+
+  TLDomAttributeDecl = class(TLDomNode, IDomNode)
+  private
+  protected
+  end;
+
+
   { TLDOMImplementation class }
 
   TLDomImplementationClass = class of TLDomImplementation;
@@ -449,8 +464,8 @@ var
     TLDomNotation, //XML_NOTATION_NODE
     TLDomDocument, //XML_HTML_DOCUMENT_NODE
     TLDomDocumentType, //XML_DTD_NODE
-    nil, //XML_ELEMENT_DECL
-    nil, //XML_ATTRIBUTE_DECL
+    TLDomElementDecl, //XML_ELEMENT_DECL
+    TLDomAttributeDecl, //XML_ATTRIBUTE_DECL
     TLDomEntity, //XML_ENTITY_DECL
     nil, //XML_NAMESPACE_DECL,
     nil, //XML_XINCLUDE_START,
@@ -804,11 +819,16 @@ begin
   XML_TEXT_NODE,
   XML_COMMENT_NODE:
     Result := '#'+UTF8Decode(FGNode.name);
+  XML_ELEMENT_NODE,
+  XML_ATTRIBUTE_NODE:
+    begin
+      Result := UTF8Decode(FGNode.name);
+      if (FGNode.ns<>nil) and (FGNode.ns.prefix<>nil) then begin
+        Result := UTF8Decode(FGNode.ns.prefix)+':'+Result;
+      end;
+    end;
   else
     Result := UTF8Decode(FGNode.name);
-    if (FGNode.ns<>nil) and (FGNode.ns.prefix<>nil) then begin
-      Result := UTF8Decode(FGNode.ns.prefix)+':'+Result;
-    end;
   end;
 end;
 
