@@ -7,14 +7,28 @@ TAG="`echo $LIBNAME\_$VERSION | tr [:lower:] [:upper:] | sed 's/\./_/g'`"
 MYTMP=./$TAG.tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
 
+TP=$1
+
+case "$TP" in
+  zip)
+	ARCHIVEFILE=$RELEASENAME.zip
+	CMD="zip -qr ../$ARCHIVEFILE *"
+	;;
+  tgz)
+	ARCHIVEFILE=$RELEASENAME.tgz
+	CMD="tar -zcf ../$ARCHIVEFILE *"
+	;;
+  *)
+  	echo "use one argument: tgz or zip"
+  	exit -1
+esac
 
 echo "Extracting $LIBNAME-pas from CVS tag $TAG ..."
 rm -rf $MYTMP
 cvs -z4 -d $CVSROOT export -r $TAG -d $MYTMP .
 
-ARCHIVEFILE=$RELEASENAME.tgz
 echo "Preparing archive $ARCHIVEFILE ..."
 rm -f $ARCHIVEFILE
 cd $MYTMP
-tar -zcf ../$ARCHIVEFILE *
+$CMD
 cd ..
