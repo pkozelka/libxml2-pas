@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/numbersInternals.h:1.10:
+// CVS-REV:libxslt/libxslt/numbersInternals.h:1.11:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,7 +30,8 @@ type
     format: PxmlChar;
     has_format: Longint;
     digitsPerGroup: Longint;
-    groupingCharacter: xmlChar;
+    groupingCharacter: Longint;
+    groupingCharacterLen: Longint;
     doc: xmlDocPtr;
     node: xmlNodePtr;
   end;

@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/keys.h:1.4:
+// CVS-REV:libxslt/libxslt/keys.h:1.5:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

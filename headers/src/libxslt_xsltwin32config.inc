@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltwin32config.h:1.26:
+// CVS-REV:libxslt/libxslt/xsltwin32config.h:1.27:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -20,21 +20,21 @@ const
    *
    * the version string like "1.2.3"
    *)
-  LIBXSLT_DOTTED_VERSION = '1.0.21';
+  LIBXSLT_DOTTED_VERSION = '1.0.22';
 
   (**
    * LIBXSLT_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBXSLT_VERSION = 10021;
+  LIBXSLT_VERSION = 10022;
 
   (**
    * LIBXSLT_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-  LIBXSLT_VERSION_STRING = '10021';
+  LIBXSLT_VERSION_STRING = '10022';
 
 (**
  * WITH_XSLT_DEBUG:

@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltInternals.h:1.67:
+// CVS-REV:libxslt/libxslt/xsltInternals.h:1.69:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -386,6 +386,10 @@ type
     extras: xsltRuntimeExtraPtr;                 (* extra per runtime informations *)
 
     styleList: xsltDocumentPtr;                  (* the stylesheet docs list *)
+    sec: Pointer;                                (* the security preferences if any *)
+
+    error: xmlGenericErrorFunc;		               (* a specific error handler *)
+    errctx: Pointer;                             (* context for the error handler *)
   end;
 
 (**

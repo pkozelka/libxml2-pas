@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltutils.h:1.29:
+// CVS-REV:libxslt/libxslt/xsltutils.h:1.31:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -86,6 +86,7 @@
  * Our own version of namespaced atributes lookup.
  *)
 function xsltGetNsProp(node: xmlNodePtr; const name, namespace: PxmlChar): PxmlChar; cdecl; external LIBXSLT_SO;
+function xsltGetUTF8Char(utf: PChar; len: PLongint): PxmlChar; cdecl; external LIBXSLT_SO;
 
 (*
  * XSLT specific error and debug reporting functions.
@@ -100,6 +101,8 @@ procedure xsltPrintErrorContext(ctxt: xsltTransformContextPtr; style: xsltStyles
 procedure xsltMessage(ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr); cdecl; external LIBXSLT_SO;
 procedure xsltSetGenericErrorFunc(ctx: Pointer; handler: xmlGenericErrorFunc); cdecl; external LIBXSLT_SO;
 procedure xsltSetGenericDebugFunc(ctx: Pointer; handler: xmlGenericErrorFunc); cdecl; external LIBXSLT_SO;
+procedure xsltSetTransformErrorFunc(ctxt: xsltTransformContextPtr; ctx: Pointer; handler: xmlGenericErrorFunc); cdecl; external LIBXSLT_SO;
+procedure xsltTransformError(ctxt: xsltTransformContextPtr; style: xsltStylesheetPtr; node: xmlNodePtr; msg: PChar); cdecl; {$IFDEF HAS_VA} varargs; {$ENDIF} external LIBXML2_SO;
 
 (*
  * Sorting.

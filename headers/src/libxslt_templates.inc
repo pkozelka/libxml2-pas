@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/templates.h:1.9:
+// CVS-REV:libxslt/libxslt/templates.h:1.10:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -24,4 +24,5 @@ function xsltTemplateProcess(ctxt: xsltTransformContextPtr; node: xmlNodePtr): P
 function xsltAttrListTemplateProcess(ctxt: xsltTransformContextPtr; target: xmlNodePtr; cur: xmlAttrPtr): xmlAttrPtr; cdecl; external LIBXSLT_SO;
 function xsltAttrTemplateProcess(ctxt: xsltTransformContextPtr; target: xmlNodePtr; attr: xmlAttrPtr): xmlAttrPtr; cdecl; external LIBXSLT_SO;
 function xsltAttrTemplateValueProcess(ctxt: xsltTransformContextPtr; attr: PxmlChar): PxmlChar; cdecl; external LIBXSLT_SO;
+function xsltAttrTemplateValueProcessNode(ctxt: xsltTransformContextPtr; str: PxmlChar; node: xmlNodePtr): PxmlChar; cdecl; external LIBXSLT_SO;
 
