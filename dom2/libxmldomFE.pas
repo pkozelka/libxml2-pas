@@ -56,7 +56,7 @@ uses
     unicode,
   {$endif}
   classes,
-  xdom2,
+  idom2,
   libxml2,
   libxslt,
   sysutils;
@@ -2487,15 +2487,13 @@ var
   ctxt: xmlParserCtxtPtr;
   root: xmlNodePtr;
 begin
+  result:=true;
   fn:=source;
   {$ifdef WIN32}
     fn := UTF8Encode(StringReplace(source, '\', '\\', [rfReplaceAll]));
   {$else}
     fn := aUrl;
   {$endif}
-  xmlFreeDoc(FPGdomeDoc);
-  //FPGdomeDoc:=xmlParseFile(pchar(fn));
-  FPGdomeDoc:=nil;
   xmlInitParser();
   ctxt := xmlCreateFileParserCtxt(PChar(fn));
   if (ctxt <> nil) then begin
@@ -2509,20 +2507,25 @@ begin
     //todo: async (separate thread)
     //todo: resolveExternals
     xmlParseDocument(ctxt);
-    if (ctxt.wellFormed<>0) then begin
-      FPGdomeDoc := ctxt.myDoc;
-    end else begin
-      xmlFreeDoc(ctxt.myDoc);
-      ctxt.myDoc := nil;
-    end;
+    if (ctxt.wellFormed<>0) then
+      if not Fvalidate or (ctxt.valid<>0)
+        then begin
+          xmlFreeDoc(FPGdomeDoc);
+          inherited Destroy;
+          FPGdomeDoc := ctxt.myDoc
+        end
+        else begin
+          xmlFreeDoc(ctxt.myDoc);
+          ctxt.myDoc := nil;
+          result:=false;
+        end;
     xmlFreeParserCtxt(ctxt);
   end;
-  if FPGdomeDoc<>nil
+  if result
     then
       begin
         root:= xmlNodePtr(FPGdomeDoc);
         inherited create(root,nil);
-        result:=true
       end
     else result:=false;
 end;
@@ -3371,8 +3374,28 @@ end;
 
 procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
   var output: WideString);
+var
+  doc:       xmlDocPtr;
+  styleDoc:  xmlDocPtr;
+  outputDoc: xmlDocPtr;
+  styleNode: xmlNodePtr;
+  tempXSL:   xsltStylesheetPtr;
+  encoding:  pchar;
+  length:    longInt;
+  CString:   pchar;
 begin
-
+  doc:=FGNode.doc;
+  styleNode:=GetGNode(stylesheet);
+  styleDoc:=styleNode.doc;
+  if (styleDoc=nil) or (doc=nil) then exit;
+  tempXSL:=xsltParseStyleSheetDoc(styleDoc);
+  if tempXSL=nil then exit;
+  outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
+  if outputDoc=nil then exit;
+  encoding:=outputDoc.encoding;
+  xmlDocDumpMemoryEnc(outputDoc,CString,@length,encoding);
+  output:=CString;
+  xmlFree(CString);
 end;
 
 procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
