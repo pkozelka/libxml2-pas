@@ -4,10 +4,7 @@
   
    See Copyright for the status of this software.
   
-   daniel@veillard.com
-  
-   14 Nov 2000 ht - added redefinition of xmlBufferWriteChar for VMS
-  
+	 daniel@veillard.com
 }
 
 {
