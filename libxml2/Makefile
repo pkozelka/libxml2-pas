@@ -25,6 +25,9 @@ i-cvsexport:
 	cvs -z4 -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
 
 tgz:
+	make $(I_VERSION) i-tgz\
+
+i-tgz:
 	cd $(MYTMP);tar -zcf ../$(ARCHIVE).tgz *;cd ..
 
 zip:
