@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.22] xmlmemory.h
+// CVS-SIGN: [1.23] xmlmemory.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -29,20 +29,14 @@
 {$endif}
 {$endif}
 
-{
-	 DEBUG_MEMORY_LOCATION:
-
-	 DEBUG_MEMORY_LOCATION should be activated only when debugging
-	 libxml i.e. if libxml has been configured with --with-debug-mem too
-}
+(**
+ * DEBUG_MEMORY_LOCATION:
+ *
+ * DEBUG_MEMORY_LOCATION should be activated only when debugging
+ * libxml i.e. if libxml has been configured with --with-debug-mem too
+ *)
 
 {$ifdef DEBUG}
-(**
- * MEM_LIST:
- *
- * keep track of all allocated blocks for error reporting
- *)
-{$define MEM_LIST} (* keep a list of all the allocated memory blocks *)
 {$endif}
 
 type
