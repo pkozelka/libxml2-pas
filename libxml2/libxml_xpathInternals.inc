@@ -367,8 +367,8 @@ procedure xmlXPathRegisterFuncLookup(ctxt: xmlXPathContextPtr; f: xmlXPathFuncLo
  * Error reporting
  *)
 procedure xmlXPatherror(ctxt: xmlXPathParserContextPtr; filename: PChar; line: Longint; no: Longint); cdecl; external LIBXML2_SO;
-procedure xmlXPathDebugDumpObject(var output: TextFile; cur: xmlXPathObjectPtr; depth: Longint); cdecl; external LIBXML2_SO;
-procedure xmlXPathDebugDumpCompExpr(var output: TextFile; comp: xmlXPathCompExprPtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlXPathDebugDumpObject(output: PLibXml2File; cur: xmlXPathObjectPtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlXPathDebugDumpCompExpr(output: PLibXml2File; comp: xmlXPathCompExprPtr; depth: Longint); cdecl; external LIBXML2_SO;
 
 (**
  * NodeSet handling

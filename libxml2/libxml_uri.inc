@@ -47,7 +47,7 @@ function  xmlBuildURI(URI: PxmlChar; base: PxmlChar): PxmlChar; cdecl; external 
 function  xmlParseURI(str: PChar): xmlURIPtr; cdecl; external LIBXML2_SO;
 function  xmlParseURIReference(uri: xmlURIPtr; str: PChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlSaveUri(uri: xmlURIPtr): PxmlChar; cdecl; external LIBXML2_SO;
-procedure xmlPrintURI(var stream: TextFile; uri: xmlURIPtr); cdecl; external LIBXML2_SO;
+procedure xmlPrintURI(stream: PLibXml2File; uri: xmlURIPtr); cdecl; external LIBXML2_SO;
 function  xmlURIEscapeStr(str: PxmlChar; list: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlURIUnescapeString(str: PChar; len: Longint; target: PChar): PChar; cdecl; external LIBXML2_SO;
 function  xmlNormalizeURIPath(path: PChar): Longint; cdecl; external LIBXML2_SO;

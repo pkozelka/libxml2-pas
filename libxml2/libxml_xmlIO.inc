@@ -141,7 +141,7 @@ procedure xmlCleanupOutputCallbacks; cdecl; external LIBXML2_SO;
 procedure xmlRegisterDefaultInputCallbacks; cdecl; external LIBXML2_SO;
 function  xmlAllocParserInputBuffer(enc: xmlCharEncoding): xmlParserInputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlParserInputBufferCreateFilename(URI: PChar; enc: xmlCharEncoding): xmlParserInputBufferPtr; cdecl; external LIBXML2_SO;
-function  xmlParserInputBufferCreateFile(var file_: TextFile; enc: xmlCharEncoding): xmlParserInputBufferPtr; cdecl; external LIBXML2_SO;
+function  xmlParserInputBufferCreateFile(aFile: PLibXml2File; enc: xmlCharEncoding): xmlParserInputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlParserInputBufferCreateFd(fd: Longint; enc: xmlCharEncoding): xmlParserInputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlParserInputBufferCreateMem(mem: PChar; size: Longint; enc: xmlCharEncoding): xmlParserInputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlParserInputBufferCreateIO(ioread: xmlInputReadCallback; ioclose: xmlInputCloseCallback; ioctx: Pointer; enc: xmlCharEncoding): xmlParserInputBufferPtr; cdecl; external LIBXML2_SO;
@@ -158,7 +158,7 @@ function  xmlRegisterInputCallbacks(matchFunc: xmlInputMatchCallback; openFunc: 
 procedure xmlRegisterDefaultOutputCallbacks; cdecl; external LIBXML2_SO;
 function  xmlAllocOutputBuffer(encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlOutputBufferCreateFilename(URI: PChar; encoder: xmlCharEncodingHandlerPtr; compression: Longint): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
-function  xmlOutputBufferCreateFile(var file_: TextFile; encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
+function  xmlOutputBufferCreateFile(aFile: PLibXml2File; encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlOutputBufferCreateFd(fd: Longint; encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlOutputBufferCreateIO(iowrite: xmlOutputWriteCallback; ioclose: xmlOutputCloseCallback; ioctx: Pointer; encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlOutputBufferWrite(out: xmlOutputBufferPtr; len: Longint; buf: PChar): Longint; cdecl; external LIBXML2_SO;

@@ -110,8 +110,8 @@ function  xmlInitMemory: Longint; cdecl; external LIBXML2_SO;
  * Those are specific to the XML debug memory wrapper
  *)
 function  xmlMemUsed: Longint; cdecl; external LIBXML2_SO;
-procedure xmlMemDisplay(var fp: TextFile); cdecl; external LIBXML2_SO;
-procedure xmlMemShow(var fp: TextFile; nr: Longint); cdecl; external LIBXML2_SO;
+procedure xmlMemDisplay(fp: PLibXml2File); cdecl; external LIBXML2_SO;
+procedure xmlMemShow(fp: PLibXml2File; nr: Longint); cdecl; external LIBXML2_SO;
 procedure xmlMemoryDump; cdecl; external LIBXML2_SO;
 
 {$IFDEF XML_DEBUG_MEMORY_LOCATION}

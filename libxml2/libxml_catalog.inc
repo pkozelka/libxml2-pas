@@ -68,7 +68,7 @@ function  xmlACatalogResolve(catal: xmlCatalogPtr; pubID: PxmlChar; sysID: PxmlC
 function  xmlACatalogResolveSystem(catal: xmlCatalogPtr; sysID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlACatalogResolvePublic(catal: xmlCatalogPtr; pubID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlACatalogResolveURI(catal: xmlCatalogPtr; URI: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
-procedure xmlACatalogDump(catal: xmlCatalogPtr; var outfile: TextFile); cdecl; external LIBXML2_SO;
+procedure xmlACatalogDump(catal: xmlCatalogPtr; outfile: PLibXml2File); cdecl; external LIBXML2_SO;
 procedure xmlFreeCatalog(catal: xmlCatalogPtr); cdecl; external LIBXML2_SO;
 function  xmlCatalogIsEmpty(catal: xmlCatalogPtr): Longint; cdecl; external LIBXML2_SO;
 
@@ -79,7 +79,7 @@ procedure xmlInitializeCatalog; cdecl; external LIBXML2_SO;
 function  xmlLoadCatalog(filename: PChar): Longint; cdecl; external LIBXML2_SO;
 procedure xmlLoadCatalogs(paths: PChar); cdecl; external LIBXML2_SO;
 procedure xmlCatalogCleanup; cdecl; external LIBXML2_SO;
-procedure xmlCatalogDump(var outfile: TextFile); cdecl; external LIBXML2_SO;
+procedure xmlCatalogDump(outfile: PLibXml2File); cdecl; external LIBXML2_SO;
 function  xmlCatalogResolve(pubID: PxmlChar; sysID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlCatalogResolveSystem(sysID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlCatalogResolvePublic(pubID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;

@@ -13,7 +13,7 @@ interface
 
 uses
 {$IFDEF WIN32}
-  windows,
+  Windows,
 {$ENDIF}
 {$IFDEF LINUX}
   libc,
@@ -38,6 +38,7 @@ type
   PLongint = ^Longint;
   PByte = ^Byte;
   PPChar = ^PChar;
+  PLibXml2File = pointer; //placeholder for 'FILE *' C-type
 
 {$DEFINE LIBXML_THREAD_ALLOC_ENABLED}
 {$DEFINE LIBXML_THREAD_ENABLED}

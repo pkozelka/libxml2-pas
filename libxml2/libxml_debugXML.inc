@@ -16,17 +16,17 @@
 (*
  * The standard Dump routines
  *)
-procedure xmlDebugDumpString(var aOutput: TextFile; str: PxmlChar); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpAttr(var aOutput: TextFile; attr: xmlAttrPtr; depth: Longint); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpAttrList(var aOutput: TextFile; attr: xmlAttrPtr; depth: Longint); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpOneNode(var aOutput: TextFile; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpNode(var aOutput: TextFile; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpNodeList(var aOutput: TextFile; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpDocumentHead(var aOutput: TextFile; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpDocument(var aOutput: TextFile; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpDTD(var aOutput: TextFile; dtd: xmlDtdPtr); cdecl; external LIBXML2_SO;
-procedure xmlDebugDumpEntities(var aOutput: TextFile; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
-procedure xmlLsOneNode(var aOutput: TextFile; node: xmlNodePtr); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpString(aOutput: PLibXml2File; str: PxmlChar); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpAttr(aOutput: PLibXml2File; attr: xmlAttrPtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpAttrList(aOutput: PLibXml2File; attr: xmlAttrPtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpOneNode(aOutput: PLibXml2File; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpNode(aOutput: PLibXml2File; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpNodeList(aOutput: PLibXml2File; node: xmlNodePtr; depth: Longint); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpDocumentHead(aOutput: PLibXml2File; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpDocument(aOutput: PLibXml2File; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpDTD(aOutput: PLibXml2File; dtd: xmlDtdPtr); cdecl; external LIBXML2_SO;
+procedure xmlDebugDumpEntities(aOutput: PLibXml2File; doc: xmlDocPtr); cdecl; external LIBXML2_SO;
+procedure xmlLsOneNode(aOutput: PLibXml2File; node: xmlNodePtr); cdecl; external LIBXML2_SO;
 function  xmlBoolToText(boolval: Longint): PChar; cdecl; external LIBXML2_SO;
 
 (****************************************************************
@@ -59,7 +59,7 @@ type
     node: xmlNodePtr;
     pctxt: xmlXPathContextPtr;
     loaded: Longint;
-    output: ^TextFile;
+    output: PLibXml2File;
     input: xmlShellReadlineFunc;
   end;
 
@@ -93,5 +93,5 @@ function  xmlShellPwd(ctxt: xmlShellCtxtPtr; buffer: PChar; node, node2: xmlNode
 (*
  * The Shell interface.
  *)
-procedure xmlShell(doc: xmlDocPtr; filename: PChar; input: xmlShellReadlineFunc; var aOutput: TextFile); cdecl; external LIBXML2_SO;
+procedure xmlShell(doc: xmlDocPtr; filename: PChar; input: xmlShellReadlineFunc; aOutput: PLibXml2File); cdecl; external LIBXML2_SO;
 
