@@ -13,6 +13,8 @@ unit libxmldom;
    Petr Kozelka     <pkozelka@centrum.cz>
 
    Thanks to the gdome2 project, where I got many ideas from.
+   (see: http://phd.cs.unibo.it/gdome2/)
+   
    Thanks to Jan Kubatzki for testing.
 
 | The routines for testing XML rules were taken from the Extended Document
