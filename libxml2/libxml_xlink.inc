@@ -64,7 +64,7 @@ type
    * This is the prototype for the link detection routine
    * It calls the default link detection callbacks upon link detection.
    *)
-  xlinkNodeDetectFunc = procedure(ctx: Pointer; node: xmlNodePtr); stdcall;
+  xlinkNodeDetectFunc = procedure(ctx: Pointer; node: xmlNodePtr); cdecl;
 
   (**
    * The link detection module interact with the upper layers using
@@ -81,7 +81,7 @@ type
    *
    * This is the prototype for a simple link detection callback.
    *)
-  xlinkSimpleLinkFunk = procedure(ctx: Pointer; node: xmlNodePtr; href: xlinkHRef; role: xlinkRole; title: xlinkTitle); stdcall;
+  xlinkSimpleLinkFunk = procedure(ctx: Pointer; node: xmlNodePtr; href: xlinkHRef; role: xlinkRole; title: xlinkTitle); cdecl;
   (**
    * xlinkExtendedLinkFunk:
    * @ctx:  user data pointer
@@ -100,7 +100,7 @@ type
    *
    * This is the prototype for a extended link detection callback.
    *)
-  xlinkExtendedLinkFunk = procedure(ctx: Pointer; node: xmlNodePtr; nbLocators: Integer; var hrefs: xlinkHRef; var roles: xlinkRole; nbArcs: Integer; var aFrom, aTo: xlinkRole; var show: xlinkShow; var actuate: xlinkActuate; nbTitles: Integer; var titles: xlinkTitle; var langs: PxmlChar);
+  xlinkExtendedLinkFunk = procedure(ctx: Pointer; node: xmlNodePtr; nbLocators: Integer; var hrefs: xlinkHRef; var roles: xlinkRole; nbArcs: Integer; var aFrom, aTo: xlinkRole; var show: xlinkShow; var actuate: xlinkActuate; nbTitles: Integer; var titles: xlinkTitle; var langs: PxmlChar); cdecl;
   (**
    * xlinkExtendedLinkSetFunk:
    * @ctx:  user data pointer
@@ -114,7 +114,7 @@ type
    *
    * This is the prototype for a extended link set detection callback.
    *)
-  xlinkExtendedLinkSetFunk = procedure(ctx: Pointer; node: xmlNodePtr; nbLocators: Integer; var hrefs: xlinkHRef; var roles: xlinkRole; nbTitles: Integer; var titles: xlinkTitle; var langs: PxmlChar);
+  xlinkExtendedLinkSetFunk = procedure(ctx: Pointer; node: xmlNodePtr; nbLocators: Integer; var hrefs: xlinkHRef; var roles: xlinkRole; nbTitles: Integer; var titles: xlinkTitle; var langs: PxmlChar); cdecl;
   (**
    * This is the structure containing a set of Links detection callbacks
    *

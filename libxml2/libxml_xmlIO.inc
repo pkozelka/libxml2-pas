@@ -62,7 +62,7 @@ type
    *
    * Returns 0 or -1 in case of error
    *)
-  xmlInputCloseCallback = function(context: Pointer): Longint;
+  xmlInputCloseCallback = function(context: Pointer): Longint; cdecl;
 
   xmlParserInputBufferPtr = ^xmlParserInputBuffer;
   xmlParserInputBuffer = record
@@ -88,7 +88,7 @@ type
    *
    * Returns 1 if yes and 0 if another Output module should be used
    *)
-  xmlOutputMatchCallback = function(const filename: PChar): Integer;
+  xmlOutputMatchCallback = function(const filename: PChar): Integer; cdecl;
 
   (**
    * xmlOutputOpenCallback:

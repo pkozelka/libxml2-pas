@@ -28,7 +28,7 @@ type
    *
    * Callback for freeing some parser input allocations
    *)
-  xmlParserInputDeallocate = procedure(p1: PxmlChar);
+  xmlParserInputDeallocate = procedure(p1: PxmlChar); cdecl;
 
   (**
    * xmlParserInput:
@@ -564,7 +564,7 @@ type
    *
    * Returns the entity input parser
    *)
-  xmlExternalEntityLoader = function(URL, ID: PChar; context: xmlParserCtxtPtr): xmlParserInputPtr;
+  xmlExternalEntityLoader = function(URL, ID: PChar; context: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;
 
 (*
  * Global variables: just the default SAX interface tables and XML

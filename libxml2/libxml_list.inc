@@ -34,7 +34,7 @@ type
    *
    * Callback function used to free data from a list
    *)
-  xmlListDeallocator = procedure(lk: xmlLinkPtr);
+  xmlListDeallocator = procedure(lk: xmlLinkPtr); cdecl;
   (**
    * xmlListDataCompare:
    * @data0: the first data
@@ -44,7 +44,7 @@ type
    *
    * Returns 0 is equality, -1 or 1 otherwise depending on the ordering
    *)
-  xmlListDataCompare = function(data0, data1: Pointer): Integer;
+  xmlListDataCompare = function(data0, data1: Pointer): Integer; cdecl;
   (**
    * xmlListWalker:
    * @data: the data found in the list
@@ -54,7 +54,7 @@ type
    *
    * Returns 0 to stop walking the list, 1 otherwise
    *)
-  xmlListWalker = function(data, user: Pointer): Integer;
+  xmlListWalker = function(data, user: Pointer): Integer; cdecl;
 
 (* Creation/Deletion *)
 function  xmlListCreate(deallocator: xmlListDeallocator; compare: xmlListDataCompare): xmlListPtr; cdecl; external LIBXML2_SO;

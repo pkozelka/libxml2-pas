@@ -42,7 +42,7 @@ type
    *
    * A callback for the xmlNanoFTPGet command
    *)
-  ftpDataCallback = procedure(userData: Pointer; data: PChar; len: Longint);
+  ftpDataCallback = procedure(userData: Pointer; data: PChar; len: Longint); cdecl;
 
 (*
  * Init
