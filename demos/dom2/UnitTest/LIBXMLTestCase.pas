@@ -4,14 +4,16 @@ interface
 
 uses
   SysUtils, Classes, TestFrameWork, libxmldom, dom2, Dialogs, msxml_impl,
-  ActiveX,GUITestRunner;
+  ActiveX,GUITestRunner,StrUtils;
 
-const xmlstr = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
+const
+  xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
+  xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
 
 type TTestCaseLIBXML = class(TTestCase)
   private
     doc: IDOMDocument;
-    msdoc: IDOMDocument;
+    doc1: IDOMDocument;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -19,6 +21,8 @@ type TTestCaseLIBXML = class(TTestCase)
   published
     procedure TestDocumentElement;
     procedure CreateElementNS;
+    procedure CreateElementNS1;
+    procedure CreateAttributeNS;
     procedure CreateElement10000Times;
     procedure CreateAttribute10000Times;
     procedure SetAttributeNode10000Times;
@@ -49,12 +53,13 @@ var impl: IDOMImplementation;
 { TTestCaseLIBXML }
 
 procedure TTestCaseLIBXML.SetUp;
-var temp: integer;
 begin
   inherited;
   impl := GetDom(domvendor);
   doc := impl.createDocument('','',nil);
   (doc as IDOMPersist).loadxml(xmlstr);
+  doc1 := impl.createDocument('','',nil);
+  (doc1 as IDOMPersist).loadxml(xmlstr1);
 end;
 
 procedure TTestCaseLIBXML.CreateElement10000Times;
@@ -102,7 +107,7 @@ end;
 
 procedure TTestCaseLIBXML.AppendExistingChild;
 var
-  node,temp: IDOMNode;
+  node: IDOMNode;
 begin
   node := doc.createElement('sub1');
   //temp:=node.parentNode;
@@ -203,7 +208,7 @@ procedure TTestCaseLIBXML.CreateAttributeNS10000Times;
 var
   i: integer;
 begin
-  for i := 0 to 10000 do doc.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');;
+  for i := 0 to 10000 do doc.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');
 end;
 
 procedure TTestCaseLIBXML.SetAttributeNode10000Times;
@@ -239,12 +244,57 @@ begin
 end;
 
 procedure TTestCaseLIBXML.CreateElementNS;
+const
+  CRLF=#13#10;
 var
   node: IDOMNode;
+  temp: string;
 begin
   node:=doc.createElementNS('http://ns.4ct.de','ct:test');
   doc.documentElement.appendChild(node);
-  OutLog((doc as IDOMPersist).xml);
+  temp:=(doc as IDOMPersist).xml;
+  if domvendor<>'LIBXML' then begin
+    temp:=(rightStr(temp,53));
+    temp:=(leftStr(temp,51));
+  end else begin
+    temp:=(rightStr(temp,52));
+    temp:=(leftStr(temp,51));
+  end;
+  OutLog(temp);
+  check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
+end;
+
+procedure TTestCaseLIBXML.CreateElementNS1;
+const
+  CRLF=#13#10;
+var
+  node: IDOMNode;
+  temp: string;
+begin
+  node:=doc1.createElementNS('http://ns.4ct.de','ct:test');
+  doc1.documentElement.appendChild(node);
+  temp:=(doc1 as IDOMPersist).xml;
+  OutLog(temp);
+  if domvendor<>'LIBXML' then begin
+    temp:=(rightStr(temp,53));
+    temp:=(leftStr(temp,51));
+  end else begin
+    temp:=(rightStr(temp,52));
+    temp:=(leftStr(temp,51));
+  end;
+  //check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
+end;
+
+procedure TTestCaseLIBXML.CreateAttributeNS;
+var
+  attr: IDOMAttr;
+  temp: String;
+begin
+  attr:=doc.createAttributeNS('http://ns.4ct.de','ct:name1');
+  attr.value:='hund';
+  doc.documentElement.setAttributeNodeNS(attr);
+  temp:=(doc as IDOMPersist).xml;
+  OutLog(temp);
 end;
 
 initialization
