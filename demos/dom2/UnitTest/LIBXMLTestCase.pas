@@ -10,7 +10,7 @@ const
   xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
   xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
 
-type TTestCaseLIBXML = class(TTestCase)
+type TTestDOM2Methods = class(TTestCase)
   private
     doc: IDOMDocument;
     doc1: IDOMDocument;
@@ -23,6 +23,36 @@ type TTestCaseLIBXML = class(TTestCase)
     procedure CreateElementNS;
     procedure CreateElementNS1;
     procedure CreateAttributeNS;
+    procedure TestDocCount;
+    procedure TestElementByID;
+  end;
+
+type TTestDomExceptions = class(TTestCase)
+  private
+    doc: IDOMDocument;
+    doc1: IDOMDocument;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  public
+  published
+    procedure AppendAttribute;
+    procedure AppendExistingChild;
+    procedure AppendNilNode;
+    procedure InsertNilNode;
+    procedure InsertAnchestor;
+  end;
+
+
+type TTestMemoryLeaks = class(TTestCase)
+  private
+    doc: IDOMDocument;
+    doc1: IDOMDocument;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  public
+  published
     procedure CreateElement10000Times;
     procedure CreateAttribute10000Times;
     procedure SetAttributeNode10000Times;
@@ -34,13 +64,6 @@ type TTestCaseLIBXML = class(TTestCase)
     procedure CreateDocumentFragment10000Times;
     procedure CreateTextNode10000Times;
     procedure AppendElement10000Times;
-    procedure AppendAttribute;
-    procedure AppendExistingChild;
-    procedure TestDocCount;
-    procedure AppendNilNode;
-    procedure InsertNilNode;
-    procedure InsertAnchestor;
-    procedure TestElementByID;
   end;
 
 
@@ -52,7 +75,7 @@ var impl: IDOMImplementation;
 
 { TTestCaseLIBXML }
 
-procedure TTestCaseLIBXML.SetUp;
+procedure TTestDom2Methods.SetUp;
 begin
   inherited;
   impl := GetDom(domvendor);
@@ -62,20 +85,53 @@ begin
   (doc1 as IDOMPersist).loadxml(xmlstr1);
 end;
 
-procedure TTestCaseLIBXML.CreateElement10000Times;
+procedure TTestMemoryLeaks.SetUp;
+begin
+  inherited;
+  impl := GetDom(domvendor);
+  doc := impl.createDocument('','',nil);
+  (doc as IDOMPersist).loadxml(xmlstr);
+  doc1 := impl.createDocument('','',nil);
+  (doc1 as IDOMPersist).loadxml(xmlstr1);
+end;
+
+procedure TTestDomExceptions.SetUp;
+begin
+  inherited;
+  impl := GetDom(domvendor);
+  doc := impl.createDocument('','',nil);
+  (doc as IDOMPersist).loadxml(xmlstr);
+  doc1 := impl.createDocument('','',nil);
+  (doc1 as IDOMPersist).loadxml(xmlstr1);
+end;
+
+procedure TTestMemoryLeaks.CreateElement10000Times;
 var
   i: integer;
 begin
   for i := 0 to 10000 do doc.createElement('test');
 end;
 
-procedure TTestCaseLIBXML.TestDocCount;
+procedure TTestDom2Methods.TestDocCount;
 begin
   doc := nil;
-  Check(doccount=0,'document not released');
+  doc1 := nil;
+  Check(doccount=0,'documents not released');
 end;
 
-procedure TTestCaseLIBXML.AppendElement10000Times;
+procedure TTestMemoryLeaks.TearDown;
+begin
+  doc := nil;
+  doc1 := nil;
+end;
+
+procedure TTestDomExceptions.TearDown;
+begin
+  doc := nil;
+  doc1 := nil;
+end;
+
+procedure TTestMemoryLeaks.AppendElement10000Times;
 var
   i: integer;
   node: IDOMNode;
@@ -87,12 +143,12 @@ begin
   end;
 end;
 
-procedure TTestCaseLIBXML.TestDocumentElement;
+procedure TTestDom2Methods.TestDocumentElement;
 begin
   Check(doc.documentElement<>nil,'documentElement is nil');
 end;
 
-procedure TTestCaseLIBXML.AppendAttribute;
+procedure TTestDomExceptions.AppendAttribute;
 var
   attr: IDOMAttr;
 begin
@@ -101,14 +157,20 @@ begin
     doc.documentElement.appendChild(attr);
     Check(False,'There should have been an EDomException');
   except
-    on E: Exception do Check(E is EDomException);
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
   end;
 end;
 
-procedure TTestCaseLIBXML.AppendExistingChild;
+procedure TTestDomExceptions.AppendExistingChild;
 var
   node: IDOMNode;
 begin
+  {
+    DOM2: If the child is already in the tree, it
+    is first removed.
+    So there must be only one child sub1 after the
+    two calls of appendChild
+  }
   node := doc.createElement('sub1');
   //temp:=node.parentNode;
   doc.documentElement.appendChild(node);
@@ -117,101 +179,102 @@ begin
   outLog((doc as IDOMPersist).xml);
 end;
 
-procedure TTestCaseLIBXML.TestElementByID;
+procedure TTestDom2Methods.TestElementByID;
 var
   elem: IDOMElement;
 begin
   elem := doc.getElementById('110');
 end;
 
-procedure TTestCaseLIBXML.AppendNilNode;
+procedure TTestDomExceptions.AppendNilNode;
 begin
   try
     doc.documentElement.appendChild(nil);
     Check(False,'There should have been an EDomError');
   except
-    on E: Exception do Check(E is EDomException);
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
   end;
 end;
 
-procedure TTestCaseLIBXML.InsertNilNode;
+procedure TTestDomExceptions.InsertNilNode;
 var
   node: IDOMNode;
 begin
-  {
-  ms-dom raises an exception for this test;
-  lib-dom does not;
-  w3c says an exception is not expected !
-  }
   node := doc.createElement('sub1');
   doc.documentElement.appendChild(node);
-  doc.documentElement.insertBefore(nil,node);
+  try
+    doc.documentElement.insertBefore(nil,node);
+    Check(False,'There should have been an EDomError');
+  except
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
+  end;
 end;
 
-procedure TTestCaseLIBXML.InsertAnchestor;
+procedure TTestDomExceptions.InsertAnchestor;
 var node1,node2: IDOMNode;
 begin
-  {
-  ms-dom raises an exception for this test;
-  lib-dom does not;
-  w3c says an exception is not expected !
-  }
   node1 := doc.createElement('sub1');
   node2 := doc.createElement('sub2');
   node1.appendChild(node2);
   doc.documentElement.appendChild(node1);
-  node1.insertBefore(doc.documentElement,node2);
+  try
+    node1.insertBefore(doc.documentElement,node2);
+    Check(False,'There should have been an EDomError');
+  except
+    on E: Exception do Check(E is EDomException,'Warning: Wrong exception type!');
+  end;
 end;
 
-procedure TTestCaseLIBXML.TearDown;
+procedure TTestDom2Methods.TearDown;
 begin
   doc := nil;
+  doc1:= nil;
   inherited;
 end;
 
-procedure TTestCaseLIBXML.CreateComment10000Times;
+procedure TTestMemoryLeaks.CreateComment10000Times;
 var
   i: integer;
 begin
   for i := 0 to 10000 do doc.createComment('test');
 end;
 
-procedure TTestCaseLIBXML.CreateAttribute10000Times;
+procedure TTestMemoryLeaks.CreateAttribute10000Times;
 var
   i: integer;
 begin
   for i := 0 to 10000 do doc.createAttribute('test');
 end;
 
-procedure TTestCaseLIBXML.CreateCDataSection10000Times;
+procedure TTestMemoryLeaks.CreateCDataSection10000Times;
 var
   i: integer;
 begin
    for i := 0 to 10000 do doc.createCDATASection('test');
 end;
 
-procedure TTestCaseLIBXML.CreateTextNode10000Times;
+procedure TTestMemoryLeaks.CreateTextNode10000Times;
 var
   i: integer;
 begin
    for i := 0 to 10000 do doc.createTextNode('test');
 end;
 
-procedure TTestCaseLIBXML.CreateDocumentFragment10000Times;
+procedure TTestMemoryLeaks.CreateDocumentFragment10000Times;
 var
   i: integer;
 begin
   for i := 0 to 10000 do doc.createDocumentFragment;
 end;
 
-procedure TTestCaseLIBXML.CreateAttributeNS10000Times;
+procedure TTestMemoryLeaks.CreateAttributeNS10000Times;
 var
   i: integer;
 begin
   for i := 0 to 10000 do doc.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');
 end;
 
-procedure TTestCaseLIBXML.SetAttributeNode10000Times;
+procedure TTestMemoryLeaks.SetAttributeNode10000Times;
 var
   i: integer;
   attr: IDOMAttr;
@@ -221,7 +284,7 @@ begin
   end;
 end;
 
-procedure TTestCaseLIBXML.SetAttributeNodes1000Times;
+procedure TTestMemoryLeaks.SetAttributeNodes1000Times;
 var
   i: integer;
   attr: IDOMAttr;
@@ -232,7 +295,7 @@ begin
   end;
 end;
 
-procedure TTestCaseLIBXML.SetAttributeNodesReplace10000Times;
+procedure TTestMemoryLeaks.SetAttributeNodesReplace10000Times;
 var
   i: integer;
   attr: IDOMAttr;
@@ -243,7 +306,7 @@ begin
   end;
 end;
 
-procedure TTestCaseLIBXML.CreateElementNS;
+procedure TTestDom2Methods.CreateElementNS;
 const
   CRLF=#13#10;
 var
@@ -264,7 +327,7 @@ begin
   check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
 end;
 
-procedure TTestCaseLIBXML.CreateElementNS1;
+procedure TTestDom2Methods.CreateElementNS1;
 const
   CRLF=#13#10;
 var
@@ -285,7 +348,7 @@ begin
   //check(temp='<test><ct:test xmlns:ct="http://ns.4ct.de"/></test>','createElementNS failed');
 end;
 
-procedure TTestCaseLIBXML.CreateAttributeNS;
+procedure TTestDom2Methods.CreateAttributeNS;
 var
   attr: IDOMAttr;
   temp: String;
@@ -298,7 +361,9 @@ begin
 end;
 
 initialization
-  RegisterTest('', TTestCaseLIBXML.Suite);
+  RegisterTest('', TTestDom2Methods.Suite);
+  RegisterTest('', TTestMemoryLeaks.Suite);
+  RegisterTest('', TTestDomExceptions.Suite);
   CoInitialize(nil);
 end.
 
