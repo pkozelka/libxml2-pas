@@ -2,7 +2,7 @@ LIBNAME=libxml2
 VERSION=2.4.13
 PACKAGE=$(LIBNAME)-pas
 ARCHIVE=$(PACKAGE)-$(VERSION)
-TAG=`echo "LIBXML_$(VERSION)" | sed "s/\./_/g"`
+TAG=`echo "LIBXML2_$(VERSION)" | sed "s/\./_/g"`
 MYTMP=./$(TAG).tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
 DCCOPTS=-B -U../libxml2
@@ -20,7 +20,6 @@ checkapi:
 
 cvsexport: clean
 	mkdir $(MYTMP)
-	cvs -z4 -d $(CVSROOT) export -l -r HEAD -d $(MYTMP) .
 	cvs -z4 -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
 
 tgz:
