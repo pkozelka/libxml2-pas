@@ -40,6 +40,9 @@ type
 		case integer of
 		1: (node: xmlNodePtr);
 		2: (doc: xmlDocPtr);
+		3: (notation: xmlNotationPtr);
+		4: (entity: xmlEntityPtr);
+		5: (dtd: xmlDtdPtr);
 	end;
 	(**
 	 * Abstract base for node implementations.
@@ -90,6 +93,9 @@ type
 		function  Get_baseName: WideString; safecall;
 		procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); safecall;
 	protected //
+		function  Get_data: WideString; safecall;
+		procedure Set_data(const data: WideString); safecall;
+	protected //
 		constructor Create(aNode: xmlNodePtr);
 	public
 		destructor Destroy; override;
@@ -119,8 +125,6 @@ type
 	TXMLDOMCharacterData = class(TXMLDOMNode,
 		IXMLDOMCharacterData, IXMLDOMNode)
 	protected //IXMLDOMCharacterData
-		function  Get_data: WideString; safecall;
-		procedure Set_data(const data: WideString); safecall;
 		function  Get_length: Integer; safecall;
 		function  substringData(offset: Integer; count: Integer): WideString; safecall;
 		procedure appendData(const data: WideString); safecall;
@@ -130,31 +134,41 @@ type
 	end;
 
 	TXMLDOMComment = class(TXMLDOMCharacterData)
-		//todo
 	end;
 
-	TXMLDOMText = class(TXMLDOMCharacterData)
-		//todo
+	TXMLDOMText = class(TXMLDOMCharacterData,
+		IXMLDOMText, IXMLDOMCharacterData, IXMLDOMNode)
+	protected //IXMLDOMText
+		function  splitText(offset: Integer): IXMLDOMText; safecall;
 	end;
 
 	TXMLDOMCDataSection = class(TXMLDOMText)
-		//todo
 	end;
 
-	TXMLDOMProcessingInstruction = class(TXMLDOMNode)
-		//todo
+	TXMLDOMProcessingInstruction = class(TXMLDOMNode,
+		IXMLDOMProcessingInstruction, IXMLDOMNode)
+	protected //IXMLDOMProcessingInstruction
+		function  IXMLDOMProcessingInstruction.Get_target = Get_nodeName;
+		//get_data and set_data methods are reused from IXMLDOMNode
 	end;
 
-	TXMLDOMAttribute = class(TXMLDOMNode)
-		//todo
+	TXMLDOMAttribute = class(TXMLDOMNode,
+		IXMLDOMAttribute)
+	protected //IXMLDOMAttribute
+		function  IXMLDOMAttribute.Get_name = Get_nodeName;
+		function  IXMLDOMAttribute.Get_value = Get_nodeValue;
+		procedure IXMLDOMAttribute.Set_value = Set_nodeValue;
 	end;
 
 	TXMLDOMEntityReference = class(TXMLDOMNode)
-		//todo
 	end;
 
-	TXMLDOMEntity = class(TXMLDOMNode)
-		//todo
+	TXMLDOMEntity = class(TXMLDOMNode,
+		IXMLDOMEntity)
+	protected //IXMLDOMEntity
+		function  Get_publicId: OleVariant; safecall;
+		function  Get_systemId: OleVariant; safecall;
+		function  Get_notationName: WideString; safecall;
 	end;
 
 	TXMLDOMDocument = class(TXMLDOMNode,
@@ -195,15 +209,20 @@ type
 		procedure Set_ontransformnode(Param1: OleVariant); safecall;
 	end;
 
-	TXMLDOMDocumentType = class(TXMLDOMNode)
-		//todo
+	TXMLDOMDocumentType = class(TXMLDOMNode,
+		IXMLDOMDocumentType)
+	protected //IXMLDOMDocumentType
+		function  IXMLDOMDocumentType.Get_name = Get_nodeName;
+		function  Get_entities: IXMLDOMNamedNodeMap; safecall;
+		function  Get_notations: IXMLDOMNamedNodeMap; safecall;
 	end;
 
-	TXMLDOMNotation = class(TXMLDOMNode)
-		//todo
+	TXMLDOMNotation = class(TXMLDOMNode,
+		IXMLDOMNotation)
+	protected //IXMLDOMNotation
+		function  Get_publicId: OleVariant; safecall;
+		function  Get_systemId: OleVariant; safecall;
 	end;
-
-	TListType = (LT_CHILDREN, LT_ATTRS, LT_OTHER);
 
 	(**
 	 * Abstract base class for NodeList and NamedNodeMap.
@@ -601,6 +620,16 @@ end;
 procedure TXMLDOMNode.transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant);
 begin
 	ENotImpl('transformNodeToObject');
+end;
+
+function TXMLDOMNode.Get_data: WideString;
+begin
+	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
+end;
+
+procedure TXMLDOMNode.Set_data(const data: WideString);
+begin
+	Set_nodeValue(data);
 end;
 
 { TXMLDOMNodeCollection }
@@ -1041,11 +1070,6 @@ begin
 	ENotImpl('TXMLDOMCharacterData.xxx');
 end;
 
-function TXMLDOMCharacterData.Get_data: WideString;
-begin
-	Result := UTF8Decode(xmlNodeGetContent(FNode.node));
-end;
-
 function TXMLDOMCharacterData.Get_length: Integer;
 begin
 	Result := Length(Get_data);
@@ -1061,14 +1085,60 @@ begin
 	ENotImpl('TXMLDOMCharacterData.xxx');
 end;
 
-procedure TXMLDOMCharacterData.Set_data(const data: WideString);
-begin
-	Set_nodeValue(data);
-end;
-
 function TXMLDOMCharacterData.substringData(offset, count: Integer): WideString;
 begin
 	Result := Copy(Get_data, offset, count);
+end;
+
+{ TXMLDOMText }
+
+function TXMLDOMText.splitText(offset: Integer): IXMLDOMText;
+begin
+	ENotImpl('TXMLDOMText.splitText');
+end;
+
+{ TXMLDOMEntity }
+
+function TXMLDOMEntity.Get_notationName: WideString;
+begin
+	ENotImpl('TXMLDOMEntity.Get_notationName');
+end;
+
+function TXMLDOMEntity.Get_publicId: OleVariant;
+begin
+	Result := UTF8Decode(xmlEntityPtr(FNode).ExternalID);
+end;
+
+function TXMLDOMEntity.Get_systemId: OleVariant;
+begin
+	Result := UTF8Decode(FNode.entity.SystemID);
+end;
+
+{ TXMLDOMDocumentType }
+
+function TXMLDOMDocumentType.Get_entities: IXMLDOMNamedNodeMap;
+var
+	n: xmlDtdPtr;
+begin
+	n.
+	ENotImpl('TXMLDOMDocumentType.Get_entities');
+end;
+
+function TXMLDOMDocumentType.Get_notations: IXMLDOMNamedNodeMap;
+begin
+	ENotImpl('TXMLDOMDocumentType.Get_notations');
+end;
+
+{ TXMLDOMNotation }
+
+function TXMLDOMNotation.Get_publicId: OleVariant;
+begin
+	Result := UTF8Decode(xmlNotationPtr(FNode).PublicID);
+end;
+
+function TXMLDOMNotation.Get_systemId: OleVariant;
+begin
+	Result := UTF8Decode(xmlNotationPtr(FNode).SystemID);
 end;
 
 end.
