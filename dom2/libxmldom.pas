@@ -820,21 +820,23 @@ end;
 function TGDOMNode.insertBefore(const newChild, refChild: IDOMNode): IDOMNode; 
 var node: xmlNodePtr;
 begin
-  node:=xmlAddPrevSibling(GetGNode(refChild),GetGNode(newChild));
+  if newChild<>nil
+    then node:=xmlAddPrevSibling(GetGNode(refChild),GetGNode(newChild))
+    else node:=nil;
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
     else result:=nil;
 end;
 
-function TGDOMNode.replaceChild(const newChild, oldChild: IDOMNode): IDOMNode; 
+function TGDOMNode.replaceChild(const newChild, oldChild: IDOMNode): IDOMNode;
 var
   old, cur, node: xmlNodePtr;
 begin
-  old := GetGNode(oldChild);
-  cur := GetGNode(newChild);
   //todo: raise exception otherwise
-  if (old<>nil) and (cur<>nil)
+  if (oldChild<>nil) and (curChild<>nil)
     then begin
+      old := GetGNode(oldChild);
+      cur := GetGNode(newChild);
       node:=xmlReplaceNode(old, cur);
       result:=MakeNode(node,FOwnerDocument) as IDOMNode
     end
@@ -852,7 +854,9 @@ function TGDOMNode.appendChild(const newChild: IDOMNode): IDOMNode;
 var
   node: xmlNodePtr;
 begin
-  node:=xmlAddChild(FGNode,GetGNode(newChild));
+  if newChild<>nil
+    then node:=xmlAddChild(FGNode,GetGNode(newChild))
+    else node:=nil;
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
     else result:=nil;
