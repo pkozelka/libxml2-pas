@@ -7,7 +7,7 @@ class                       method                 importance    ok     remark
                                                                                                                                    
 -                           GetDom                 1             X                                                              
 attr                        name                   1             X                                                                
-attr                        specified              3                                                                             
+attr                        specified              3             X      more tests neccessary                                                          
 attr                        value                  1             X      test again, please                                                                 
 characterData               appendData             3                                                                             
 characterData               deleteData             3                                                                             
@@ -50,25 +50,25 @@ element                     getAttribute           1             X
 element                     getAttributeNS         1             X                                                                
 element                     getAttributeNode       1             X                                                               
 element                     getAttributeNodeNS     1             X                                                               
-element                     getElementsByTagName   2                                                                             
+element                     getElementsByTagName   2             X                                                               
 element                     getElementsByTagNameNS 2                                                                             
 element                     hasAttribute           1             X                                                                
 element                     hasAttributeNS         1             X                                                                
 element                     normalize              2                                                                             
-element                     removeAttribute        2                                                                             
-element                     removeAttributeNS      2                                                                             
-element                     removeAttributeNode    2                                                                             
+element                     removeAttribute        2             X                                                                
+element                     removeAttributeNS      2             X                                                               
+element                     removeAttributeNode    2             X                                                               
 element                     setAttribute           1             X
 element                     setAttributeNS         1             X                                                    
 element                     setAttributeNode       1             X                                                               
 element                     setAttributeNodeNS     1             X                                                               
-element                     tagName                3                                                                            
+element                     tagName                3             X                                                               
 entity                      notationName           3                   
 entity                      publicID               3                   
 entity                      systemID               3                   
 namedNodeMap                getNamedItem           3             X                                                                
 namedNodeMap                getNamedItemNS         3                                                                             
-namedNodeMap                item                   3                                                                             
+namedNodeMap                item                   3             X                                                                
 namedNodeMap                length                 3             X                                                                
 namedNodeMap                removeNamedItem        3                                                                             
 namedNodeMap                removeNamedItemNS      3                                                                             
@@ -97,7 +97,7 @@ node                        removeChild            1             X
 node                        replaceChild           2                                                                             
 node                        supports               3       
 node/IDOMNodeSelect         selectNode             1             X
-node/IDOMNodeSelect         selectNodes            1             ?   Implemented, not tested                                                         
+node/IDOMNodeSelect         selectNodes            1             X  
 nodelist                    item                   1             X                                                                
 nodelist                    length                 1             X                                                                
 notation                    publicId               3                   
@@ -110,6 +110,6 @@ Summary:
 99 tests at all    = 100,0 %
 
 43 high priority methods
-all done (one not tested)
+all done
 
-50 methods done totally       
+59 methods done totally       
