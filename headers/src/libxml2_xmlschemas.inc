@@ -50,8 +50,8 @@ type
   (*
    *  A schemas validation context
    *)
-  xmlSchemaValidityErrorFunc = procedure (ctx: Pointer; msg: Pchar; args: array of const); cdecl;
-  xmlSchemaValidityWarningFunc = procedure (ctx: Pointer; msg: Pchar; args: array of const); cdecl;
+  xmlSchemaValidityErrorFunc = procedure (ctx: Pointer; msg: Pchar); cdecl; {$IFDEF HAS_TVA} varargs; {$ENDIF}
+  xmlSchemaValidityWarningFunc = procedure (ctx: Pointer; msg: Pchar); cdecl; {$IFDEF HAS_TVA} varargs; {$ENDIF}
 
   xmlSchemaParserCtxt = record end;
   xmlSchemaParserCtxtPtr = ^xmlSchemaParserCtxt;
