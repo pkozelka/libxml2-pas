@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.88 2002-01-28 21:39:43 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.89 2002-01-28 23:35:20 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -651,7 +651,38 @@ begin
     xmlUnlinkNode(xmlNodePtr(Result));
   end;
   xmlAddChild(elem, xmlNodePtr(attr));
-  elem.nsDef := attr.ns; //DIRTY  
+  elem.nsDef := attr.ns; //DIRTY
+end;
+
+function isNCName(aStr: DomString): boolean;
+var
+  i: integer;
+begin
+  Result := false;
+  if (Length(aStr)=0) then exit;
+  if (not xmlIsLetter(Ord(aStr[1]))) then exit;
+  for i:=2 to Length(aStr) do begin
+    if not xmlIsBaseChar(Ord(aStr[i])) then exit;
+  end;
+  Result := true;
+end;
+
+function isNotReserved(aStr: DomString): boolean;
+begin
+  Result := UpperCase(Copy(aStr, 1, 3))<>'XML';
+end;
+
+function isNamespaceUri(aStr: DomString): boolean;
+var
+  i: integer;
+begin
+  Result := false;
+  if (Length(aStr)=0) then exit;
+  if (not xmlIsLetter(Ord(aStr[1]))) then exit;
+  for i:=2 to Length(aStr) do begin
+    if xmlIsBlank(Ord(aStr[i])) then exit;  //???
+  end;
+  Result := true;
 end;
 
 { TGDomDocumentBuilderFactory }
@@ -1042,15 +1073,16 @@ end;
 
 function TGDOMNode.get_localName: DomString;
 begin
+  Result := '';
   case FGNode.type_ of
   XML_ELEMENT_NODE,
   XML_ATTRIBUTE_NODE:
     // this is neccessary, because according to the dom2
     // specification localName has to be nil for nodes,
     // that don't have a namespace
-    Result := UTF8Decode(FGNode.name);
-  else
-    Result := '';
+    if (FGNode.ns <> nil) then begin
+      Result := UTF8Decode(FGNode.name);
+    end;
   end;
 end;
 
@@ -1646,6 +1678,7 @@ function TGDOMDocument.createElement(const tagName: DomString): IDomElement;
 var
   node: xmlNodePtr;
 begin
+  DomAssert(isNCName(tagName), INVALID_CHARACTER_ERR, 'tagName');
   node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(tagName)),nil);
   Result := GetDOMObject(node) as IDomElement;
 end;
@@ -1794,13 +1827,19 @@ var
   ns: xmlNsPtr;
   uprefix, ulocal: String;
 begin
-  if (namespaceURI<>'') then begin
-    uprefix := prefix(qualifiedName);
+  DomAssert(isNotReserved(qualifiedName), NAMESPACE_ERR, 'qualifiedName starts with reserved string "XML".');
+  uprefix := prefix(qualifiedName);
+  if (uprefix<>'') then begin
+    DomAssert(isNamespaceUri(namespaceURI), NAMESPACE_ERR, 'namespace:'+namespaceURI);
     ulocal := localName(qualifiedName);
+    DomAssert(isNotReserved(ulocal), INVALID_CHARACTER_ERR, 'localName starts with reserved string "XML".');
+    DomAssert(isNCName(ulocal), INVALID_CHARACTER_ERR, 'localName invalid');
+    DomAssert(isNCName(uprefix), INVALID_CHARACTER_ERR, 'prefix invalid');
     node := xmlNewDocNode(requestDocPtr, nil, PChar(ulocal), nil);
     ns := xmlNewNs(node, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
     xmlSetNs(node, ns);
   end else begin
+    DomAssert(isNCName(qualifiedName), NAMESPACE_ERR, 'qualifiedName');
     ulocal := UTF8Encode(qualifiedName);
     node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(qualifiedName)), nil);
   end;
@@ -2047,17 +2086,14 @@ end;
  * On-demand creation of the underlying document.
  *)
 function TGDOMDocument.requestDocPtr: xmlDocPtr;
-var
-  doc: xmlDocPtr;
 begin
   Result := GetGDoc;
   if Result<>nil then exit; //the document is already created so we have to use it
   // otherwise, we create the document, using all the parameters specified so far
 
   //todo: distinguish empty doc, parsing, and push-parsing cases (for async)
-  doc := xmlNewDoc(XML_DEFAULT_VERSION);
-
-  SetGDoc(doc);
+  Result := xmlNewDoc(XML_DEFAULT_VERSION);
+  SetGDoc(Result);
 end;
 
 function TGDOMDocument.requestNodePtr: xmlNodePtr;
