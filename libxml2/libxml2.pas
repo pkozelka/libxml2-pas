@@ -77,6 +77,8 @@ type
 {$I libxml_threads.inc}
 {$I libxml_c14n.inc}
 
+{$I libxml_xmlunicode.inc}
+
 {$IFDEF WIN32}
 { this function should release memory using the same mem.manager that libxml2
   uses for allocating it. Unfortunately it doesn't work...
