@@ -29,7 +29,9 @@ const
   LIBXML2_SO = 'libxml2.so';
 {$ENDIF}
 
-{$IFDEF VER140}
+{$IFDEF VER130}
+{$ALIGN ON}
+{$ELSE}
 {$ALIGN 4}
 {$ENDIF}
 {$MINENUMSIZE 4}
@@ -42,12 +44,15 @@ type
   PPChar = ^PChar;
   PLibXml2File = pointer; //placeholder for 'FILE *' C-type
 
+{$IFDEF VER130}
+function StrNextChar(p: PxmlChar): PxmlChar;
+{$ENDIF}
+
 {$DEFINE LIBXML_THREAD_ALLOC_ENABLED}
 {$DEFINE LIBXML_THREAD_ENABLED}
 {$DEFINE LIBXML_HTML_ENABLED}
 {$DEFINE LIBXML_DOCB_ENABLED}
 
-{TODO: $I libxml_xmlversion.inc}
 {$I libxml_xmlwin32version.inc}
 
 {$I libxml_xmlmemory.inc}
@@ -205,6 +210,13 @@ begin
   Result := AllocMem(sz + 1);
   Move(str^, Result^, sz);
 end;
+
+{$IFDEF VER130}
+function StrNextChar(p: PxmlChar): PxmlChar;
+begin
+  Result := p + 1;
+end;
+{$ENDIF}
 
 initialization
   // setup Delphi memory handler
