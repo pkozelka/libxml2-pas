@@ -1,5 +1,5 @@
 unit libxml_core;
-//$Id: libxml_core.pas,v 1.2 2002-08-13 19:59:01 pkozelka Exp $
+//$Id: libxml_core.pas,v 1.3 2002-09-19 16:54:46 pkozelka Exp $
 (*
  * libxml-based core implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -25,6 +25,7 @@ uses
   ComObj,
   Windows,
 {$ENDIF}
+  libxml2i,
   libxml2;
 
 type
