@@ -1000,11 +1000,14 @@ const
 var 
   node: xmlNodePtr;
 begin
-  if self.isAncestorOrSelf(GetGNode(newChild)) then CheckError(HIERARCHY_REQUEST_ERR);
+  node := GetGNode(newChild);
+  if self.isAncestorOrSelf(node) then CheckError(HIERARCHY_REQUEST_ERR);
   if not (newChild.NodeType in FAllowedChildTypes) then
     CheckError(HIERARCHY_REQUEST_ERR);
   if (GetGNode(refChild) = GetGNode(refChild.OwnerDocument.documentElement)) then
     if (newChild.nodeType = Element_Node) then CheckError(HIERARCHY_REQUEST_ERR);
+  if node.doc <> FGNode.doc then CheckError(WRONG_DOCUMENT_ERR);
+  if (GetGNode(refChild)).parent<>FGNode then CheckError(NOT_FOUND_ERR);
   if (newChild <> nil) and (refChild <> nil) then
     node := xmlAddPrevSibling(GetGNode(refChild), GetGNode(newChild))
   else node := nil;
@@ -1339,10 +1342,17 @@ end;
 function TGDOMNamedNodeMap.setNamedItem(const newItem: IDomNode): IDomNode;
 var
   xmlNewAttr, attr: xmlAttrPtr;
-  node: xmlNodePtr;
+  node,node1: xmlNodePtr;
 begin
   node := FGNamedNodeMap;
-  xmlNewAttr := xmlAttrPtr(GetGNode(newItem));
+  node1:=GetGNode(newItem);
+  if node.doc<>node1.doc
+    then checkError(WRONG_DOCUMENT_ERR);
+  if node1.parent<>nil
+    then checkError(INUSE_ATTRIBUTE_ERR);
+  if node1.type_<>ATTRIBUTE_NODE
+    then checkError(HIERARCHY_REQUEST_ERR);
+  xmlNewAttr := xmlAttrPtr(node1);
   //todo: check type of newItem
   attr := setattr(node, xmlNewAttr);
   (FOwnerDocument as IDomInternal).removeAttr(xmlnewAttr);
@@ -1399,11 +1409,19 @@ var
   ns:        xmlNSPtr;
   namespace: PChar;
   newAttr:   IDomAttr;
+  node,node1: xmlNodePtr;
 begin
-  newAttr := newItem as IDomAttr;
-  if newAttr <> nil then begin
-    xmlnewAttr := xmlAttrPtr(GetGNode(newAttr));    // Get the libxml2-Attribute
-    node := FGNamedNodeMap;
+  node := FGNamedNodeMap;
+  node1:= GetGNode(newItem);
+  if node1 <> nil then begin
+    if node.doc<>node1.doc
+      then checkError(WRONG_DOCUMENT_ERR);
+    if node1.parent<>nil
+      then checkError(INUSE_ATTRIBUTE_ERR);
+    if node1.type_<>ATTRIBUTE_NODE
+      then checkError(HIERARCHY_REQUEST_ERR);
+    newAttr := newItem as IDomAttr;
+    xmlnewAttr := xmlAttrPtr(node1);    // Get the libxml2-Attribute
     xmlnewAttr.parent := node;
     if xmlnewAttr.ns <> nil then begin
       namespace := xmlnewAttr.ns.href;
@@ -1565,14 +1583,13 @@ var
   temp:         xmlAttrPtr;
   node:         xmlNodePtr;
 begin
+  if not IsXMLName(Name) then checkError(INVALID_CHARACTER_ERR);
   name1 := TGdomString.Create(Name);
   name2 := TGdomString.Create(Value);
   node := xmlNodePtr(GElement);
   temp := xmlSetProp(node, name1.CString, name2.CString);
   temp.parent := node;
   temp.doc := node.doc;
-  //(FOwnerDocument as IDomInternal).appendAttr(temp);
-  //todo: raise exception if temp=nil?
   name1.Free;
   name2.Free;
 end;
@@ -1580,7 +1597,6 @@ end;
 procedure TGDOMElement.removeAttribute(const Name: DOMString);
 var
   oldattr: xmlAttrPtr;
-  //attr,oldattr1,xmlNewAttr: xmlAttrPtr;
   name1: TGdomString;
 begin
   name1 := TGdomString.Create(Name);
@@ -1614,7 +1630,7 @@ begin
   xmlnewAttr.last := nil;
   oldattr := xmlHasProp(node, xmlNewattr.Name);
   // already an attribute with this name?
-  if oldattr <> nil then replace := True 
+  if oldattr <> nil then replace := True
   else replace := False;
   attr := node.properties;                         // get the old attr-list
   if (attr = nil)                                  // if it is empty or its an attribute with the same name
@@ -1659,8 +1675,12 @@ var
 begin
   if newAttr <> nil then begin
     xmlnewAttr := xmlAttrPtr(GetGNode(newAttr));     // Get the libxml2-Attribute
-    xmlnewAttr.last := nil;
     node := xmlNodePtr(GElement);
+    if xmlnewAttr.doc<>node.doc
+      then checkError(WRONG_DOCUMENT_ERR);
+    if xmlnewAttr.parent<>nil
+      then checkError(INUSE_ATTRIBUTE_ERR);
+    xmlnewAttr.last := nil;
     xmlnewAttr.parent := node;
     oldAttr := setAttr(node, xmlNewAttr);
     (FOwnerDocument as IDomInternal).removeAttr(xmlnewAttr);
@@ -1674,8 +1694,6 @@ begin
     end;
   end;
 end;
-
-
 
 function TGDOMElement.removeAttributeNode(const oldAttr: IDomAttr): IDomAttr;
 var
@@ -1703,6 +1721,8 @@ begin
       end else begin
         Result := nil;
       end;
+    end else begin
+      checkError(NOT_FOUND_ERR)
     end;
   end else Result := nil;
 end;
@@ -1736,7 +1756,19 @@ var
   ns: TGdomNamespace;
   //temp: xmlAttrPtr;
   value1: TGdomString;
+  alocalName: WideString;
 begin
+  alocalName := localName(qualifiedName);
+  if (prefix(qualifiedName) = 'xml') and (namespaceURI <>
+    'http://www.w3.org/XML/1998/namespace') then checkError(NAMESPACE_ERR);
+  if (prefix(qualifiedName) = 'xmlns') and (namespaceURI <>
+    'http://www.w3.org/2000/xmlns/') then checkError(NAMESPACE_ERR);
+  if ((qualifiedName) = 'xmlns') and (namespaceURI <>
+    'http://www.w3.org/2000/xmlns/') then checkError(NAMESPACE_ERR);
+  if (((Pos(':', alocalName)) > 0) or ((length(namespaceURI)) = 0) and
+    ((Pos(':', qualifiedName)) > 0)) then checkError(NAMESPACE_ERR);
+  if qualifiedName <> '' then if not IsXmlName(qualifiedName) then
+      checkError(INVALID_CHARACTER_ERR);
   value1 := TGdomString.Create(Value);
   ns := TGDOMNamespace.Create(xmlNodePtr(GElement), namespaceURI,
     qualifiedName, get_ownerDocument);
@@ -1794,6 +1826,10 @@ begin
   if newAttr <> nil then begin
     xmlnewAttr := xmlAttrPtr(GetGNode(newAttr));    // Get the libxml2-Attribute
     node := xmlNodePtr(GElement);
+    if xmlnewAttr.doc<>node.doc
+      then checkError(WRONG_DOCUMENT_ERR);
+    if xmlnewAttr.parent<>nil
+      then checkError(INUSE_ATTRIBUTE_ERR);
     xmlnewAttr.parent := node;
     if xmlnewAttr.ns <> nil then begin
       namespace := xmlnewAttr.ns.href;
@@ -2260,6 +2296,7 @@ begin
       checkError(INVALID_CHARACTER_ERR);
   ns := TGDOMNamespace.Create(nil, namespaceURI, qualifiedName, self);
   AAttr := xmlNewNsProp(nil, ns.ns, ns.localName.CString, nil);
+  AAttr.doc:=self.FPGdomeDoc;
   ns.Free;
   if AAttr <> nil then begin
     FAttrList.Add(AAttr);
@@ -2615,6 +2652,7 @@ var
   s1, s2, s: widestring;
 begin
   s := Get_data;
+  if (offset < 0) or (offset > length(s)) or (Count < 0) then checkError(INDEX_SIZE_ERR);
   s1 := Copy(s, 1, offset);
   s2 := Copy(s, offset + Count + 1, Length(s) - offset - Count);
   s := s1 + Data + s2;
