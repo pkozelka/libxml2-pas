@@ -64,6 +64,7 @@ uses
   classes,
   idom2,
   idom2_ext,
+  idom_experimental,
   libxml2,
   libxslt,
   sysutils,

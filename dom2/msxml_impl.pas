@@ -51,6 +51,7 @@ uses
   windows,
   ComObj,
   idom2,
+  idom_experimental,
   idom2_ext;
 
   const MSXML2Rental = 'MSXML2_RENTAL_MODEL';
