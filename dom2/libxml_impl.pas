@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.33 2002-05-02 23:40:15 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.34 2002-08-05 00:37:29 pkozelka Exp $
 (*
  * libxml-based implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -733,6 +733,7 @@ end;
 
 function TLDomNode.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
 begin
+  Result := nil;
 {TODO!
   RegisterNs('xyz4ct', namespaceURI);
   if localName='*' then begin
@@ -1159,7 +1160,9 @@ end;
 function TLDomEntRefChildNodes.GetFirstChildNodePtr: xmlNodePtr;
 begin
   Result := fOwnerNode.requestNodePtr.children;
-  Result := Result.children;
+  if (Result <> nil) then begin
+    Result := Result.children;
+  end;
 end;
 
 { TLDomDocument }
@@ -2068,10 +2071,14 @@ end;
 
 function TLDomEntityReference.get_nodeValue: DomString;
 var
-  p: PxmlChar;
+  firstChild: xmlEntityPtr;
 begin
-  p := xmlEntityPtr(fMyNode.children).content;
-  Result := UTF8Decode(p);
+  firstChild := xmlEntityPtr(fMyNode.children);
+  if (firstChild = nil) then begin
+    Result := '';
+  end else begin
+    Result := UTF8Decode(firstChild.content);
+  end;
 end;
 
 function TLDomEntityReference.get_ChildNodes: IDomNodeList;
