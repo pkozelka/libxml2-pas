@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.54 2002-01-16 20:25:41 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.55 2002-01-16 20:34:58 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -981,21 +981,27 @@ var
 begin
 	inherited Create;
 	self.QueryInterface(IDomDocument, doc);
-	if (doc<>nil) then begin
+	if (doc=nil) then begin
+		// this node is not a document
 		DomAssert(Assigned(aNode), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
+		DomAssert(aNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
+		// if the node is flying, register it in the owner document
+		if (aNode.parent=nil) then begin
+			RegisterFlyingNode(aNode);
+		end;
+		// if this is not the document itself, pretend having a reference to the owner document.
+		// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+		if (doc = nil) then begin
+	//		get_ownerDocument._AddRef;
+		end;
+	end else begin
+		// this is a document node
+		TGDOMDocument(self).FFlyingNodes := TList.Create; //DIRTY - beutify this (with virtual constructor)
+		Inc(doccount);
+		_AddRef; //todo: replace with better solution
 	end;
-	DomAssert(aNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
 	FGNode := aNode;
 	inc(nodecount);
-	// if the node is flying, register it in the owner document
-	if (aNode.parent=nil) then begin
-		RegisterFlyingNode(aNode);
-	end;
-	// if this is not the document itself, pretend having a reference to the owner document.
-	// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-	if (doc = nil) then begin
-//		get_ownerDocument._AddRef;
-	end;
 end;
 
 destructor TGDOMNode.destroy;
@@ -1594,9 +1600,6 @@ constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
 begin
 	//Create root-node as pascal object
 	inherited Create(nil);
-	FFlyingNodes := TList.Create;
-	Inc(doccount);
-	_AddRef; //todo: replace with better solution
 end;
 
 destructor TGDOMDocument.Destroy;
