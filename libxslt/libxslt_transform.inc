@@ -32,7 +32,7 @@ function  xsltApplyStylesheetUser(style: xsltStylesheetPtr; doc: xmlDocPtr; para
  * Private Interfaces.
  *)
 procedure xsltApplyStripSpaces(ctxt: xsltTransformContextPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
-function  xsltExtElementLookup(ctxt: xsltTransformContextPtr; name: PxmlChar; URI: PxmlChar): xsltTransformFunction; cdecl; external LIBXSLT_SO;
+//[pk](defined in extensions.h) function  xsltExtElementLookup(ctxt: xsltTransformContextPtr; name: PxmlChar; URI: PxmlChar): xsltTransformFunction; cdecl; external LIBXSLT_SO;
 function  xsltApplyStylesheet(style: xsltStylesheetPtr; doc: xmlDocPtr; params: PPchar): xmlDocPtr; cdecl; external LIBXSLT_SO;
 function  xsltProfileStylesheet(style: xsltStylesheetPtr; doc: xmlDocPtr; params: PPchar; output: PLibXml2File): xmlDocPtr; cdecl; external LIBXSLT_SO;
 function  xsltRunStylesheet(style: xsltStylesheetPtr; doc: xmlDocPtr; params: PPchar; output: Pchar; SAX: xmlSAXHandlerPtr; IObuf: xmlOutputBufferPtr): Longint; cdecl; external LIBXSLT_SO;
