@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/HTMLtree.h:1.23:
+// CVS-REV:gnome-xml/include/libxml/HTMLtree.h:1.24:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -70,4 +70,5 @@ procedure htmlNodeDumpFormatOutput(buf: xmlOutputBufferPtr; doc: xmlDocPtr; cur:
 procedure htmlDocContentDumpOutput(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: PChar); cdecl; external LIBXML2_SO;
 procedure htmlDocContentDumpFormatOutput(buf: xmlOutputBufferPtr; cur: xmlDocPtr; encoding: PChar; format: Longint); cdecl; external LIBXML2_SO;
 function  htmlIsBooleanAttr(name: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+procedure htmlNodeDumpOutput(buf: xmlOutputBufferPtr; doc: xmlDocPtr; cur: xmlDocPtr; encoding: PChar); cdecl; external LIBXML2_SO;
 

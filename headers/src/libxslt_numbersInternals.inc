@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/numbersInternals.h:1.11:
+// CVS-REV:libxslt/libxslt/numbersInternals.h:1.12:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltInternals.h:1.72:
+// CVS-REV:libxslt/libxslt/xsltInternals.h:1.74:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -24,7 +24,7 @@ const
    *
    * Max number of specified xsl: sort on an element.
   *)
-  XSLT_MAX_SORT = 5;
+  XSLT_MAX_SORT = 15;
 
   (**
    * XSLT_PAT_NO_PRIORITY:
@@ -34,12 +34,30 @@ const
   XSLT_PAT_NO_PRIORITY = -(12345789);
 
   (**
-   * xsltRuntimeExtra:
+   * XSLT_RUNTIME_EXTRA_LST:
+   * @ctxt: the transformation context
+   * @nr: the index
    *
-   * Extra information added to the transformation context.
+   * Macro used to access extra information stored in the context
    *)
 /// #define XSLT_RUNTIME_EXTRA_LST(ctxt, nr) (ctxt)->extras[(nr)].info
+
+  (**
+   * XSLT_RUNTIME_EXTRA_FREE:
+   * @ctxt: the transformation context
+   * @nr: the index
+   *
+   * Macro used to free extra information stored in the context
+   *)
 /// #define XSLT_RUNTIME_EXTRA_FREE(ctxt, nr) (ctxt)->extras[(nr)].deallocate
+
+  (**
+   * XSLT_RUNTIME_EXTRA:
+   * @ctxt: the transformation context
+   * @nr: the index
+   *
+   * Macro used to define extra information stored in the context
+   *)
 /// #define XSLT_RUNTIME_EXTRA(ctxt, nr) (ctxt)->extras[(nr)].val
 
 type

@@ -30,7 +30,7 @@ type
    * the set of option that can be configured
    *)
   xsltSecurityOption = (
-    XSLT__SECPREF_READ_NONE,
+    DUMMY__XSLT_SECPREF_READ_0,
     XSLT_SECPREF_READ_FILE,   // = 1,
     XSLT_SECPREF_WRITE_FILE,
     XSLT_SECPREF_CREATE_DIRECTORY,

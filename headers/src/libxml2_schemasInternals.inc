@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/schemasInternals.h:1.6:
+// CVS-REV:gnome-xml/include/libxml/schemasInternals.h:1.7:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -118,25 +118,95 @@ const
   XML_SCHEMAS_ANYATTR_STRICT = 3;
 
 const
+  (**
+   * XML_SCHEMAS_TYPE_MIXED:
+   *
+   * the element content type is mixed
+   *)
   XML_SCHEMAS_TYPE_MIXED = 1;//1 << 0
 
 const
+  (**
+   * XML_SCHEMAS_ELEM_NILLABLE:
+   *
+   * the element is nillable
+   *)
   XML_SCHEMAS_ELEM_NILLABLE = 1; //1 << 0
+  (**
+   * XML_SCHEMAS_ELEM_GLOBAL:
+   *
+   * the element is global
+   *)
   XML_SCHEMAS_ELEM_GLOBAL   = 2; //1 << 1
+  (**
+   * XML_SCHEMAS_ELEM_DEFAULT:
+   *
+   * the element has a default value
+   *)
   XML_SCHEMAS_ELEM_DEFAULT  = 4; //1 << 2
+  (**
+   * XML_SCHEMAS_ELEM_FIXED:
+   *
+   * the element has a fixed value
+   *)
   XML_SCHEMAS_ELEM_FIXED    = 8; //1 << 3
+  (**
+   * XML_SCHEMAS_ELEM_ABSTRACT:
+   *
+   * the element is abstract
+   *)
   XML_SCHEMAS_ELEM_ABSTRACT =16; //1 << 4
+  (**
+   * XML_SCHEMAS_ELEM_TOPLEVEL:
+   *
+   * the element is top level
+   *)
   XML_SCHEMAS_ELEM_TOPLEVEL =32; //1 << 5
+  (**
+   * XML_SCHEMAS_ELEM_REF:
+   *
+   * the element is a reference to a type
+   *)
   XML_SCHEMAS_ELEM_REF      =64; //1 << 6
 
 const
+  (**
+   * XML_SCHEMAS_FACET_UNKNOWN:
+   *
+   * unknown facet handling
+   *)
   XML_SCHEMAS_FACET_UNKNOWN  = 0;
+  (**
+   * XML_SCHEMAS_FACET_PRESERVE:
+   *
+   * preserve the type of the facet
+   *)
   XML_SCHEMAS_FACET_PRESERVE = 1;
+  (**
+   * XML_SCHEMAS_FACET_REPLACE:
+   *
+   * replace the type of the facet
+   *)
   XML_SCHEMAS_FACET_REPLACE  = 2;
+  (**
+   * XML_SCHEMAS_FACET_COLLAPSE:
+   *
+   * collapse the types of the facet
+   *)
   XML_SCHEMAS_FACET_COLLAPSE = 3;
 
 const
+  (**
+   * XML_SCHEMAS_QUALIF_ELEM:
+   *
+   * the shemas requires qualified elements
+   *)
   XML_SCHEMAS_QUALIF_ELEM = 1; //1 << 0
+  (**
+   * XML_SCHEMAS_QUALIF_ATTR:
+   *
+   * the shemas requires qualified attributes
+   *)
   XML_SCHEMAS_QUALIF_ATTR	= 2; //1 << 1
 
 {}
@@ -160,6 +230,11 @@ type
     content: xmlNodePtr;                         (* the annotation *)
   end;
 
+  (**
+   * _xmlSchemaType:
+   *
+   * Schemas type definition.
+   *)
   xmlSchemaAttributePtr = ^xmlSchemaAttribute;
   xmlSchemaAttribute = record
     _type: xmlSchemaTypeType;                    (* The kind of type *)
@@ -220,6 +295,7 @@ type
   end;
 
   (**
+   * xmlSchemaElement:
    * An element definition.
    *
    * xmlSchemaType, xmlSchemaFacet and xmlSchemaElement start of
@@ -281,6 +357,8 @@ type
   end;
 
   (**
+   * _xmlSchema:
+   *
    * A Schemas definition
    *)
   _xmlSchema = record

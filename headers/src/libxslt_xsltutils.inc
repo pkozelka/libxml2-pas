@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltutils.h:1.34:
+// CVS-REV:libxslt/libxslt/xsltutils.h:1.35:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -15,7 +15,7 @@
  *)
 
 (**
- * TODO:
+ * XSLT_TODO:
  *
  * Macro to flag unimplemented blocks.
  *)
@@ -26,7 +26,7 @@
             __FILE__, __LINE__);
 }
 (**
- * STRANGE:
+ * XSLT_STRANGE:
  *
  * Macro to flag that a problem was detected internally.
  *)
@@ -140,12 +140,17 @@ function  xsltTimestamp: Longint; cdecl; external LIBXSLT_SO;
 procedure xsltCalibrateAdjust(delta: Longint); cdecl; external LIBXSLT_SO;
 
 const
+  (**
+   * XSLT_TIMESTAMP_TICS_PER_SEC:
+   *
+   * Sampling precision for profiling
+   *)
   XSLT_TIMESTAMP_TICS_PER_SEC = 100000;
 
+type
   (*
    * Hooks for the debugger.
    *)
-type
   xsltDebugStatusCodes = Longint;
 const
   XSLT_DEBUG_NONE         = 0; (* no debugging allowed *)

@@ -88,6 +88,7 @@ type
 {$I libxml2_schemasInternals.inc}
 {$I libxml2_xmlschemastypes.inc}
 {$I libxml2_xmlschemas.inc}
+{$I libxml2_xmlreader.inc}
 
 // functions existing only in some compilers
 

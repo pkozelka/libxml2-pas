@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.116:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.117:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -229,13 +229,13 @@ type
    *)
   xmlElementContentPtr = ^xmlElementContent;
   xmlElementContent = record
-    type_: xmlElementContentType;   (* PCDATA, ELEMENT, SEQ or OR  *)
-    ocur: xmlElementContentOccur;   (* ONCE, OPT, MULT or PLUS  *)
-    name: PxmlChar;                 (* Element name  *)
-    c1: xmlElementContentPtr;       (* first child  *)
-    c2: xmlElementContentPtr;       (* second child  *)
-    parent: xmlElementContentPtr;   (* parent  *)
-    prefix: PxmlChar;               (* prefix *)
+    type_: xmlElementContentType;   (* PCDATA, ELEMENT, SEQ or OR *)
+    ocur: xmlElementContentOccur;   (* ONCE, OPT, MULT or PLUS *)
+    name: PxmlChar;                 (* Element name *)
+    c1: xmlElementContentPtr;       (* first child *)
+    c2: xmlElementContentPtr;       (* second child *)
+    parent: xmlElementContentPtr;   (* parent *)
+    prefix: PxmlChar;               (* Namespace prefix *)
   end;
 
   (**
