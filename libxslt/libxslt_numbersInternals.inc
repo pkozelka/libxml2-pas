@@ -51,22 +51,14 @@
     
      This data structure lists the various parameters needed to format numbers
     }
-  { Number of '0' in integer part  }
-  { Number of '0' in fractional part  }
-  { Number of '#' in fractional part  }
-  { Number of chars per display 'group'  }
-  { Scaling for percent or permille  }
-  { Flag to catch multiple occurences of percent/permille  }
-  { Flag for processing -ve prefix/suffix  }
-
      xsltFormatNumberInfo = record
-          integer_digits : longint;
-          frac_digits : longint;
-          frac_hash : longint;
-          group : longint;
-          multiplier : longint;
-          is_multiplier_set : char;
-          is_negative_pattern : char;
+          integer_digits : longint;     { Number of '0' in integer part  }
+          frac_digits : longint;        { Number of '0' in fractional part  }
+          frac_hash : longint;          { Number of '#' in fractional part  }
+          group : longint;              { Number of chars per display 'group'  }
+          multiplier : longint;         { Scaling for percent or permille  }
+          is_multiplier_set : char;     { Flag to catch multiple occurences of percent/permille  }
+          is_negative_pattern : char;   { Flag for processing -ve prefix/suffix  }
        end;
 
      xsltFormatNumberInfoPtr = ^xsltFormatNumberInfo;
