@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.91 2002-01-29 01:02:11 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.92 2002-01-29 02:30:51 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -671,6 +671,18 @@ begin
   Result := true;
 end;
 
+function isQName(aStr: DomString): boolean;
+var
+  pfx: string;
+begin
+  pfx := prefix(aStr);
+  if (pfx='') then begin
+    Result := isNCName(aStr);
+  end else begin
+    Result := isNCName(pfx) and isNCName(localName(aStr));
+  end;
+end;
+
 function isNotReserved(aStr: DomString): boolean;
 begin
   Result := UpperCase(Copy(aStr, 1, 3))<>'XML';
@@ -830,17 +842,22 @@ var
   dtd:xmlDtdPtr;
   uqname, upubid, usysid: String;
 begin
+  DomAssert(isNotReserved(qualifiedName), NAMESPACE_ERR, 'qualifiedName starts with reserved string "XML".');
+  DomAssert(isQName(qualifiedName), NAMESPACE_ERR, 'not a qualified name:'+qualifiedName);
   uqname := UTF8Encode(qualifiedName);
   upubid := UTF8Encode(publicId);
   usysid := UTF8Encode(systemId);
-  dtd := xmlCreateIntSubSet(nil, PChar(uqname), PChar(upubid), PChar(usysid)); //todo: doc!
+  dtd := xmlCreateIntSubSet(nil, PChar(uqname), PChar(upubid), PChar(usysid));
   Result := GetDomObject(dtd) as IDomDocumentType;
 end;
 
 function TGDOMImplementation.createDocument(const namespaceURI, qualifiedName: DomString; doctype: IDomDocumentType): IDomDocument;
 begin
-  DomAssert(doctype=nil, NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
   Result := TGDOMDocument.Create(nil);
+  if (doctype<>nil) then begin
+    DomAssert(doctype.ownerDocument=nil, WRONG_DOCUMENT_ERR, 'doctype already belongs to another document');
+    Result.appendChild(doctype);
+  end;
   // prepare documentElement if necessary
   if (qualifiedName<>'') then begin
     Result.appendChild(Result.createElementNS(namespaceURI, qualifiedName));
@@ -857,14 +874,19 @@ begin
     // this node is not a document
     DomAssert(Assigned(aLibXml2Node), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
     FGNode._private := self;
-    DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
-    // if the node is flying, register it in the owner document
-    if (FGNode.parent=nil) then begin
-      RegisterFlyingNode(FGNode);
+
+    if not (self is TGDOMDocumentType) then begin
+      DomAssert(FGNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
     end;
-    // if this is not the document itself, pretend having a reference to the owner document.
-    // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-		get_ownerDocument._AddRef;
+    if (FGNode.doc<>nil) then begin
+      // if the node is flying, register it in the owner document
+      if (FGNode.parent=nil) then begin
+        RegisterFlyingNode(FGNode);
+      end;
+      // if this is not the document itself, pretend having a reference to the owner document.
+      // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+      get_ownerDocument._AddRef;
+    end;
   end;
   Inc(nodecount);
 end;
@@ -872,9 +894,11 @@ end;
 destructor TGDOMNode.Destroy;
 begin
   if not (self is TGDOMDocument) then begin
-  // if this is not the document itself, release the pretended reference to the owner document:
-  // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-		get_ownerDocument._Release;
+    if (FGNode.doc<>nil) then begin
+      // if this is not the document itself, release the pretended reference to the owner document:
+      // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+      get_ownerDocument._Release;
+    end;
   end;
   if (FGNode<>nil) then begin
     FGNode._private := nil;
@@ -1683,6 +1707,7 @@ var
   node: xmlNodePtr;
 begin
   DomAssert(isNCName(tagName), INVALID_CHARACTER_ERR, 'tagName');
+  DomAssert(isNotReserved(tagName), NAMESPACE_ERR, 'tagName starts with reserved string "XML".');
   node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(tagName)),nil);
   Result := GetDOMObject(node) as IDomElement;
 end;
