@@ -640,17 +640,24 @@ informations are stored}
   function xsltXPathFunctionLookup (ctxt: xmlXPathContextPtr; const name: PChar; const ns_uri: PChar) : xmlXPathFunction; cdecl; external LIBXSLT_SO;
   function xsltXPathGetTransformContext (ctxt: xmlXPathParserContextPtr) : xsltTransformContextPtr; cdecl; external LIBXSLT_SO;
   function xsltXPathVariableLookup (ctxt: Pointer; const name: PChar; const ns_uri: PChar) : xmlXPathObjectPtr; cdecl; external LIBXSLT_SO;
-  function xsltDocDefaultLoader (const URI: PChar; dict: xmlDictPtr; options: Longint; ctxt: Pointer; type_: xsltLoadType) : xmlDocPtr; cdecl;
+var  
+  __xslDebugStatus: PInteger;
+var  
+  __xsltDocDefaultLoader: xsltDocLoaderFuncPtr;
   function xsltEngineVersion(): PChar; cdecl;
   function xsltExtMarker(): PChar; cdecl;
+var
+  __xsltGenericDebug: xmlGenericErrorFuncPtr;
+var
+  __xsltGenericDebugContext: PPointer;
+var
+  __xsltGenericError: xmlGenericErrorFuncPtr;
+var
+  __xsltGenericErrorContext: PPointer;
   function xsltLibxmlVersion(): Longint; cdecl;
   function xsltLibxsltVersion(): Longint; cdecl;
-
 var
   __xsltMaxDepth: PInteger;
-  __xslDebugStatus: PInteger;
-  __xsltGenericDebugContext: PPointer;
-  __xsltGenericErrorContext: PPointer;
 
 implementation
 uses
@@ -666,15 +673,6 @@ procedure CheckForNil(ptr: Pointer; name:string);
 begin
   if not Assigned(ptr) then
     raise Exception.Create('"' + name + '" could not be loaded from the dynamic library ' + LIBXSLT_SO);
-end;
-
-var
-   pxsltDocDefaultLoader: xsltDocLoaderFuncPtr;
-
-function xsltDocDefaultLoader (const URI: PChar; dict: xmlDictPtr; options: Longint; ctxt: Pointer; type_: xsltLoadType) : xmlDocPtr; cdecl;
-begin
-  CheckForNil(pxsltDocDefaultLoader, 'xsltDocDefaultLoader');
-  Result := pxsltDocDefaultLoader^(URI, dict, options, ctxt, type_);
 end;
 
 var
@@ -721,17 +719,19 @@ initialization
   // get to these addresses (and also those of other data values exported from
   // the DLL) by using GetProcAddress.
   libHandle := LoadLibrary(LIBXSLT_SO);
-  if libHandle <> 0 then 
+  if libHandle <> 0 then
   begin
-    pxsltDocDefaultLoader := xsltDocLoaderFuncPtr(GetProcAddress(libHandle, 'xsltDocDefaultLoader'));
+    __xslDebugStatus := PInteger(GetProcAddress(libHandle, 'xslDebugStatus'));
+    __xsltDocDefaultLoader := xsltDocLoaderFuncPtr(GetProcAddress(libHandle, 'xsltDocDefaultLoader'));
     pxsltEngineVersion := PPChar(GetProcAddress(libHandle, 'xsltEngineVersion'));
     pxsltExtMarker := PPChar(GetProcAddress(libHandle, 'xsltExtMarker'));
+    __xsltGenericDebug := xmlGenericErrorFuncPtr(GetProcAddress(libHandle, 'xsltGenericDebug'));
+    __xsltGenericDebugContext := PPointer(GetProcAddress(libHandle, 'xsltGenericDebugContext'));
+    __xsltGenericError := xmlGenericErrorFuncPtr(GetProcAddress(libHandle, 'xsltGenericError'));
+    __xsltGenericErrorContext := PPointer(GetProcAddress(libHandle, 'xsltGenericErrorContext'));
     pxsltLibxmlVersion := PInteger(GetProcAddress(libHandle, 'xsltLibxmlVersion'));
     pxsltLibxsltVersion := PInteger(GetProcAddress(libHandle, 'xsltLibxsltVersion'));
     __xsltMaxDepth := PInteger(GetProcAddress(libHandle, 'xsltMaxDepth'));
-    __xslDebugStatus := PInteger(GetProcAddress(libHandle, 'xslDebugStatus'));
-    __xsltGenericDebugContext := PPointer(GetProcAddress(libHandle, 'xsltGenericDebugContext'));
-    __xsltGenericErrorContext := PPointer(GetProcAddress(libHandle, 'xsltGenericErrorContext'));
     FreeLibrary(libHandle);
   end;
 

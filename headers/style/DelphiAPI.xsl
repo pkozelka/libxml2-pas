@@ -31,6 +31,44 @@
 
 <xsl:key name="enumTypeKey" match="enum" use="@type"/>
 
+<xsl:variable name="memoryFunctions">
+xmlFree 
+xmlMalloc 
+xmlMallocAtomic 
+xmlMemStrdup 
+xmlRealloc 
+</xsl:variable>
+
+<xsl:variable name="indirectVariables">
+docbDefaultSAXHandler 
+htmlDefaultSAXHandler 
+oldXMLWDcompatibility 
+xmlBufferAllocScheme 
+xmlDefaultBufferSize 
+xmlDefaultSAXHandler 
+xmlDefaultSAXLocator 
+xmlDeregisterNodeDefaultValue 
+xmlDoValidityCheckingDefaultValue 
+xmlGenericError 
+xmlGenericErrorContext 
+xmlGetWarningsDefaultValue 
+xmlIndentTreeOutput 
+xmlKeepBlanksDefaultValue 
+xmlLastError 
+xmlLineNumbersDefaultValue 
+xmlLoadExtDtdDefaultValue 
+xmlOutputBufferCreateFilenameValue 
+xmlParserDebugEntities 
+xmlParserInputBufferCreateFilenameValue 
+xmlParserVersion 
+xmlPedanticParserDefaultValue 
+xmlRegisterNodeDefaultValue 
+xmlSaveNoEmptyTags 
+xmlStructuredError 
+xmlSubstituteEntitiesDefaultValue 
+xmlTreeIndentString 
+</xsl:variable>
+
 <!-- 
   Template for the document root. This generates a boiler-plate header
   and footer around the other code 
@@ -318,7 +356,19 @@ end.
 
 <xsl:template match="variable" mode="VariablesPassOne">
   <xsl:choose>
-    <xsl:when test="contains(@type, 'Func') and not(contains(@name, 'DefaultValue'))">
+    <xsl:when test="contains($indirectVariables, concat(@name, ' '))">
+      <xsl:text>
+  function __</xsl:text>
+      <xsl:value-of select="@name"/>
+      <xsl:text>(): </xsl:text>
+      <xsl:call-template name="FixupVarType">
+        <xsl:with-param name="text" select="concat(@type, ' *')"/>
+      </xsl:call-template>
+      <xsl:text>; cdecl; external </xsl:text>
+      <xsl:call-template name="WriteLibName"/>
+      <xsl:text>;</xsl:text>
+    </xsl:when>
+    <xsl:when test="contains($memoryFunctions, concat(@name ,' '))">
       <xsl:variable name="typeName" select="@type"/>
       <xsl:variable name="nArgs" select="count(../functype[@name=$typeName]/arg)"/>
       <xsl:if test="../functype[@name=$typeName]/arg[$nArgs]/@type!='...'">
@@ -341,26 +391,38 @@ end.
       </xsl:call-template>
       <xsl:text>; cdecl;</xsl:text>
     </xsl:when>
+    <xsl:when test="@type='xmlChRangeGroup'"> 
+      <xsl:text>
+var
+  __</xsl:text>
+      <xsl:value-of select="@name"/>
+      <xsl:text>: </xsl:text>
+      <xsl:value-of select="concat(@type, 'Ptr;')"/>
+    </xsl:when>
+    <xsl:when test="contains(@type, '[]')">
+      <xsl:text>
+var
+  </xsl:text>
+      <xsl:value-of select="@name"/>
+      <xsl:text>: PChar;</xsl:text>
+    </xsl:when>
     <xsl:otherwise>
-       <xsl:if test="not(starts-with(@name, 'xmlIs')) and not(contains(@type, '[]'))">
-         <xsl:text>
-  function __</xsl:text>
-         <xsl:value-of select="@name"/>
-         <xsl:text>(): </xsl:text>
-         <xsl:call-template name="FixupVarType">
-           <xsl:with-param name="text" select="concat(@type, ' *')"/>
-         </xsl:call-template>
-         <xsl:text>; cdecl; external </xsl:text>
-         <xsl:call-template name="WriteLibName"/>
-         <xsl:text>;</xsl:text>
-      </xsl:if>
+      <xsl:text>
+var
+  __</xsl:text>
+      <xsl:value-of select="@name"/>
+      <xsl:text>: </xsl:text>
+      <xsl:call-template name="FixupVarType">
+        <xsl:with-param name="text" select="concat(@type, ' *')"/>
+      </xsl:call-template>
+      <xsl:text>;</xsl:text>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
 <xsl:template match="variable" mode="VariablesPassTwo">
   <xsl:choose>
-    <xsl:when test="contains(@type, 'Func') and not(contains(@name, 'DefaultValue'))">
+    <xsl:when test="contains($memoryFunctions, concat(@name ,' '))">
       <xsl:variable name="typeName" select="@type"/>
       <xsl:variable name="nArgs" select="count(../functype[@name=$typeName]/arg)"/>
       <xsl:if test="../functype[@name=$typeName]/arg[$nArgs]/@type!='...'">
@@ -439,29 +501,43 @@ end;
 </xsl:template>
 
 <xsl:template match="variable" mode="VariablesPassThree">
-  <xsl:if test="(contains(@type, 'Func') and not(contains(@name, 'DefaultValue'))) or (starts-with(@type, 'const '))">
+  <xsl:if test="not(contains($indirectVariables, concat(@name ,' ')))">
     <xsl:variable name="typeName" select="@type"/>
     <xsl:variable name="nArgs" select="count(../functype[@name=$typeName]/arg)"/>
-    <xsl:if test="(($unit!='libxml2') and starts-with(@type, 'const ')) or (../functype[@name=$typeName]/arg[$nArgs]/@type!='...')">
-      <xsl:text>    p</xsl:text>
-      <xsl:value-of select="@name"/>
-      <xsl:text> := </xsl:text>
-      <xsl:choose>
-        <xsl:when test="($unit!='libxml2') and starts-with(@type, 'const ')">
-          <xsl:call-template name="FixupVarType">
-            <xsl:with-param name="text" select="concat(substring-after(@type, 'const '), ' *')"/>
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="@type"/>
-          <xsl:text>Ptr</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:text>(GetProcAddress(libHandle, '</xsl:text>
-      <xsl:value-of select="@name"/>
-      <xsl:text>'));
+    <xsl:text>    </xsl:text>
+    <xsl:choose>
+      <xsl:when test="contains($memoryFunctions, concat(@name, ' ')) or ($unit!='libxml2') and starts-with(@type, 'const ')">
+        <xsl:text>p</xsl:text>
+      </xsl:when>
+      <xsl:when test="not(contains(@type, '[]'))">
+        <xsl:text>__</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:value-of select="@name"/>
+    <xsl:text> := </xsl:text>
+    <xsl:choose>
+      <xsl:when test="contains($memoryFunctions, concat(@name, ' '))">
+        <xsl:value-of select="@type"/>
+        <xsl:text>Ptr</xsl:text>
+      </xsl:when>
+      <xsl:when test="($unit!='libxml2') and starts-with(@type, 'const ')">
+        <xsl:call-template name="FixupVarType">
+          <xsl:with-param name="text" select="concat(substring-after(@type, 'const '), ' *')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains(@type, '[]')">
+        <xsl:text>PChar</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="FixupVarType">
+          <xsl:with-param name="text" select="concat(@type, ' *')"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:text>(GetProcAddress(libHandle, '</xsl:text>
+    <xsl:value-of select="@name"/>
+    <xsl:text>'));
 </xsl:text>
-    </xsl:if>
   </xsl:if>
 </xsl:template>
 
@@ -549,7 +625,11 @@ end;
       </xsl:otherwise>
     </xsl:choose>
   </xsl:if>
-  <xsl:text>; cdecl;</xsl:text>
+  <xsl:text>; cdecl</xsl:text>
+  <xsl:if test="($type='functype') and $hasVarArgs">
+    <xsl:text> varargs</xsl:text>
+  </xsl:if>
+  <xsl:text>;</xsl:text>
   <xsl:if test="$type='function'">
     <xsl:if test="$hasVarArgs">
       <xsl:text> varargs;</xsl:text>
@@ -662,7 +742,7 @@ end;
       <xsl:text>PCardinal</xsl:text>
     </xsl:when>
     <xsl:when test="$text='unsigned int *'">
-      <xsl:text>PInteger</xsl:text>
+      <xsl:text>PCardinal</xsl:text>
     </xsl:when>
     <xsl:when test="$text='char **'">
       <xsl:text>PPChar</xsl:text>

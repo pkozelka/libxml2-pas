@@ -1336,13 +1336,13 @@ type
       entityDeclSAXFunc = procedure  (ctx: Pointer; const name: PChar; type_: Longint; const publicId: PChar; const systemId: PChar; content: PChar); cdecl;
         entityDeclSAXFuncPtr = ^entityDeclSAXFunc;
 
-      errorSAXFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      errorSAXFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         errorSAXFuncPtr = ^errorSAXFunc;
 
       externalSubsetSAXFunc = procedure  (ctx: Pointer; const name: PChar; const ExternalID: PChar; const SystemID: PChar); cdecl;
         externalSubsetSAXFuncPtr = ^externalSubsetSAXFunc;
 
-      fatalErrorSAXFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      fatalErrorSAXFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         fatalErrorSAXFuncPtr = ^fatalErrorSAXFunc;
 
       ftpDataCallback = procedure  (userData: Pointer; const data: PChar; len: Longint); cdecl;
@@ -1399,7 +1399,7 @@ type
       unparsedEntityDeclSAXFunc = procedure  (ctx: Pointer; const name: PChar; const publicId: PChar; const systemId: PChar; const notationName: PChar); cdecl;
         unparsedEntityDeclSAXFuncPtr = ^unparsedEntityDeclSAXFunc;
 
-      warningSAXFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      warningSAXFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         warningSAXFuncPtr = ^warningSAXFunc;
 
       xlinkExtendedLinkFunk = procedure  (ctx: Pointer; node: xmlNodePtr; nbLocators: Longint; const hrefs: xlinkHRefPtr; const roles: xlinkRolePtr; nbArcs: Longint; const from: xlinkRolePtr; const to_: xlinkRolePtr; show: xlinkShowPtr; actuate: xlinkActuatePtr; nbTitles: Longint; const titles: xlinkTitlePtr; const langs: PPChar); cdecl;
@@ -1435,7 +1435,7 @@ type
       xmlFreeFunc = procedure  (mem: Pointer); cdecl;
         xmlFreeFuncPtr = ^xmlFreeFunc;
 
-      xmlGenericErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      xmlGenericErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         xmlGenericErrorFuncPtr = ^xmlGenericErrorFunc;
 
       xmlHashCopier = function  (payload: Pointer; name: PChar) : Pointer; cdecl;
@@ -1504,16 +1504,16 @@ type
       xmlRegisterNodeFunc = procedure  (node: xmlNodePtr); cdecl;
         xmlRegisterNodeFuncPtr = ^xmlRegisterNodeFunc;
 
-      xmlRelaxNGValidityErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      xmlRelaxNGValidityErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         xmlRelaxNGValidityErrorFuncPtr = ^xmlRelaxNGValidityErrorFunc;
 
-      xmlRelaxNGValidityWarningFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      xmlRelaxNGValidityWarningFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         xmlRelaxNGValidityWarningFuncPtr = ^xmlRelaxNGValidityWarningFunc;
 
-      xmlSchemaValidityErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      xmlSchemaValidityErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         xmlSchemaValidityErrorFuncPtr = ^xmlSchemaValidityErrorFunc;
 
-      xmlSchemaValidityWarningFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      xmlSchemaValidityWarningFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         xmlSchemaValidityWarningFuncPtr = ^xmlSchemaValidityWarningFunc;
 
       xmlShellCmd = function  (ctxt: xmlShellCtxtPtr; arg: PChar; node: xmlNodePtr; node2: xmlNodePtr) : Longint; cdecl;
@@ -1531,10 +1531,10 @@ type
       xmlTextReaderErrorFunc = procedure  (arg: Pointer; const msg: PChar; severity: xmlParserSeverities; locator: xmlTextReaderLocatorPtr); cdecl;
         xmlTextReaderErrorFuncPtr = ^xmlTextReaderErrorFunc;
 
-      xmlValidityErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      xmlValidityErrorFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         xmlValidityErrorFuncPtr = ^xmlValidityErrorFunc;
 
-      xmlValidityWarningFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl;
+      xmlValidityWarningFunc = procedure  (ctx: Pointer; const msg: PChar); cdecl varargs;
         xmlValidityWarningFuncPtr = ^xmlValidityWarningFunc;
 
       xmlXPathAxisFunc = function  (ctxt: xmlXPathParserContextPtr; cur: xmlXPathObjectPtr) : xmlXPathObjectPtr; cdecl;
@@ -4028,9 +4028,22 @@ actually an xmlCharEncoding}
   function __xmlDeregisterNodeDefaultValue(): xmlDeregisterNodeFuncPtr; cdecl; external LIBXML2_SO;
   function __xmlDoValidityCheckingDefaultValue(): PInteger; cdecl; external LIBXML2_SO;
   procedure xmlFree (mem: Pointer); cdecl;
+  function __xmlGenericError(): xmlGenericErrorFuncPtr; cdecl; external LIBXML2_SO;
   function __xmlGenericErrorContext(): PPointer; cdecl; external LIBXML2_SO;
   function __xmlGetWarningsDefaultValue(): PInteger; cdecl; external LIBXML2_SO;
   function __xmlIndentTreeOutput(): PInteger; cdecl; external LIBXML2_SO;
+var
+  __xmlIsBaseCharGroup: xmlChRangeGroupPtr;
+var
+  __xmlIsCharGroup: xmlChRangeGroupPtr;
+var
+  __xmlIsCombiningGroup: xmlChRangeGroupPtr;
+var
+  __xmlIsDigitGroup: xmlChRangeGroupPtr;
+var
+  __xmlIsExtenderGroup: xmlChRangeGroupPtr;
+var
+  __xmlIsIdeographicGroup: xmlChRangeGroupPtr;
   function __xmlKeepBlanksDefaultValue(): PInteger; cdecl; external LIBXML2_SO;
   function __xmlLastError(): xmlErrorPtr; cdecl; external LIBXML2_SO;
   function __xmlLineNumbersDefaultValue(): PInteger; cdecl; external LIBXML2_SO;
@@ -4038,26 +4051,38 @@ actually an xmlCharEncoding}
   function xmlMalloc (size: size_t) : Pointer; cdecl;
   function xmlMallocAtomic (size: size_t) : Pointer; cdecl;
   function xmlMemStrdup (const str: PChar) : PChar; cdecl;
-  function xmlOutputBufferCreateFilenameValue (const URI: PChar; encoder: xmlCharEncodingHandlerPtr; compression: Longint) : xmlOutputBufferPtr; cdecl;
+  function __xmlOutputBufferCreateFilenameValue(): xmlOutputBufferCreateFilenameFuncPtr; cdecl; external LIBXML2_SO;
   function __xmlParserDebugEntities(): PInteger; cdecl; external LIBXML2_SO;
-  function xmlParserInputBufferCreateFilenameValue (const URI: PChar; enc: xmlCharEncoding) : xmlParserInputBufferPtr; cdecl;
-  function __xmlParserMaxDepth(): PInteger; cdecl; external LIBXML2_SO;
+  function __xmlParserInputBufferCreateFilenameValue(): xmlParserInputBufferCreateFilenameFuncPtr; cdecl; external LIBXML2_SO;
+var
+  __xmlParserMaxDepth: PCardinal;
   function __xmlParserVersion(): PPChar; cdecl; external LIBXML2_SO;
   function __xmlPedanticParserDefaultValue(): PInteger; cdecl; external LIBXML2_SO;
   function xmlRealloc (mem: Pointer; size: size_t) : Pointer; cdecl;
   function __xmlRegisterNodeDefaultValue(): xmlRegisterNodeFuncPtr; cdecl; external LIBXML2_SO;
   function __xmlSaveNoEmptyTags(): PInteger; cdecl; external LIBXML2_SO;
-  procedure xmlStructuredError (userData: Pointer; error: xmlErrorPtr); cdecl;
-  function __xmlSubstituteEntitiesDefaultValue(): PInteger; cdecl; external LIBXML2_SO;
-  function __xmlTreeIndentString(): PPChar; cdecl; external LIBXML2_SO;
-  function __xmlXPathNAN(): PDouble; cdecl; external LIBXML2_SO;
-  function __xmlXPathNINF(): PDouble; cdecl; external LIBXML2_SO;
-  function __xmlXPathPINF(): PDouble; cdecl; external LIBXML2_SO;
-
+var
+  xmlStringComment: PChar;
 var
   xmlStringText: PChar;
+var
   xmlStringTextNoenc: PChar;
-  xmlStringComment: PChar;
+  function __xmlStructuredError(): xmlStructuredErrorFuncPtr; cdecl; external LIBXML2_SO;
+  function __xmlSubstituteEntitiesDefaultValue(): PInteger; cdecl; external LIBXML2_SO;
+  function __xmlTreeIndentString(): PPChar; cdecl; external LIBXML2_SO;
+var
+  __xmlXPathNAN: PDouble;
+var
+  __xmlXPathNINF: PDouble;
+var
+  __xmlXPathPINF: PDouble;
+
+type charTab = array[0..255] of Byte;
+   charTabPtr = ^charTab;
+
+var
+  xmlIsPubidChar_tab: charTab;
+
 
 implementation
 uses
@@ -4112,39 +4137,12 @@ begin
 end;
 
 var
-   pxmlOutputBufferCreateFilenameValue: xmlOutputBufferCreateFilenameFuncPtr;
-
-function xmlOutputBufferCreateFilenameValue (const URI: PChar; encoder: xmlCharEncodingHandlerPtr; compression: Longint) : xmlOutputBufferPtr; cdecl;
-begin
-  CheckForNil(pxmlOutputBufferCreateFilenameValue, 'xmlOutputBufferCreateFilenameValue');
-  Result := pxmlOutputBufferCreateFilenameValue^(URI, encoder, compression);
-end;
-
-var
-   pxmlParserInputBufferCreateFilenameValue: xmlParserInputBufferCreateFilenameFuncPtr;
-
-function xmlParserInputBufferCreateFilenameValue (const URI: PChar; enc: xmlCharEncoding) : xmlParserInputBufferPtr; cdecl;
-begin
-  CheckForNil(pxmlParserInputBufferCreateFilenameValue, 'xmlParserInputBufferCreateFilenameValue');
-  Result := pxmlParserInputBufferCreateFilenameValue^(URI, enc);
-end;
-
-var
    pxmlRealloc: xmlReallocFuncPtr;
 
 function xmlRealloc (mem: Pointer; size: size_t) : Pointer; cdecl;
 begin
   CheckForNil(pxmlRealloc, 'xmlRealloc');
   Result := pxmlRealloc^(mem, size);
-end;
-
-var
-   pxmlStructuredError: xmlStructuredErrorFuncPtr;
-
-procedure xmlStructuredError (userData: Pointer; error: xmlErrorPtr); cdecl;
-begin
-  CheckForNil(pxmlStructuredError, 'xmlStructuredError');
-  pxmlStructuredError^(userData, error);
 end;
 
 
@@ -4158,16 +4156,25 @@ initialization
   if libHandle <> 0 then
   begin
     pxmlFree := xmlFreeFuncPtr(GetProcAddress(libHandle, 'xmlFree'));
+    __xmlIsBaseCharGroup := xmlChRangeGroupPtr(GetProcAddress(libHandle, 'xmlIsBaseCharGroup'));
+    __xmlIsCharGroup := xmlChRangeGroupPtr(GetProcAddress(libHandle, 'xmlIsCharGroup'));
+    __xmlIsCombiningGroup := xmlChRangeGroupPtr(GetProcAddress(libHandle, 'xmlIsCombiningGroup'));
+    __xmlIsDigitGroup := xmlChRangeGroupPtr(GetProcAddress(libHandle, 'xmlIsDigitGroup'));
+    __xmlIsExtenderGroup := xmlChRangeGroupPtr(GetProcAddress(libHandle, 'xmlIsExtenderGroup'));
+    __xmlIsIdeographicGroup := xmlChRangeGroupPtr(GetProcAddress(libHandle, 'xmlIsIdeographicGroup'));
+    xmlIsPubidChar_tab := charTabPtr(GetProcAddress(libHandle, 'xmlIsPubidChar_tab'))^;
     pxmlMalloc := xmlMallocFuncPtr(GetProcAddress(libHandle, 'xmlMalloc'));
     pxmlMallocAtomic := xmlMallocFuncPtr(GetProcAddress(libHandle, 'xmlMallocAtomic'));
     pxmlMemStrdup := xmlStrdupFuncPtr(GetProcAddress(libHandle, 'xmlMemStrdup'));
-    pxmlOutputBufferCreateFilenameValue := xmlOutputBufferCreateFilenameFuncPtr(GetProcAddress(libHandle, 'xmlOutputBufferCreateFilenameValue'));
-    pxmlParserInputBufferCreateFilenameValue := xmlParserInputBufferCreateFilenameFuncPtr(GetProcAddress(libHandle, 'xmlParserInputBufferCreateFilenameValue'));
+    __xmlParserMaxDepth := PCardinal(GetProcAddress(libHandle, 'xmlParserMaxDepth'));
     pxmlRealloc := xmlReallocFuncPtr(GetProcAddress(libHandle, 'xmlRealloc'));
-    pxmlStructuredError := xmlStructuredErrorFuncPtr(GetProcAddress(libHandle, 'xmlStructuredError'));
+    xmlStringComment := PChar(GetProcAddress(libHandle, 'xmlStringComment'));
     xmlStringText := PChar(GetProcAddress(libHandle, 'xmlStringText'));
     xmlStringTextNoenc := PChar(GetProcAddress(libHandle, 'xmlStringTextNoenc'));
-    xmlStringComment := PChar(GetProcAddress(libHandle, 'xmlStringComment'));;
+    __xmlXPathNAN := PDouble(GetProcAddress(libHandle, 'xmlXPathNAN'));
+    __xmlXPathNINF := PDouble(GetProcAddress(libHandle, 'xmlXPathNINF'));
+    __xmlXPathPINF := PDouble(GetProcAddress(libHandle, 'xmlXPathPINF'));
+
     FreeLibrary(libHandle);
   end;
 
