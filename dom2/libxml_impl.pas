@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.11 2002-02-11 20:44:16 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.12 2002-02-11 20:51:08 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -81,6 +81,25 @@ type
   public
     property  GNode: xmlNodePtr read FGNode;
     destructor Destroy; override;
+  end;
+
+  { TLDOMAttr class }
+
+  TLDOMAttr = class(TLDOMNode, IDomNode, IDomAttr)
+  protected //IDomNode
+    function  IDomNode.get_childNodes = returnChildNodes;
+    function  IDomNode.get_parentNode = returnNullDomNode;
+    function  IDomNode.get_firstChild = returnNullDomNode;
+    function  IDomNode.get_lastChild = returnNullDomNode;
+    function  IDomNode.get_previousSibling = returnNullDomNode;
+    function  IDomNode.get_nextSibling = returnNullDomNode;
+  protected //IDomAttr
+    function  IDomAttr.get_name = get_nodeName;
+    function  IDomAttr.get_childNodes = returnChildNodes;
+    function  get_specified: Boolean;
+    function  IDomAttr.get_value = get_nodeValue;
+    procedure IDomAttr.set_value = set_nodeValue;
+    function  get_ownerElement: IDomElement;
   end;
 
   { TLDOMChildNodeList class }
@@ -282,7 +301,7 @@ type
 var
   GlbNodeClasses: array[XML_ELEMENT_NODE..XML_ENTITY_DECL] of TLDOMNodeClass = (
     nil, //TGDOMElement,
-    nil, //TGDOMAttr,
+    TLDOMAttr,
     TLDOMText,
     TLDOMCDataSection,
     TLDOMEntityReference,
@@ -1325,6 +1344,20 @@ end;
 
 function TLDOMNotation.get_systemId: DomString;
 begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+{ TLDOMAttr }
+
+function TLDOMAttr.get_ownerElement: IDomElement;
+begin
+  Result := GetDOMObject(FGNode.parent) as IDomElement;
+end;
+
+function TLDOMAttr.get_specified: Boolean;
+begin
+  //todo: implement it correctly
+  Result := true;
   DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
