@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.6 2002-02-11 19:56:07 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.7 2002-02-11 20:15:21 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -97,6 +97,56 @@ type
     destructor Destroy; override;
   end;
 
+  { TGDOMCharacterData class }
+
+  TLDOMCharacterData = class(TLDOMNode, IDomCharacterData, IDomNode)
+  private
+  protected // IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
+    function  get_length: Integer;
+    function  substringData(offset, count: Integer): DomString;
+    procedure appendData(const data: DomString);
+    procedure insertData(offset: Integer; const data: DomString);
+    procedure deleteData(offset, count: Integer);
+    procedure replaceData(offset, count: Integer; const data: DomString);
+  public
+  end;
+
+  { TGDOMText class }
+
+  TLDOMText = class(TLDOMCharacterData, IDomText, IDomCharacterData, IDomNode)
+  protected //IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
+  protected //IDomText
+    function  IDomText.get_data = get_nodeValue;
+    procedure IDomText.set_data = set_nodeValue;
+    function  splitText(offset: Integer): IDomText;
+  end;
+
+  { TLDOMCDATASection class }
+
+  TLDOMCDATASection = class(TLDOMText, IDomCDataSection, IDomCharacterData, IDomNode)
+  protected //IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
+  protected //IDomCDataSection
+    function  IDomCDataSection.get_data = get_nodeValue;
+    procedure IDomCDataSection.set_data = set_nodeValue;
+  end;
+
+  { TGDOMComment class }
+
+  TLDOMComment = class(TLDOMCharacterData, IDomComment, IDomCharacterData, IDomNode)
+  protected //IDomCharacterData
+    function  IDomCharacterData.get_data = get_nodeValue;
+    procedure IDomCharacterData.set_data = set_nodeValue;
+  protected //IDomComment
+    function  IDomComment.get_data = get_nodeValue;
+    procedure IDomComment.set_data = set_nodeValue;
+  end;
+
   { TLDOMDocumentFragment class }
 
   TLDOMDocumentFragment = class(TLDOMNode, IDomDocumentFragment, IDomNode)
@@ -181,8 +231,8 @@ var
   GlbNodeClasses: array[XML_ELEMENT_NODE..XML_ENTITY_DECL] of TLDOMNodeClass = (
     nil, //TGDOMElement,
     nil, //TGDOMAttr,
-    nil, //TGDOMText,
-    nil, //TGDOMCDataSection,
+    TLDOMText,
+    TLDOMCDataSection,
     nil, //TGDOMEntityReference,
     nil, //TGDOMEntity,
     nil, //TGDOMProcessingInstruction,
@@ -1103,6 +1153,61 @@ end;
 procedure TLDOMDocument.set_nodeValue(const value: DomString);
 begin
   DomAssert(False, NO_MODIFICATION_ALLOWED_ERR);
+end;
+
+{ TLDOMCharacterData }
+
+procedure TLDOMCharacterData.appendData(const data: DomString);
+begin
+  xmlNodeAddContent(FGNode, PChar(UTF8Encode(data)));
+end;
+
+procedure TLDOMCharacterData.deleteData(offset, count: Integer);
+begin
+  replaceData(offset, count, '');
+end;
+
+function TLDOMCharacterData.get_length: Integer;
+begin
+  Result := Length(get_nodeValue);
+end;
+
+procedure TLDOMCharacterData.insertData(offset: Integer; const data: DomString);
+begin
+  replaceData(offset, 0, PChar(UTF8Encode(data)));
+end;
+
+procedure TLDOMCharacterData.replaceData(offset, count: Integer; const data: DomString);
+var
+  s1,s2,s: WideString;
+begin
+  s := get_nodeValue;
+  s1 := Copy(s, 1, offset);
+  s2 := Copy(s, offset + count+1, Length(s)-offset-count);
+  set_nodeValue(s1 + data + s2);
+end;
+
+function TLDOMCharacterData.substringData(offset, count: Integer): DomString;
+begin
+  Result := Copy(get_nodeValue, offset, count);
+end;
+
+{ TLDOMText }
+
+function TLDOMText.splitText(offset: Integer): IDomText;
+var
+  v: DomString;
+  rest: DomString;
+  p: IDomNode;
+begin
+  v := get_nodeValue;
+  rest := Copy(v, offset+1, Length(v)-offset);
+  set_nodeValue(Copy(v, 1, offset));
+  Result := get_ownerDocument.createTextNode(rest);
+  p := get_parentNode;
+  if p=nil then exit;
+  // nodes must be kept as siblings
+  Result := p.insertBefore(Result, get_nextSibling) as IDomText;
 end;
 
 end.
