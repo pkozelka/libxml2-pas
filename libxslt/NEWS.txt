@@ -1,9 +1,9 @@
 libxslt-pas
 
 
-Version 1.0.16:
+Version 1.0.17:
 ---------------
-- API adjusted to match libxslt-1.0.16
+- API adjusted to match libxslt-1.0.17
 - translations use the CVS-SIGN format which improves maintenance
 
 Version 1.0.8:
