@@ -3,25 +3,35 @@ unit libxmldom;
 {
    ------------------------------------------------------------------------------
    This unit is an object-oriented wrapper for libxml2.
-   It implements the interfaces defined in dom2.pas.
+   It implements the interfaces defined in xdom2.pas.
 
-   Author:
+   Original author:
    Uwe Fechner <ufechner@4commerce.de>
    .
-   Some Code by:
-   Martijn Brinkers
-   Petr Kozelka
+   Contributers:
+   Martijn Brinkers <m.brinkers@pobox.com>
+   Petr Kozelka     <pkozelka@centrum.cz>
 
-   The IsXML... routines are written by Dieter Köhler,
-   http://www.philo.de/xml/
+   Thanks to the gdome2 project, where I got many ideas from.
+   Thanks to Jan Kubatzki for testing.
+
+| The routines for testing XML rules were taken from the Extended Document
+| Object Model (XDOM) package, copyright (c) 1999-2002 by Dieter Köhler.
+| The latest XDOM version is available at "http://www.philo.de/xml/" under
+| a different open source license.  In addition, the author gave permission
+| to use the routines for testing XML rules included in this file under the
+| terms of either MPL 1.1, GPL 2.0 or LGPL 2.1.
+
 
      Copyright:
      4commerce technologies AG
      Kamerbalken 10-14
      22525 Hamburg, Germany
 
+     http://www.4commerce.de
+
     Published under a double license:
-    a) the GNU Library General Public License: 
+    a) the GNU Library General Public License:
        http://www.gnu.org/copyleft/lgpl.html
     b) the Mozilla Public License:
        http://www.mozilla.org/MPL/MPL-1.1.html
@@ -37,7 +47,7 @@ unit libxmldom;
 //
 // Not Supported by libxml2:
 // IDOMNodeEx, IDOMParseError (extended interfaces, not part of dom-spec)
-// Attr.ownerElement
+
 
 interface
 
@@ -233,7 +243,7 @@ type
 
   TGDOMElement = class(TGDOMNode, IDOMElement)
   private
-    function GetGElement: xmlElementPtr;
+    function GetGElement: xmlNodePtr;
   protected
     // IDOMElement
     function get_tagName: DOMString;
@@ -257,7 +267,7 @@ type
   public
     constructor Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
     destructor destroy; override;
-    property GElement: xmlElementPtr read GetGElement;
+    property GElement: xmlNodePtr read GetGElement;
   end;
 
   { TMSDOMText }
@@ -540,13 +550,14 @@ begin
     else result:=qualifiedName;
 end;
 
-function libxmlStringToString(libstring:pchar):String;
+function libxmlStringToString(libstring:pchar):WideString;
   var s: string;
   begin
     if libstring<>nil
       then begin
         s := libstring;
-        result:= s;
+        //xmlFree(libstring);
+        result:= UTF8Decode(s);
       end
       else result:='';
   end;
@@ -950,7 +961,10 @@ begin
       old := GetGNode(oldChild);
       cur := GetGNode(newChild);
       node:=xmlReplaceNode(old, cur);
-      result:=MakeNode(node,FOwnerDocument) as IDOMNode
+      old.parent:=nil;
+      (FOwnerDocument as IDOMInternal).appendNode(old);
+      result:=oldChild;
+      //result:=MakeNode(node,FOwnerDocument) as IDOMNode
     end
     else result:=nil;
 end;
@@ -1072,7 +1086,11 @@ begin
     else recursive:= 0;
   node:=xmlCopyNode(FGNode,recursive);
   if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    then begin
+      if node.parent=nil
+        then (FOwnerDocument as IDOMInternal).appendNode(node);
+      result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    end
     else result:=nil;
 end;
 
@@ -1470,9 +1488,9 @@ end;
 //TGDOMElement Implementation
 //***************************
 
-function TGDOMElement.GetGElement: xmlElementPtr;
+function TGDOMElement.GetGElement: xmlNodePtr;
 begin
-  result:=xmlElementPtr(GNode);
+  result:=xmlNodePtr(GNode);
 end;
 // IDOMElement
 function TGDOMElement.get_tagName: DOMString;
@@ -1483,20 +1501,35 @@ end;
 function TGDOMElement.getAttribute(const name: DOMString): DOMString;
 var
   name1: TGdomString;
+  temp1: pchar;
+  attr: xmlAttrPtr;
 begin
   name1:=TGdomString.create(name);
-  result:=libxmlstringToString(xmlGetProp(xmlNodePtr(GElement),name1.CString));
+  attr:=xmlHasProp(GElement,name1.CString);
+  if attr<>nil
+    then begin
+      if attr.children<>nil then
+        temp1:=attr.children.content
+      else
+        temp1:=nil;
+      result:=libxmlstringToString(temp1);
+    end else result:='';
   name1.free;
 end;
 
 procedure TGDOMElement.setAttribute(const name, value: DOMString);
 var
   name1,name2: TGdomString;
-  //temp: xmlAttrPtr;
+  temp: xmlAttrPtr;
+  node: xmlNodePtr;
 begin
   name1:=TGdomString.create(name);
   name2:=TGdomString.create(value);
-  {temp:=}xmlSetProp(xmlNodePtr(GElement),name1.CString,name2.CString);
+  node:=xmlNodePtr(GElement);
+  temp:=xmlSetProp(node,name1.CString,name2.CString);
+  temp.parent:=node;
+  temp.doc:=node.doc;
+  //(FOwnerDocument as IDOMInternal).appendAttr(temp);
   //todo: raise exception if temp=nil?
   name1.free;
   name2.free;
@@ -1510,26 +1543,9 @@ begin
   name1:=TGdomString.create(name);
   oldattr := xmlHasProp(xmlNodePtr(GElement), name1.CString);
   name1.Free;
-  if oldAttr<>nil then begin
-    xmlnewAttr:=oldAttr                       ;     // Get the libxml2-Attribute
-    node:=xmlNodePtr(GElement);
-    oldattr1:=xmlHasProp(node,xmlNewattr.name);     // already an attribute with this name?
-    if oldattr1<>nil then begin
-      attr:=node.properties;                         // if not, then oldattr=nil
-      if attr=oldattr1
-        then node.properties:=nil
-        else begin
-           while attr.next <> oldattr1 do begin
-             attr:=attr.next
-           end;
-           attr.next:=nil;
-        end;
-      if oldattr<>nil
-        then begin
-          xmlFreeProp(oldattr);
-        end
-    end;
-  end
+  //todo: make it work with xmlns attributes
+  if oldattr<>nil
+    then xmlRemoveProp(oldattr);
 end;
 
 function TGDOMElement.getAttributeNode(const name: DOMString): IDOMAttr;
@@ -1642,10 +1658,10 @@ begin
            end;
            attr.next:=nil;
         end;
-      //(FOwnerDocument as IDOMInternal).appendAttr(oldAttr1);
       if oldattr<>nil
         then begin
           result:=oldattr;
+          xmlNewAttr.parent:=nil;     //important, otherwise it would be freed
           (FOwnerDocument as IDOMInternal).appendAttr(xmlNewattr);
         end
         else begin
@@ -1664,13 +1680,23 @@ function TGDOMElement.getAttributeNS(const namespaceURI, localName: DOMString):
   DOMString;
 var
   name1,name2: TGdomString;
+  attr:xmlAttrPtr;
+  temp1: pchar;
 begin
   name2:=TGdomString.create(namespaceURI);
   name1:=TGdomString.create(localName);
-  result:=libxmlstringToString(xmlGetNSProp(xmlNodePtr(GElement),name1.CString,
-    name2.CString));
+  attr:=xmlHasNSProp(xmlNodePtr(GElement),name1.CString,
+    name2.CString);
   name1.free;
   name2.free;
+  if attr<>nil
+    then begin
+      if attr.children<>nil then
+        temp1:=attr.children.content
+      else
+        temp1:=nil;
+      result:=libxmlstringToString(temp1);
+    end else result:='';
 end;
 
 procedure TGDOMElement.setAttributeNS(const namespaceURI, qualifiedName, value: DOMString);
@@ -2101,7 +2127,10 @@ begin
   AEntityReference:=xmlNewReference(FPGdomeDoc,name1.CString);
   name1.free;
   if AEntityReference<>nil
-    then result:=TGDOMEntityReference.Create(AEntityReference,self)
+    then begin
+      FNodeList.Add(AEntityReference);
+      result:=TGDOMEntityReference.Create(AEntityReference,self)
+    end
     else result:=nil;
 end;
 
@@ -2213,7 +2242,11 @@ begin
   AElement.nsdef:=ns.NS;
   ns.free;
   if AElement<>nil
-    then result:=TGDOMElement.Create(AElement,self)
+    then begin
+      AElement.parent:=nil;
+      FNodeList.Add(AElement);
+      result:=TGDOMElement.Create(AElement,self)
+    end
     else result:=nil;
 end;
 
@@ -2973,11 +3006,8 @@ end;
 
 procedure TGDOMDocument.appendAttr(attr: xmlAttrPtr);
 begin
-
   if attr<>nil
-
     then FAttrList.add(attr);
-
 end;
 
 procedure TGDOMDocument.appendNode(node: xmlNodePtr);
@@ -2985,6 +3015,12 @@ begin
   if node<>nil
     then FNodeList.add(node);
 end;
+
+//********************************************************************//
+// | The following routines for testing XML rules were taken from the //
+// | Extended Document Object Model (XDOM) package,                   //
+// | copyright (c) 1999-2002 by Dieter Köhler.                        //
+//********************************************************************//
 
 function IsXmlIdeographic(const S: WideChar): boolean;
 begin
