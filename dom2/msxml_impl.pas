@@ -50,7 +50,7 @@ uses
   {$endif}
   windows,
   ComObj,
-  iDom2;
+  idom2;
 
   const MSXML2Rental = 'MSXML2_RENTAL_MODEL';
   const MSXML2Free = 'MSXML2_FREETHREADING_MODEL';
@@ -75,6 +75,22 @@ type
     ['{72A3E81C-8F5E-43B5-93DB-F229949FD07F}']
     (* Used to get the MS interface from IDomAttr interface *)
     function getOrgInterface : IXMLDOMAttribute;
+  end;
+
+  // this inteface is similar to the interface IDomNodeEx from Borland,
+  // but not the same, therefore a slightly different name is used
+  IDomNodeExt = interface(IDomNode)
+    ['{1B41AE3F-6365-41FC-AFDD-26BC143F9C0F}']
+    { Property Acessors }
+    function get_text: DomString;
+    function get_xml: DomString;
+    procedure set_text(const Value: DomString);
+    { Methods }
+    procedure transformNode(const stylesheet: IDomNode; var output: DomString); overload;
+    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
+    { Properties }
+    property text: DomString read get_text write set_text;
+    property xml: DomString read get_xml;
   end;
 
 implementation
@@ -134,7 +150,7 @@ type
   TMSXMLDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
     private
       fFreeThreading     : Boolean;
-      fDomImplementation : IDOMImplementation;
+      fDomImplementation : IDomImplementation;
 
     public
       constructor create(freeThreading : Boolean);
@@ -187,7 +203,7 @@ type
   end;
 
 
-  TMSXMLNode = class(TInterfacedObject, IDomNode, IDomNodeSelect, IMSXMLExtDomNode, IDomNodeEx)
+  TMSXMLNode = class(TInterfacedObject, IDomNode, IDomNodeSelect, IMSXMLExtDomNode, IDomNodeExt)
     private
       fMSDomNode : IXMLDOMNode;
 
@@ -233,10 +249,14 @@ type
     procedure registerNS(const prefix : DomString; const uri : DomString);
     procedure transformNode(const stylesheet: IDomNode; var output: WideString); overload;
     procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
+    function get_text: DomString;
+    procedure set_text(const Value: DomString);
+    function get_xml: DOMString;
+    property xml: DOMString read get_xml;
   end;
 
 
-  TMSXMLDocument = class(TMSXMLNode, IDomDocument, IDOMPersist, IDOMParseOptions)
+  TMSXMLDocument = class(TMSXMLNode, IDomDocument, IDomPersist, IDomParseOptions)
     private
       fMSDomDocument : IXMLDOMDocument;
 
@@ -274,7 +294,7 @@ type
               const localName    : DomString) : IDomNodeList;
       function  getElementById(const elementId : DomString) : IDomElement;
 
-      { IDOMPersist methods}
+      { IDomPersist methods}
       function  get_xml : DomString;
       function  asyncLoadState : Integer;
       function  load(source : DomString) : Boolean;
@@ -285,7 +305,7 @@ type
       procedure set_OnAsyncLoad(
               const sender : TObject;
               eventHandler : TAsyncEventHandler);
-      { IDOMParseOptions methods}
+      { IDomParseOptions methods}
       function get_async: Boolean;
       procedure set_async(Value: Boolean);
       function get_preserveWhiteSpace: Boolean;
@@ -929,7 +949,7 @@ var
   document : IDomDocument;
 begin
   document := newDocument;
-  (document as IDOMPersist).loadXML(xml);
+  (document as IDomPersist).loadXML(xml);
   result := document;
 end;
 
@@ -1316,7 +1336,7 @@ begin
   // XXX NOT YET IMPLEMENTED
 end;
 
-{ IDOMParseOptions Interface }
+{ IDomParseOptions Interface }
 
 function TMSXMLDocument.get_async: Boolean;
 begin
@@ -1875,7 +1895,7 @@ function TMSXMLElement.getAttributeNS(
         const namespaceURI : DomString;
         const localName    : DomString) : DomString;
 var
-  attr : IDOMAttr;
+  attr : IDomAttr;
 begin
   attr := getAttributeNodeNS(namespaceURI, localName);
   if assigned(attr) then
@@ -1915,7 +1935,7 @@ var attr : IXMLDomNode;
 begin
   attr := fMSElement.attributes.getQualifiedItem(localName, namespaceURI);
   if attr <> nil then
-    result := domCreateNode(attr) as IDOMAttr
+    result := domCreateNode(attr) as IDomAttr
   else
     result := nil;
 end;
@@ -2270,7 +2290,7 @@ begin
 end;
 
 
-function TMSXMLNode.selectNode(const nodePath : WideString): IDOMNode;
+function TMSXMLNode.selectNode(const nodePath : WideString): IDomNode;
 var
   node : IXMLDOMNode;
 begin
@@ -2281,7 +2301,7 @@ begin
     result := nil;
 end;
 
-function TMSXMLNode.selectNodes(const nodePath : WideString): IDOMNodeList;
+function TMSXMLNode.selectNodes(const nodePath : WideString): IDomNodeList;
 var
   msNodeList : IXMLDOMNodeList;
 begin
@@ -2311,9 +2331,30 @@ procedure TMSXMLNode.transformNode(const stylesheet: IDomNode;
 var
   msStylesheet,node: ixmldomnode;
 begin
+  if output = nil
+    then output:=(stylesheet.get_OwnerDocument.domImplementation.createDocument('','',nil));
   msStylesheet:=(stylesheet as IMSXMLExtDomNode).getOrgInterface;
   node:=(output as IMSXMLExtDomNode).getOrgInterface;
   fMSDomNode.transformNodeToObject(msStylesheet, node);
+end;
+
+function TMSXMLNode.get_text: DomString;
+//var i: integer; node: IDomNode;
+begin
+  // concat content of all text node children of node
+  Result := fMSDomNode.text;
+end;
+
+procedure TMSXMLNode.set_text(const Value: DomString);
+//var i: integer; node: IDomNode; text: IDomText;
+begin
+  // replace all children of node with value as text node
+  fMSDomNode.text := Value;
+end;
+
+function TMSXMLNode.get_xml: DOMString;
+begin
+  Result := fMSDomNode.xml;
 end;
 
 initialization
