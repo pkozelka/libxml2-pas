@@ -867,7 +867,13 @@ function TMSXMLDocument.importNode(
         importedNode : IDomNode;
         deep         : Boolean) : IDomNode;
 begin
-  raise EDomException.create(etNotSupportedErr, 'ImportNode is not supported');
+  //Remark:
+  //workaround, to make programs work, that are written in a
+  //dom2-compliant way.
+  //Nodes are imported automatically by msdom, if node.appendChild
+  //is used.
+  result:=importedNode;
+  //raise EDomException.create(etNotSupportedErr, 'ImportNode is not supported');
 end;
 
 function TMSXMLDocument.createElementNS(

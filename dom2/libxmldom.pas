@@ -96,6 +96,8 @@ type
     FOwnerDocument: IDOMDocument;
     FPrefix: String; //for xpath
     FURI: String;    //for xpath
+    FFreeNode: Boolean; //Nodes, created via document.createXXX must
+                        //be freed manually
   protected
     function GetGDOMNode: xmlNodePtr; //new
     function IsReadOnly: boolean;     //new
@@ -132,7 +134,7 @@ type
     function selectNodes(const nodePath: WideString): IDOMNodeList;
     procedure RegisterNS(const prefix,URI: DomString);
   public
-    constructor Create(ANode: xmlNodePtr;ADocument:IDOMDocument;parentnode:boolean=false);
+    constructor Create(ANode: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
     destructor destroy; override;
     property GNode: xmlNodePtr read FGNode;
   end;
@@ -143,7 +145,7 @@ type
   TGDOMNodeList = class(TGDOMInterface, IDOMNodeList)
   private
      FParent: xmlNodePtr;
-     FXPathList: xmlNodeSetPtr;
+     FXPathObject: xmlXPathObjectPtr;
      FOwnerDocument: IDOMDocument;
   protected
     { IDOMNodeList }
@@ -151,7 +153,7 @@ type
     function get_length: Integer;
   public
     constructor Create(AParent: xmlNodePtr;ADocument:IDOMDocument); overload;
-    constructor Create(AXpathNodeList: xmlNodeSetPtr;ADocument:IDOMDocument); overload;
+    constructor Create(AXpathObject: xmlXPathObjectPtr;ADocument:IDOMDocument); overload;
     destructor destroy; override;
   end;
 
@@ -248,7 +250,7 @@ type
     function hasAttributeNS(const namespaceURI, localName: DOMString): WordBool;
     procedure normalize;
   public
-    constructor Create(AElement: xmlElementPtr;ADocument:IDOMDocument);
+    constructor Create(AElement: xmlElementPtr;ADocument:IDOMDocument;freenode:boolean=false);
     destructor destroy; override;
     property GElement: xmlElementPtr read GetGElement;
   end;
@@ -910,11 +912,16 @@ begin
   //  then CheckError(WRONG_DOCUMENT_ERR);
   if self.isAncestorOrSelf(GetGNode(newChild))
     then CheckError(HIERARCHY_REQUEST_ERR);
-  if IsReadOnlyNode((GetGNode(newChild)).parent)
+  if IsReadOnlyNode(node.parent)
     then CheckError(NO_MODIFICATION_ALLOWED_ERR);
-  if newChild.parentNode<>nil
-    then newChild.parentNode.RemoveChild(newChild);
-  node:=xmlAddChild(FGNode,GetGNode(newChild));
+  if node.parent<>nil
+    //then newChild.parentNode.RemoveChild(newChild);
+    then xmlUnlinkNode(node);
+//  /* If the newChild is already in the tree, it is first removed. */
+//	if (gdome_xmlGetParent(new_priv->n) != NULL)
+//		gdome_xmlUnlinkChild(gdome_xmlGetParent(new_priv->n), new_priv->n);
+//
+  node:=xmlAddChild(FGNode,node);
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
     else result:=nil;
@@ -980,22 +987,22 @@ begin
     else result:=false;
 end;
 
-constructor TGDOMNode.Create(ANode: xmlNodePtr;ADocument:IDOMDocument;parentnode:boolean=false);
+constructor TGDOMNode.Create(ANode: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
 begin
   inherited create;
   Assert(Assigned(ANode));
   FGNode := ANode;
   FOwnerDocument:=ADocument;
+  FFreeNode:=freenode;
   inc(nodecount);
 end;
 
 destructor TGDOMNode.destroy;
 begin
-  if nodecount>0 then begin
-    //if FOwnerDocument<>nil then xmlFreeNode(FGNode);
+//    if FFreeNode
+//      then xmlFreeNode(FGNode);
     dec(nodecount);
     FOwnerDocument:=nil;
-  end;
   inherited destroy;
 end;
 
@@ -1008,11 +1015,11 @@ constructor TGDOMNodeList.Create(AParent: xmlNodePtr;ADocument:IDOMDocument);
 begin
   inherited Create;
   FParent := AParent;
-  FXpathList := nil;
+  FXpathObject := nil;
   FOwnerDocument := ADocument;
 end;
 
-constructor TGDOMNodeList.Create(AXpathNodeList: xmlNodeSetPtr;
+constructor TGDOMNodeList.Create(AXpathObject: xmlXPathObjectPtr;
   ADocument: IDOMDocument);
 // create a IDOMNodeList from a var of type xmlNodeSetPtr
 //	xmlNodeSetPtr = ^xmlNodeSet;
@@ -1024,13 +1031,15 @@ constructor TGDOMNodeList.Create(AXpathNodeList: xmlNodeSetPtr;
 begin
   inherited Create;
   FParent := nil;
-  FXpathList := AXpathNodeList;
+  FXpathObject := AXpathObject;
   FOwnerDocument := ADocument;
 end;
 
 destructor TGDOMNodeList.destroy;
 begin
   FOwnerDocument:=nil;
+  if FXPathObject<>nil then
+    xmlXPathFreeObject(FXPathObject);
   inherited destroy;
   // ToDo:
   // nodeTab freigeben
@@ -1056,8 +1065,11 @@ begin
       dec(i);
       node:=node.next
     end;
+    if i>0 then checkError(INDEX_SIZE_ERR);
   end else begin
-      node:=xmlXPathNodeSetItem(FXPathList,i);
+      if FXPathObject<>nil
+        then node:=xmlXPathNodeSetItem(FXPathObject.nodesetval,i)
+        else checkError(101);
   end;
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
@@ -1078,7 +1090,7 @@ begin
     end;
     result:=i;
   end else begin
-    result:=FXPathList.nodeNr;
+    result:=FXPathObject.nodesetval.nodeNr;
   end;
 end;
 
@@ -1588,10 +1600,10 @@ begin
   inherited normalize;
 end;
 
-constructor TGDOMElement.Create(AElement: xmlElementPtr;ADocument:IDOMDocument);
+constructor TGDOMElement.Create(AElement: xmlElementPtr;ADocument:IDOMDocument;freenode:boolean=false);
 begin
   inc(elementcount);
-  inherited create(xmlNodePtr(AElement),ADocument);
+  inherited create(xmlNodePtr(AElement),ADocument,freenode);
 end;
 
 destructor TGDOMElement.destroy;
@@ -1631,13 +1643,11 @@ end;
 
 destructor TGDOMDocument.destroy;
 begin
-  if doccount>0 then begin
     if FPGdomeDoc<>nil
       then begin
         xmlFreeDoc(FPGdomeDoc);
         dec(doccount);
       end;
-  end;
   inherited Destroy;
 end;
 
@@ -1673,7 +1683,7 @@ begin
 
 end;
 
-function TGDOMDocument.createElement(const tagName: DOMString): IDOMElement; 
+function TGDOMDocument.createElement(const tagName: DOMString): IDOMElement;
 var
   exc:GdomeException;
   name1: TGdomString;
@@ -1683,7 +1693,7 @@ begin
   AElement:=xmlElementPtr(xmlNewDocNode(FPGdomeDoc,nil,name1.CString,nil));
   name1.free;
   if AElement<>nil
-    then result:=TGDOMElement.Create(AElement,self)
+    then result:=TGDOMElement.Create(AElement,self,true)
     else result:=nil;
 end;
 
@@ -1963,9 +1973,8 @@ begin
 end;
 
 // IDOMPersist
-function TGDOMDocument.get_xml: DOMString; 
+function TGDOMDocument.get_xml: DOMString;
 var
-  exc: GdomeException;
   mem: ppchar;
   err: boolean;
   CString,encoding:pchar;
@@ -2079,6 +2088,7 @@ begin
     21: result:='NotSupportedByLibxmldom_ERR';
     22: result:='SaveXMLToDisk_ERR';
     100: result:='LIBXML2_NULL_POINTER_ERR';
+    101: result:='INVALID_NODE_SET_ERR';
   else
     result:='Unknown error no: '+inttostr(err);
   end;
@@ -2556,10 +2566,10 @@ begin
     if nodetype = 1
       then begin
         nodecount:=res.nodesetval.nodeNr;
-        result:=TGDOMNodeList.Create(res.nodesetval,FOwnerDocument)
+        result:=TGDOMNodeList.Create(res,FOwnerDocument)
       end
       else result:=nil;
-    xmlXPathFreeNodeSetList(res);
+    //xmlXPathFreeNodeSetList(res);
     //xmlXPathFreeObject(res);
     xmlXPathFreeContext(ctxt);
   end else result:=nil;
@@ -2635,12 +2645,12 @@ function TGDOMNode.IsAncestorOrSelf(newNode: xmlNodePtr): boolean;
 var
   node:xmlNodePtr;
 begin
-  node:=newNode;
+  node:=FGNode;
   result:=true;
   while node<>nil do begin
-    if node=FGNode
+    if node=newNode
       then exit;
-    node:=newNode.parent;
+    node:=node.parent;
   end;
   result:=false;
 end;
