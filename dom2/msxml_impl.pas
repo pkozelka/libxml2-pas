@@ -502,7 +502,7 @@ type
    * and the Dom wrappers. It is used to get from a M$ interface to the wrapper
    * (if there is already a wrapper created).
    * It is not optimized for speed. It internally uses a TList whereas a map
-   * would faster. TList is chosen to minimize dependecies. 
+   * would faster. TList is chosen to minimize dependecies.
   *)
   TDomWrapperRepository = class(Tobject)
     private
@@ -530,7 +530,16 @@ var
   *)
   gDomWrapperRepository : TDomWrapperRepository;
 
+// begin helper routines
 
+{ TODO : move to a different unit - xmlutils.pas }
+
+function prefix(qualifiedName: WideString): WideString;
+begin
+  Result := Copy(qualifiedName, 1,Pos(':', qualifiedName) - 1);
+end;
+
+// end helper routines
 
 function domCreateImplementation(msIntf : IXMLDOMImplementation)
         : IDomImplementation;
@@ -1197,9 +1206,8 @@ begin
   //raise EDomException.create(etNotSupportedErr, 'ImportNode is not supported');
 end;
 
-function TMSXMLDocument.createElementNS(
-        const namespaceURI  : DomString;
-        const qualifiedName : DomString) : IDomElement;
+function TMSXMLDocument.createElementNS(const namespaceURI: DomString;
+    const qualifiedName: DomString): IDomElement;
 var
   msElement : IXMLDOMElement;
   node: IXMLDOMNode;
@@ -1208,8 +1216,9 @@ begin
   msElement:=node as IXMLDOMElement;
   if msElement = nil then
     result := nil
-  else
+  else begin
     result := domCreateElement(msElement);
+  end;
 end;
 
 function TMSXMLDocument.createAttributeNS(
@@ -1513,6 +1522,10 @@ end;
 function TMSXMLNode.get_NamespaceURI : DomString;
 begin
   result := fMSDomNode.namespaceURI;
+  if result <> '' then exit;
+  if fMSDomNode.nodeType <> NODE_ATTRIBUTE then exit;
+  if (fMSDomNode.prefix <> 'xmlns') and (fMSDomNode.nodeValue <> 'xmlns') then exit;
+  result := 'http://www.w3.org/2000/xmlns/';
 end;
 
 procedure TMSXMLNode.set_Prefix(const prefix : DomString);
@@ -1715,25 +1728,49 @@ end;
 function TMSXMLNamedNodeMap.getNamedItemNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomNode;
+var
+  msNode : IXMLDOMNode;
 begin
-  (* Namespace is not supported*)
-  result := getNamedItem(localName);
+  if namespaceURI <> 'http://www.w3.org/2000/xmlns/' then begin
+    msNode := fMSDomNamedNodeMap.getQualifiedItem(localName,namespaceURI);
+    if msNode = nil then begin
+      result := nil
+    end else begin
+      result := domCreateNode(msNode);
+    end;
+  end else begin
+    result := getNamedItem('xmlns:'+localName);
+  end;
 end;
 
 function TMSXMLNamedNodeMap.setNamedItemNS(const newItem : IDomNode) : IDomNode;
+var
+  msNode : IXMLDOMNode;
 begin
-  (* Namespace is not supported*)
-  result := setNamedItem(newItem);
+  msNode := fMSDomNamedNodeMap.setNamedItem(
+          (newItem as IMSXMLExtDomNode).getOrgInterface);
+  if msNode = nil then
+    result := nil
+  else
+    result := domCreateNode(msNode);
 end;
 
 function TMSXMLNamedNodeMap.removeNamedItemNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomNode;
+var
+  msNode : IXMLDOMNode;
 begin
-  (* Namespace is not supported*)
-  result := removeNamedItem(localName);
+  if namespaceURI = 'http://www.w3.org/2000/xmlns/' then begin
+    msNode := fMSDomNamedNodeMap.removeNamedItem('xmlns:'+localName);
+  end else begin
+    msNode := fMSDomNamedNodeMap.removeQualifiedItem(localName,namespaceUri);
+    if msNode = nil then
+      result := nil
+    else
+      result := domCreateNode(msNode);
+  end;
 end;
-
 (*
  *  TMSXMLDocumentType
 *)
@@ -1820,7 +1857,14 @@ end;
 
 function TMSXMLElement.getAttribute(const name : DomString) : DomString;
 begin
-  result := fMSElement.getAttribute(name);
+  try
+    result := fMSElement.getAttribute(name);
+  except
+    on e: Exception do begin
+      // OleVariant might be nil
+      if e is EVariantError then result := '';
+    end;
+  end;
 end;
 
 procedure TMSXMLElement.setAttribute(
