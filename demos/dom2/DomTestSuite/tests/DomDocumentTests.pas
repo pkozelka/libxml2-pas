@@ -1,5 +1,12 @@
 unit DomDocumentTests;
 
+(*
+ * Tests cases for IDomDocument.
+ *
+ * NOTE: writing tests and compliance tests without a fully non-compliant DOM
+ * could easily result in incorrect test code.
+*)
+
 interface
 
 uses
@@ -72,6 +79,12 @@ type
       procedure getElementByIdXMLNSNullTest;
       (* converted from: documentGetElementsByTagNameAllXMLNS.js *)
       procedure getElementsByTagNameAllXMLNSTest;
+      (* converted from: documentGetElementsByTagNameLength.js *)
+      procedure getElementsByTagNameLengthTest;
+      (* converted from: documentGetElementsByTagNameSpecifiedXMLNS.js *)
+      procedure getElementsByTagNameSpecifiedXMLNSTest;
+      (* converted from: documentGetElementsByTagNameTotalLength.js *)
+      procedure getElementsByTagNameTotalLengthTest;
 
   end;
 
@@ -698,6 +711,104 @@ begin
   check(nodeList.length = 6, 'nodeList.length <> 6');
 end;
 
+
+
+(* checks if getElementsByTagName returns all elements *)
+procedure TDomDocumentFundamentalTests.getElementsByTagNameLengthTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <address>' +
+     '    <street>the street</street>' +
+     '    <info>1' +
+     '      <info>2' +
+     '        <info>3' +
+     '        </info>' +
+     '      </info>' +
+     '    </info>' +
+     '    <info>4</info>' +
+     '    <info>5</info>' +
+     '  </address>';
+var
+  document : IDomDocument;
+  nodeList : IDomNodeList;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  nodeList := document.getElementsByTagName('info');
+  check(nodeList.length = 5, 'nodeList.length <> 5');
+end;
+
+
+
+(*
+ * checks if getElementsByTagNameNS returns the correct elements in the
+ * correct order
+*)
+procedure TDomDocumentFundamentalTests.getElementsByTagNameSpecifiedXMLNSTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <!DOCTYPE someNS:address [' +
+     '  <!ELEMENT someNS:address (someNS:street, someNS:info*, info*)>' +
+     '  <!ELEMENT someNS:street (someNS:info)*>' +
+     '  <!ELEMENT someNS:info (#PCDATA)>' +
+     '  <!ELEMENT info (#PCDATA)>' +
+     '  <!ATTLIST someNS:address xmlns:someNS CDATA #IMPLIED>' +
+     '  ]>' +
+     '  <someNS:address xmlns:someNS="http:/localhost">' +
+     '    <someNS:street><someNS:info>1</someNS:info></someNS:street>' +
+     '    <someNS:info>2</someNS:info>' +
+     '    <someNS:info>3</someNS:info>' +
+     '    <someNS:info>4</someNS:info>' +
+     '    <someNS:info>5</someNS:info>' +
+     '    <info>6</info>' +
+     '  </someNS:address>';
+var
+  document : IDomDocument;
+  nodeList : IDomNodeList;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  nodeList := document.getElementsByTagNameNS('*', 'info');
+  check(nodeList.length = 6, 'nodeList.length <> 6');
+  //XXX TODO: check the order of elements
+end;
+
+(*
+ * checks if getElementsByTagName('*') returns all elements in the correct order
+*)
+procedure TDomDocumentFundamentalTests.getElementsByTagNameTotalLengthTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <address>' +
+     '    <street>0</street>' +
+     '    <info1>1' +
+     '      <info2>2' +
+     '        <info3 someAttr="123">3' +
+     '        </info3>' +
+     '      </info2>' +
+     '    </info1>' +
+     '    <info4>4</info4>' +
+     '    <info5>5</info5>' +
+     '  </address>';
+var
+  document : IDomDocument;
+  nodeList : IDomNodeList;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  nodeList := document.getElementsByTagName('*');
+  check(nodeList.length = 7, 'nodeList.length <> 7');
+  check(nodeList.item[0].nodeName = 'address', 'nodeName <> address');
+  check(nodeList.item[1].nodeName = 'street', 'nodeName <> street');
+  check(nodeList.item[2].nodeName = 'info1', 'nodeName <> info1');
+  check(nodeList.item[3].nodeName = 'info2', 'nodeName <> info2');
+  check(nodeList.item[4].nodeName = 'info3', 'nodeName <> info3');
+  check(nodeList.item[5].nodeName = 'info4', 'nodeName <> info4');
+  check(nodeList.item[6].nodeName = 'info5', 'nodeName <> info5');
+end;
 
 
 (******************************************************************************)
