@@ -614,7 +614,7 @@ begin
       checkError(NAMESPACE_ERR);
     end;
   if not IsXmlName(qualifiedName)
-    then checkError(NAMESPACE_ERR);
+    then checkError(INVALID_CHARACTER_ERR);
   name1:=TGdomString.create(qualifiedName);
   name2:=TGdomString.create(publicId);
   name3:=TGdomString.create(systemId);
@@ -660,10 +660,12 @@ begin
     //XML_DOCB_DOCUMENT_NODE,
     XML_DOCUMENT_NODE:
       Result := '#document';
-    XML_TEXT_NODE,
-    XML_CDATA_SECTION_NODE,
-    XML_COMMENT_NODE,
+    XML_CDATA_SECTION_NODE:
+      Result := '#cdata-section';
     XML_DOCUMENT_FRAG_NODE:
+      Result := '#document-fragment';
+    XML_TEXT_NODE,
+    XML_COMMENT_NODE:
       Result := '#'+UTF8Decode(FGNode.name);
   else
     Result := UTF8Decode(FGNode.name);
@@ -866,11 +868,16 @@ var
   temp: String;
 begin
   case FGNode.type_ of
-    //todo: check the result for the other nodetypes
-    //this is necessary, because libxml2 delivers
-    //'text' instead of '#text'
-    3: temp:='#text';
-    9: temp:='#document';
+    XML_HTML_DOCUMENT_NODE,
+    //XML_DOCB_DOCUMENT_NODE,
+    XML_DOCUMENT_NODE:
+      Result := '#document';
+    XML_CDATA_SECTION_NODE:
+      Result := '#cdata-section';
+    XML_TEXT_NODE,
+    XML_COMMENT_NODE,
+    XML_DOCUMENT_FRAG_NODE:
+      Result := '#'+UTF8Decode(FGNode.name);
   else
     begin
       temp:=FGNode.name;
@@ -1133,10 +1140,12 @@ begin
   if FParent<>nil then begin
     i:=1;
     node:=FParent.children;
-    while (node.next<>nil) do begin
-      inc(i);
-      node:=node.next
-    end;
+    if node<>nil
+      then while (node.next<>nil) do begin
+             inc(i);
+             node:=node.next
+           end
+      else i:=0;
     result:=i;
   end else begin
     result:=FXPathObject.nodesetval.nodeNr;
@@ -1764,21 +1773,23 @@ var
   name2: TGdomString;
   root:xmlNodePtr;
   ns: TGDOMNamespace;
-  alocalName: string;
+  alocalName: widestring;
 begin
   FGdomimpl:=GDOMImpl;
   if doctype<>nil then
     if doctype.ownerDocument<>nil
       then if (doctype.ownerDocument as IUnknown) <> (self as IUnknown)
         then checkError(WRONG_DOCUMENT_ERR);
-  ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName,self);
-  alocalName:=ns.localName.CString;
+  alocalName:=localName(qualifiedName);
+  if (prefix(qualifiedName)='xml') and (namespaceURI<>'http://www.w3.org/XML/1998/namespace')
+    then checkError(NAMESPACE_ERR);
   if (((Pos(':',alocalName))>0)
     or ((length(namespaceURI))=0) and ((Pos(':',qualifiedName))>0))
-    then begin
-      ns.Free;
-      checkError(NAMESPACE_ERR);
-    end;
+    then checkError(NAMESPACE_ERR);
+  if qualifiedName<>''
+    then if not IsXmlName(qualifiedName)
+      then checkError(INVALID_CHARACTER_ERR);
+  ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName,self);
 
   FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
   FPGdomeDoc.children:=xmlNewDocNode(FPGdomeDoc,ns.ns,ns.localName.CString,nil);
@@ -2107,8 +2118,17 @@ function TGDOMDocument.createAttributeNS(const namespaceURI,
 var
   AAttr: xmlAttrPtr;
   ns: TGDOMNameSpace;
-  //temp:string;
+  alocalName:widestring;
 begin
+  alocalName:=localName(qualifiedName);
+  if (prefix(qualifiedName)='xml') and (namespaceURI<>'http://www.w3.org/XML/1998/namespace')
+    then checkError(NAMESPACE_ERR);
+  if (((Pos(':',alocalName))>0)
+    or ((length(namespaceURI))=0) and ((Pos(':',qualifiedName))>0))
+      then checkError(NAMESPACE_ERR);
+  if qualifiedName<>''
+    then if not IsXmlName(qualifiedName)
+      then checkError(INVALID_CHARACTER_ERR);
   ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName,self);
   AAttr:=xmlNewNsProp(nil,ns.ns,ns.localName.CString,nil);
   ns.free;
