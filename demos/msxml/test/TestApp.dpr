@@ -5,10 +5,14 @@ program TestApp(input, output);
 uses
 	TestMain in 'TestMain.pas';
 
-{$R *.RES}
+{$R *.res}
 
 begin
 	Reset(output);
-	main(ParamStr(1));
+	if (ParamCount=0) then begin
+		main('../../data/birds.xml');
+	end else begin
+		main(ParamStr(1));
+	end;
 	Close(output);
 end.

@@ -54,10 +54,11 @@ var
 	doc: IXMLDOMDocument;
 begin
 	doc := CoDOMDocument.Create;
+	WriteLN('Loading "', aFilename, '"');
 	doc.load(aFileName);
 	Test_SelectSingleNode(doc, '//Family[@Name="ANHINGIDAE"]');
 	Test_SelectNodes(doc, '/Class/Order');
-	Test_XmlOutput(doc.documentElement);
+	Test_XmlOutput(doc.selectSingleNode('//Family'));
 	WriteLN('Press ENTER to continue...');
 	ReadLN;
 end;
