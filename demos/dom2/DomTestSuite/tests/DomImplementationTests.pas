@@ -349,7 +349,7 @@ end;
 
 
 (*
- * tests if prefixing a qualified name with xml results in INVALID_ACCESS_ERR
+ * tests if prefixing a qualified name with xml results in NAMESPACE_ERR
  * (converted from: domimplementationCreateDocXMLNSPrefixXMLNS.js)
 *)
 procedure TDomImplementationFundamentalTests.createDocXMLNSPrefixXMLNSTest;
@@ -363,11 +363,11 @@ begin
   try
     document := fDomImplementation.createDocument(
             namespaceURI, qualifiedName, nil);
-    fail('EDomException INVALID_ACCESS_ERR should have been thrown but was not');
+    fail('EDomException NAMESPACE_ERR should have been thrown but was not');
   except
     on e : EDomException do
-      check(e.code = INVALID_ACCESS_ERR,
-              'INVALID_ACCESS_ERR should be thrown but was: ' + e.message);
+      check(e.code = NAMESPACE_ERR,
+              'NAMESPACE_ERR should be thrown but was: ' + e.message);
   end;
 end;
 
