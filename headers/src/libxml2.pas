@@ -2,7 +2,7 @@ unit libxml2;
 {
   ------------------------------------------------------------------------------
   This unit collects all the translated headers of libxml2 (aka gnome-xml).
-  2001 (C) Petr Kozelka <pkozelka@email.cz>
+  2001-2002 (C) Petr Kozelka <pkozelka@email.cz>
   ------------------------------------------------------------------------------
   Project site:
     http://sourceforge.net/projects/libxml2-pas
@@ -43,13 +43,13 @@ type
   PLibXml2File = pointer; //placeholder for 'FILE *' C-type
 
 {$IFDEF VER130}
-function StrNextChar(p: PxmlChar): PxmlChar;
+function StrNextChar(p: PChar): PChar;
 {$ENDIF}
 
-{$DEFINE libxml2_THREAD_ALLOC_ENABLED}
-{$DEFINE libxml2_THREAD_ENABLED}
-{$DEFINE libxml2_HTML_ENABLED}
-{$DEFINE libxml2_DOCB_ENABLED}
+{$DEFINE LIBXML_THREAD_ALLOC_ENABLED}
+{$DEFINE LIBXML_THREAD_ENABLED}
+{$DEFINE LIBXML_HTML_ENABLED}
+{$DEFINE LIBXML_DOCB_ENABLED}
 
 {$I libxml2_xmlwin32version.inc}
 
@@ -210,7 +210,7 @@ begin
 end;
 
 {$IFDEF VER130}
-function StrNextChar(p: PxmlChar): PxmlChar;
+function StrNextChar(p: PChar): PChar;
 begin
   Result := p + 1;
 end;

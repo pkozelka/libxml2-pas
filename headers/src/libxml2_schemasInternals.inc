@@ -20,7 +20,8 @@
  *)
 type
   xmlSchemaTypeType = (
-    XML_SCHEMA_TYPE_BASIC = 1,
+    DUMMY__XML_SCHEMA_TYPE_0, // =0 // this is for D5 compatibility
+    XML_SCHEMA_TYPE_BASIC,// = 1,
     XML_SCHEMA_TYPE_ANY,
     XML_SCHEMA_TYPE_FACET,
     XML_SCHEMA_TYPE_SIMPLE,

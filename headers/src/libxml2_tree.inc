@@ -132,7 +132,8 @@ type
    *)
 
   xmlAttributeType = (
-    XML_ATTRIBUTE_CDATA       = 1,
+    DUMMY_XML_ATTRIBUTE_TYPE_0, // = 0 // this is for D5 compatibility
+    XML_ATTRIBUTE_CDATA,        // = 1,
     XML_ATTRIBUTE_ID,
     XML_ATTRIBUTE_IDREF,
     XML_ATTRIBUTE_IDREFS,
@@ -150,7 +151,8 @@ type
    * A DTD Attribute default definition.
    *)
   xmlAttributeDefault = (
-    XML_ATTRIBUTE_NONE     = 1,
+    DUMMY_XML_ATTRIBUTE_DEFAULT_0, // = 0 // this is for D5 compatibility
+    XML_ATTRIBUTE_NONE,            // = 1,
     XML_ATTRIBUTE_REQUIRED,
     XML_ATTRIBUTE_IMPLIED,
     XML_ATTRIBUTE_FIXED
@@ -198,7 +200,8 @@ type
    * Possible definitions of element content types.
    *)
   xmlElementContentType = (
-    XML_ELEMENT_CONTENT_PCDATA  = 1,
+    DUMMY_XML_ELEMENT_CONTENT_TYPE_0, // = 0 // this is for D5 compatibility
+    XML_ELEMENT_CONTENT_PCDATA,       // = 1,
     XML_ELEMENT_CONTENT_ELEMENT,
     XML_ELEMENT_CONTENT_SEQ,
     XML_ELEMENT_CONTENT_OR
@@ -210,7 +213,8 @@ type
    * Possible definitions of element content occurences.
    *)
   xmlElementContentOccur = (
-    XML_ELEMENT_CONTENT_ONCE = 1,
+    DUMMY_XML_ELEMENT_CONTENT_OCCUR_0, // = 0 // this is for D5 compatibility
+    XML_ELEMENT_CONTENT_ONCE,          // = 1,
     XML_ELEMENT_CONTENT_OPT,
     XML_ELEMENT_CONTENT_MULT,
     XML_ELEMENT_CONTENT_PLUS
@@ -239,7 +243,7 @@ type
    * The differnt possibility for an element content type.
    *)
   xmlElementTypeVal = (
-    XML_ELEMENT_TYPE_UNDEFINED = 0,
+    XML_ELEMENT_TYPE_UNDEFINED, // = 0,
     XML_ELEMENT_TYPE_EMPTY,
     XML_ELEMENT_TYPE_ANY,
     XML_ELEMENT_TYPE_MIXED,
@@ -364,7 +368,7 @@ type
    * need or double it's allocated size each time it is found too small.
    *)
   xmlBufferAllocationScheme = (
-    XML_BUFFER_ALLOC_DOUBLEIT = 0,
+    XML_BUFFER_ALLOC_DOUBLEIT, // = 0,
     XML_BUFFER_ALLOC_EXACT
   );
 
