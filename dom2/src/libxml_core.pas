@@ -1,5 +1,5 @@
 unit libxml_core;
-//$Id: libxml_core.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
+//$Id: libxml_core.pas,v 1.2 2002-08-13 19:59:01 pkozelka Exp $
 (*
  * libxml-based core implementation of DOM level 2.
  * This unit implements *only* the standard DOM features.
@@ -727,13 +727,14 @@ end;
 
 function TLDomNode.getElementsByTagName(const name: DomString): IDomNodeList;
 begin
-{TODO!
-  if name='*' then begin
+  Result := nil;
+(*
+  if (name = '*') then begin
     Result := selectNodes('.//*');
   end else begin
     Result := selectNodes('.//'+name);
   end;
-}
+*)
 end;
 
 function TLDomNode.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
@@ -2071,6 +2072,7 @@ end;
 
 function TLDomEntityReference.get_lastChild: IDomNode;
 begin
+//TODO: check - this sometimes returns null when firstChild is not null.
   Result := GetDOMObject(fMyNode.children.last) as IDomNode;
 end;
 
@@ -2089,7 +2091,7 @@ end;
 function TLDomEntityReference.get_ChildNodes: IDomNodeList;
 begin
   if (fChildNodes=nil) then begin
-    TLDomEntRefChildNodes.Create(self); // assigns fChildNodes
+    TLDomEntRefChildNodes.Create(Self); // assigns fChildNodes
   end;
   Result := fChildNodes;
 end;

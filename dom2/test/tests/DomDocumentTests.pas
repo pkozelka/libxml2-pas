@@ -515,15 +515,14 @@ const
 var
   document  : IDomDocument;
   entityRef : IDomEntityReference;
+  node: IDomNode;
 begin
-  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
-          parse(XML_VALID_DOC);
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.parse(XML_VALID_DOC);
   entityRef := document.createEntityReference(ENTITY_NAME);
   check(entityRef.childNodes.length = 1, 'entityRef.childNodes.length <> 1');
-  check(entityRef.childNodes.item[0].nodeName = '#text',
-          'entity nodeName <> #text');
-  check(entityRef.childNodes.item[0].nodeValue = ENTITY_VALUE,
-          'entity nodeValue <> SomeEntity');
+  node := entityRef.childNodes.item[0];
+  check(node.nodeName = '#text', 'entity nodeName <> #text');
+  check(node.nodeValue = ENTITY_VALUE, 'entity nodeValue <> SomeEntity');
 end;
 
 
