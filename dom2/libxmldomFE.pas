@@ -108,6 +108,26 @@ type
     function IsSameNode(node:IDOMNode): boolean;
   end;
 
+  (*
+   * IDomOutputOptions
+   *)
+  IDomOutputOptions = interface
+    ['{B2ECC3F1-CC9B-4445-85C6-3D62638F7835}']
+    { Property Acessors }
+    function get_beautify: Boolean;
+    function get_encoding: DomString;
+    function get_compressionLevel: Integer;
+    procedure set_beautify(beautify: boolean);
+    procedure set_encoding(encoding: DomString);
+    procedure set_compressionLevel(compressionLevel: Integer);
+    { Properties }
+    property beautify: Boolean read get_beautify write set_beautify;
+    property encoding: DomString read get_encoding write set_encoding;
+    property compressionLevel: Integer
+      read get_compressionLevel
+      write set_compressionLevel;
+  end;
+
  TGDOMNodeClass = class of TGDOMNode;
 
  TGDOMNode = class(TGDOMInterface, IDOMNode, IXMLDOMNodeRef,IDOMNodeSelect,
@@ -152,7 +172,7 @@ type
     function selectNodes(const nodePath: WideString): IDOMNodeList;
     procedure RegisterNS(const prefix,URI: DomString);
     { IDOMNodeEx}
-    procedure transformNode(const stylesheet: IDOMNode; var output: WideString); overload;
+    procedure transformNode(const stylesheet: IDOMNode; var output: DomString); overload;
     procedure transformNode(const stylesheet: IDOMNode; var output: IDOMDocument); overload;
     { IDOMNodeCompare }
     function IsSameNode(node:IDOMNode): boolean;
@@ -1093,7 +1113,6 @@ var
   temp:string;
 begin
   node:=FGNode.children;
-  next:=nil;
   while node<>nil do begin
     nodeType:=node.type_;
     if nodeType=TEXT_NODE then begin
@@ -3288,7 +3307,7 @@ begin
 end;
 
 procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
-  var output: WideString);
+  var output: DomString);
 var
   doc:       xmlDocPtr;
   styleDoc:  xmlDocPtr;
@@ -3314,8 +3333,7 @@ begin
   outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
   if outputDoc=nil then exit;
   encoding:=outputDoc.encoding;
-  //xmlDocDumpMemoryEnc(outputDoc,CString,@length,encoding);
-  xmlDocDumpMemory(outputDoc,CString,@length1);
+  xmlDocDumpMemoryEnc(outputDoc,CString,@length1,encoding);
   output:=CString;
   //Cut the leading <xml... > header
   len:=pos('>',output)+2;
@@ -3338,9 +3356,6 @@ var
   outputDoc: xmlDocPtr;
   styleNode: xmlNodePtr;
   tempXSL:   xsltStylesheetPtr;
-  //encoding:  pchar;
-  //length:    longInt;
-  node: xmlNodePtr;
 begin
   doc:=FGNode.doc;
   styleNode:=GetGNode(stylesheet);
