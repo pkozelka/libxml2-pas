@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<repository>
+  <xObjects>
+    <xObject id="user"            class="user" />
+
+    <xObject id="customer.one"        class="customer.one" />
+    <xObject id="customer.finance"    class="customer.finance" />
+
+    <xObject id="internet"            class="user.object" />
+
+    <xObject id="frame_ol"            class="user.object" />
+    <xObject id="frame_om"            class="user.object" />
+    <xObject id="frame_or"            class="user.object" />
+    <xObject id="frame_ul"            class="user.object" />
+    <xObject id="frame_ur"            class="user.object" />
+    <xObject id="frame_um"            class="user.object" />
+    <xObject id="frame_mr"            class="user.object" />
+    <xObject id="frame_ml"            class="user.object" />
+    <xObject id="frame_ul"            class="user.object" />
+    <xObject id="frame_ur"            class="user.object" />
+    <xObject id="form_o"              gui-template="form"     class="user.object" />
+    <xObject id="form_m"              gui-template="form"     class="user.object" />
+    <xObject id="form_u"              gui-template="form"     class="user.object" />
+
+    <xObject id="mydesk"              class="user.object" />
+
+    <xObject id="user.name"           class="user.name" />
+  </xObjects>
+  <xClasses>
+
+    <xClass id="user"                  uri="user.xml" />
+
+    <xClass id="customer.one"              uri="customer.one.xml" />
+    <xClass id="customer.finance"          uri="customer.finance.xml" />
+
+    <xClass id="user.object"               uri="user.object.xml" />
+
+    <xClass id="user.name"                 uri="user.name.xml" />
+  </xClasses>
+</repository>
