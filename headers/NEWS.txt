@@ -2,7 +2,33 @@
 *************************  LATEST CHANGES  *************************
 ********************************************************************
 
-- moved to different directory structure
+- moved all files related to libxml2 and libxslt into CVS module "headers"
+- first attempt to produce also binary releases
+- header source distribution were merged. There is now only one deliverable, 
+  called libxml2-pas-2.4.23-src, which contains latest versions of libxml2, libxslt and libexslt.
+  The same applies to demo files and other related stuff.
+- started works on producing binary distributions
+
+
+libxml2-pas 2.4.23:
+-------------------
+
+libxslt-pas 1.0.19:
+-------------------
+- added "simplexslt" example to demos
+
+libexslt-pas 0.7.10:
+-------------------
+
+iconv 0.7: 
+----------
+[unchanged]
+
+********************************************************************
+*************************  OLDER  CHANGES  *************************
+********************************************************************
+
+- release process compatible with libxml part
 
 libxml2-pas 2.4.21:
 -------------------
@@ -16,15 +42,6 @@ libxslt-pas 1.0.18:
 libexslt-pas 0.7.9:
 -------------------
 - added.
-
-iconv 0.7: 
-----------
-[unchanged]
-
-********************************************************************
-*************************  OLDER  CHANGES  *************************
-********************************************************************
-
 
 libxml2-pas 2.4.20:
 -------------------
