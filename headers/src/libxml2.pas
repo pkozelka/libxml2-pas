@@ -18,7 +18,11 @@ uses
   Windows,
 {$ENDIF}
 {$IFDEF LINUX}
-  libc,
+{
+  Unit "libc" does not need to be used explicitly as it is part of the System unit.
+  And, it is better to NOT present it here, because otherwise it would not be 
+  possible to compile the unit standalone or in a package.
+}
 {$ENDIF}
   iconv;
 const
