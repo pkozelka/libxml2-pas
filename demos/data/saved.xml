@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE test SYSTEM "test.dtd">
-<test><sometag name="1st child of DocumentElement">abc</sometag><anothertag name="2nd child of DocumentElement"/><lasttag/></test>
