@@ -95,11 +95,12 @@ type
 
 implementation
 
-// functions from globals.b
+// functions from globals.h
 
 procedure xmlFree(str: PxmlChar);
 begin
-  FreeMem(PChar(str));
+//NOT WORKING:  FreeMem(PChar(str));
+//TODO: find correct way of releasing the memory
 end;
 
 // macros from xpath.h
