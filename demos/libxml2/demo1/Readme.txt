@@ -1,8 +1,7 @@
 Running the demo:
 -----------------
 
-The following dlls are neccesary and must be placed in this directory or in the 
-\WINNT\system32 directory:
+The following dlls are neccesary and must be in PATH:
 
 iconv.dll
 libxml2.dll
@@ -15,7 +14,7 @@ Type:
 
 > demo1
 
-from the console and you get an explannation on the screen.
+from the console and you get an explanation on the screen.
 
 
 Learning the libxml2-api:
