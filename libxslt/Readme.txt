@@ -1,28 +1,58 @@
-xslt-header translations version 0.2
+Delphi-Headers for libxslt
+==========================
+Libxml2 is a low-level library for the work with xml-documents.
+libxml2-pas is translation of the header files into Pascal language.
 
-Tested with Delphi6 /win2k
+AUTHORS
+-------
+Petr Kozelka <pkozelka@email.cz>	-  original header translations
+Uwe Fechner <ufechner@4commerce.de>	-  testing, demo application(s)
 
-The following dlls are neccesary and must be placed in this directory or in the 
-\WINNT\system32 directory:
+
+VERSION COMPLIANCE
+------------------
+This set of units was written for libxslt version 2.4.11. However, 
+translations of some API functions might be missing. To see, which 
+parts of the header translations aren't done yet, look at undone.txt
+
+
+WHAT YOU FIND IN THIS PACKAGE
+-----------------------------
+libxslt/		- pascal translations of the libxslt headers
+
+
+KNOWN PROBLEMS
+--------------
+- extending the xslt-processor with own functions doesn't work yet
+- no demo-program yet
+
+
+USAGE
+-----
+The libxslt unit is typically used in applications which also use libxml2 unit.
+Note that you should *NEVER* need to include any of the *.inc files in the translation directory.
+To use functions implemented in libxslt, you just put "libxslt" into your _uses_ list:
+
+program MyPrg;
+uses libxml2,libxslt;
+begin
+  ... your code here ...
+end.
+
+The following dlls are necessary and must be placed in this directory or in a 
+directory listed in the PATH environment variable:
 
 iconv.dll
 libxml2.dll
 libxslt.dll
 libexslt.dll
 
-You can download them at:
 
-http://www.fh-frankfurt.de/~igor/projects/libxml/index.html
 
-Known Problems:
-
-- extending the xslt-processor with own functions doesn't work yet
-- to see, which parts of the header translations aren't done yet,
-  look at undone.txt
-- no demo-program yet
-
-Suggestions to:
-
-ufechner@4commerce.de
-
+LINKS
+-----
+http://sourceforge.net/projects/libxml2-pas			- project's web site
+mailto:libxml2-pas-devel@lists.sourceforge.net			- mailing list
+http://xmlsoft.org/						- the libxml2 libraries web site
+http://www.fh-frankfurt.de/~igor/projects/libxml/index.html	- Windows build of libxml2 by Igor Zlatkovic
 
