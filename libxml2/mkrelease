@@ -17,8 +17,3 @@ echo "Preparing archive $ARCHIVEFILE ..."
 cd $MYTMP
 tar -zcf ../$ARCHIVEFILE *
 cd ..
-
-echo "Uploading $ARCHIVEFILE to SourceForge incoming FTP"
-#ftp-put.sh upload.log upload.sourceforge.net incoming $ARCHIVEFILE $ARCHIVEFILE anonymous libxml2-pas@sourceforge.net
-cat upload.log
-rm -f upload.log
