@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/parser.h:1.78:
+// CVS-REV:gnome-xml/include/libxml/parser.h:1.79:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -584,20 +584,10 @@ LIBXML_DLL_IMPORT extern xmlSAXHandler docbDefaultSAXHandler;
  * Entity substitution default behavior.
  *)
 
-{$IFDEF VMS}
-(**
- * xmlSubstituteEntitiesDefaultValue:
- *
- * Global variable controlling the entity substitution default behavior
- *)
-//TODO: LIBXML_DLL_IMPORT extern int xmlSubstituteEntitiesDefaultVal;
-{$ENDIF}
-(*
-{$if false}
+{$IFDEF ALWAYS_FALSE}
 //TODO: LIBXML_DLL_IMPORT extern int xmlSubstituteEntitiesDefaultValue;
 //TODO: LIBXML_DLL_IMPORT extern int xmlGetWarningsDefaultValue;
-{$ifend}
-*)
+{$ENDIF}
 
 (*
  * Init/Cleanup.

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/parserInternals.h:1.48:
+// CVS-REV:gnome-xml/include/libxml/parserInternals.h:1.49:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -11,9 +11,6 @@
  * See Copyright for the status of this software.
  *
  * daniel@veillard.com
- *
- * 14 Nov 2000 ht - truncated declaration of xmlParseElementChildrenContentDecl
- * for VMS
  *
  *)
 
@@ -244,13 +241,7 @@ function  xmlParseEnumeratedType(ctxt: xmlParserCtxtPtr; var tree: xmlEnumeratio
 function  xmlParseAttributeType(ctxt: xmlParserCtxtPtr; var tree: xmlEnumerationPtr): Longint; cdecl; external LIBXML2_SO;
 procedure xmlParseAttributeListDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
 function  xmlParseElementMixedContentDecl(ctxt: xmlParserCtxtPtr; inputchk: xmlParserInputPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
-{$IFDEF VMS}
-function  xmlParseElementChildrenContentD(ctxt: xmlParserCtxtPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
-const
-  xmlParseElementChildrenContentDecl = xmlParseElementChildrenContentD;
-{$ELSE}
 function  xmlParseElementChildrenContentDecl(ctxt: xmlParserCtxtPtr; inputchk: xmlParserInputPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
-{$ENDIF}
 function  xmlParseElementContentDecl(ctxt: xmlParserCtxtPtr; name: PxmlChar; var result: xmlElementContentPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlParseElementDecl(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
 procedure xmlParseMarkupDecl(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;

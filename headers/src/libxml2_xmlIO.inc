@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlIO.h:1.37:
+// CVS-REV:gnome-xml/include/libxml/xmlIO.h:1.39:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -181,6 +181,7 @@ function  xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtx
 }
 
 function xmlNormalizeWindowsPath(path: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function xmlCheckFilename(path: PChar): Longint; cdecl; external LIBXML2_SO;
 
 (**
  * Default 'file://' protocol callbacks

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/encoding.h:1.29:
+// CVS-REV:gnome-xml/include/libxml/encoding.h:1.30:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -160,6 +160,7 @@ function  xmlCharEncCloseFunc(handler: xmlCharEncodingHandlerPtr): Longint; cdec
  *)
 function  UTF8Toisolat1(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Longint; cdecl; external LIBXML2_SO;
 function  isolat1ToUTF8(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Longint; cdecl; external LIBXML2_SO;
+function  xmlGetUTF8Char(utf: PChar; len: PLongint): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * exports additional "UTF-8 aware" string routines which are.

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.112:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.113:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -597,11 +597,6 @@ function  xmlUnsetNsProp(node: xmlNodePtr; ns: xmlNsPtr; name: PxmlChar): Longin
 (*
  * Internal, don't use.
  *)
-{$IFDEF VMS}
-procedure xmlBufferWriteXmlCHAR(buf: xmlBufferPtr; aString: PxmlChar); cdecl; external LIBXML2_SO;
-procedure xmlBufferWriteCHAR(buf: xmlBufferPtr; aString: PxmlChar); cdecl; external LIBXML2_SO;
-{$ENDIF}
-
 procedure xmlBufferWriteChar(buf: xmlBufferPtr; aString: PChar); cdecl; external LIBXML2_SO;
 procedure xmlBufferWriteQuotedString(buf: xmlBufferPtr; aString: PxmlChar); cdecl; external LIBXML2_SO;
 
