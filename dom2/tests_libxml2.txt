@@ -30,22 +30,22 @@ document                    getElementByID         2                    jk: not 
 document                    getElementsByTagName   2                                                                             
 document                    getElementsByTagNameNS 2                                                                             
 document                    importNode             2                   
-document                    domImplementation      2                                                                             
-document                    docType                2                      
+document                    domImplementation      2             X                                                                 
+document                    docType                2             X         
 document/IDOMPersist        load                   1             X                                                                
 document/IDOMPersist        save                   1             X                                                                
 document/IDOMPersist        loadXML                1             X      
 document/IDOMPersist        xml                    1             X                                                                
 document/IDOMParseOptions   validate               ?                    fe: failure not reported        
 documentType                entities               ?                                                           
-documentType                internalSubset         3                   
-documentType                name                   3                   
+documentType                internalSubset         3             X      
+documentType                name                   3             X      
 documentType                notations              3                   
-documentType                publicId               2                                                                             
-documentType                systemId               2                                                                             
+documentType                publicId               2             X                                                                
+documentType                systemId               2             X                                                                
 domImplementation           createDocument         1             X      
 domImplementation           createDocumentType     2                   
-domImplementation           hasFeature             3                                            
+domImplementation           hasFeature             3             X                               
 element                     getAttribute           1             X                                                                     
 element                     getAttributeNS         1             X                                                                
 element                     getAttributeNode       1             X                                                               
@@ -107,9 +107,9 @@ processingInstruction       target                 3
 
 Summary: 
 
-99 tests at all    = 100,0 %
+99 methods at all    = 100,0 %
 
 43 high priority methods
 all done
 
-67 methods done totally       
+71 methods done totally       
