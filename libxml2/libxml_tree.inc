@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.100] tree.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 
 (*
@@ -18,7 +18,7 @@
 
 
 type
-	xmlElementType =  Longint;
+  xmlElementType =  Longint;
 
 {[pk] following declarations are in xmlIO.inc:
 xmlParserInputBuffer
@@ -40,14 +40,14 @@ const
    *
    * default buffer size 4000
    *)
-	BASE_BUFFER_SIZE = 4000;
-	(**
-	 * XML_XML_NAMESPACE:
-	 *
-	 * This is the namespace for the special xml: prefix predefined in the
-	 * XML Namespace specification
-	 *)
-	XML_XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
+  BASE_BUFFER_SIZE = 4000;
+  (**
+   * XML_XML_NAMESPACE:
+   *
+   * This is the namespace for the special xml: prefix predefined in the
+   * XML Namespace specification
+   *)
+  XML_XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
 
 
   (*
@@ -59,28 +59,28 @@ const
    * Actually this had diverged a bit, and now XML_DOCUMENT_TYPE_NODE should
    * be deprecated to use an XML_DTD_NODE.
    *)
-	//[pk] note: all these constants are declared unconditionally, as it makes more sense
-	XML_ELEMENT_NODE       = 1;
-	XML_ATTRIBUTE_NODE     = 2;
-	XML_TEXT_NODE          = 3;
-	XML_CDATA_SECTION_NODE = 4;
-	XML_ENTITY_REF_NODE    = 5;
-	XML_ENTITY_NODE        = 6;
-	XML_PI_NODE            = 7;
-	XML_COMMENT_NODE       = 8;
-	XML_DOCUMENT_NODE      = 9;
-	XML_DOCUMENT_TYPE_NODE = 10;
-	XML_DOCUMENT_FRAG_NODE = 11;
-	XML_NOTATION_NODE      = 12;
-	XML_HTML_DOCUMENT_NODE = 13;
-	XML_DTD_NODE           = 14;
-	XML_ELEMENT_DECL       = 15;
-	XML_ATTRIBUTE_DECL     = 16;
-	XML_ENTITY_DECL        = 17;
-	XML_NAMESPACE_DECL     = 18;
-	XML_XINCLUDE_START     = 19;
-	XML_XINCLUDE_END       = 20;
-	XML_DOCB_DOCUMENT_NODE = 21;
+  //[pk] note: all these constants are declared unconditionally, as it makes more sense
+  XML_ELEMENT_NODE       = 1;
+  XML_ATTRIBUTE_NODE     = 2;
+  XML_TEXT_NODE          = 3;
+  XML_CDATA_SECTION_NODE = 4;
+  XML_ENTITY_REF_NODE    = 5;
+  XML_ENTITY_NODE        = 6;
+  XML_PI_NODE            = 7;
+  XML_COMMENT_NODE       = 8;
+  XML_DOCUMENT_NODE      = 9;
+  XML_DOCUMENT_TYPE_NODE = 10;
+  XML_DOCUMENT_FRAG_NODE = 11;
+  XML_NOTATION_NODE      = 12;
+  XML_HTML_DOCUMENT_NODE = 13;
+  XML_DTD_NODE           = 14;
+  XML_ELEMENT_DECL       = 15;
+  XML_ATTRIBUTE_DECL     = 16;
+  XML_ENTITY_DECL        = 17;
+  XML_NAMESPACE_DECL     = 18;
+  XML_XINCLUDE_START     = 19;
+  XML_XINCLUDE_END       = 20;
+  XML_DOCB_DOCUMENT_NODE = 21;
 
 type
   (**
@@ -90,19 +90,19 @@ type
    * It's unsigned allowing to pinpoint case where char * are assigned
    * to xmlChar * (possibly making serialization back impossible).
    *)
-	xmlChar = char;
-	PxmlChar = PChar;
-	PPxmlChar = ^PxmlChar;
+  xmlChar = char;
+  PxmlChar = PChar;
+  PPxmlChar = ^PxmlChar;
 
 // BAD_CAST: not necessary in Pascal
 
 const
-	(**
-	 * XML_LOCAL_NAMESPACE:
-	 *
-	 * A namespace declaration node
-	 *)
-	XML_LOCAL_NAMESPACE = XML_NAMESPACE_DECL;
+  (**
+   * XML_LOCAL_NAMESPACE:
+   *
+   * A namespace declaration node
+   *)
+  XML_LOCAL_NAMESPACE = XML_NAMESPACE_DECL;
 
 const
   (**
@@ -110,16 +110,16 @@ const
    *
    * a DTD Attribute type definition
    *)
-	XML_ATTRIBUTE_CDATA = 1;
-	XML_ATTRIBUTE_ID = 2;
-	XML_ATTRIBUTE_IDREF = 3;
-	XML_ATTRIBUTE_IDREFS = 4;
-	XML_ATTRIBUTE_ENTITY = 5;
-	XML_ATTRIBUTE_ENTITIES = 6;
-	XML_ATTRIBUTE_NMTOKEN = 7;
-	XML_ATTRIBUTE_NMTOKENS = 8;
-	XML_ATTRIBUTE_ENUMERATION = 9;
-	XML_ATTRIBUTE_NOTATION = 10;
+  XML_ATTRIBUTE_CDATA = 1;
+  XML_ATTRIBUTE_ID = 2;
+  XML_ATTRIBUTE_IDREF = 3;
+  XML_ATTRIBUTE_IDREFS = 4;
+  XML_ATTRIBUTE_ENTITY = 5;
+  XML_ATTRIBUTE_ENTITIES = 6;
+  XML_ATTRIBUTE_NMTOKEN = 7;
+  XML_ATTRIBUTE_NMTOKENS = 8;
+  XML_ATTRIBUTE_ENUMERATION = 9;
+  XML_ATTRIBUTE_NOTATION = 10;
 
 const
   (**
@@ -127,17 +127,17 @@ const
    *
    * a DTD Attribute default definition
    *)
-	XML_ATTRIBUTE_NONE = 1;
-	XML_ATTRIBUTE_REQUIRED = 2;
-	XML_ATTRIBUTE_IMPLIED = 3;
-	XML_ATTRIBUTE_FIXED = 4;
+  XML_ATTRIBUTE_NONE = 1;
+  XML_ATTRIBUTE_REQUIRED = 2;
+  XML_ATTRIBUTE_IMPLIED = 3;
+  XML_ATTRIBUTE_FIXED = 4;
 
 const
-	XML_ELEMENT_TYPE_UNDEFINED = 0;
-	XML_ELEMENT_TYPE_EMPTY = 1;
-	XML_ELEMENT_TYPE_ANY = 2;
-	XML_ELEMENT_TYPE_MIXED = 3;
-	XML_ELEMENT_TYPE_ELEMENT = 4;
+  XML_ELEMENT_TYPE_UNDEFINED = 0;
+  XML_ELEMENT_TYPE_EMPTY = 1;
+  XML_ELEMENT_TYPE_ANY = 2;
+  XML_ELEMENT_TYPE_MIXED = 3;
+  XML_ELEMENT_TYPE_ELEMENT = 4;
 
 const
   (**
@@ -145,10 +145,10 @@ const
    *
    * Possible definitions of element content types
    *)
-	XML_ELEMENT_CONTENT_PCDATA = 1;
-	XML_ELEMENT_CONTENT_ELEMENT = 2;
-	XML_ELEMENT_CONTENT_SEQ = 3;
-	XML_ELEMENT_CONTENT_OR = 4;
+  XML_ELEMENT_CONTENT_PCDATA = 1;
+  XML_ELEMENT_CONTENT_ELEMENT = 2;
+  XML_ELEMENT_CONTENT_SEQ = 3;
+  XML_ELEMENT_CONTENT_OR = 4;
 
 const
   (**
@@ -156,10 +156,10 @@ const
    *
    * Possible definitions of element content occurrences
    *)
-	XML_ELEMENT_CONTENT_ONCE = 1;
-	XML_ELEMENT_CONTENT_OPT = 2;
-	XML_ELEMENT_CONTENT_MULT = 3;
-	XML_ELEMENT_CONTENT_PLUS = 4;
+  XML_ELEMENT_CONTENT_ONCE = 1;
+  XML_ELEMENT_CONTENT_OPT = 2;
+  XML_ELEMENT_CONTENT_MULT = 3;
+  XML_ELEMENT_CONTENT_PLUS = 4;
 
 const
   (**
@@ -168,292 +168,292 @@ const
    * A buffer allocation scheme can be defined to either match exactly the
    * need or double it's allocated size each time it is found too small
    *)
-	XML_BUFFER_ALLOC_DOUBLEIT = 0;
-	XML_BUFFER_ALLOC_EXACT = 1;
+  XML_BUFFER_ALLOC_DOUBLEIT = 0;
+  XML_BUFFER_ALLOC_EXACT = 1;
 type
-	xmlDocPtr = ^xmlDoc;
-	xmlDtdPtr = ^xmlDtd;
-	xmlNodePtr = ^xmlNode;
+  xmlDocPtr = ^xmlDoc;
+  xmlDtdPtr = ^xmlDtd;
+  xmlNodePtr = ^xmlNode;
 
-	PxmlNodePtr = ^xmlNodePtr;
+  PxmlNodePtr = ^xmlNodePtr;
 
-	{
-		xmlNotation:
-		a DTD Notation definition
-	}
-	xmlNotationPtr = ^xmlNotation;
-	xmlNotation = record
-		name : PxmlChar;                { Notation name  }
-		PublicID : PxmlChar;            { Public identifier, if any  }
-		SystemID : PxmlChar;            { System identifier, if any  }
-	end;
+  (**
+   * xmlNotation:
+   * a DTD Notation definition
+   *)
+  xmlNotationPtr = ^xmlNotation;
+  xmlNotation = record
+    name : PxmlChar;                { Notation name  }
+    PublicID : PxmlChar;            { Public identifier, if any  }
+    SystemID : PxmlChar;            { System identifier, if any  }
+  end;
 
-	{
-		xmlAttributeType:
-		a DTD Attribute type definition
-	}
+  (**
+   * xmlAttributeType:
+   * a DTD Attribute type definition
+   *)
 
-	xmlAttributeType =  Longint;
+  xmlAttributeType =  Longint;
 
-	{
-		xmlAttributeDefault:
-		a DTD Attribute default definition
-	}
-	xmlAttributeDefault =  Longint;
+	(**
+   * xmlAttributeDefault:
+   * a DTD Attribute default definition
+   *)
+  xmlAttributeDefault =  Longint;
 
-	{
-		xmlEnumeration:
-		list structure used when there is an enumeration in DTDs
-	}
-	xmlEnumerationPtr = ^xmlEnumeration;
-	xmlEnumeration = record
-		next : xmlEnumerationPtr;       { next one  }
-		name : PxmlChar;                { Enumeration name  }
-	end;
+	(**
+   * xmlEnumeration:
+   * list structure used when there is an enumeration in DTDs
+   *)
+  xmlEnumerationPtr = ^xmlEnumeration;
+  xmlEnumeration = record
+    next : xmlEnumerationPtr;       { next one  }
+    name : PxmlChar;                { Enumeration name  }
+  end;
 
-	{
-		xmlAttribute:
-		an Attribute declaration in a DTD
-	}
-	xmlAttributePtr = ^xmlAttribute;
-	xmlAttribute = record
-		_private : pointer;             { application data }
-		type_ : xmlElementType;         { XML_ATTRIBUTE_DECL, must be second !  }
-		name : PxmlChar;                { Attribute name  }
-		children : xmlNodePtr;          { NULL  }
-		last : xmlNodePtr;              { NULL  }
-		parent : xmlDtdPtr;             { -> DTD  }
-		next : xmlNodePtr;              { next sibling link   }
-		prev : xmlNodePtr;              { previous sibling link   }
-		doc : xmlDocPtr;                { the containing document  }
-		nexth : xmlAttributePtr;        { next in hash table  }
-		atype : xmlAttributeType;       { The attribute type  }
-		def : xmlAttributeDefault;      { the default  }
-		defaultValue : PxmlChar;        { or the default value  }
-		tree : xmlEnumerationPtr;       { or the enumeration tree if any  }
-		prefix : PxmlChar;              { the namespace prefix if any  }
-		elem : PxmlChar;                { Element holding the attribute  }
-	end;
+	(**
+   * xmlAttribute:
+   * an Attribute declaration in a DTD
+   *)
+  xmlAttributePtr = ^xmlAttribute;
+  xmlAttribute = record
+    _private : pointer;             { application data }
+    type_ : xmlElementType;         { XML_ATTRIBUTE_DECL, must be second !  }
+    name : PxmlChar;                { Attribute name  }
+    children : xmlNodePtr;          { NULL  }
+    last : xmlNodePtr;              { NULL  }
+    parent : xmlDtdPtr;             { -> DTD  }
+    next : xmlNodePtr;              { next sibling link   }
+    prev : xmlNodePtr;              { previous sibling link   }
+    doc : xmlDocPtr;                { the containing document  }
+    nexth : xmlAttributePtr;        { next in hash table  }
+    atype : xmlAttributeType;       { The attribute type  }
+    def : xmlAttributeDefault;      { the default  }
+    defaultValue : PxmlChar;        { or the default value  }
+    tree : xmlEnumerationPtr;       { or the enumeration tree if any  }
+    prefix : PxmlChar;              { the namespace prefix if any  }
+    elem : PxmlChar;                { Element holding the attribute  }
+  end;
 
-	{
-		xmlElementContentType:
-		Possible definitions of element content types
-	}
-	xmlElementContentType =  Longint;
+	(**
+   * xmlElementContentType:
+   * Possible definitions of element content types
+   *)
+  xmlElementContentType =  Longint;
 
-	{
-		xmlElementContentOccur:
-		Possible definitions of element content occurences
-	}
-	xmlElementContentOccur =  Longint;
+	(**
+   * xmlElementContentOccur:
+   * Possible definitions of element content occurences
+   *)
+  xmlElementContentOccur =  Longint;
 
-	{
-		xmlElementContent:
-		an XML Element content as stored after parsing an element definition
-		in a DTD.
-	}
-	xmlElementContentPtr = ^xmlElementContent;
-	xmlElementContent = record
-		type_ : xmlElementContentType;  { PCDATA, ELEMENT, SEQ or OR  }
-		ocur : xmlElementContentOccur;  { ONCE, OPT, MULT or PLUS  }
-		name : PxmlChar;                { Element name  }
-		c1 : xmlElementContentPtr;      { first child  }
-		c2 : xmlElementContentPtr;      { second child  }
-		parent : xmlElementContentPtr;  { parent  }
-		prefix: PxmlChar;               { prefix }
-	end;
+	(**
+   * xmlElementContent:
+   * an XML Element content as stored after parsing an element definition
+   * in a DTD.
+   *)
+  xmlElementContentPtr = ^xmlElementContent;
+  xmlElementContent = record
+    type_ : xmlElementContentType;  { PCDATA, ELEMENT, SEQ or OR  }
+    ocur : xmlElementContentOccur;  { ONCE, OPT, MULT or PLUS  }
+    name : PxmlChar;                { Element name  }
+    c1 : xmlElementContentPtr;      { first child  }
+    c2 : xmlElementContentPtr;      { second child  }
+    parent : xmlElementContentPtr;  { parent  }
+    prefix: PxmlChar;               { prefix }
+  end;
 
-	{
-		xmlElementTypeVal:
-		the differnt possibility for an element content type
-	}
-	xmlElementTypeVal =  Longint;
+	(**
+   * xmlElementTypeVal:
+   * the differnt possibility for an element content type
+   *)
+  xmlElementTypeVal =  Longint;
 
-	{
-		xmlElement:
-		an XML Element declaration from a DTD
-	}
-	xmlElementPtr = ^xmlElement;
-	xmlElement = record
-		_private : pointer;             { application data }
-		type_ : xmlElementType;         { XML_ELEMENT_DECL, must be second !  }
-		name : PxmlChar;                { Element name  }
-		children : xmlNodePtr;          { NULL  }
-		last : xmlNodePtr;              { NULL  }
-		parent : xmlDtdPtr;             { -> DTD  }
-		next : xmlNodePtr;              { next sibling link   }
-		prev : xmlNodePtr;              { previous sibling link   }
-		doc : xmlDocPtr;                { the containing document  }
-		etype : xmlElementTypeVal;      { The type  }
-		content : xmlElementContentPtr; { the allowed element content  }
-		attributes : xmlAttributePtr;   { List of the declared attributes  }
-		prefix : PxmlChar;              { the namespace prefix if any  }
-	end;
+	(**
+   * xmlElement:
+   * an XML Element declaration from a DTD
+   *)
+  xmlElementPtr = ^xmlElement;
+  xmlElement = record
+    _private : pointer;             { application data }
+    type_ : xmlElementType;         { XML_ELEMENT_DECL, must be second !  }
+    name : PxmlChar;                { Element name  }
+    children : xmlNodePtr;          { NULL  }
+    last : xmlNodePtr;              { NULL  }
+    parent : xmlDtdPtr;             { -> DTD  }
+    next : xmlNodePtr;              { next sibling link   }
+    prev : xmlNodePtr;              { previous sibling link   }
+    doc : xmlDocPtr;                { the containing document  }
+    etype : xmlElementTypeVal;      { The type  }
+    content : xmlElementContentPtr; { the allowed element content  }
+    attributes : xmlAttributePtr;   { List of the declared attributes  }
+    prefix : PxmlChar;              { the namespace prefix if any  }
+  end;
 
-	xmlNsType = xmlElementType;
-	{
-		xmlNs:
+  xmlNsType = xmlElementType;
+	(**
+   * xmlNs:
+   *
+   * An XML namespace.
+   * Note that prefix == NULL is valid, it defines the default namespace
+   * within the subtree (until overriden).
+   *
+   * xmlNsType is unified with xmlElementType
+   *)
+  xmlNsPtr = ^xmlNs;
+  PxmlNsPtr = ^xmlNsPtr;
+  xmlNs = record
+    next : xmlNsPtr;                { next Ns link for this node   }
+    nodetype : xmlNsType;           { global or local  }
+    href : PxmlChar;                { URL for the namespace  }
+    prefix : PxmlChar;              { prefix for the namespace  }
+  end;
 
-		An XML namespace.
-		Note that prefix == NULL is valid, it defines the default namespace
-		within the subtree (until overriden).
+	(**
+   * xmlDtd:
+   *
+   * An XML DtD, as defined by <!DOCTYPE ... There is actually one for
+   * the internal subset and for the external subset
+   *)
+  xmlDtd = record
+    _private : pointer;             { application data }
+    type_ : xmlElementType;         { XML_DTD_NODE, must be second !  }
+    name : PxmlChar;                { Name of the DTD  }
+    children : xmlNodePtr;          { the value of the property link  }
+    last : xmlNodePtr;              { last child link  }
+    parent : xmlDocPtr;             { child->parent link  }
+    next : xmlNodePtr;              { next sibling link   }
+    prev : xmlNodePtr;              { previous sibling link   }
+    doc : xmlDocPtr;                { the containing document  }
+                                    { End of common part  }
+    notations : pointer;          	{ Hash table for notations if any  }
+    elements : pointer;           	{ Hash table for elements if any  }
+    attributes : pointer;         	{ Hash table for attributes if any  }
+    entities : pointer;           	{ Hash table for entities if any  }
+    ExternalID : PxmlChar;        	{ External identifier for PUBLIC DTD  }
+    SystemID : PxmlChar;          	{ URI for a SYSTEM or PUBLIC DTD  }
+    pentities : pointer;          	{ Hash table for param entities if any  }
+  end;
 
-		xmlNsType is unified with xmlElementType
-	}
-	xmlNsPtr = ^xmlNs;
-	PxmlNsPtr = ^xmlNsPtr;
-	xmlNs = record
-		next : xmlNsPtr;                { next Ns link for this node   }
-		nodetype : xmlNsType;           { global or local  }
-		href : PxmlChar;                { URL for the namespace  }
-		prefix : PxmlChar;              { prefix for the namespace  }
-	end;
+	(**
+   * xmlAttr:
+   * A attribute on an XML node.
+   *)
 
-	{
-		xmlDtd:
+  xmlAttrPtr = ^xmlAttr;
+  xmlAttr = record
+    _private : pointer;             { application data }
+    type_ : xmlElementType;         { XML_ATTRIBUTE_NODE, must be second !  }
+    name : PxmlChar;                { the name of the property  }
+    children : xmlNodePtr;          { the value of the property  }
+    last : xmlNodePtr;              { NULL  }
+    parent : xmlNodePtr;            { child->parent link  }
+    next : xmlAttrPtr;              { next sibling link   }
+    prev : xmlAttrPtr;              { previous sibling link   }
+    doc : xmlDocPtr;                { the containing document  }
+    ns : xmlNsPtr;                  { pointer to the associated namespace  }
+    atype : xmlAttributeType;       { the attribute type if validating  }
+  end;
 
-		An XML DtD, as defined by <!DOCTYPE ... There is actually one for
-		the internal subset and for the external subset
-	}
-	xmlDtd = record
-		_private : pointer;             { application data }
-		type_ : xmlElementType;         { XML_DTD_NODE, must be second !  }
-		name : PxmlChar;                { Name of the DTD  }
-		children : xmlNodePtr;          { the value of the property link  }
-		last : xmlNodePtr;              { last child link  }
-		parent : xmlDocPtr;             { child->parent link  }
-		next : xmlNodePtr;              { next sibling link   }
-		prev : xmlNodePtr;              { previous sibling link   }
-		doc : xmlDocPtr;                { the containing document  }
-																		{ End of common part  }
-		notations : pointer;          	{ Hash table for notations if any  }
-		elements : pointer;           	{ Hash table for elements if any  }
-		attributes : pointer;         	{ Hash table for attributes if any  }
-		entities : pointer;           	{ Hash table for entities if any  }
-		ExternalID : PxmlChar;        	{ External identifier for PUBLIC DTD  }
-		SystemID : PxmlChar;          	{ URI for a SYSTEM or PUBLIC DTD  }
-		pentities : pointer;          	{ Hash table for param entities if any  }
-	end;
+	(**
+   * xmlID:
+   * An XML ID instance.
+   *)
+  xmlIDPtr = ^xmlID;
+  xmlID = record
+    next : xmlIDPtr;              	{ next ID  }
+    value : PxmlChar;               { The ID name  }
+    attr : xmlAttrPtr;              { The attribut holding it  }
+  end;
 
-	{
-		xmlAttr:
-		A attribute on an XML node.
-	}
+	(**
+   * xmlRef:
+   * An XML IDREF instance.
+   *)
+  xmlRefPtr = ^xmlRef;
+  xmlRef = record
+    next : xmlRefPtr;               { next Ref  }
+    value : PxmlChar;               { The Ref name  }
+    attr : xmlAttrPtr;              { The attribut holding it  }
+  end;
 
-	xmlAttrPtr = ^xmlAttr;
-	xmlAttr = record
-		_private : pointer;             { application data }
-		type_ : xmlElementType;         { XML_ATTRIBUTE_NODE, must be second !  }
-		name : PxmlChar;                { the name of the property  }
-		children : xmlNodePtr;          { the value of the property  }
-		last : xmlNodePtr;              { NULL  }
-		parent : xmlNodePtr;            { child->parent link  }
-		next : xmlAttrPtr;              { next sibling link   }
-		prev : xmlAttrPtr;              { previous sibling link   }
-		doc : xmlDocPtr;                { the containing document  }
-		ns : xmlNsPtr;                  { pointer to the associated namespace  }
-		atype : xmlAttributeType;       { the attribute type if validating  }
-	end;
+	(**
+   * xmlBufferAllocationScheme:
+   *
+   * A buffer allocation scheme can be defined to either match exactly the
+   * need or double it's allocated size each time it is found too small
+   *)
 
-	{
-		xmlID:
-		An XML ID instance.
-	}
-	xmlIDPtr = ^xmlID;
-	xmlID = record
-		next : xmlIDPtr;              	{ next ID  }
-		value : PxmlChar;               { The ID name  }
-		attr : xmlAttrPtr;              { The attribut holding it  }
-	end;
+  xmlBufferAllocationScheme =  Longint;
 
-	{
-		xmlRef:
-		An XML IDREF instance.
-	}
-	xmlRefPtr = ^xmlRef;
-	xmlRef = record
-		next : xmlRefPtr;               { next Ref  }
-		value : PxmlChar;               { The Ref name  }
-		attr : xmlAttrPtr;              { The attribut holding it  }
-	end;
+	(**
+   * xmlBuffer:
+   * A buffer structure
+   *)
+  xmlBufferPtr = ^xmlBuffer;
+  xmlBuffer = record
+    content : PxmlChar;             { The buffer content UTF8  }
+    use : dword;                    { The buffer size used  }
+    size: dword;                    { The buffer size  }
+    alloc: xmlBufferAllocationScheme; { The realloc method  }
+  end;
 
-	{
-		xmlBufferAllocationScheme:
-
-		A buffer allocation scheme can be defined to either match exactly the
-		need or double it's allocated size each time it is found too small
-	}
-
-	xmlBufferAllocationScheme =  Longint;
-
-	{
-		xmlBuffer:
-		A buffer structure
-	}
-	xmlBufferPtr = ^xmlBuffer;
-	xmlBuffer = record
-		content : PxmlChar;             { The buffer content UTF8  }
-		use : dword;                    { The buffer size used  }
-		size: dword;                    { The buffer size  }
-		alloc: xmlBufferAllocationScheme; { The realloc method  }
-	end;
-
-	{
-		xmlNode:
-		A node in an XML tree.
-	}
-	xmlNode = record
-		_private : pointer;             { application data }
-		type_ : xmlElementType;         { type number, must be second !  }
-		name : PxmlChar;                { the name of the node, or the entity  }
-		children : xmlNodePtr;          { parent->childs link  }
-		last : xmlNodePtr;              { last child link  }
-		parent : xmlNodePtr;            { child->parent link  }
-		next : xmlNodePtr;              { next sibling link   }
-		prev : xmlNodePtr;              { previous sibling link   }
-		doc : xmlDocPtr;                { the containing document  }
-		{ End of common part  }
-		ns : xmlNsPtr;                  { pointer to the associated namespace  }
+	(**
+   * xmlNode:
+   * A node in an XML tree.
+   *)
+  xmlNode = record
+    _private : pointer;             { application data }
+    type_ : xmlElementType;         { type number, must be second !  }
+    name : PxmlChar;                { the name of the node, or the entity  }
+    children : xmlNodePtr;          { parent->childs link  }
+    last : xmlNodePtr;              { last child link  }
+    parent : xmlNodePtr;            { child->parent link  }
+    next : xmlNodePtr;              { next sibling link   }
+    prev : xmlNodePtr;              { previous sibling link   }
+    doc : xmlDocPtr;                { the containing document  }
+    { End of common part  }
+    ns : xmlNsPtr;                  { pointer to the associated namespace  }
 {$ifndef XML_USE_BUFFER_CONTENT    }
-		content : PxmlChar;             { the content  }
+    content : PxmlChar;             { the content  }
 {$else}
-		content : xmlBufferPtr;         { the content in a buffer  }
+    content : xmlBufferPtr;         { the content in a buffer  }
 {$endif}
-		properties : xmlAttrPtr;        { properties list  }
-		nsDef : xmlNsPtr;               { namespace definitions on this node  }
-	end;
+    properties : xmlAttrPtr;        { properties list  }
+    nsDef : xmlNsPtr;               { namespace definitions on this node  }
+  end;
 
-	{
-		xmlDoc:
-		An XML document.
-	}
-	xmlDoc = record
-		_private : pointer;             { application data }
-		type_ : xmlElementType;         { XML_DOCUMENT_NODE, must be second !  }
-		name : Pchar;                 	{ name/filename/URI of the document  }
-		children : xmlNodePtr;          { the document tree  }
-		last : xmlNodePtr;              { last child link  }
-		parent : xmlNodePtr;            { child->parent link  }
-		next : xmlNodePtr;              { next sibling link   }
-		prev : xmlNodePtr;              { previous sibling link   }
-		doc : xmlDocPtr;                { autoreference to itself  }
-		{ End of common part  }
-		compression : longint;          { level of zlib compression  }
-		standalone : longint;         	{ standalone document (no external refs)  }
-		intSubset : xmlDtdPtr;          { the document internal subset  }
-		extSubset : xmlDtdPtr;          { the document external subset  }
-		oldNs : xmlNsPtr;               { Global namespace, the old way  }
-		version : PxmlChar;             { the XML version string  }
-		encoding : PxmlChar;            { external initial encoding, if any  }
-		ids : pointer;                  { Hash table for ID attributes if any  }
-		refs : pointer;                 { Hash table for IDREFs attributes if any  }
-		URL : PxmlChar;                 { The URI for that document  }
-		charset : longint;              { encoding of the in-memory content - actually an xmlCharEncoding  }
-	end;
+	(**
+   * xmlDoc:
+   * An XML document.
+   *)
+  xmlDoc = record
+    _private : pointer;             { application data }
+    type_ : xmlElementType;         { XML_DOCUMENT_NODE, must be second !  }
+    name : Pchar;                 	{ name/filename/URI of the document  }
+    children : xmlNodePtr;          { the document tree  }
+    last : xmlNodePtr;              { last child link  }
+    parent : xmlNodePtr;            { child->parent link  }
+    next : xmlNodePtr;              { next sibling link   }
+    prev : xmlNodePtr;              { previous sibling link   }
+    doc : xmlDocPtr;                { autoreference to itself  }
+    { End of common part  }
+    compression : longint;          { level of zlib compression  }
+    standalone : longint;         	{ standalone document (no external refs)  }
+    intSubset : xmlDtdPtr;          { the document internal subset  }
+    extSubset : xmlDtdPtr;          { the document external subset  }
+    oldNs : xmlNsPtr;               { Global namespace, the old way  }
+    version : PxmlChar;             { the XML version string  }
+    encoding : PxmlChar;            { external initial encoding, if any  }
+    ids : pointer;                  { Hash table for ID attributes if any  }
+    refs : pointer;                 { Hash table for IDREFs attributes if any  }
+    URL : PxmlChar;                 { The URI for that document  }
+    charset : longint;              { encoding of the in-memory content - actually an xmlCharEncoding  }
+  end;
 
-	{
-		Variables.
-	}
+	(**
+   * Variables.
+   *)
 (* TODO: translate somehow
 LIBXML_DLL_IMPORT extern int oldXMLWDcompatibility;/* maintain compatibility with old WD */
 LIBXML_DLL_IMPORT extern int xmlIndentTreeOutput;  /* try to indent the tree dumps */
@@ -462,9 +462,9 @@ LIBXML_DLL_IMPORT extern int xmlSaveNoEmptyTags; /* save empty tags as <empty></
 LIBXML_DLL_IMPORT extern int xmlDefaultBufferSize; /* default buffer size */
 *)
 
-{
-	Handling Buffers.
-}
+(*
+ * Handling Buffers.
+ *)
 procedure xmlSetBufferAllocationScheme(scheme:xmlBufferAllocationScheme);cdecl;external LIBXML2_SO;
 function  xmlGetBufferAllocationScheme:xmlBufferAllocationScheme;cdecl;external LIBXML2_SO;
 function  xmlBufferCreate:xmlBufferPtr;cdecl;external LIBXML2_SO;
@@ -483,9 +483,9 @@ function  xmlBufferContent(buf:xmlBufferPtr):PxmlChar;cdecl;external LIBXML2_SO;
 procedure xmlBufferSetAllocationScheme(buf:xmlBufferPtr; scheme:xmlBufferAllocationScheme);cdecl;external LIBXML2_SO;
 function  xmlBufferLength(buf:xmlBufferPtr):longint;cdecl;external LIBXML2_SO;
 
-{
-	Creating/freeing new structures
-}
+(*
+ * Creating/freeing new structures
+ *)
 function  xmlCreateIntSubset(doc:xmlDocPtr; name:PxmlChar; ExternalID:PxmlChar; SystemID:PxmlChar):xmlDtdPtr;cdecl;external LIBXML2_SO;
 function  xmlNewDtd(doc:xmlDocPtr; name:PxmlChar; ExternalID:PxmlChar; SystemID:PxmlChar):xmlDtdPtr;cdecl;external LIBXML2_SO;
 function  xmlGetIntSubset(doc:xmlDocPtr):xmlDtdPtr;cdecl;external LIBXML2_SO;
@@ -506,9 +506,9 @@ function  xmlCopyPropList(target:xmlNodePtr; cur:xmlAttrPtr):xmlAttrPtr;cdecl;ex
 function  xmlCopyDtd(dtd:xmlDtdPtr):xmlDtdPtr;cdecl;external LIBXML2_SO;
 function  xmlCopyDoc(doc:xmlDocPtr; recursive:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
 
-{
-	Creating new nodes
-}
+(*
+ * Creating new nodes
+ *)
 function  xmlNewDocNode(doc:xmlDocPtr; ns:xmlNsPtr; name:PxmlChar; content:PxmlChar):xmlNodePtr;cdecl;external LIBXML2_SO;
 function  xmlNewDocRawNode(doc:xmlDocPtr; ns:xmlNsPtr; name:PxmlChar; content:PxmlChar):xmlNodePtr;cdecl;external LIBXML2_SO;
 function  xmlNewNode(ns:xmlNsPtr; name:PxmlChar):xmlNodePtr;cdecl;external LIBXML2_SO;
@@ -529,9 +529,9 @@ function  xmlDocCopyNode(node:xmlNodePtr; doc:xmlDocPtr; recursive:longint):xmlN
 function  xmlCopyNodeList(node:xmlNodePtr):xmlNodePtr;cdecl;external LIBXML2_SO;
 function  xmlNewDocFragment(doc:xmlDocPtr):xmlNodePtr;cdecl;external LIBXML2_SO;
 
-{
-	Navigating
-}
+(*
+ * Navigating
+ *)
 function  xmlGetLineNo(node: xmlNodePtr): int64; cdecl;external LIBXML2_SO;
 function  xmlGetNodePath(node: xmlNodePtr): PxmlChar; cdecl;external LIBXML2_SO;
 function  xmlDocGetRootElement(doc:xmlDocPtr):xmlNodePtr;cdecl;external LIBXML2_SO;
@@ -539,9 +539,9 @@ function  xmlGetLastChild(parent:xmlNodePtr):xmlNodePtr;cdecl;external LIBXML2_S
 function  xmlNodeIsText(node:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
 function  xmlIsBlankNode(node:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
 
-{
-	Changing the structure
-}
+(*
+ * Changing the structure
+ *)
 function  xmlDocSetRootElement(doc:xmlDocPtr; root:xmlNodePtr):xmlNodePtr;cdecl;external LIBXML2_SO;
 procedure xmlNodeSetName(cur:xmlNodePtr; name:PxmlChar);cdecl;external LIBXML2_SO;
 function  xmlAddChild(parent:xmlNodePtr; cur:xmlNodePtr):xmlNodePtr;cdecl;external LIBXML2_SO;
@@ -558,9 +558,9 @@ procedure xmlFreeNode(cur:xmlNodePtr);cdecl;external LIBXML2_SO;
 procedure xmlSetTreeDoc(tree:xmlNodePtr; doc:xmlDocPtr);cdecl;external LIBXML2_SO;
 procedure xmlSetListDoc(list:xmlNodePtr; doc:xmlDocPtr);cdecl;external LIBXML2_SO;
 
-{
-	Namespaces
-}
+(*
+ * Namespaces
+ *)
 function  xmlSearchNs(doc:xmlDocPtr; node:xmlNodePtr; nameSpace:PxmlChar):xmlNsPtr;cdecl;external LIBXML2_SO;
 function  xmlSearchNsByHref(doc:xmlDocPtr; node:xmlNodePtr; href:PxmlChar):xmlNsPtr;cdecl;external LIBXML2_SO;
 function  xmlGetNsList(doc:xmlDocPtr; node:xmlNodePtr):PxmlNsPtr;cdecl;external LIBXML2_SO;
@@ -568,9 +568,9 @@ procedure xmlSetNs(node:xmlNodePtr; ns:xmlNsPtr);cdecl;external LIBXML2_SO;
 function  xmlCopyNamespace(cur:xmlNsPtr):xmlNsPtr;cdecl;external LIBXML2_SO;
 function  xmlCopyNamespaceList(cur:xmlNsPtr):xmlNsPtr;cdecl;external LIBXML2_SO;
 
-{
-	Changing the content.
-}
+(*
+ * Changing the content.
+ *)
 function  xmlSetProp(node:xmlNodePtr; name:PxmlChar; value:PxmlChar):xmlAttrPtr;cdecl;external LIBXML2_SO;
 function  xmlGetProp(node:xmlNodePtr; name:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
 function  xmlHasProp(node:xmlNodePtr; name:PxmlChar):xmlAttrPtr;cdecl;external LIBXML2_SO;
@@ -593,16 +593,16 @@ procedure xmlNodeSetSpacePreserve(cur:xmlNodePtr; val:longint);cdecl;external LI
 function  xmlNodeGetBase(doc:xmlDocPtr; cur:xmlNodePtr):PxmlChar;cdecl;external LIBXML2_SO;
 procedure xmlNodeSetBase(cur:xmlNodePtr; uri:PxmlChar);cdecl;external LIBXML2_SO;
 
-{
-	Removing content.
-}
+(*
+ * Removing content.
+ *)
 function  xmlRemoveProp(attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
 function  xmlUnsetProp(node:xmlNodePtr; name:PxmlChar):longint;cdecl;external LIBXML2_SO;
 function  xmlUnsetNsProp(node:xmlNodePtr; ns:xmlNsPtr; name:PxmlChar):longint;cdecl;external LIBXML2_SO;
 
-{
-	Internal, don't use
-}
+(*
+ * Internal, don't use
+ *)
 {$ifdef VMS}
 procedure xmlBufferWriteXmlCHAR(buf:xmlBufferPtr; aString:PxmlChar);cdecl;external LIBXML2_SO;
 procedure xmlBufferWriteCHAR(buf:xmlBufferPtr; aString:PxmlChar);cdecl;external LIBXML2_SO;
@@ -611,14 +611,14 @@ procedure xmlBufferWriteCHAR(buf:xmlBufferPtr; aString:PxmlChar);cdecl;external 
 procedure xmlBufferWriteChar(buf:xmlBufferPtr; aString:Pchar);cdecl;external LIBXML2_SO;
 procedure xmlBufferWriteQuotedString(buf:xmlBufferPtr; aString:PxmlChar);cdecl;external LIBXML2_SO;
 
-{
-	Namespace handling
-}
+(*
+ * Namespace handling
+ *)
 function  xmlReconciliateNs(doc:xmlDocPtr; tree:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
 
-{
-	Saving
-}
+(*
+ * Saving
+ *)
 procedure xmlDocDumpFormatMemory(cur:xmlDocPtr; var mem:PxmlChar; size:Plongint; format:longint);cdecl;external LIBXML2_SO;
 procedure xmlDocDumpMemory(cur:xmlDocPtr; var mem:PxmlChar; size:Plongint);cdecl;external LIBXML2_SO;
 procedure xmlDocDumpMemoryEnc(out_doc:xmlDocPtr; var doc_txt_ptr:PxmlChar; doc_txt_len:Plongint; txt_encoding:Pchar);cdecl;external LIBXML2_SO;
