@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.94 2002-01-29 02:56:20 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.95 2002-01-29 17:55:01 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -84,6 +84,7 @@ type
     FChildNodes: TGDOMChildNodeList; // non-counted reference
     function  returnNullDomNode: IDomNode;
     function  returnEmptyString: DomString;
+    function  returnChildNodes: IDomNodeList;
   protected //ILibXml2Node
     function  LibXml2NodePtr: xmlNodePtr;
   protected //IDomNode
@@ -186,6 +187,7 @@ type
   TGDOMAttr = class(TGDOMNode, IDomNode, IDomAttr)
   protected //IDomNode
 //    procedure set_nodeValue(const value: DomString);
+    function  IDomNode.get_childNodes = returnChildNodes;
     function  IDomNode.get_parentNode = returnNullDomNode;
     function  IDomNode.get_firstChild = returnNullDomNode;
     function  IDomNode.get_lastChild = returnNullDomNode;
@@ -193,6 +195,7 @@ type
     function  IDomNode.get_nextSibling = returnNullDomNode;
   protected //IDomAttr
     function  IDomAttr.get_name = get_nodeName;
+    function  IDomAttr.get_childNodes = returnChildNodes;
     function  get_specified: Boolean;
     function  IDomAttr.get_value = get_nodeValue;
     procedure IDomAttr.set_value = set_nodeValue;
@@ -205,9 +208,11 @@ type
   private
     FAttributes: TGDOMAttributes; // non-counted reference
   protected //IDomNode
+    function  IDomNode.get_childNodes = returnChildNodes;
     function  get_attributes: IDomNamedNodeMap;
   protected //IDomElement
     function  IDomElement.get_tagName = get_localName;
+    function  IDomElement.get_childNodes = returnChildNodes;
     function  getAttribute(const name: DomString): DomString;
     procedure setAttribute(const name, value: DomString);
     procedure removeAttribute(const name: DomString);
@@ -297,8 +302,9 @@ type
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomNotation
-    function get_publicId: DomString;
-    function get_systemId: DomString;
+    function  IDomNotation.get_parentNode = returnNullDomNode;
+    function  get_publicId: DomString;
+    function  get_systemId: DomString;
   end;
 
   { TGDOMEntity }
@@ -307,14 +313,19 @@ type
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomEntity
-    function get_publicId: DomString;
-    function get_systemId: DomString;
-    function get_notationName: DomString;
+    function  IDomEntity.get_parentNode = returnNullDomNode;
+    function  get_publicId: DomString;
+    function  get_systemId: DomString;
+    function  get_notationName: DomString;
   end;
 
   { TGDOMEntityReference }
 
   TGDOMEntityReference = class(TGDOMNode, IDomEntityReference, IDomNode)
+  protected //IDomNode
+    function  IDomNode.get_childNodes = returnChildNodes;
+  protected //IDomEntityReference
+    function  IDomEntityReference.get_childNodes = returnChildNodes;
   end;
 
   { TGDOMProcessingInstruction }
@@ -343,6 +354,7 @@ type
     function  IDomNode.get_nodeValue = returnEmptyString;
     procedure set_nodeValue(const value: DomString);
     function  get_nodeType: DOMNodeType;
+    function  IDomNode.get_childNodes = returnChildNodes;
     function  IDomNode.get_parentNode = returnNullDomNode;
     function  IDomNode.get_previousSibling = returnNullDomNode;
     function  IDomNode.get_nextSibling = returnNullDomNode;
@@ -351,6 +363,14 @@ type
     function  IDomNode.get_prefix = returnEmptyString;
     function  IDomNode.get_localName = returnEmptyString;
   protected //IDomDocument
+    function  IDomDocument.get_nodeValue = returnEmptyString;
+    function  IDomDocument.get_childNodes = returnChildNodes;
+    function  IDomDocument.get_parentNode = returnNullDomNode;
+    function  IDomDocument.get_previousSibling = returnNullDomNode;
+    function  IDomDocument.get_nextSibling = returnNullDomNode;
+    function  IDomDocument.get_namespaceURI = returnEmptyString;
+    function  IDomDocument.get_prefix = returnEmptyString;
+    function  IDomDocument.get_localName = returnEmptyString;
     function  get_doctype: IDomDocumentType;
     function  get_domImplementation: IDomImplementation;
     function  get_documentElement: IDomElement;
@@ -400,9 +420,13 @@ type
 
   { TGDOMDocumentFragment }
 
-  TGDOMDocumentFragment = class(TGDOMNode, IDomNode, IDomDocumentFragment)
+  TGDOMDocumentFragment = class(TGDOMNode, IDomDocumentFragment, IDomNode)
   protected //IDomNode
+    function  IDomNode.get_childNodes = returnChildNodes;
     function  IDomNode.get_parentNode = returnNullDomNode;
+  protected //IDomDocumentFragment
+    function  IDomDocumentFragment.get_childNodes = returnChildNodes;
+    function  IDomDocumentFragment.get_parentNode = returnNullDomNode;
   end;
 
   { TGDOMDocumentBuilderFactory }
@@ -1019,20 +1043,29 @@ begin
   Result := GetDOMObject(FGNode.parent) as IDomNode
 end;
 
-function TGDOMNode.get_childNodes: IDomNodeList;
+function TGDOMNode.returnChildNodes: IDomNodeList;
 begin
   if (FChildNodes=nil) then begin
+{
     // create wrapper for child list, if relevant
     //todo: change this to VMT redirection
     case get_nodeType of
+    ATTRIBUTE_NODE,
     DOCUMENT_NODE,
     DOCUMENT_FRAGMENT_NODE,
     ELEMENT_NODE,
     ENTITY_REFERENCE_NODE:
-      TGDOMChildNodeList.Create(self); // assigns FChildNodes
-    end;
+}
+    TGDOMChildNodeList.Create(self); // assigns FChildNodes
   end;
   Result := FChildNodes;
+end;
+
+function TGDOMNode.get_childNodes: IDomNodeList;
+begin
+  // classes that need to support childNodes
+  // must redirect this VMT record to returnChildNodes
+  Result := nil;
 end;
 
 function TGDOMNode.get_firstChild: IDomNode;
@@ -2226,7 +2259,7 @@ begin
   Result := p.insertBefore(Result, get_nextSibling) as IDomText;
 end;
 
-{ TMSDOMEntity }
+{ TGDOMEntity }
 
 function TGDOMEntity.get_notationName: DomString;
 begin
