@@ -627,6 +627,16 @@ begin
   end;
 end;
 
+function getEncoding(PI:string):string;
+//extracts the encoding from the xml header
+//todo: more general algorithm
+var
+  pos1: integer;
+begin
+  pos1:=pos('encoding',PI)+length('encoding')+2;
+  result:=trim(copy(PI,pos1,length(PI)-pos1-2));
+end;
+
 (*
 function TGDOMImplementationFactory.DOMImplementation: IDomImplementation;
 begin
@@ -2478,7 +2488,9 @@ begin
         format := -1;
       end;
       xmlDocDumpFormatMemoryEnc(FPGdomeDoc, CString, @length, encoding, format);
-      Result := CString;
+      if encoding<>'utf8'
+        then Result := CString
+        else Result := UTF8Decode(CString);
       xmlFree(CString);  //this works with the new dll from 2001-01-25
     end;
 end;
@@ -2537,15 +2549,24 @@ end;
 function TGDOMDocument.loadxml(const Value: DOMString): boolean;
   // Load dom from string;
 var
-  temp: TGdomString;
   root: xmlNodePtr;
   ctxt: xmlParserCtxtPtr;
+  pxml: string;
+  header,encoding: string;
+  ppxml: pointer;
 begin
-  // to do: add the following line to the other load methods
   Result := False;
-  temp := TGdomString.Create(Value);
   xmlInitParser();
-  ctxt := xmlCreateDocParserCtxt(temp.CString);
+  header:=leftstr(Value,pos('>',value));
+  encoding:=getEncoding(header);
+  Fencoding:=encoding;
+  if (encoding<>'utf8') and (encoding<>'utf16') then begin
+    pxml := Value + #0;
+    ctxt := xmlCreateDocParserCtxt(@pxml[1]);
+  end else begin
+    pxml:=UTF8Encode(value);
+    ctxt := xmlCreateDocParserCtxt(pchar(pxml));
+  end;
   if (ctxt <> nil) then begin
     ctxt.validate := -1;
     //todo: async (separate thread)
@@ -2554,7 +2575,6 @@ begin
     if (ctxt.wellFormed <> 0) then if not Fvalidate or (ctxt.valid <> 0) then begin
         xmlFreeDoc(FPGdomeDoc);
         inherited Destroy;
-        // to do: add the following line to the other load methods
         Result := True;
         FPGdomeDoc := ctxt.myDoc
       end else begin
@@ -2569,7 +2589,6 @@ begin
     end;
     xmlFreeParserCtxt(ctxt);
   end;
-  temp.Free;
   if Result then begin
     root := xmlNodePtr(FPGdomeDoc);
     inherited Create(root, nil);
