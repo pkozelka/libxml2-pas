@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.16 2002-02-12 08:55:11 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.17 2002-02-14 23:24:50 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -76,6 +76,9 @@ type
     function  cloneNode(deep: Boolean): IDomNode;
     procedure normalize;
     function  isSupported(const feature, version: DomString): Boolean;
+  protected //ready for IDomElement, IDomDocument
+    function  getElementsByTagName(const name: DomString): IDomNodeList;
+    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
   protected
     constructor Create(aLibXml2Node: pointer); virtual;
     function  requestNodePtr: xmlNodePtr; virtual;
@@ -222,8 +225,6 @@ type
     function  setAttributeNodeNS(const newAttr: IDomAttr): IDomAttr;
     function  hasAttribute(const name: DomString): Boolean;
     function  hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
-    function  getElementsByTagName(const name: DomString): IDomNodeList;
-    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
   protected
     constructor Create(aLibXml2Node: pointer); override;
   public
@@ -318,8 +319,6 @@ type
     function  createElementNS(const namespaceURI, qualifiedName: DomString): IDomElement;
     function  createAttributeNS(const namespaceURI, qualifiedName: DomString): IDomAttr;
     function  getElementById(const elementId: DomString): IDomElement;
-    function  getElementsByTagName(const name: DomString): IDomNodeList;
-    function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
   protected //
     constructor Create(aLibXml2Node: pointer); override;
     (**
@@ -350,6 +349,51 @@ type
     function get_internalSubset: DomString;
   end;
 
+  { TLDOMImplementation class }
+
+  TLDomImplementation = class(TLDomObject, IDomImplementation)
+  private
+    class function getInstance(aFreeThreading: boolean): IDomImplementation;
+  protected //IDomImplementation
+    function hasFeature(const feature, version: DomString): Boolean;
+    function createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
+    function createDocument(const namespaceURI, qualifiedName: DomString; doctype: IDomDocumentType): IDomDocument;
+  public
+    class function featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
+  end;
+
+  { TLDomDocumentBuilder class }
+
+  TLDomDocumentBuilder = class(TLDOMObject, IDomDocumentBuilder)
+  private
+    FFreeThreading : Boolean;
+  protected //IDomDocumentBuilder
+    function  Get_DomImplementation : IDomImplementation;
+    function  Get_IsNamespaceAware : Boolean;
+    function  Get_IsValidating : Boolean;
+    function  Get_HasAsyncSupport : Boolean;
+    function  Get_HasAbsoluteURLSupport : Boolean;
+    function  newDocument : IDomDocument;
+    function  parse(const xml : DomString) : IDomDocument;
+    function  load(const url : DomString) : IDomDocument;
+  protected
+    constructor Create(AFreeThreading : Boolean);
+  public
+    destructor Destroy; override;
+  end;
+
+  { TLDomDocumentBuilderFactory class }
+
+  TLDomDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
+  private
+    FFreeThreading : Boolean;
+  protected //IDomDocumentBuilderFactory
+    function  NewDocumentBuilder : IDomDocumentBuilder;
+    function  Get_VendorID : DomString;
+  public
+    constructor Create(aFreeThreading : Boolean);
+  end;
+
 //overridable implementations
 var
   GlbNodeClasses: array[XML_ELEMENT_NODE..XML_DOCB_DOCUMENT_NODE] of TLDomNodeClass = (
@@ -361,11 +405,11 @@ var
     TLDomEntity, //XML_ENTITY_NODE
     TLDomProcessingInstruction, //XML_PI_NODE
     TLDomComment, //XML_COMMENT_NODE
-    nil, //TGDOMDocument, //XML_DOCUMENT_NODE
+    TLDomDocument, //XML_DOCUMENT_NODE
     TLDomDocumentType, //XML_DOCUMENT_TYPE_NODE
     TLDomDocumentFragment, //XML_DOCUMENT_FRAG_NODE
     TLDomNotation, //XML_NOTATION_NODE
-    nil, //TGDOMDocument, //XML_HTML_DOCUMENT_NODE
+    TLDomDocument, //XML_HTML_DOCUMENT_NODE
     TLDomDocumentType, //XML_DTD_NODE
     nil, //XML_ELEMENT_DECL
     nil, //XML_ATTRIBUTE_DECL
@@ -373,12 +417,15 @@ var
     nil, //XML_NAMESPACE_DECL,
     nil, //XML_XINCLUDE_START,
     nil, //XML_XINCLUDE_END,
-    nil  //XML_DOCB_DOCUMENT_NODE
+    TLDomDocument //XML_DOCB_DOCUMENT_NODE
   );
 
 
 //temporarily exposed:
 function  GetDomObject(aNode: pointer): IUnknown;
+
+const
+  vendorID = 'LIBXML';  { Do not localize }
 
 implementation
 
@@ -588,6 +635,30 @@ end;
 function TLDomNode.get_attributes: IDomNamedNodeMap;
 begin
   Result := nil;
+end;
+
+function TLDomNode.getElementsByTagName(const name: DomString): IDomNodeList;
+begin
+{TODO!
+  if name='*' then begin
+    Result := selectNodes('.//*');
+  end else begin
+    Result := selectNodes('.//'+name);
+  end;
+}
+end;
+
+function TLDomNode.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
+begin
+{TODO!
+  RegisterNs('xyz4ct', namespaceURI);
+  if localName='*' then begin
+    Result := selectNodes('.//xyz4ct:'+localName);
+  end else begin
+    Result := selectNodes('.//xyz4ct:'+localName);
+  end;
+  //todo: more generic code
+}
 end;
 
 function TLDomNode.get_firstChild: IDomNode;
@@ -1098,16 +1169,6 @@ begin
   end;
 end;
 
-function TLDomDocument.getElementsByTagName(const name: DomString): IDomNodeList;
-begin
-  //TODO!
-end;
-
-function TLDomDocument.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
-begin
-  //TODO!
-end;
-
 function TLDomDocument.GetFlyingNodes: TList;
 begin
   if FFlyingNodes=nil then begin
@@ -1551,16 +1612,6 @@ begin
   xmlFree(p);
 end;
 
-function TLDomElement.getElementsByTagName(const name: DomString): IDomNodeList;
-begin
-  //TODO!
-end;
-
-function TLDomElement.getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
-begin
-  //TODO!                                      
-end;
-
 function TLDomElement.hasAttribute(const name: DomString): Boolean;
 begin
   Result := xmlHasProp(FGNode, PChar(UTF8Encode(name)))<>nil;
@@ -1631,5 +1682,162 @@ begin
   xmlSetNSProp(FGNode, ns, PChar(ulocal), PChar(UTF8Encode(value)));
 end;
 
+{ TGDOMImplementation }
+
+function TLDomImplementation.createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
+var
+  dtd:xmlDtdPtr;
+  upubid, usysid: String;
+  uprefix, ulocal: String;
+begin
+  SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
+  checkName(uprefix, ulocal);
+  upubid := UTF8Encode(publicId);
+  usysid := UTF8Encode(systemId);
+  dtd := xmlCreateIntSubSet(nil, PChar(UTF8Encode(qualifiedName)), PChar(upubid), PChar(usysid));
+  Result := GetDomObject(dtd) as IDomDocumentType;
+end;
+
+function TLDomImplementation.createDocument(const namespaceURI, qualifiedName: DomString; doctype: IDomDocumentType): IDomDocument;
+begin
+  Result := TLDomDocument.Create(nil);
+  if (doctype<>nil) then begin
+    DomAssert(doctype.ownerDocument=nil, WRONG_DOCUMENT_ERR, 'doctype already belongs to another document');
+    Result.appendChild(doctype);
+  end;
+  // prepare documentElement if necessary
+  if (qualifiedName<>'') then begin
+    Result.appendChild(Result.createElementNS(namespaceURI, qualifiedName));
+  end else begin
+    DomAssert(namespaceURI='', NAMESPACE_ERR, 'cannot create documentElement in namespace "'+namespaceURI+'", because qualifiedName was not specified.');
+  end;
+end;
+
+class function TLDomImplementation.featureIsSupported(const aFeature, aVersion: DomString; const aFeatures: array of DomString): Boolean;
+var
+  i: integer;
+  fea: string;
+  ver: string;
+begin
+  fea := UpperCase(aFeature);
+  ver := UpperCase(aVersion);
+  i := Low(aFeatures);
+  while (i<High(aFeatures)) do begin
+    Result := (fea = aFeatures[i]);
+    Inc(i);
+    Result := Result and (ver=aFeatures[i]);
+    if Result then exit;
+    Inc(i);
+  end;
+  Result := false;
+end;
+
+class function TLDomImplementation.getInstance(aFreeThreading: boolean): IDomImplementation;
+begin
+  Result := LDOMImplementation[aFreeThreading];
+  if (Result = nil) then begin
+    Result := TLDomImplementation.Create; // currently, the same imlementation for both cases
+    LDOMImplementation[aFreeThreading] := Result;
+  end;
+end;
+
+function TLDomImplementation.hasFeature(const feature, version: DomString): Boolean;
+begin
+  Result := featureIsSupported(feature, version, IMPLEMENTATION_FEATURES);
+end;
+
+{ TLDomDocumentBuilder }
+
+constructor TLDomDocumentBuilder.Create(aFreeThreading : Boolean);
+begin
+  inherited Create;
+  FFreeThreading := aFreeThreading;
+end;
+
+destructor TLDOMDocumentBuilder.Destroy;
+begin
+  inherited Destroy;
+end;
+
+function TLDomDocumentBuilder.Get_DomImplementation : IDomImplementation;
+begin
+  Result := TLDomImplementation.getInstance(FFreeThreading);
+end;
+
+function TLDomDocumentBuilder.Get_IsNamespaceAware : Boolean;
+begin
+  Result := True;
+end;
+
+function TLDomDocumentBuilder.Get_IsValidating : Boolean;
+begin
+  Result := True;
+end;
+
+function TLDomDocumentBuilder.Get_HasAbsoluteURLSupport : Boolean;
+begin
+  Result := False;
+end;
+
+function TLDomDocumentBuilder.Get_HasAsyncSupport : Boolean;
+begin
+  Result := False;
+end;
+
+function TLDomDocumentBuilder.load(const url: DomString): IDomDocument;
+var
+  doc: TLDomDocument;
+  ok: boolean;
+begin
+  doc := TLDomDocument.Create(nil);
+  doc.DomImplementation := Get_DomImplementation;
+//TODO!  ok := doc.load(url);
+  DomAssert(ok, PARSE_ERR, 'Error while parsing file:'+url);
+  Result := doc;
+end;
+
+function TLDomDocumentBuilder.newDocument: IDomDocument;
+var
+  doc: TLDOMDocument;
+begin
+  doc := TLDomDocument.Create(nil);
+  doc.DomImplementation := Get_DomImplementation;
+  Result := doc;
+end;
+
+function TLDomDocumentBuilder.parse(const xml: DomString): IDomDocument;
+var
+  doc: TLDomDocument;
+  ok: boolean;
+begin
+  doc := TLDomDocument.Create(nil);
+  doc.DomImplementation := Get_DomImplementation;
+//TODO!  ok := doc.loadxml(xml);
+  DomAssert(ok, PARSE_ERR, 'Error while parsing xml:'#13+xml);
+  Result := doc;
+end;
+
+{ TLDomDocumentBuilderFactory }
+
+constructor TLDomDocumentBuilderFactory.Create(aFreeThreading : Boolean);
+begin
+  FFreeThreading := aFreeThreading;
+end;
+
+function TLDomDocumentBuilderFactory.NewDocumentBuilder : IDomDocumentBuilder;
+begin
+  Result := TLDomDocumentBuilder.Create(FFreeThreading);
+end;
+
+function TLDomDocumentBuilderFactory.Get_VendorID : DomString;
+begin
+  Result := vendorID;
+end;
+
+initialization
+finalization
+  // release on-demand created instances
+  LDOMImplementation[false] := nil;
+  LDOMImplementation[true] := nil;
 end.
 
