@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/encoding.h:1.28:
+// CVS-REV:gnome-xml/include/libxml/encoding.h:1.29:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -134,6 +134,7 @@ procedure xmlCleanupCharEncodingHandlers; cdecl; external LIBXML2_SO;
 procedure xmlRegisterCharEncodingHandler(handler: xmlCharEncodingHandlerPtr); cdecl; external LIBXML2_SO;
 function  xmlGetCharEncodingHandler(enc: xmlCharEncoding): xmlCharEncodingHandlerPtr; cdecl; external LIBXML2_SO;
 function  xmlFindCharEncodingHandler(name: PChar): xmlCharEncodingHandlerPtr; cdecl; external LIBXML2_SO;
+function  xmlNewCharEncodingHandler(name: PChar; aInput: xmlCharEncodingInputFunc; aOutput: xmlCharEncodingOutputFunc): xmlCharEncodingHandlerPtr; cdecl; external LIBXML2_SO;
 
 (*
  * Interfaces for encoding names and aliases.

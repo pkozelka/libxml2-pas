@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/parser.h:1.77:
+// CVS-REV:gnome-xml/include/libxml/parser.h:1.78:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -667,6 +667,7 @@ function  xmlParseDTD(ExternalID: PxmlChar; SystemID: PxmlChar): xmlDtdPtr; cdec
 function  xmlSAXParseDTD(sax: xmlSAXHandlerPtr; ExternalID: PxmlChar; SystemID: PxmlChar): xmlDtdPtr; cdecl; external LIBXML2_SO;
 function  xmlIOParseDTD(sax: xmlSAXHandlerPtr; input: xmlParserInputBufferPtr; enc: xmlCharEncoding): xmlDtdPtr; cdecl; external LIBXML2_SO;
 function  xmlParseBalancedChunkMemory(doc: xmlDocPtr; sax: xmlSAXHandlerPtr; user_data: Pointer; depth: Longint; aString: PxmlChar; lst: PxmlNodePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlParseBalancedChunkMemoryRecover(doc: xmlDocPtr; sax: xmlSAXHandlerPtr; user_data: Pointer; depth: Longint; aString: PxmlChar; lst: PxmlNodePtr; aRecover: Longint): Longint; cdecl; external LIBXML2_SO;
 function  xmlParseExternalEntity(doc: xmlDocPtr; sax: xmlSAXHandlerPtr; user_data: Pointer; depth: Longint; URL: PxmlChar; ID: PxmlChar; lst: PxmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlParseCtxtExternalEntity(ctx: xmlParserCtxtPtr; URL: PxmlChar; ID: PxmlChar; lst: PxmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 
