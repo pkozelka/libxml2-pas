@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltwin32config.h:1.27:
+// CVS-REV:libxslt/libxslt/xsltwin32config.h:1.28:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
