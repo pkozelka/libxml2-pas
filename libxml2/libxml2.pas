@@ -12,17 +12,19 @@ unit libxml2;
 interface
 
 uses
-	iconv;
-
-const
 {$ifdef WIN32}
-	LIBXML2_SO = 'libxml2.dll';
+	windows,
 {$endif}
 {$ifdef LINUX}
-	LIBXML2_SO = 'libxml2.so.2';
+  libc,
+{$endif}
+	iconv;
+const
+{$ifdef WIN32}
+	LIBXML2_SO = 'libxml.dll';
 {$endif}
 
-{$WEAKPACKAGEUNIT}
+//{$WEAKPACKAGEUNIT}
 
 {$ifdef VER140}
 {$ALIGN 4}
@@ -90,7 +92,7 @@ type
 	ILibXml2Node = interface ['{1D4BD646-0AB9-4810-B4BD-7277FB0CFA30}']
 		function  LibXml2NodePtr: xmlNodePtr;
 	end;
-	
+
 implementation
 
 // functions from globals.b
@@ -152,6 +154,33 @@ procedure MOVETO_STARTTAG(var p: PxmlChar);
 begin
 	while ((p^<>#0) and (p^<>'<')) do Inc(p);
 end;
+
+procedure InitExportedVar;
+{$ifdef WIN32}
+begin
+  xmlDoValidityCheckingDefaultValue :=
+    GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
+  Assert(xmlDoValidityCheckingDefaultValue <> nil);
+  xmlSubstituteEntitiesDefaultValue :=
+    GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
+  Assert(xmlSubstituteEntitiesDefaultValue <> nil);
+end;
+{$else}
+begin
+  // to do:
+  // not yet tested
+  // I suppose, that I don't use dlopen correctly
+  xmlDoValidityCheckingDefaultValue :=
+    dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
+  Assert(xmlDoValidityCheckingDefaultValue <> nil);
+  xmlSubstituteEntitiesDefaultValue :=
+    dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
+  Assert(xmlSubstituteEntitiesDefaultValue <> nil);
+end;
+{$endif}
+Initialization
+
+  InitExportedVar;
 
 end.
 

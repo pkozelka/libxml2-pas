@@ -46,6 +46,10 @@ const
 					| [#x10000-#x10FFFF]
 	any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
 }
+var
+  xmlDoValidityCheckingDefaultValue:^longint;
+  xmlSubstituteEntitiesDefaultValue:^longint;
+
 function  IS_CHAR(c:longint):longint;cdecl;external LIBXML2_SO name 'xmlIsChar';
 {
 	IS_BLANK:
