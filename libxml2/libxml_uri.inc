@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.13] uri.h
+// CVS-SIGN: [1.14] uri.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -20,7 +20,7 @@ type
    * xmlURI:
    *
    * A parsed URI reference. This is a struct containing the various fields
-   * as described in RFC 2396 but separated for further processing
+   * as described in RFC 2396 but separated for further processing.
    *)
   xmlURIPtr = ^xmlURI;
   xmlURI = record

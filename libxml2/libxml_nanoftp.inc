@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.9] nanoftp.h
+// CVS-SIGN: [1.10] nanoftp.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -29,8 +29,8 @@ type
    * @hour:  the hour
    * @minute:  the minute
    *
-   * A callback for the xmlNanoFTPList command
-   * Note that only one of year and day:minute are specified
+   * A callback for the xmlNanoFTPList command.
+   * Note that only one of year and day:minute are specified.
    *)
   ftpListCallback = procedure(userData: Pointer; filename, attrib, owner, group: PChar; size: Longint; links: Longint; year: Longint; month: Byte; day, hour, minute: Longint); cdecl;
 
@@ -40,25 +40,25 @@ type
    * @data: the data received
    * @len: its size in bytes
    *
-   * A callback for the xmlNanoFTPGet command
+   * A callback for the xmlNanoFTPGet command.
    *)
   ftpDataCallback = procedure(userData: Pointer; data: PChar; len: Longint); cdecl;
 
 (*
- * Init
+ * Init.
  *)
 procedure xmlNanoFTPInit; cdecl; external LIBXML2_SO;
 procedure xmlNanoFTPCleanup; cdecl; external LIBXML2_SO;
 
 (*
- * Creating/freeing contexts
+ * Creating/freeing contexts.
  *)
 function  xmlNanoFTPNewCtxt(URL: PChar): Pointer; cdecl; external LIBXML2_SO;
 procedure xmlNanoFTPFreeCtxt(ctx: Pointer); cdecl; external LIBXML2_SO;
 function  xmlNanoFTPConnectTo(server: PChar; port: Longint): Pointer; cdecl; external LIBXML2_SO;
 
 (*
- * Opening/closing session connections
+ * Opening/closing session connections.
  *)
 function  xmlNanoFTPOpen(URL: PChar): Pointer; cdecl; external LIBXML2_SO;
 function  xmlNanoFTPConnect(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
@@ -69,13 +69,13 @@ procedure xmlNanoFTPProxy(host: PChar; port: Longint; user: PChar; passwd: PChar
 function  xmlNanoFTPUpdateURL(ctx: Pointer; URL: PChar): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Rathern internal commands
+ * Rather internal commands.
  *)
 function  xmlNanoFTPGetResponse(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
 function  xmlNanoFTPCheckResponse(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * CD/DIR/GET handlers
+ * CD/DIR/GET handlers.
  *)
 function  xmlNanoFTPCwd(ctx: Pointer; directory: PChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlNanoFTPGetConnection(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.18] catalog.h
+// CVS-SIGN: [1.19] catalog.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -23,18 +23,18 @@ const
   (**
    * XML_CATALOGS_NAMESPACE:
    *
-   * The namespace for the XML Catalogs elements
+   * The namespace for the XML Catalogs elements.
    *)
   XML_CATALOGS_NAMESPACE = 'urn:oasis:names:tc:entity:xmlns:xml:catalog';
   (**
    * XML_CATALOG_PI:
    *
-   * the specific XML Catalog Processing Instuction name
+   * the specific XML Catalog Processing Instuction name.
    *)
   XML_CATALOG_PI = 'oasis-xml-catalog';
 
   (*
-   * The API is voluntarily limited to general cataloging
+   * The API is voluntarily limited to general cataloging.
    *)
 type
   xmlCatalogPrefer = Longint;
@@ -56,7 +56,7 @@ type
   xmlCatalogPtr = ^xmlCatalog;
 
 (*
- * Operations on a given catalog
+ * Operations on a given catalog.
  *)
 function  xmlNewCatalog(sgml: Longint): xmlCatalogPtr; cdecl; external LIBXML2_SO;
 function  xmlLoadACatalog(filename: PChar): xmlCatalogPtr; cdecl; external LIBXML2_SO;
@@ -73,7 +73,7 @@ procedure xmlFreeCatalog(catal: xmlCatalogPtr); cdecl; external LIBXML2_SO;
 function  xmlCatalogIsEmpty(catal: xmlCatalogPtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
- * Global operations
+ * Global operations.
  *)
 procedure xmlInitializeCatalog; cdecl; external LIBXML2_SO;
 function  xmlLoadCatalog(filename: PChar): Longint; cdecl; external LIBXML2_SO;
@@ -99,7 +99,7 @@ function  xmlCatalogLocalResolve(catalogs: Pointer; pubID: PxmlChar; sysID: Pxml
 function  xmlCatalogLocalResolveURI(catalogs: Pointer; URI: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 
 (*
- * Preference settings
+ * Preference settings.
  *)
 function  xmlCatalogSetDebug(level: Longint): Longint; cdecl; external LIBXML2_SO;
 function  xmlCatalogSetDefaultPrefer(prefer: xmlCatalogPrefer): xmlCatalogPrefer; cdecl; external LIBXML2_SO;

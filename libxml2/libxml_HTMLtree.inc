@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.20] HTMLtree.h
+// CVS-SIGN: [1.21] HTMLtree.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -18,14 +18,14 @@ const
   (**
    * HTML_TEXT_NODE:
    *
-   * Macro, a text node in a HTML document is really implemented
+   * Macro. A text node in a HTML document is really implemented
    * the same way as a text node in an XML document.
    *)
   HTML_TEXT_NODE = XML_TEXT_NODE;
 
   (**
    *
-   * Macro, an entity reference in a HTML document is really implemented
+   * Macro. An entity reference in a HTML document is really implemented
    * the same way as an entity reference in an XML document.
    *)
   HTML_ENTITY_REF_NODE = XML_ENTITY_REF_NODE;
@@ -33,7 +33,7 @@ const
   (**
    * HTML_COMMENT_NODE:
    *
-   * Macro, a comment in a HTML document is really implemented
+   * Macro. A comment in a HTML document is really implemented
    * the same way as a comment in an XML document.
    *)
   HTML_COMMENT_NODE = XML_COMMENT_NODE;
@@ -41,7 +41,7 @@ const
   (**
    * HTML_PRESERVE_NODE:
    *
-   * Macro, a preserved node in a HTML document is really implemented
+   * Macro. A preserved node in a HTML document is really implemented
    * the same way as a CDATA section in an XML document.
    *)
   HTML_PRESERVE_NODE = XML_CDATA_SECTION_NODE;
@@ -49,7 +49,7 @@ const
   (**
    * HTML_PI_NODE:
    *
-   * Macro, a processing instruction in a HTML document is really implemented
+   * Macro. A processing instruction in a HTML document is really implemented
    * the same way as a processing instruction in an XML document.
    *)
   HTML_PI_NODE = XML_PI_NODE;

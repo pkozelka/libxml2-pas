@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.5] list.h
+// CVS-SIGN: [1.6] list.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -32,7 +32,7 @@ type
    * xmlListDeallocator:
    * @lk:  the data to deallocate
    *
-   * Callback function used to free data from a list
+   * Callback function used to free data from a list.
    *)
   xmlListDeallocator = procedure(lk: xmlLinkPtr); cdecl;
   (**
@@ -40,9 +40,9 @@ type
    * @data0: the first data
    * @data1: the second data
    *
-   * Callback function used to compare 2 data
+   * Callback function used to compare 2 data.
    *
-   * Returns 0 is equality, -1 or 1 otherwise depending on the ordering
+   * Returns 0 is equality, -1 or 1 otherwise depending on the ordering.
    *)
   xmlListDataCompare = function(data0, data1: Pointer): Integer; cdecl;
   (**
@@ -50,9 +50,9 @@ type
    * @data: the data found in the list
    * @user: extra user provided data to the walker
    *
-   * Callback function used when walking a list with xmlListWalk()
+   * Callback function used when walking a list with xmlListWalk().
    *
-   * Returns 0 to stop walking the list, 1 otherwise
+   * Returns 0 to stop walking the list, 1 otherwise.
    *)
   xmlListWalker = function(data, user: Pointer): Integer; cdecl;
 

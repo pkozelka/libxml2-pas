@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.5] DOCBparser.h
+// CVS-SIGN: [1.6] DOCBparser.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -15,7 +15,7 @@
 
 type
   (*
-   * Most of the back-end structures from XML and SGML are shared
+   * Most of the back-end structures from XML and SGML are shared.
    *)
   docbParserCtxt = xmlParserCtxt;
   docbParserCtxtPtr = xmlParserCtxtPtr;
@@ -37,7 +37,7 @@ function  docbSAXParseFile(filename: PChar; encoding: PChar; sax: docbSAXHandler
 function  docbParseFile(filename: PChar; encoding: PChar): docbDocPtr; cdecl; external LIBXML2_SO;
 
 (**
- * Interfaces for the Push mode
+ * Interfaces for the Push mode.
  *)
 procedure docbFreeParserCtxt(ctxt: docbParserCtxtPtr); cdecl; external LIBXML2_SO;
 function  docbCreatePushParserCtxt(sax: docbSAXHandlerPtr; user_data: Pointer; chunk: PChar; size: Longint; filename: PChar; enc: xmlCharEncoding): docbParserCtxtPtr; cdecl; external LIBXML2_SO;

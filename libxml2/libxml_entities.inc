@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.34] entities.h
+// CVS-SIGN: [1.35] entities.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -17,7 +17,7 @@ type
   xmlEntityType = Longint;
 const
   (*
-   * The different valid entity types
+   * The different valid entity types.
    *)
   XML_INTERNAL_GENERAL_ENTITY          = 1;
   XML_EXTERNAL_GENERAL_PARSED_ENTITY   = 2;
@@ -53,14 +53,14 @@ type
   end;
 
   (*
-   * All entities are stored in an hash table
-   * there is 2 separate hash tables for global and parameter entities
+   * All entities are stored in an hash table.
+   * there is 2 separate hash tables for global and parameter entities.
    *)
   xmlEntitiesTable = xmlHashTable;
   xmlEntitiesTablePtr = ^xmlEntitiesTable;
 
 (*
- * External functions :
+ * External functions:
  *)
 procedure xmlInitializePredefinedEntities; cdecl; external LIBXML2_SO;
 function  xmlAddDocEntity(doc: xmlDocPtr; name: PxmlChar; aType: Longint; ExternalID: PxmlChar; SystemID: PxmlChar; content: PxmlChar): xmlEntityPtr; cdecl; external LIBXML2_SO;

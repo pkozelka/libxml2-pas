@@ -14,7 +14,7 @@
  *)
 
 (*
- * The standard Dump routines
+ * The standard Dump routines.
  *)
 procedure xmlDebugDumpString(aOutput: PLibXml2File; str: PxmlChar); cdecl; external LIBXML2_SO;
 procedure xmlDebugDumpAttr(aOutput: PLibXml2File; attr: xmlAttrPtr; depth: Longint); cdecl; external LIBXML2_SO;
@@ -40,16 +40,16 @@ type
    * xmlShellReadlineFunc:
    * @prompt:  a string prompt
    *
-   * This is a generic signature for the XML shell input function
+   * This is a generic signature for the XML shell input function.
    *
-   * Returns a string which will be freed by the Shell
+   * Returns a string which will be freed by the Shell.
    *)
   xmlShellReadlineFunc = function(prompt: PChar): PChar; cdecl;
 
   (**
    * xmlShellCtxt:
    *
-   * A debugging shell context
+   * A debugging shell context.
    * TODO: add the defined function tables.
    *)
   xmlShellCtxtPtr = ^xmlShellCtxt;
@@ -70,9 +70,9 @@ type
    * @node:  a first node
    * @node2:  a second node
    *
-   * This is a generic signature for the XML shell functions
+   * This is a generic signature for the XML shell functions.
    *
-   * Returns an int, negative returns indicating errors
+   * Returns an int, negative returns indicating errors.
    *)
   xmlShellCmd = function(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): Longint; cdecl;
 

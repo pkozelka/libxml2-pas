@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.9] xpointer.h
+// CVS-SIGN: [1.10] xpointer.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -28,7 +28,7 @@ type
   end;
 
 (*
- * Handling of location sets
+ * Handling of location sets.
  *)
 function  xmlXPtrLocationSetCreate(val: xmlXPathObjectPtr): xmlLocationSetPtr; cdecl; external LIBXML2_SO;
 procedure xmlXPtrFreeLocationSet(obj: xmlLocationSetPtr); cdecl; external LIBXML2_SO;
@@ -48,7 +48,7 @@ procedure xmlXPtrLocationSetDel(cur: xmlLocationSetPtr; val: xmlXPathObjectPtr);
 procedure xmlXPtrLocationSetRemove(cur: xmlLocationSetPtr; val: Longint); cdecl; external LIBXML2_SO;
 
 (*
- * Functions
+ * Functions.
  *)
 function  xmlXPtrNewContext(doc: xmlDocPtr; here: xmlNodePtr; origin: xmlNodePtr): xmlXPathContextPtr; cdecl; external LIBXML2_SO;
 function  xmlXPtrEval(str: PxmlChar; ctx: xmlXPathContextPtr): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;

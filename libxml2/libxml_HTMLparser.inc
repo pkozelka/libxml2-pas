@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.25] HTMLparser.h
+// CVS-SIGN: [1.26] HTMLparser.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -15,7 +15,7 @@
 
 type
   (*
-   * Most of the back-end structures from XML and HTML are shared
+   * Most of the back-end structures from XML and HTML are shared.
    *)
   htmlParserCtxt = xmlParserCtxt;
   htmlParserCtxtPtr = xmlParserCtxtPtr;
@@ -28,7 +28,7 @@ type
   htmlNodePtr = xmlNodePtr;
 
   (*
-   * Internal description of an HTML element
+   * Internal description of an HTML element.
    *)
   htmlElemDescPtr = ^htmlElemDesc;
   htmlElemDesc = record
@@ -44,7 +44,7 @@ type
   end;
 
   (*
-   * Internal description of an HTML entity
+   * Internal description of an HTML entity.
    *)
   htmlEntityDescPtr = ^htmlEntityDesc;
   htmlEntityDesc = record
@@ -74,7 +74,7 @@ function  htmlIsScriptAttribute(name: PxmlChar): Longint; cdecl; external LIBXML
 function  htmlHandleOmittedElem(val: Longint): Longint; cdecl; external LIBXML2_SO;
 
 (**
- * Interfaces for the Push mode
+ * Interfaces for the Push mode.
  *)
 procedure htmlFreeParserCtxt(ctxt: htmlParserCtxtPtr); cdecl; external LIBXML2_SO;
 function  htmlCreatePushParserCtxt(sax: htmlSAXHandlerPtr; user_data: Pointer; chunk: PChar; size: Longint; filename: PChar; enc: xmlCharEncoding): htmlParserCtxtPtr; cdecl; external LIBXML2_SO;
