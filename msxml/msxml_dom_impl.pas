@@ -226,6 +226,9 @@ type
 		procedure Set_onreadystatechange(Param1: OleVariant); safecall;
 		procedure Set_ondataavailable(Param1: OleVariant); safecall;
 		procedure Set_ontransformnode(Param1: OleVariant); safecall;
+		//
+		function  transformNode(const stylesheet: IXMLDOMNode): WideString; safecall;
+		procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); safecall;
 	protected //DOM2 functions (incomplete)
 		function  createElementNS(const namespaceURI, qualifiedName: WideString): IXMLDOMElement; safecall;
 		function  createAttributeNS(const namespaceURI, qualifiedName: WideString): IXMLDOMAttribute; safecall;
@@ -1291,6 +1294,11 @@ begin
 	Result := GetDOMObject(attr.parent) as IXMLDOMNode;
 end;
 
+function TXMLDOMDocument.NodePtr: xmlNodePtr;
+begin
+	Result := xmlNodePtr(requestDocPtr);
+end;
+
 procedure TXMLDOMDocument.save(destination: OleVariant);
 var
 	fn: string;
@@ -1381,9 +1389,41 @@ begin
 	Result := FPtr.doc;
 end;
 
-function TXMLDOMDocument.NodePtr: xmlNodePtr;
+function TXMLDOMDocument.transformNode(const stylesheet: IXMLDOMNode): WideString;
+var
+	stylesheetNode: xmlDocPtr;
+	style: xsltStylesheetPtr;
+	rv: xmlDocPtr;
+	p: PxmlChar;
+	sz: integer;
+	s: string;
 begin
-	Result := xmlNodePtr(requestDocPtr);
+	stylesheetNode := xmlDocPtr(GetNodePtr(stylesheet));
+	if (XML_DOCUMENT_NODE <> stylesheetNode.type_) then begin
+		ENotImpl('TXMLDOMDocument.transformNode for stylesheet of non-document type');
+	end;
+	style := xsltParseStylesheetDoc(stylesheetNode); //todo: what if stylesheet is not a Document ?
+	rv := xsltApplyStylesheet(style, FPtr.doc, nil);
+	xmlDocDumpMemory(rv.doc, p, @sz);
+	s := p;
+	xmlFree(p);
+	Result := s;
+	xmlFree(rv);
+end;
+
+procedure TXMLDOMDocument.transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant);
+var
+	stylesheetNode: xmlDocPtr;
+	style: xsltStylesheetPtr;
+	rv: xmlDocPtr;
+begin
+	stylesheetNode := xmlDocPtr(GetNodePtr(stylesheet));
+	if (XML_DOCUMENT_NODE <> stylesheetNode.type_) then begin
+		ENotImpl('TXMLDOMDocument.transformNodeToObject for stylesheet of non-document type');
+	end;
+	style := xsltParseStylesheetDoc(stylesheetNode); //todo: what if stylesheet is not a Document ?
+	rv := xsltApplyStylesheet(style, FPtr.doc, nil);
+	outputObject := GetDOMObject(rv);
 end;
 
 { TXMLDOMParser }
