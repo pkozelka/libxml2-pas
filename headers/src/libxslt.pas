@@ -21,8 +21,6 @@ const
   LIBEXSLT_SO = 'libexslt.so';
 {$ENDIF}
 
-{$WEAKPACKAGEUNIT}
-
 {$I pasconfig.inc}
 
 type
