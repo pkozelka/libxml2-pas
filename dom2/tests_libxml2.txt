@@ -1,3 +1,5 @@
+Tests, passed from libxmldomFE.pas
+
 priority:
 1 = high
 2 = medium
@@ -22,14 +24,14 @@ document                    createElementNS        1             X
 document                    createCDATASection     2             X                                                                
 document                    createComment          2             X                                                                
 document                    createDocumentFragment 3             X                                                                
-document                    createEntityReference  3                                                                             
+document                    createEntityReference  3             X                                                                
 document                    createProcessingInstr. 3             X                                                                
 document                    createTextNode         1             X                                                                
 document                    documentElement        1             X                                                                
-document                    getElementByID         2             X       more tests neccessary                              
+document                    getElementByID         2             X       
 document                    getElementsByTagName   2             X                                                                
 document                    getElementsByTagNameNS 2             X                                                                
-document                    importNode             2                   
+document                    importNode             2             X      
 document                    domImplementation      2             X                                                                 
 document                    docType                2             X         
 document/IDOMPersist        load                   1             X                                                                
@@ -63,7 +65,7 @@ element                     setAttributeNS         1             X
 element                     setAttributeNode       1             X                                                               
 element                     setAttributeNodeNS     1             X                                                               
 element                     tagName                3             X                                                               
-entity                      notationName           3                   
+entity                      notationName           3             X      
 entity                      publicID               3                   
 entity                      systemID               3                   
 namedNodeMap                getNamedItem           3             X                                                                
@@ -113,4 +115,4 @@ Summary:
 43 high priority methods
 all done
 
-90 methods done totally       
+93 methods done totally       
