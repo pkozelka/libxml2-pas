@@ -346,7 +346,6 @@ type
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
-    procedure appendNs(ns: xmlNsPtr);
   end;
 
   TGDOMDocument = class(TGDOMNode, IDOMDocument, IDOMParseOptions, IDOMPersist, IDOMInternal)
@@ -406,7 +405,6 @@ type
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
-    procedure appendNs(ns: xmlNsPtr);
   public
     constructor Create(
       GDOMImpl:IDOMImplementation;
@@ -2865,26 +2863,6 @@ begin
   if node<>nil
     then FNodeList.add(node);
 end;
-
-procedure TGDOMDocument.appendNs(ns: xmlNsPtr);
-begin
-//  if ns<>nil
-//    then FNsList.add(ns);
-end;
-
-{function IsXmlNCName(const S: wideString): boolean;
-var
-  i: integer;
-begin
-  Result:= true;
-  if Length(S) = 0 then begin Result:= false; exit; end;
-  if not ( IsXmlLetter(PWideChar(S)^)
-           or (PWideChar(S)^ = '_')   )
-    then begin Result:= false; exit; end;
-  for i:= 2 to length(S) do
-    if not IsXmlNCNameChar(S[i])
-      then begin Result:= false; exit; end;
-end;}
 
 function IsXmlIdeographic(const S: WideChar): boolean;
 begin
