@@ -181,8 +181,7 @@ end;
 
 function  DelphiMallocFunc(size:size_t):pointer;
 begin
-  GetMem(Result, size);
-  FillChar(Result^, size, 0);
+  Result := AllocMem(size);
 end;
 
 function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer;
