@@ -256,9 +256,9 @@ begin
 	systemId      := 'myDoc.dtd';
 	docType       := fDomImplementation.createDocumentType(
                            qualifiedName, publicId, systemId);
-  checkNotNull(docType);
-  check(docType.name = qualifiedName);
-  checkNull(docType.ownerDocument);
+  checkNotNull(docType, 'docType is null');
+  check(docType.name = qualifiedName, 'docType.name should be "'+qualifiedName+'" but is "'+docType.name+'"');
+  checkNull(docType.ownerDocument, 'docType.ownerDocument is null');
 end;
 
 
