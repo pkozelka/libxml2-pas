@@ -1,0 +1,9 @@
+Project mailing list: libxml2-pas-devel@lists.sourceforge.net
+
+Maintainer:
+Petr Kozelka <pkozelka@email.cz>
+
+Contributors:
+Uwe Fechner <ufechner@4commerce.de>
+Martijn Brinkers <martijn_brinkers@yahoo.co.uk>
+
