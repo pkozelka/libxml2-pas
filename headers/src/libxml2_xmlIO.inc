@@ -161,10 +161,10 @@ function  xmlOutputBufferCreateFilename(URI: PChar; encoder: xmlCharEncodingHand
 function  xmlOutputBufferCreateFile(aFile: PLibXml2File; encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlOutputBufferCreateFd(fd: Longint; encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
 function  xmlOutputBufferCreateIO(iowrite: xmlOutputWriteCallback; ioclose: xmlOutputCloseCallback; ioctx: Pointer; encoder: xmlCharEncodingHandlerPtr): xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
-function  xmlOutputBufferWrite(out: xmlOutputBufferPtr; len: Longint; buf: PChar): Longint; cdecl; external LIBXML2_SO;
-function  xmlOutputBufferWriteString(out: xmlOutputBufferPtr; str: PChar): Longint; cdecl; external LIBXML2_SO;
-function  xmlOutputBufferFlush(out: xmlOutputBufferPtr): Longint; cdecl; external LIBXML2_SO;
-function  xmlOutputBufferClose(out: xmlOutputBufferPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlOutputBufferWrite(aOut: xmlOutputBufferPtr; len: Longint; buf: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlOutputBufferWriteString(aOut: xmlOutputBufferPtr; str: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlOutputBufferFlush(aOut: xmlOutputBufferPtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlOutputBufferClose(aOut: xmlOutputBufferPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlRegisterOutputCallbacks(matchFunc: xmlOutputMatchCallback; openFunc: xmlOutputOpenCallback; writeFunc: xmlOutputWriteCallback; closeFunc: xmlOutputCloseCallback): Longint; cdecl; external LIBXML2_SO;
 
 {$IFDEF LIBXML_HTTP_ENABLED}
