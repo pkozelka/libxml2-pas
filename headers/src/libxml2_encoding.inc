@@ -89,7 +89,7 @@ type
    *     as the return value is positive, else unpredictiable.
    * The value of @outlen after return is the number of octets consumed.
    *)
-  xmlCharEncodingInputFunc = function(aOut: PByte; outlen: Integer; aIn: PByte; inlen: Integer): Integer; cdecl;
+  xmlCharEncodingInputFunc = function(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Integer; cdecl;
 
   (**
    * xmlCharEncodingOutputFunc:
@@ -109,7 +109,7 @@ type
    *     as the return value is positive, else unpredictiable.
    * The value of @outlen after return is the number of ocetes consumed.
    *)
-  xmlCharEncodingOutputFunc = function(aOut: PByte; outlen: Integer; aIn: PByte; inlen: Integer): Integer; cdecl;
+  xmlCharEncodingOutputFunc = function(aOut: PByte; outlen: PLongint; aIn: PByte; inlen: PLongint): Integer; cdecl;
 
   (*
    * Block defining the handlers for non UTF-8 encodings.

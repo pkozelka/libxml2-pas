@@ -109,6 +109,6 @@ type
 function xmlTextReaderLocatorLineNumber(locator: xmlTextReaderLocatorPtr): Longint; cdecl; external LIBXML2_SO;
 { int xmlTextReaderLocatorLinePosition(xmlTextReaderLocatorPtr locator); }
 function xmlTextReaderLocatorBaseURI(locator: xmlTextReaderLocatorPtr): PxmlChar; cdecl; external LIBXML2_SO;
-procedure xmlTextReaderSetErrorHandler(reader: xmlTextReaderPtr; f: xmlTextReaderErrorFunc; var arg: Pointer); cdecl; external LIBXML2_SO;
-procedure xmlTextReaderGetErrorHandler(reader: xmlTextReaderPtr; f: xmlTextReaderErrorFunc; var arg: Pointer); cdecl; external LIBXML2_SO;
+procedure xmlTextReaderSetErrorHandler(reader: xmlTextReaderPtr; f: xmlTextReaderErrorFunc; arg: Pointer); cdecl; external LIBXML2_SO;
+procedure xmlTextReaderGetErrorHandler(reader: xmlTextReaderPtr; var f: xmlTextReaderErrorFunc; var arg: Pointer); cdecl; external LIBXML2_SO;
 
