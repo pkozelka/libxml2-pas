@@ -1,0 +1,123 @@
+Guide for converting programs, that used msxml before, to
+the use of the libxmldom.pas implementation of the xdom2.pas
+interfaces:
+
+
+1) include the following units into your project:
+
+uses 
+  xdom2,libxmldom; // if you got the files from the sourceforge cvs, rename 
+                   // libxmldomFE.pas to libxmldom.pas first
+
+If you want to have the choice, to switch to msxml at runtime,
+than write:
+
+uses
+  idom2,libxmldom,msxml_impl;
+
+2) define a const for the domvendor:
+
+const
+  domvendor=SLIBXML;
+  //domvendor='MSXML2_RENTAL_MODEL'; //if you want to try msxml
+
+
+3) define a global variable like that:
+
+var
+  dom: IDOMImplementation;
+
+4) initialize the dom:
+
+dom:=getDom(domvendor) //just once at the start of the program
+                       //there is no need to free the domimplementation at the end,
+                       //it's done automaticly because it works with interfaces
+
+5) get an empty document:
+
+var
+  doc: IDOMDocument; (local var)
+
+doc:=dom.createDocument('','',nil);
+
+6) load from string:
+
+(doc as IDOMPersist).loadxml('<?xml version="1.0" encoding="iso-8859-1"?><test/>');
+
+7) load from file:
+var 
+  ok: boolean;
+
+(doc as IDOMParseOptions).preserveWhiteSpace:=false; //this line is important for msdom-compatibility
+ok:= (doc as IDOMPersist).load(filename);            //always check, whether the result is true!
+
+8) save to file:
+ok:=(doc as IDOMPersist).save(filename);             //always check, whether the result is true!
+
+9) free the document, when not longer needed:
+
+doc:=nil; // It's a good idea, to set all the vars, that hold dom-interfaces, to nil
+          // when you don't need them any more.
+          // Well, if you casted interfaces like (doc as IDomPersist).xxx 
+          // than the document isn't freed, if you set the vars to nil, because there
+          // still is a reference to the hidden var of type IDomPersist.
+          //
+          // So you can do the following:
+          // var
+          //   doc: IDomDocument;
+          //   persist: IDomPersist;
+          // doc:=dom.createDocument('','',nil);
+          // persist:= doc as IDomPersist;
+          // persist.load(filename);       
+          // ...
+          // persist:=nil;
+          // doc:=nil
+          // writeln(doccount);  //now doccount is zero
+          //
+          // Much more easy:
+          // You put your code into a procedure, define all vars locally,
+          // than they are freed automatically, when you leave the procedure.
+
+
+Remark:
+
+Suppose, the following namespace is definied:
+<xds:repository xmlns:xds="http://xmlns.4commerce.de/xds">
+
+Then this works with msxml, but is wrong for dom2 implementations: 
+getElementsByTagName('xds:datalinks'); 
+
+Use this method instead:
+getElementsByTagNameNs('http://xmlns.4commerce.de/xds','datalinks'); 
+
+
+Working with DTD's (validation):
+--------------------------------
+
+If you do this:
+
+var
+  ok: boolean;
+
+doc:=dom.createDocument('','',nil);
+ok:=(doc as IDOMPersist).load(filename);
+
+than the file is validated automatically, but no error is raised, if
+the validation fails.
+The result is false, if the file wasn't found or if it isn't well-formed.
+
+If you do that:
+
+(doc as IDOMParseOptions).validate:=true;
+ok:=(doc as IDOMPersist).load(filename);
+
+than the ok is false and the resulting document is NIL, if there 
+was a validation failure.
+
+
+
+
+Best regards:
+
+Uwe
+
