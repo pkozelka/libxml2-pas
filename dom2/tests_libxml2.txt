@@ -110,7 +110,7 @@ text                        splittext              3             X
 
 Summary: 
 
-100 methods at all    = 100,0 %
+100 methods at all   = 100,0 %
 
 43 high priority methods
 all done
