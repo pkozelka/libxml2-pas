@@ -1581,7 +1581,8 @@ begin
     if xmlnewAttr.ns<>nil
       then begin
         namespace:=xmlnewAttr.ns.href;
-        xmlSetNs(node,xmlnewAttr.ns);
+        node.nsDef:=xmlnewAttr.ns;
+        //xmlSetNs(node,xmlnewAttr.ns);
       end else namespace:='';
     slocalName:=localName(xmlNewattr.name);
     oldattr:=xmlHasNSProp(node,pchar(slocalName),namespace); // already an attribute with this name?
@@ -1953,11 +1954,15 @@ gdome_xml_doc_importNode (GdomeDocument *self, GdomeNode *importedNode, GdomeBoo
 function TGDOMDocument.createElementNS(const namespaceURI,
   qualifiedName: DOMString): IDOMElement;
 var
-	AElement: xmlNodePtr;
+  AElement: xmlNodePtr;
   ns: TGDOMNamespace;
+  temp:string;
 begin
   ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName);
   AElement:=xmlNewDocNode(FPGdomeDoc,ns.NS,ns.localName.CString,nil);
+  temp:=AElement.ns.href;
+  temp:=AElement.ns.prefix;
+  AElement.nsdef:=ns.NS;
   ns.free;
   if AElement<>nil
     then result:=TGDOMElement.Create(AElement,self)
