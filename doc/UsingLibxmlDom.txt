@@ -1,12 +1,12 @@
 Guide for converting programs, that used msxml before, to
-the use of the libxmldom.pas implementation of the xdom2.pas
+the use of the libxmldom.pas implementation of the idom2.pas
 interfaces:
 
 
 1) include the following units into your project:
 
 uses 
-  xdom2,libxmldom; // if you got the files from the sourceforge cvs, rename 
+  idom2,libxmldom; // if you got the files from the sourceforge cvs, rename 
                    // libxmldomFE.pas to libxmldom.pas first
 
 If you want to have the choice, to switch to msxml at runtime,
