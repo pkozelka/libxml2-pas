@@ -2,30 +2,32 @@
 
 #
 # Usage:
-# checkapi.sh <LOCAL_ROOT> [<files>]
+# checkapi.sh <localroot> [<files>]
 #
 
 # TODO:
 #   - check that LIBXML2_PAS variable is correctly set
-#
-#
+#   - check that <localroot> is a valid CVS working copy
+#   - cache files in localroot for later use in diff
 
-TRANSLATED_FILES="`find libxml2 libxslt -name '*.inc'`"
-LOCALROOT=/home/pk/cvs/gnome.org
+LOCALROOT=$1
+shift 1
+FILELIST="$*"
 TMP=CHECKAPI.TMP
-
 RESULTFILE=checkapi-results.zip
+
+CHGCOUNT=0
 
 rm -rf $TMP $RESULTFILE
 
 THISPATH=`pwd`
-for fn in $TRANSLATED_FILES ; do
+for fn in $FILELIST ; do
 	cd $THISPATH
-	echo -n "$fn:  "
+	echo -n "  checking: $fn:  "
 	LINE=`head $fn | grep CVS-REV`
 	if [ "x$LINE" = "x" ]; then
 		echo
-		echo "  ERROR: no CVS-REV in $fn"
+		echo "ERROR: no CVS-REV in $fn"
 		continue
 	fi
 	ORIGFILE=`echo $LINE | cut -d: -f2`
@@ -35,7 +37,7 @@ for fn in $TRANSLATED_FILES ; do
 	CVSENTRY=`grep "^/$ORIGFILENAME/" $LOCALROOT/$ORIGFILEPATH/CVS/Entries`
 	if [ "x$CVSENTRY" = "x" ]; then
 		echo
-		echo "  ERROR: file $ORIGFILENAME not found in $LOCALROOT/$ORIGFILEPATH/CVS/Entries"
+		echo "ERROR: file $ORIGFILENAME not found in $LOCALROOT/$ORIGFILEPATH/CVS/Entries"
 		continue
 	fi
 	NEWREV=`echo $CVSENTRY | cut -d/ -f3`
@@ -56,7 +58,7 @@ for fn in $TRANSLATED_FILES ; do
 	mkdir -p `dirname $TARGETFILE`
 
 	# copy orig. file
-	echo "    copying $ORIGFILENAME to $TARGETFILE"
+	echo "Copying $ORIGFILENAME to $TARGETFILE"
 	cp $LOCALROOT/$ORIGFILE $TARGETFILE
 
 	# translate it into pascal and apply known conversions
@@ -77,21 +79,26 @@ for fn in $TRANSLATED_FILES ; do
 
 	# get diff
 	cmd="cvs -z4 -d$CVSROOT rdiff -r $REV -r $NEWREV $ORIGFILE"
-	echo "    Extracting diff file ($TARGETFILE.diff):"
-	echo "    $cmd"
+	echo "Extracting diff file ($TARGETFILE.diff):"
+	echo "$cmd"
 	$cmd >$TARGETFILE.diff
 
 	# get log entries
-	cd $LOCALROOT
 	cmd="cvs -z4 -d$CVSROOT log -N -r$REV:$NEWREV $ORIGFILE"
-	echo "    Extracting log file ($TARGETFILE.log):"
-	echo "    $cmd"
-	$cmd >$origpwd/$TARGETFILE.log
+	echo "Extracting log file ($TARGETFILE.log):"
+	echo "$cmd"
+	cd $LOCALROOT
+	$cmd >$THISPATH/$TARGETFILE.log
 	cd $THISPATH
+	CHGCOUNT=`expr $CHGCOUNT + 1`
 done
 
-echo "Compressing results into $RESULTFILE..."
-cd $TMP
-zip -r ../$RESULTFILE *
-cd $THISPATH
+if [ $CHGCOUNT -gt 0 ]; then
+	echo "Compressing results into $RESULTFILE..."
+	cd $TMP
+	zip -rD ../$RESULTFILE *
+	cd $THISPATH
+fi
 rm -rf $TMP
+
+echo "Total: $CHGCOUNT files changed"
