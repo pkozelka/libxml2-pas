@@ -24,9 +24,10 @@ function toPascal()
 		# apply known replacements
 		echo "  applying additional conversions --> $aOutputFile"
 		sed -f "$LIBXML2_PAS/headers/utils/afterconv.sed" $aOutputFile.1 > $aOutputFile || mv $aOutputFile.1 $aOutputFile 
+		rm -f $aOutputFile.1
 
 		# compare original translation and the one with replacements
-		diff -u4 -w $aOutputFile.1 $aOutputFile >$aOutputFile.diff12
+#		diff -u4 -w $aOutputFile.1 $aOutputFile >$aOutputFile.diff12
 	fi
 }
 
@@ -39,11 +40,47 @@ function getCvsRevision()
 	sed -n '/^\/'$entry'\//{s:^/'$entry'/\([^/]*\)/.*:\1:;p}' $dirName/CVS/Entries
 }
 
+function cacheGet()
+{
+	local aPathName=$1
+	local aRev=${2}
+	local aTarget=${3?'target not specified'}
+
+	local filePath=${aPathName%/*}
+	local fileName=${aPathName:${#filePath}+1}
+	local repos=`cat $filePath/CVS/Repository`
+
+	local cachedFile=$TMPBASE/$repos/$fileName-$aRev
+	if [ -s "$cachedFile" ]; then
+		cp $cachedFile $aTarget
+		return
+	fi
+}
+
+function cachePut()
+{
+	local aPathName=$1
+	local aRev=${2?'revision not specified'}
+
+	local filePath=${aPathName%/*}
+	local fileName=${aPathName:${#filePath}+1}
+	local repos=`cat $filePath/CVS/Repository`
+
+	local cachedFile=$TMPBASE/$repos/$fileName-$aRev
+	if [ -s "$cachedFile" ]; then
+		true
+	else
+		mkdir -p ${cachedFile%/*}
+		cp $aPathName $cachedFile
+	fi
+}
+
 
 LOCALROOT=$1
 shift 1
 FILELIST="$*"
-TMP=CHECKAPI.TMP
+TMPBASE=${TMP-"$HOME/tmp"}/checkapi
+TMP=$TMPBASE/$$
 RESULTFILE=checkapi-results.zip
 
 CHGCOUNT=0
@@ -54,7 +91,7 @@ fi
 
 
 rm -rf $TMP $RESULTFILE
-mkdir $TMP
+mkdir -p $TMP
 
 THISPATH=`pwd`
 for fn in $FILELIST ; do
@@ -78,6 +115,9 @@ for fn in $FILELIST ; do
 		echo "ERROR: file $origFileName is not under revision control" >&2
 		continue
 	fi
+
+	cachePut "$LOCALROOT/$origFile" "$newRev"
+
 	if [ "$curRev" = "$newRev" ]; then
 		echo "ok, $newRev ($origFile)"
 		continue
@@ -88,23 +128,34 @@ for fn in $FILELIST ; do
 	dirPrefix=${origFilePath:${#s}+1}
 
 	TARGETFILE=$TMP/$dirPrefix/$origFileName
-
-	mkdir -p `dirname $TARGETFILE`
+	mkdir -p $TMP/$dirPrefix
 
 	# copy orig. file
 	echo "Copying $origFileName to $TARGETFILE"
 	cp $LOCALROOT/$origFile $TARGETFILE
 
-	toPascal $TARGETFILE
+	pasFile=$TMP/$dirPrefix/${origFileName%.h}.pas
+	toPascal "$TARGETFILE" "$pasFile"
 
 	# find the CVSROOT for this file - it is stored with the CVS local copy
 	CVSROOT="`cat $LOCALROOT/$origFilePath/CVS/Root`"
 
+	oldHfile="$TMP/$dirPrefix/${origFileName%.h}-${curRev}.h"
+	if cacheGet "$LOCALROOT/$origFile" "$curRev" "$oldHfile"; then
+		diff -u4 $oldHfile $LOCALROOT/$origFile >$TARGETFILE.$curRev-$newRev.diff
+		oldPasFile=${oldHfile%.h}.pas
+		toPascal "$oldHfile" "$oldPasFile"
+		diff -u4 $oldPasFile $pasFile >$TMP/$dirPrefix/${origFileName%.h}.pas.$curRev-$newRev.diff
+		rm -f $oldPasFile
+	fi
+	rm -f $oldHfile
+
 	# get diff
-	cmd="cvs -z4 -d$CVSROOT rdiff -u4 -r $REV -r $newRev $origFile"
-	echo "Extracting diff file ($TARGETFILE.diff):"
-	echo "$cmd"
-	$cmd >$TARGETFILE.diff
+#	cmd="cvs -z4 -d$CVSROOT rdiff -u -r $REV -r $newRev $origFile"
+#	echo "Extracting diff file ($TARGETFILE.diff):"
+#	echo "$cmd"
+#	$cmd >$TARGETFILE.diff
+
 
 	# get log entries
 	cmd="cvs -z4 -d$CVSROOT log -N -r$curRev:$newRev $origFile"
@@ -152,13 +203,16 @@ for dir in `cat $TMP/allPaths`; do
 		# report any other files
 		echo "CONVERTING $sfn"
 
-		origFileName=`basename $sfn`
-		ORIGFILEPATH=`dirname $sfn`
-		basePath=`basename $ORIGFILEPATH`
-		newFn=$TMP/$basePath/${basePath}_${origFileName%.h}.inc
+		origFilePath="${sfn%/*}"
+		origFileName="${sfn:${#origFilePath}+1}"
+
+		s=${origFilePath%/*}
+		dirPrefix=${origFilePath:${#s}+1}
+
+		newFn=$TMP/$dirPrefix/${dirPrefix}_${origFileName%.h}.inc
 		h2pasFn=${newFn%.inc}.h2pas
-		HFILE=$TMP/$basePath/${basePath}_${origFileName}
-		mkdir -p `dirname $HFILE`
+		HFILE=$TMP/$dirPrefix/${dirPrefix}_${origFileName}
+		mkdir -p ${HFILE%/*}
 		echo "  copying $origFileName to $HFILE"
 		cp $fn $HFILE
 
@@ -178,6 +232,7 @@ EOF
 
 		if [ -s $h2pasFn ]; then
 			cat $h2pasFn >>$newFn
+			rm -f $h2pasFn
 		else
 			echo "//   Sorry - h2pas is not available" >>$newFn
 			echo "//   Use original C code instead:" >>$newFn
@@ -192,6 +247,7 @@ if [ $CHGCOUNT -gt 0 ]; then
 	echo "Compressing results into $RESULTFILE..."
 	cd $TMP
 	zip -rD ../$RESULTFILE *
+	mv ../$RESULTFILE $THISPATH
 	cd $THISPATH
 fi
 #rm -rf $TMP
