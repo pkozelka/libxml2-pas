@@ -50,14 +50,15 @@ uses
   {$endif}
   windows,
   ComObj,
-  idom2;
+  idom2,
+  idom2_ext;
 
   const MSXML2Rental = 'MSXML2_RENTAL_MODEL';
   const MSXML2Free = 'MSXML2_FREETHREADING_MODEL';
 
 type
 
-  (*
+   (*
    * Extensions to IDomNode interface.
    *
   *)
@@ -75,22 +76,6 @@ type
     ['{72A3E81C-8F5E-43B5-93DB-F229949FD07F}']
     (* Used to get the MS interface from IDomAttr interface *)
     function getOrgInterface : IXMLDOMAttribute;
-  end;
-
-  // this inteface is similar to the interface IDomNodeEx from Borland,
-  // but not the same, therefore a slightly different name is used
-  IDomNodeExt = interface(IDomNode)
-    ['{1B41AE3F-6365-41FC-AFDD-26BC143F9C0F}']
-    { Property Acessors }
-    function get_text: DomString;
-    function get_xml: DomString;
-    procedure set_text(const Value: DomString);
-    { Methods }
-    procedure transformNode(const stylesheet: IDomNode; var output: DomString); overload;
-    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
-    { Properties }
-    property text: DomString read get_text write set_text;
-    property xml: DomString read get_xml;
   end;
 
 implementation
@@ -255,8 +240,12 @@ type
     property xml: DOMString read get_xml;
   end;
 
+  IDocEx=interface
+  ['{5A422311-6BA4-4EE8-9BDB-AC35AFDB04ED}']
+    function get_fMSDomDocument: IXMLDOMDocument;
+  end;
 
-  TMSXMLDocument = class(TMSXMLNode, IDomDocument, IDomPersist, IDomParseOptions)
+  TMSXMLDocument = class(TMSXMLNode, IDomDocument, IDomPersist, IDomParseOptions,IDocEx)
     private
       fMSDomDocument : IXMLDOMDocument;
 
@@ -314,6 +303,8 @@ type
       procedure set_preserveWhiteSpace(Value: Boolean);
       procedure set_resolveExternals(Value: Boolean);
       procedure set_validate(Value: Boolean);
+      { IDocEx}
+      function get_fMSDomDocument:IXMLDOMDocument;
   end;
 
 
@@ -1202,7 +1193,7 @@ begin
   //dom2-compliant way.
   //Nodes are imported automatically by msdom, if node.appendChild
   //is used.
-  result := importedNode;
+  result := importedNode.cloneNode(deep);
   //raise EDomException.create(etNotSupportedErr, 'ImportNode is not supported');
 end;
 
@@ -2314,7 +2305,9 @@ end;
 
 procedure TMSXMLNode.registerNS(const prefix : DomString; const uri : DomString);
 begin
-
+  ((get_OwnerDocument as IDocEx).get_fMSDomDocument as IXMLDomDocument2).setProperty(
+          'SelectionNamespaces',
+          'xmlns:'+prefix+'=''' + URI + '''');
 end;
 
 procedure TMSXMLNode.transformNode(const stylesheet: IDomNode;
@@ -2355,6 +2348,11 @@ end;
 function TMSXMLNode.get_xml: DOMString;
 begin
   Result := fMSDomNode.xml;
+end;
+
+function TMSXMLDocument.get_fMSDomDocument: IXMLDOMDocument;
+begin
+  Result:=fMSDomDocument;
 end;
 
 initialization

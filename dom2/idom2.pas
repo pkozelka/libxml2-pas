@@ -882,7 +882,6 @@ type
     property documentElement : IDomElement read get_DocumentElement;
   end;
 
-{$ifdef WITHOUT_IDOM_EXPERIMENTAL}
 
   (****************************************************************************
    ***   the following interfaces are not part of the official DOM specs    ***
@@ -931,7 +930,7 @@ type
   end;
 
   (*
-   * IDOMParseOptions
+   * IDomParseOptions
    *)
   IDomParseOptions = interface
     ['{FA884EC2-A131-4992-904A-0D71289FB87A}']
@@ -956,40 +955,10 @@ type
     property validate : Boolean read get_validate write set_validate;
   end;
 
-  (*
-   * non standard DOM extension.
-  *)
-  IDomNodeSelect = interface
-    ['{A50A05D4-3E67-44CA-9872-C80CD83A47BD}']
-    function selectNode(const nodePath : DomString) : IDomNode;
-    function selectNodes(const nodePath : DomString) : IDomNodeList;
-    procedure registerNs(const prefix : DomString; const uri : DomString);
-  end;
-
-  IDomNodeEx = interface(IDomNode)
-    ['{17D937A2-C6EE-448F-8530-221D744AC083}']
-    { Property Acessors }
-    //function get_text: DOMString; safecall;
-    //function get_xml: DOMString; safecall;
-    //procedure set_text(const Value: DOMString); safecall;
-    { Methods }
-    procedure transformNode(const stylesheet: IDomNode; var output: WideString); overload;
-    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
-    { Properties }
-    //property text: DOMString read get_text write set_text;
-    //property xml: DOMString read get_xml;
-  end;
-
-{$endif} // WITHOUT_IDOM_EXPERIMENTAL
-
-  (****************************************************************************
-   *   following interfaces are not part of the DOM spec. but are needed to   *
-   *   maintain vendor independence in an easy way.                           *
-   ****************************************************************************)
 
   (*
    * Defines the interface to obtain DOM Document instances.
-   *)
+  *)
   IDomDocumentBuilder = interface
     ['{92724EDA-8951-4E46-8415-84221EAE0044}']
     {property setters/getters}
@@ -1017,12 +986,12 @@ type
      * @Param XML The xml to parse
      * @Returns The newly created document
      * @Raises DomException
-     *)
+    *)
     function  parse(const xml : DomString) : IDomDocument;
 
     (*
      * Loads and parses XML from url and returns a new document.
-     *)
+    *)
     function load(const url : DomString) : IDomDocument;
 
     property domImplementation : IDomImplementation read get_DomImplementation;
@@ -1035,13 +1004,13 @@ type
     (*
      * true if asbsolute URLs are supported, false if only relative or local
      * URLs are supported
-     *)
+    *)
     property hasAbsoluteURLSupport : Boolean read get_HasAbsoluteURLSupport;
   end;
 
   (*
    * DomDocumentBuilder Factory for creating Vendor specified DocumentBuilder.
-   *)
+  *)
   IDomDocumentBuilderFactory = interface
     ['{27E9F2B1-98D6-49D0-AAE4-2B0D2DF128BE}']
     {property setters/getters}
@@ -1056,32 +1025,9 @@ type
     property vendorID : DomString read get_VendorID;
   end;
 
-
-  (**
-   * Interface for enumerating vendors.
-   *)
-  IDomVendorList = interface
-    ['{2739F26E-98D6-49D0-AAE4-2B0D2DF128BE}']
-
-    (**
-     * @return  number of registered vendors
-     *)
-    function  get_Count: integer;
-
-    (**
-     * Get one of the registered vendors
-     * @param aIndex  zero-based index of the factory to retrieve
-     * @return  a document builder factory
-     *)
-    function  get_Item(const aIndex: integer): IDomDocumentBuilderFactory;
-
-    property Count: integer read get_Count;
-    property Item[const aIndex: integer]: IDomDocumentBuilderFactory read get_Item;
-  end;
-
   (*
    * Exception class for Vendor Registration
-   *)
+  *)
   EDomVendorRegisterException = class(Exception);
 
   (*
@@ -1089,26 +1035,21 @@ type
    * @Param AFactory the factory that need to be registered.
    * @Raise EDomVendorRegisterException if a factory has already registered with
    * the same AVendorID.
-   *)
+  *)
   procedure registerDomVendorFactory(factory : IDomDocumentBuilderFactory);
 
   (*
    * get a DomcumentBuilderFactory based on its Vendor  ID
    * @Param AVendorID the ID that uniquely specifies the DOM implementation
    * @Raise EDomVendorRegisterException if AVendorID does not exist
-   *)
-  function getDocumentBuilderFactory(vendorID : DomString) : IDomDocumentBuilderFactory;
+  *)
+  function getDocumentBuilderFactory(vendorID : DomString) :
+          IDomDocumentBuilderFactory;
 
   (*
    * equivalent to get_DocumentBuilderFactory. for compatibillity with Borland
-   *)
-  function getDOM(const vendorDesc : string = '') : IDOMImplementation;
-
-  (**
-   * provides access to the list of all registered vendors.
-   * @return  interface enabling to enumerate vendors.
-   *)
-  function getDomVendorList: IDomVendorList;
+  *)
+  function getDOM(const vendorDesc : string = '') : IDomImplementation;
 
 implementation
 
@@ -1117,17 +1058,15 @@ type
   (*
    * Register for registering different DocumentBuilderFactories. Each
    * DocumentBuilderFactory is identified by a vendorID.
-   *)
-  TDomVendorRegister = class(TInterfacedObject, IDomVendorList)
+  *)
+  TDomVendorRegister = class(TObject)
     private
       (* list of DocumentBuilderFactories *)
       fFactoryList : TInterfaceList;
-    protected //IDomVendorList
-      function  get_Count: integer;
-      function  get_Item(const aIndex: integer): IDomDocumentBuilderFactory;
+
     public
-      constructor Create;
-      destructor Destroy; override;
+      constructor create;
+      destructor destroy; override;
 
       (*
        * add a new DocumentBuilderFactory to the list.
@@ -1151,20 +1090,15 @@ var
   gDomVendorRegister : TDomVendorRegister;
 
 (******************************************************************************)
-
-{ TDomVendorRegister }
-
-constructor TDomVendorRegister.Create;
+constructor TDomVendorRegister.create;
 begin
-  inherited Create;
+  inherited create;
   fFactoryList := TInterfaceList.Create;
-  _AddRef; // one extra lock needed
 end;
 
-destructor TDomVendorRegister.Destroy;
+destructor TDomVendorRegister.destroy;
 begin
-  fFactoryList.Free;
-  inherited Destroy;
+  fFactoryList.free;
 end;
 
 procedure TDomVendorRegister.add(
@@ -1176,32 +1110,28 @@ begin
   fFactoryList.add(domDocumentBuilderFactory);
 end;
 
-function TDomVendorRegister.get_Count: integer;
-begin
-  Result := fFactoryList.Count;
-end;
-
-function TDomVendorRegister.get_Factory(vendorID : DomString) : IDomDocumentBuilderFactory;
+function TDomVendorRegister.get_Factory(
+        vendorID : DomString) : IDomDocumentBuilderFactory;
 var
   i : Integer;
 begin
-  for i := 0 to fFactoryList.Count - 1 do begin
-    Result := fFactoryList.items[i] as IDomDocumentBuilderFactory;
+  for i := 0 to fFactoryList.Count - 1 do
+  begin
     {check the name}
-    if (Result.vendorID = vendorID) then exit;
+    if (fFactoryList.items[i] as IDomDocumentBuilderFactory).vendorID
+      =  vendorID then
+    begin
+      result := fFactoryList.items[i] as IDomDocumentBuilderFactory;
+      exit;
+    end;
   end;
-  Result := nil;
-end;
-
-function TDomVendorRegister.get_Item(const aIndex: integer): IDomDocumentBuilderFactory;
-begin
-  Result := fFactoryList[aIndex] as IDomDocumentBuilderFactory;
+  result := nil;
 end;
 
 (******************************************************************************)
 (*
  * returns the global TDomVendorRegister (create on demand)
- *)
+*)
 function get_DomVendorRegisterSingleton : TDomVendorRegister;
 begin
   if gDomVendorRegister = nil then
@@ -1209,11 +1139,6 @@ begin
     gDomVendorRegister := TDomVendorRegister.create;
   end;
   result := gDomVendorRegister;
-end;
-
-function getDomVendorList: IDomVendorList;
-begin
-  Result := get_DomVendorRegisterSingleton as IDomVendorList;
 end;
 
 (******************************************************************************)
@@ -1238,7 +1163,7 @@ begin
   result := factory;
 end;
 
-function getDOM(const vendorDesc : string = '') : IDOMImplementation;
+function getDOM(const vendorDesc : string = '') : IDomImplementation;
 begin
   result := getDocumentBuilderFactory(VendorDesc).
       newDocumentBuilder.DOMImplementation;
