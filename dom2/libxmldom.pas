@@ -99,6 +99,7 @@ type
   protected
     function GetGDOMNode: xmlNodePtr; //new
     function IsReadOnly: boolean;     //new
+    function IsAncestorOrSelf(newNode:xmlNodePtr): boolean; //new
     // IDOMNode
     function get_nodeName: DOMString;
     function get_nodeValue: DOMString;
@@ -393,7 +394,8 @@ type
     constructor Create(
          GDOMImpl:IDOMImplementation;
       const namespaceURI, qualifiedName: DOMString;
-      doctype: IDOMDocumentType);
+      doctype: IDOMDocumentType); overload;
+    constructor Create(GDOMImpl:IDOMImplementation); overload;
     destructor destroy; override;
   end;
 
@@ -873,20 +875,37 @@ end;
  * Returns: the node added.
  *)
 function TGDOMNode.appendChild(const newChild: IDOMNode): IDOMNode;
+
+const
+  FAllowedChildTypes= [ Element_Node,
+                        Text_Node,
+                        CDATA_Section_Node,
+                        Entity_Reference_Node,
+                        Processing_Instruction_Node,
+                        Comment_Node,
+                        Document_Type_Node,
+                        Document_Fragment_Node,
+                        Notation_Node];
 var
   node: xmlNodePtr;
 begin
+  if newChild=nil then CheckError(Not_Supported_Err);
   if self.IsReadOnly
     then CheckError(NO_MODIFICATION_ALLOWED_ERR);
+  if not (newChild.NodeType in FAllowedChildTypes)
+    then CheckError(HIERARCHY_REQUEST_ERR);
+  if FGNode.type_=Document_Node then
+    if (newChild.nodeType = Element_Node) and (xmlDocGetRootElement(xmlDocPtr(FGNode))<>nil)
+      then CheckError(HIERARCHY_REQUEST_ERR);
   if self.get_ownerDocument<>newChild.ownerDocument
     then CheckError(WRONG_DOCUMENT_ERR);
-  if newChild<>nil
-    then begin
-      if IsReadOnlyNode((GetGNode(newChild)).parent)
-        then CheckError(NO_MODIFICATION_ALLOWED_ERR);
-      node:=xmlAddChild(FGNode,GetGNode(newChild))
-    end
-    else node:=nil;
+  if self.isAncestorOrSelf(GetGNode(newChild))
+    then CheckError(HIERARCHY_REQUEST_ERR);
+  if IsReadOnlyNode((GetGNode(newChild)).parent)
+    then CheckError(NO_MODIFICATION_ALLOWED_ERR);
+  if newChild.parentNode<>nil
+    then newChild.parentNode.RemoveChild(newChild);
+  node:=xmlAddChild(FGNode,GetGNode(newChild));
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
     else result:=nil;
@@ -1585,8 +1604,7 @@ constructor TGDOMDocument.create(
                const namespaceURI, qualifiedName: DOMString;
                doctype: IDOMDocumentType);
 var
-  exc: GdomeException;
-  name1,name2: TGdomString;
+  name2: TGdomString;
   root:xmlNodePtr;
 begin
   FGdomimpl:=GDOMImpl;
@@ -1597,7 +1615,8 @@ begin
   //Get root-node
   root:= xmlNodePtr(FPGdomeDoc);
   //Create root-node as pascal object
-  inherited create(root,nil);
+  inherited create(root,self);
+  //self._Release;
   inc(doccount);
 end;
 
@@ -2106,12 +2125,12 @@ gdome_xml_n_canAppend (GdomeNode *self, GdomeNode *newChild, GdomeException *exc
 		return TRUE;
 	switch (gdome_xmlGetType (priv->n)) {
 	case XML_DOCUMENT_TYPE_NODE:
-  case XML_DTD_NODE:
+        case XML_DTD_NODE:
 	case XML_PI_NODE:
 	case XML_COMMENT_NODE:
-  case XML_TEXT_NODE:
-  case XML_CDATA_SECTION_NODE:
-  case XML_NOTATION_NODE:
+        case XML_TEXT_NODE:
+        case XML_CDATA_SECTION_NODE:
+        case XML_NOTATION_NODE:
 		ret = FALSE;
     break;
 	case XML_DOCUMENT_NODE:
@@ -2572,7 +2591,8 @@ end;
 
 function TGDOMDocumentBuilder.newDocument: IDomDocument;
 begin
-  result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
+  //result:=TGDOMDocument.Create(Get_DomImplementation,'','',nil);
+  result:=TGDOMDocument.Create(Get_DomImplementation);
 end;
 
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
@@ -2590,6 +2610,46 @@ end;
 function TGDOMNode.IsReadOnly: boolean;
 begin
   result:=IsReadOnlyNode(FGNode)
+end;
+
+function TGDOMNode.IsAncestorOrSelf(newNode: xmlNodePtr): boolean;
+(*
+	if (ret) {
+		xmlNode *p = priv->n;
+		while (p != NULL) {
+			if (p == new_priv->n) {
+				ret = FALSE;
+				break;
+			}
+			p = gdome_xmlGetParent (p);
+		}
+	}
+*)
+var
+  node:xmlNodePtr;
+begin
+  node:=newNode;
+  result:=true;
+  while node<>nil do begin
+    if node=FGNode
+      then exit;
+    node:=newNode.parent;
+  end;
+  result:=false;
+end;
+
+constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
+var
+  root:xmlNodePtr;
+begin
+  FGdomimpl:=GDOMImpl;
+  FPGdomeDoc:=xmlNewDoc('1.0');
+  //Get root-node
+  root:= xmlNodePtr(FPGdomeDoc);
+  //Create root-node as pascal object
+  inherited create(root,self);
+  //self._Release;
+  inc(doccount);
 end;
 
 initialization
