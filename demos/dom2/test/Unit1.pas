@@ -42,6 +42,7 @@ type
     Test1: TCheckBox;
     Button8: TButton;
     Button10: TButton;
+    Button11: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -56,6 +57,7 @@ type
     procedure TestDocument5000Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button10Click(Sender: TObject);
+    procedure Button11Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -68,7 +70,11 @@ var
   Form1: TForm1;
 
 implementation
-uses jkDomTest,feDomTest,conapp;
+
+uses
+  jkDomTest,feDomTest,conapp;
+var
+  stack: pointer;
 
 {$R *.dfm}
 
@@ -278,5 +284,46 @@ begin
   test9.Checked:=false;
   dom2.Checked:=false;
 end;
+
+Procedure GetSizeInfo( p: Pointer; s: String );
+Var
+  MemInfo: TMemoryBasicInformation;
+Begin
+  FillChar( MemInfo, Sizeof( MemInfo ), 0 );
+  VirtualQuery( p,
+                MemInfo, Sizeof( MemInfo ));
+  OutLog( format('%s: %d',[S, MemInfo.RegionSize]));
+End;
+
+Procedure GetHeapInfo;
+Begin
+  //Form1.memo1.lines.add('Heap size: '+IntToStr( AllocMemSize ));
+  With GetHeapStatus, Form1.memo1.lines Do Begin
+    Add('TotalAddrSpace: '+IntToStr(TotalAddrSpace));
+    //Add('TotalUncommitted: '+IntToStr(TotalUncommitted));
+    //Add('TotalCommitted: '+IntToStr( TotalCommitted ));
+    //Add('TotalAllocated: '+IntToStr( TotalAllocated ));
+    //Add('TotalFree: '+IntToStr( TotalFree ));
+    //Add('FreeSmall: '+IntToStr( FreeSmall ));
+    //Add('FreeBig: '+IntToStr( FreeBig ));
+    //Add('Unused: '+IntToStr( Unused ));
+    //Add('Overhead: '+IntToStr( Overhead ));
+    //Add('HeapErrorCode: '+IntToStr( HeapErrorCode ));
+  End;
+End;
+
+procedure TForm1.Button11Click(Sender: TObject);
+begin
+  memo1.clear;
+//  GetSizeInfo( Pointer( HInstance ), 'Commited bytes for process image');
+//  GetSizeInfo( stack, 'Commited bytes for stack' );
+//  GetSizeInfo( @Sysinit.Datamark, 'Commited bytes for data section' );
+  GetHeapInfo;
+end;
+
+Initialization
+  asm
+    mov stack, esp
+  End;
 
 end.
