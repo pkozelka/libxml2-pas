@@ -8,7 +8,7 @@ class                       method                 importance    ok     remark
 -                           GetDom                 1             X                                                              
 attr                        name                   1             X                                                                
 attr                        specified              3             X      more tests neccessary                                                          
-attr                        value                  1             X      test again, please                                                                 
+attr                        value                  1             X                                                                      
 characterData               appendData             3             X                                                                
 characterData               deleteData             3             X                                                                
 characterData               Data                   2             X                                                                
@@ -26,7 +26,7 @@ document                    createEntityReference  3
 document                    createProcessingInstr. 3             X                                                                
 document                    createTextNode         1             X                                                                
 document                    documentElement        1             X                                                                
-document                    getElementByID         2                    jk: not able to test now                              
+document                    getElementByID         2             X       more tests neccessary                              
 document                    getElementsByTagName   2             X                                                                
 document                    getElementsByTagNameNS 2             X                                                                
 document                    importNode             2                   
@@ -113,4 +113,4 @@ Summary:
 43 high priority methods
 all done
 
-89 methods done totally       
+90 methods done totally       

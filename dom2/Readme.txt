@@ -1,25 +1,19 @@
 Special Remark:
 ===============
 
-The current version of dom2 works only with the libxml2 dll,
-that is contained in libxml.zip in this directory.
-There is a bug in the current libxml2.dll from Igor.
-Get this libxml.dll file, rename it to libxml2.dll and use
-it until the bug in Igor's dll is fixed.
+The current version of dom2 works needs libxml2.dll from
+2002-01-05 or newer.
 
-New in the version from 2001-01-03 in Dom2.pas:
------------------------------------------------
+New in in xdom2.pas:
+--------------------
 
-You can choose between enums for NodeTypes and integer for NodeTypes.
-Integer-values are used by xmldom.pas from Borland (D6 Enterprise),
-so if you want to write code, that is compatible to xmldom.pas than
-use {$DEFINE NodeTypeInteger}.
-
+removed enum types for nodes, to be compatible with xmldom.pas 
+from Borland
 
 The files in this directory:
 ----------------------------
 
-Dom2.pas
+xdom2.pas
 .
 a dom2-complient interface unit, translated from Java by Martijn Brinkers,
 some xmldom.pas (a similar wrapper from Borland, but not open source) 
@@ -27,7 +21,12 @@ compatibility added by Uwe Fechner
 
 libxmldom.pas
 
-an implementation for the dom2.pas interfaces, using the libxml2-pas wrapper,
+an experimental implementation for the xdom2.pas interfaces, using the libxml2-pas wrapper,
+that you can find in the folder libxml2 here in the cvs
+
+libxmldomFE.pas
+
+an stable implementation for the xdom2.pas interfaces, using the libxml2-pas wrapper,
 that you can find in the folder libxml2 here in the cvs
 
 msxmldom.pas
