@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.1 2002-08-06 20:20:21 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.2 2002-10-26 09:14:24 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -138,21 +138,21 @@ function TGDOMNode.selectNode(const nodePath: DomString): IDomNode;
 //       a) if invalid nodePath expression
 //       b) if Result type <> nodelist
 var
-	ctxt: xmlXPathContextPtr;
-	rv: xmlXPathObjectPtr;
-	node: xmlNodePtr;
+  ctxt: xmlXPathContextPtr;
+  rv: xmlXPathObjectPtr;
+  node: xmlNodePtr;
 begin
-	ctxt := xmlXPathNewContext(LDomNode.MyNode.doc);
-	rv := xmlXPathEval(PChar(UTF8Encode(nodePath)), ctxt);
-	Result := nil;
-	if (rv=nil) then exit;
-	if (rv.type_ = XPATH_NODESET) then begin
-		if (rv.nodesetval.nodeNr > 0) then begin
-			node := rv.nodesetval.nodeTab^;
-			Result := GetDomObject(node) as IDomNode;
-		end;
-	end;
-	xmlXPathFreeObject(rv);
+  ctxt := xmlXPathNewContext(LDomNode.MyNode.doc);
+  rv := xmlXPathEval(PChar(UTF8Encode(nodePath)), ctxt);
+  Result := nil;
+  if (rv=nil) then exit;
+  if (rv.type_ = XPATH_NODESET) then begin
+    if (rv.nodesetval.nodeNr > 0) then begin
+      node := rv.nodesetval.nodeTab^;
+      Result := GetDomObject(node) as IDomNode;
+    end;
+  end;
+  xmlXPathFreeObject(rv);
 end;
 
 function TGDOMNode.selectNodes(const nodePath: DomString): IDomNodeList;
@@ -189,7 +189,7 @@ end;
  *)
 procedure TGDOMXPathNodeList.Eval;
 begin
-	if (FXPathObj<>nil) then begin
+  if (FXPathObj<>nil) then begin
     xmlXPathFreeObject(FXPathObj);
   end;
   FXPathObj := xmlXPathEvalExpression(PChar(FQuery), FXPathCtxt);
@@ -287,8 +287,8 @@ end;
 
 function TGDOMDocument.get_xml: DomString;
 var
-	p: PxmlChar;
-	sz: Integer;
+  p: PxmlChar;
+  sz: Integer;
 begin
   xmlDocDumpMemory(requestDocPtr, p, @sz);
   Result := UTF8Decode(p);
