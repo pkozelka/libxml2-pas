@@ -11,13 +11,15 @@ unit libxml2;
 
 interface
 
+uses
+	iconv;
+
 const
 {$ifdef WIN32}
 	LIBXML2_SO = 'libxml2.dll';
 {$endif}
 {$ifdef LINUX}
-	LIBXML2_SO = 'libxml2.so.2';  //on debian linux this is correct
-                                      //on other linux perhaps libxml2.so
+	LIBXML2_SO = 'libxml2.so.2';
 {$endif}
 
 {$WEAKPACKAGEUNIT}
@@ -33,7 +35,6 @@ type
 	PLongInt = ^LongInt;
 	PByte = ^byte;
 	PPChar = ^PChar;
-	size_t = longint;
 
 {$define LIBXML_THREAD_ALLOC_ENABLED}
 {$define LIBXML_THREAD_ENABLED}
