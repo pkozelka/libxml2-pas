@@ -1,5 +1,12 @@
 libxml2-pas
 
+
+not released yet:
+---------------
+- API adjusted to match libxml2-2.4.16
+- replaced incorrect translation of FILE* arguments by PLibXml2File generic pointer
+- added missing cdecl modifiers to all callback functions
+
 Version 2.4.15:
 ---------------
 - API adjusted to match libxml2-2.4.15

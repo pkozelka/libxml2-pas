@@ -1,4 +1,4 @@
-$Id: TODO.txt,v 1.3 2002-02-18 09:14:46 pkozelka Exp $
+$Id: TODO.txt,v 1.4 2002-02-27 19:16:48 pkozelka Exp $
 libxml2-pas: libxml2 header header translation for Pascal
 
 TODO
@@ -6,7 +6,6 @@ TODO
 (sorted by importance):
 - xmlXPathObject.boolval: find out if the translation is correct, or why it looks so strange
 - complete translation of iconv.pas
-- FILE* arguments in some functions - check if it is possible to use them really in Pascal
 - more examples
 - complete testsuite for DUnit (skeleton should be generated from libxml2-api.xml
 - error api: add a unit to make it easy to check&throw exceptions
@@ -17,6 +16,7 @@ TODO
 
 DONE
 ====
+- FILE* arguments in some functions - translation corrected (reported by Robert Marquardt, Team JEDI)
 - Delphi Memory Manager is used, which allowed also translation of xmlFree()
 - autodetection of changes in header files in gnome-xml CVS base ('make checkapi')
 - all header files translated
