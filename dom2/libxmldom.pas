@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.72 2002-01-20 21:47:35 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.73 2002-01-20 22:40:57 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -767,7 +767,7 @@ begin
     end;
     // if this is not the document itself, pretend having a reference to the owner document.
     // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-//		get_ownerDocument._AddRef;
+		get_ownerDocument._AddRef;
   end;
   Inc(nodecount);
 end;
@@ -777,7 +777,7 @@ begin
   if not (self is TGDOMDocument) then begin
   // if this is not the document itself, release the pretended reference to the owner document:
   // This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-//		get_ownerDocument._Release;
+		get_ownerDocument._Release;
   end;
   if (FGNode<>nil) then begin
     FGNode._private := nil;
@@ -2022,6 +2022,7 @@ procedure TGDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
     for i:=FFlyingNodes.Count-1 downto 0 do begin
       p := FFlyingNodes[i];
       node := p;
+      node._private := nil;
       case node.type_ of
       XML_HTML_DOCUMENT_NODE,
       XML_DOCB_DOCUMENT_NODE,
