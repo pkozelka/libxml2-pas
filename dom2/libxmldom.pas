@@ -38,6 +38,7 @@ unit libxmldom;
 // Attr.ownerElement
 
 interface
+
 uses
   {$ifdef VER130} //Delphi 5
     unicode,
@@ -45,7 +46,6 @@ uses
   classes,
   dom2,
   libxml2,
-  conapp,
   sysutils;
 
 const
@@ -98,6 +98,7 @@ type
     FURI: String;    //for xpath
   protected
     function GetGDOMNode: xmlNodePtr; //new
+    function IsReadOnly: boolean;     //new
     // IDOMNode
     function get_nodeName: DOMString;
     function get_nodeValue: DOMString;
@@ -467,6 +468,8 @@ function GetGNode(const Node: IDOMNode): xmlNodePtr;
 
 procedure CheckError(err:integer);
 
+function IsReadOnlyNode(node:xmlNodePtr): boolean;
+
 function ErrorString(err:integer):string;
 
 implementation
@@ -694,9 +697,9 @@ begin
   temp.free;
 end;
 
-function TGDOMNode.get_nodeType: DOMNodeType; 
+function TGDOMNode.get_nodeType: DOMNodeType;
 begin
-  result:=domOrdToNodeType(FGNode.type_);
+  result:=domNodeType(FGNode.type_);
 end;
 
 function TGDOMNode.get_parentNode: IDOMNode; 
@@ -833,7 +836,7 @@ var
   old, cur, node: xmlNodePtr;
 begin
   //todo: raise exception otherwise
-  if (oldChild<>nil) and (curChild<>nil)
+  if (oldChild<>nil) and (newChild<>nil)
     then begin
       old := GetGNode(oldChild);
       cur := GetGNode(newChild);
@@ -850,12 +853,39 @@ begin
   result:=childNode;
 end;
 
-function TGDOMNode.appendChild(const newChild: IDOMNode): IDOMNode; 
+(**
+ * gdome_xml_n_appendChild:
+ * @self:  Node Object ref
+ * @newChild:  The node to add
+ * @exc:  Exception Object ref
+ *
+ * Adds the node @newChild to the end of the list of children of this node.
+ * If the @newChild is already in the tree, it is first removed. If it is a
+ * DocumentFragment node, the entire contents of the document fragment are
+ * moved into the child list of this node
+ *
+ * %GDOME_HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not
+ * allow children of the type of the @newChild node, or if the node to append is
+ * one of this node's ancestors or this node itself.
+ * %GDOME_WRONG_DOCUMENT_ERR: Raised if @newChild was created from a different
+ * document than the one that created this node.
+ * %GDOME_NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly.
+ * Returns: the node added.
+ *)
+function TGDOMNode.appendChild(const newChild: IDOMNode): IDOMNode;
 var
   node: xmlNodePtr;
 begin
+  if self.IsReadOnly
+    then CheckError(NO_MODIFICATION_ALLOWED_ERR);
+  if self.get_ownerDocument<>newChild.ownerDocument
+    then CheckError(WRONG_DOCUMENT_ERR);
   if newChild<>nil
-    then node:=xmlAddChild(FGNode,GetGNode(newChild))
+    then begin
+      if IsReadOnlyNode((GetGNode(newChild)).parent)
+        then CheckError(NO_MODIFICATION_ALLOWED_ERR);
+      node:=xmlAddChild(FGNode,GetGNode(newChild))
+    end
     else node:=nil;
   if node<>nil
     then result:=MakeNode(node,FOwnerDocument) as IDOMNode
@@ -1732,9 +1762,81 @@ begin
   result:=(self.get_documentElement as IDOMNodeSelect).selectNodes(tagName);
 end;
 
-function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode; 
+function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode;
+var
+  recurse: integer;
+  node: xmlNodePtr;
+(**
+ * gdome_xml_doc_importNode:
+ * @self:  Document Objects ref
+ * @importedNode:  The node to import.
+ * @deep:  If %TRUE, recursively import the subtree under the specified node;
+ *         if %FALSE, import only the node itself. This has no effect on Attr,
+ *         EntityReference, and Notation nodes.
+ * @exc:  Exception Object ref
+ *
+ *
+ * Imports a node from another document to this document. The returned node has
+ * no parent; (parentNode is %NULL). The source node is not altered or removed
+ * from the original document; this method creates a new copy of the source
+ * node. %GDOME_DOCUMENT_NODE, %GDOME_DOCUMENT_TYPE_NODE, %GDOME_NOTATION_NODE
+ * and %GDOME_ENTITY_NODE nodes are not supported.
+ *
+ * %GDOME_NOT_SUPPORTED_ERR: Raised if the type of node being imported is not
+ * supported.
+ * Returns: the imported node that belongs to this Document.
+ *)
 begin
+  result:=nil;
+  if importedNode=nil then exit;
+  case integer(importedNode.nodeType) of
+    DOCUMENT_NODE,DOCUMENT_TYPE_NODE,NOTATION_NODE,ENTITY_NODE: CheckError(21);
+    ATTRIBUTE_NODE: CheckError(21); //ToDo: implement this case
+  else
+    if deep
+      then recurse:=1
+      else recurse:=0;
+    node:=xmlDocCopyNode(GetGNode(importedNode),FPGdomeDoc,recurse);
+    if node <> nil
+      then result:=MakeNode(node,self)
+      else result:=nil;
+  end;
 end;
+(* the c-code to translate (from gdome)
+
+GdomeNode *
+gdome_xml_doc_importNode (GdomeDocument *self, GdomeNode *importedNode, GdomeBoolean deep, GdomeException *exc) {
+	Gdome_xml_Document *priv = (Gdome_xml_Document * )self;
+  Gdome_xml_Node *priv_node = (Gdome_xml_Node * )importedNode;
+	xmlNode *ret = NULL;
+
+	g_return_val_if_fail (priv != NULL, NULL);
+  g_return_val_if_fail (GDOME_XML_IS_DOC (priv), NULL);
+	g_return_val_if_fail (importedNode != NULL, NULL);
+	g_return_val_if_fail (exc != NULL, NULL);
+
+  switch (gdome_xml_n_nodeType (importedNode, exc)) {
+	case XML_ATTRIBUTE_NODE:
+    g_assert (gdome_xmlGetOwner ((xmlNode * )priv->n) == priv->n);
+		ret = (xmlNode * )xmlCopyProp ((xmlNode * )priv->n, (xmlAttr * )priv_node->n);
+    gdome_xmlSetParent (ret, NULL);
+    break;
+  case XML_DOCUMENT_FRAG_NODE:
+  case XML_ELEMENT_NODE:
+  case XML_ENTITY_REF_NODE:
+  case XML_PI_NODE:
+  case XML_TEXT_NODE:
+  case XML_CDATA_SECTION_NODE:
+  case XML_COMMENT_NODE:
+		ret = xmlDocCopyNode (priv_node->n, priv->n, deep);
+    break;
+  default:
+    *exc = GDOME_NOT_SUPPORTED_ERR;
+  }
+
+  return gdome_xml_n_mkref (ret);
+}
+*)
 
 function TGDOMDocument.createElementNS(const namespaceURI,
   qualifiedName: DOMString): IDOMElement;
@@ -1960,6 +2062,122 @@ procedure CheckError(err:integer);
 begin
   if err <>0
     then raise EDOMException.Create(ErrorString(err));
+end;
+
+function IsReadOnlyNode(node:xmlNodePtr): boolean;
+begin
+  if node<>nil
+    then  case node.type_ of
+      XML_NOTATION_NODE,XML_ENTITY_NODE,XML_ENTITY_DECL: result:=true;
+    else
+      result:=false;
+    end
+  else
+    result:=false;
+end;
+
+(**
+ * gdome_xml_n_canAppend:
+ * @self:  Node Object ref (priv)
+ * @newChild:  The Node Object ref of the node to test (newPriv)
+ * @exc:  Exception Object ref
+ *
+ * Tests if a @newChild can be added in the child list of this node.
+ * Returns: %TRUE if @newChild can be added, %FALSE otherwise.
+ *)
+(*
+GdomeBoolean
+gdome_xml_n_canAppend (GdomeNode *self, GdomeNode *newChild, GdomeException *exc)
+{
+	Gdome_xml_Node *priv = (Gdome_xml_Node * )self;
+	Gdome_xml_Node *new_priv = (Gdome_xml_Node * )newChild;
+	xmlElementType new_type;
+  GdomeBoolean ret = TRUE;
+
+	g_return_val_if_fail (priv != NULL, FALSE);
+	g_return_val_if_fail (GDOME_XML_IS_N (priv), FALSE);
+	g_return_val_if_fail (new_priv != NULL, FALSE);
+	g_return_val_if_fail (GDOME_XML_IS_N (new_priv), FALSE);
+	g_return_val_if_fail (exc != NULL, FALSE);
+
+  /* Check if self can have a child of newChild type */
+  new_type = gdome_xmlGetType (new_priv->n);
+  if (new_type == XML_DOCUMENT_FRAG_NODE)
+		return TRUE;
+	switch (gdome_xmlGetType (priv->n)) {
+	case XML_DOCUMENT_TYPE_NODE:
+  case XML_DTD_NODE:
+	case XML_PI_NODE:
+	case XML_COMMENT_NODE:
+  case XML_TEXT_NODE:
+  case XML_CDATA_SECTION_NODE:
+  case XML_NOTATION_NODE:
+		ret = FALSE;
+    break;
+	case XML_DOCUMENT_NODE:
+    /* Element (max of one), ProcessingInstruction, Comment, DocumentType (max of one) */
+		if ((new_type != XML_ELEMENT_NODE &&
+				 new_type != XML_PI_NODE &&
+				 new_type != XML_COMMENT_NODE &&
+				 new_type != XML_DTD_NODE &&
+				 new_type != XML_DOCUMENT_TYPE_NODE) ||
+				(new_type == XML_ELEMENT_NODE &&
+				 xmlDocGetRootElement ((xmlDoc * )priv->n) != NULL) ||
+				((new_type == XML_DTD_NODE ||
+					new_type == XML_DOCUMENT_TYPE_NODE) &&
+				 ((xmlDoc * )priv->n)->intSubset != NULL))
+			ret = FALSE;
+    break;
+  case XML_DOCUMENT_FRAG_NODE:
+  case XML_ENTITY_REF_NODE:
+  case XML_ELEMENT_NODE:
+  case XML_ENTITY_NODE:
+	case XML_ENTITY_DECL:
+		/* Element, ProcessingInstruction, Comment, Text, CDATASection, EntityReference	*/
+		if (new_type != XML_ELEMENT_NODE &&
+				new_type != XML_PI_NODE &&
+				new_type != XML_COMMENT_NODE &&
+				new_type != XML_TEXT_NODE &&
+				new_type != XML_CDATA_SECTION_NODE &&
+				new_type != XML_ENTITY_REF_NODE)
+			ret = FALSE;
+    break;
+	case XML_ATTRIBUTE_NODE:
+    /* Text, EntityReference */
+		if (new_type != XML_TEXT_NODE &&
+				new_type != XML_ENTITY_REF_NODE)
+			ret = FALSE;
+    break;
+  default:
+    g_warning ("gdome_xml_n_canAppend: invalid node type");
+		ret = FALSE;
+    break;
+	}
+
+  /* Check if newChild is an ancestor of self */
+	if (ret) {
+		xmlNode *p = priv->n;
+		while (p != NULL) {
+			if (p == new_priv->n) {
+				ret = FALSE;
+				break;
+			}
+			p = gdome_xmlGetParent (p);
+		}
+	}
+
+  return ret;
+}*)
+
+function canAppendNode(priv,newPriv:xmlNodePtr): boolean;
+var
+   new_type: integer;
+begin
+//ToDo:
+//Finish the translation from C
+  if newPriv<>nil
+    then new_type:=newPriv.type_;
+  result:=true;
 end;
 
 { TGdomString }
@@ -2367,6 +2585,11 @@ procedure TGDOMNode.RegisterNS(const prefix, URI: DomString);
 begin
   FPrefix:=prefix;
   FURI:=URI;
+end;
+
+function TGDOMNode.IsReadOnly: boolean;
+begin
+  result:=IsReadOnlyNode(FGNode)
 end;
 
 initialization
