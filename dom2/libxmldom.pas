@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.74 2002-01-21 00:07:15 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.75 2002-01-21 00:30:02 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -235,7 +235,6 @@ type
     function  getElementsByTagNameNS(const namespaceURI, localName: DomString): IDomNodeList;
     function  hasAttribute(const name: DomString): Boolean;
     function  hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
-    procedure normalize;
   protected
     constructor Create(aLibXml2Node: pointer); override;
   public
@@ -1513,7 +1512,7 @@ begin
       Result := newAttr;
     end else begin
       if (olda<>nil) then begin
-        xmlRemoveProp(olda);
+        xmlUnlinkNode(xmlNodePtr(olda));
         RegisterFlyingNode(xmlNodePtr(olda));
       end;
 
@@ -1521,13 +1520,15 @@ begin
       attr := FGNode.properties;
       FGNode.properties := newa;
       newa.next := attr;
+      newa.parent := FGNode;
+      FGNode.nsDef := newa.ns; //[pk] I am not sure if this is really correct, looks strange
       if attr=nil then begin
         FGNode.properties := newa;
       end else begin
         attr.prev := newa;
       end;
-      Result := GetDomObject(olda) as IDomAttr;
       UnregisterFlyingNode(xmlNodePtr(newa));
+      Result := GetDomObject(olda) as IDomAttr;
     end;
   end else begin
     Result := nil;
@@ -1549,14 +1550,7 @@ end;
 
 function TGDOMElement.hasAttributeNS(const namespaceURI, localName: DomString): Boolean;
 begin
-  Result := (nil<>xmlHasNsProp(FGNode,
-    PChar(UTF8Encode(localName)),
-    PChar(UTF8Encode(namespaceURI))));
-end;
-
-procedure TGDOMElement.normalize;
-begin
-  inherited normalize;
+  Result := (nil<>xmlHasNsProp(FGNode, PChar(UTF8Encode(localName)), PChar(UTF8Encode(namespaceURI))));
 end;
 
 constructor TGDOMElement.Create(aLibXml2Node: pointer);
@@ -1577,7 +1571,6 @@ constructor TGDOMDocument.Create(aLibXml2Node: pointer);
 begin
   inherited Create(aLibXml2Node);
   Inc(doccount);
-//	_AddRef;
 end;
 
 destructor TGDOMDocument.Destroy;
@@ -1715,7 +1708,10 @@ begin
   result:=nil;
   if importedNode=nil then exit;
   case integer(importedNode.nodeType) of
-    DOCUMENT_NODE,DOCUMENT_TYPE_NODE,NOTATION_NODE,ENTITY_NODE:
+    DOCUMENT_NODE,
+    DOCUMENT_TYPE_NODE,
+    NOTATION_NODE,
+    ENTITY_NODE:
       DomAssert(false, NOT_SUPPORTED_ERR);
     ATTRIBUTE_NODE:
       DomAssert(false, NOT_SUPPORTED_ERR); //ToDo: implement this case
