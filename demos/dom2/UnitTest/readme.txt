@@ -1,31 +1,26 @@
-ToDo (dom2 implementations for delphi):
+UNIT TESTING for libxmldom.pas
 
-a) add dummy routine to msxml_impl.pas (importNode)
-   OK/FE
+I use this program for new dom2 test routines.
 
-b) add test routine, that is doing the following:
-   10 000 times document.createElement
-   OK/JK
+Before I was using the program "dom2demo.dpr" for testing
+the dom. (from the demos/dom2/test folder)
 
-c) add test routine, that is doing the following:
-   10 000 times node:=document.createElement
-                documentElement.appendChild(node)
-   OK/JK
+To compile it, you have to include utils/dunit into your
+library search path.
 
-d) add test routne:
-   1 * attr:=document.createAttribute
-       documentElement.appendChild(attr)
-   OK/JK
+If you have ideas for more tests, add them to 
+LIBXMLTestCase.pas.
 
-e) add test routine for getElementsByID
-   OK/JK
-   
+Some tests are meant to find memory leaks.
+I use the windows task manager for that task, if you
+know how to check the memory usage of the program (with
+the usage of the dll's) by the program itself, please write
+an email.
 
-f) check for correct exception, if invalid parameters a
-   are passed (like nil or invalid characters) to all
-   methods
+Have fun!
 
-   1. appendChild - OK/JK
-   ...
+feedback to:
 
-Fe, 08.01.2001
+Uwe Fechner <ufechner@4commerce.de>
+
+
