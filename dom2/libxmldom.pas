@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.99 2002-01-30 12:02:31 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.100 2002-01-30 15:36:30 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -67,6 +67,7 @@ type
   TGDOMObject = class(TInterfacedObject)
   protected
     procedure DomAssert(aCondition: boolean; aErrorCode:integer; aMsg: WideString='');
+    procedure checkNsName(aPrefix, aLocalName, aNamespaceURI: String);
   public
     function SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT; override;
   end;
@@ -619,19 +620,18 @@ begin
   Result:=true;
 end;
 
-function prefix(qualifiedName:String):String;
+procedure SplitQName(aQName: String; out aPrefix, aLocalName: String);
+var
+	n: integer;
 begin
-  Result := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
-end;
-
-function localName(qualifiedName:String):String;
-var prefix: String;
-begin
-  prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
-  if length(prefix)>0
-    then Result:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
-      length(qualifiedName)-length(prefix)-1))
-    else Result:=qualifiedName;
+	n := Pos(':', aQName);
+	if (n>0) then begin
+		aPrefix := Copy(aQName, 1, n-1);
+		aLocalName := Copy(aQName, n+1, Length(aQName));
+	end else begin
+		aPrefix := '';
+		aLocalName := aQName;
+	end;
 end;
 
 (**
@@ -710,18 +710,6 @@ begin
     if not xmlIsBaseChar(Ord(aStr[i])) then exit;
   end;
   Result := true;
-end;
-
-function isQName(aStr: DomString): boolean;
-var
-  pfx: string;
-begin
-  pfx := prefix(aStr);
-  if (pfx='') then begin
-    Result := isNCName(aStr);
-  end else begin
-    Result := isNCName(pfx) and isNCName(localName(aStr));
-  end;
 end;
 
 function isNotReserved(aStr: DomString): boolean;
@@ -835,6 +823,13 @@ end;
 
 { TGDOMObject }
 
+procedure TGDOMObject.checkNsName(aPrefix, aLocalName, aNamespaceURI: String);
+begin
+  DomAssert(isNotReserved(aPrefix), NAMESPACE_ERR, 'prefix starts with reserved string "XML".');
+  DomAssert(isNotReserved(aLocalName), NAMESPACE_ERR, 'localName starts with reserved string "XML".');
+  //todo
+end;
+
 procedure TGDOMObject.DomAssert(aCondition: boolean; aErrorCode: integer; aMsg: WideString);
 begin
   DomAssert1(aCondition, aErrorCode, aMsg, ClassName);
@@ -850,14 +845,14 @@ end;
 function TGDOMImplementation.createDocumentType(const qualifiedName, publicId, systemId: DomString): IDomDocumentType;
 var
   dtd:xmlDtdPtr;
-  uqname, upubid, usysid: String;
+  upubid, usysid: String;
+  prefix, local: String;
 begin
-  DomAssert(isNotReserved(qualifiedName), NAMESPACE_ERR, 'qualifiedName starts with reserved string "XML".');
-  DomAssert(isQName(qualifiedName), NAMESPACE_ERR, 'not a qualified name:'+qualifiedName);
-  uqname := UTF8Encode(qualifiedName);
+  SplitQName(UTF8Encode(qualifiedName), prefix, local);
+  checkNsName(prefix, local, '');
   upubid := UTF8Encode(publicId);
   usysid := UTF8Encode(systemId);
-  dtd := xmlCreateIntSubSet(nil, PChar(uqname), PChar(upubid), PChar(usysid));
+  dtd := xmlCreateIntSubSet(nil, PChar(local), PChar(upubid), PChar(usysid));
   Result := GetDomObject(dtd) as IDomDocumentType;
 end;
 
@@ -1657,8 +1652,7 @@ var
   uprefix, ulocal: String;
   ns: xmlNsPtr;
 begin
-  uprefix := prefix(qualifiedName);
-  ulocal := localName(qualifiedName);
+  SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
   ns := xmlNewNs(FGNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
   xmlSetNSProp(FGNode, ns, PChar(ulocal), PChar(UTF8Encode(value)));
 end;
@@ -1761,10 +1755,11 @@ end;
 function TGDOMDocument.createElement(const tagName: DomString): IDomElement;
 var
   node: xmlNodePtr;
+  uprefix, ulocal: String;
 begin
-  DomAssert(isNCName(tagName), INVALID_CHARACTER_ERR, 'tagName');
-  DomAssert(isNotReserved(tagName), NAMESPACE_ERR, 'tagName starts with reserved string "XML".');
-  node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(tagName)),nil);
+  SplitQName(UTF8Encode(tagName), uprefix, ulocal);
+  checkNsName(uprefix, ulocal, '');
+  node := xmlNewDocNode(requestDocPtr, nil, PChar(ulocal),nil);
   Result := GetDOMObject(node) as IDomElement;
 end;
 
@@ -1814,10 +1809,11 @@ end;
 function TGDOMDocument.createAttribute(const name: DomString): IDomAttr;
 var
   attr: xmlAttrPtr;
+  uprefix, ulocal: String;
 begin
-  DomAssert(isNotReserved(name), NAMESPACE_ERR, 'name starts with reserved string "XML".');
-  DomAssert(isNCName(name), NAMESPACE_ERR, 'name');
-  attr := xmlNewDocProp(requestDocPtr, PChar(UTF8Encode(name)), nil);
+  SplitQName(UTF8Encode(name), uprefix, ulocal);
+  checkNsName(uprefix, ulocal, '');
+  attr := xmlNewDocProp(requestDocPtr, PChar(ulocal), nil);
   Result := GetDOMObject(attr) as IDomAttr;
 end;
 
@@ -1912,23 +1908,15 @@ function TGDOMDocument.createElementNS(const namespaceURI, qualifiedName: DomStr
 var
   node: xmlNodePtr;
   ns: xmlNsPtr;
-  uprefix, ulocal: String;
+  uprefix, ulocal, uuri: String;
 begin
-  DomAssert(isNotReserved(qualifiedName), NAMESPACE_ERR, 'qualifiedName starts with reserved string "XML".');
-  uprefix := prefix(qualifiedName);
-  if (uprefix<>'') then begin
-    DomAssert(isNamespaceUri(namespaceURI), NAMESPACE_ERR, 'namespace:'+namespaceURI);
-    ulocal := localName(qualifiedName);
-    DomAssert(isNotReserved(ulocal), INVALID_CHARACTER_ERR, 'localName starts with reserved string "XML".');
-    DomAssert(isNCName(ulocal), INVALID_CHARACTER_ERR, 'localName invalid');
-    DomAssert(isNCName(uprefix), INVALID_CHARACTER_ERR, 'prefix invalid');
-    node := xmlNewDocNode(requestDocPtr, nil, PChar(ulocal), nil);
-    ns := xmlNewNs(node, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+  SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
+  uuri := UTF8Encode(namespaceURI);
+  checkNsName(uprefix, ulocal, uuri);
+  node := xmlNewDocNode(requestDocPtr, nil, PChar(ulocal), nil);
+  if (uuri<>'') then begin
+    ns := xmlNewNs(node, PChar(uuri), PChar(uprefix));
     xmlSetNs(node, ns);
-  end else begin
-    DomAssert(isNCName(qualifiedName), NAMESPACE_ERR, 'qualifiedName');
-    ulocal := UTF8Encode(qualifiedName);
-    node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(qualifiedName)), nil);
   end;
   Result := GetDOMObject(node) as IDomElement;
 end;
@@ -1937,22 +1925,16 @@ function TGDOMDocument.createAttributeNS(const namespaceURI, qualifiedName: DomS
 var
   attr: xmlAttrPtr;
   ns: xmlNsPtr;
-  uprefix, ulocal: String;
+  uprefix, ulocal, uuri: String;
 begin
-  DomAssert(isNotReserved(qualifiedName), NAMESPACE_ERR, 'qualifiedName starts with reserved string "XML".');
-  uprefix := prefix(qualifiedName);
-  if (uprefix<>'') then begin
-    DomAssert(isNamespaceUri(namespaceURI), NAMESPACE_ERR, 'namespace:'+namespaceURI);
-    ulocal := localName(qualifiedName);
-    DomAssert(isNotReserved(ulocal), INVALID_CHARACTER_ERR, 'localName starts with reserved string "XML".');
-    DomAssert(isNCName(ulocal), INVALID_CHARACTER_ERR, 'localName invalid');
-    DomAssert(isNCName(uprefix), INVALID_CHARACTER_ERR, 'prefix invalid');
-    ns := xmlNewNs(nil, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+  SplitQName(UTF8Encode(qualifiedName), uprefix, ulocal);
+  uuri := UTF8Encode(namespaceURI);
+  checkNsName(uprefix, ulocal, uuri);
+  if (uuri<>'') then begin
+    ns := xmlNewNs(nil, PChar(uuri), PChar(uprefix));
     attr := xmlNewNsProp(nil, ns, PChar(ulocal), nil);
     attr.doc := requestDocPtr;
   end else begin
-    DomAssert(isNCName(qualifiedName), NAMESPACE_ERR, 'qualifiedName');
-    ulocal := UTF8Encode(qualifiedName);
     attr := xmlNewDocProp(requestDocPtr, PChar(ulocal), nil);
   end;
   Result := GetDOMObject(attr) as IDomAttr;
