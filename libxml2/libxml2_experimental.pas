@@ -1,5 +1,5 @@
 unit libxml2_experimental;
-//$Id: libxml2_experimental.pas,v 1.6 2002-03-08 08:13:17 pkozelka Exp $
+//$Id: libxml2_experimental.pas,v 1.7 2002-03-17 16:12:38 pkozelka Exp $
 (**
  * Title:        libxml2 experimental unit
  * Description:  Contains experimental code for support or development of libxml2
@@ -31,16 +31,31 @@ var
 
 // error output redirected to OutputDebugString
 
-procedure myGenericErrorFunc(ctx: Pointer; msg: PChar); cdecl;
+procedure myGenericErrorFunc(aCtx: Pointer; aMsg: PChar); cdecl;
+var
+  msg: WideString;
+  p: Pointer;
+  arg: PChar;
+  n: Integer;
 begin
+  msg := UTF8Decode(aMsg);
+  // dirty hack for C varargs:
+  n := Pos('%s', msg);
+  if (n>0) then begin
+    p := @aMsg;
+    Inc(PChar(p), sizeof(Pointer));
+    arg := PChar(p^);
+    msg := StringReplace(msg, '%s', UTF8Decode(arg), []);
+  end;
+  // (end of dirty hack)
   if Assigned(myErrH) then begin
     myErrH(msg);
   end;
 {$IFDEF WIN32}
-  OutputDebugStringW(PWideChar(UTF8Decode(msg)));
+  OutputDebugStringW(PWideChar(msg));
 {$ENDIF}
 {$IFDEF LINUX}
-  Writeln(UTF8Decode(msg));
+  Writeln(msg);
 {$ENDIF}
 end;
 
