@@ -5,15 +5,15 @@ The intention is to keep it in sync with any changes in original C headers.
 
 You can find here:
 
-libxml2:        the header translation for libxml2.dll / libxml2.so
-libxslt:        dito for libxslt.dll /libxslt.so
-dom2:           a dom2 compliant interface and implementations based on libxml2 and msdom
-demos/data      xml-files (and more data files), used by the demo programs
-demos/libxml2   a simple xpath demo for the using libxml2
-demos/dom2/test a graphical testsuite, testing 98 of 100 dom2 functions and more
-msxml           a msxml compliant interface and an implementation based on libxml2
-msxmldom        depreciated
-wrappers        depreciated
+libxml2:              the header translation for libxml2.dll / libxml2.so
+libxslt:              dito for libxslt.dll /libxslt.so
+dom2:                 a dom2 compliant interface and implementations based on libxml2 and msdom
+demos/data            xml-files (and more data files), used by the demo programs
+demos/libxml2/demo1   a simple xpath demo for the using libxml2
+demos/dom2/test       a graphical testsuite, testing 98 of 100 dom2 functions and more
+msxml                 a msxml compliant interface and an implementation based on libxml2
+msxmldom              depreciated
+wrappers              depreciated
 
 
 CONTACT:
