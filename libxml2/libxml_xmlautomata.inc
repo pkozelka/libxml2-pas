@@ -1,39 +1,51 @@
+// CVS-SIGN: [1.5] xmlautomata.h
+{
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+}
 (*
- * automata.h : description of the API to build regexp automats
+ * automata.h: description of the API to build regexp automats
  *
  * See Copyright for the status of this software.
  *
  * Daniel Veillard <veillard@redhat.com>
  *)
 
-(* 
- * xmlAutomataPtr:
- * 
- * A libxml automata description, It can be compiled into a regexp
- *)
 type
-  _xmlAutomata = xmlAutomata;
-  xmlAutomataPtr = xmlAutomata;
+  (* 
+   * xmlAutomataPtr: 
+   * 
+   * A libxml automata description, It can be compiled into a regexp
+   *)
+  xmlAutomata = record end;
+  xmlAutomataPtr = ^xmlAutomata;
 
-(* 
- * xmlAutomataStatePtr:
- *
- * A state int the automata description,
- *)
-  _xmlAutomataState = xmlAutomataState;
-  xmlAutomataStatePtr = xmlAutomataState;
+  (*
+   * xmlAutomataStatePtr:
+   *
+   * A state int the automata description,
+   *)
+  xmlAutomataState = record end;
+  xmlAutomataStatePtr = ^xmlAutomataState;
 
 (*
  * Building API
  *)
-function xmlNewAutomata:xmlAutomataPtr;cdecl;external;
-procedure xmlFreeAutomata(am:xmlAutomataPtr);cdecl;external;
-function xmlAutomataGetInitState(am:xmlAutomataPtr):xmlAutomataStatePtr;cdecl;external;
-function xmlAutomataSetFinalState(am:xmlAutomataPtr; state:xmlAutomataStatePtr):longint;cdecl;external;
-function xmlAutomataNewState(am:xmlAutomataPtr):xmlAutomataStatePtr;cdecl;external;
-function xmlAutomataNewTransition(am:xmlAutomataPtr; from:xmlAutomataStatePtr; to:xmlAutomataStatePtr; token:PxmlChar; data:pointer):xmlAutomataStatePtr;cdecl;external;
-function xmlAutomataNewCountTrans(am:xmlAutomataPtr; from:xmlAutomataStatePtr; to:xmlAutomataStatePtr; token:PxmlChar; min:longint; max:longint; data:pointer):xmlAutomataStatePtr;cdecl;external;
-function xmlAutomataNewEpsilon(am:xmlAutomataPtr; from:xmlAutomataStatePtr; to:xmlAutomataStatePtr):xmlAutomataStatePtr;cdecl;external;
-function xmlAutomataNewCounter(am:xmlAutomataPtr):longint;cdecl;external;
-function xmlAutomataCompile(am:xmlAutomataPtr):xmlRegexpPtr;cdecl;external;
+function  xmlNewAutomata: xmlAutomataPtr; cdecl; external LIBXML2_SO;
+procedure xmlFreeAutomata(am: xmlAutomataPtr); cdecl; external LIBXML2_SO;
+function  xmlAutomataGetInitState(am: xmlAutomataPtr): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataSetFinalState(am: xmlAutomataPtr; state: xmlAutomataStatePtr): Longint; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewState(am: xmlAutomataPtr): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewTransition(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; token: PxmlChar; data: Pointer): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewCountTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; token: PxmlChar; min, max: Longint; data: Pointer): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewOnceTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; token: PxmlChar; min, max: Longint; data: Pointer): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewAllTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; lax: Longint): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewEpsilon(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewCountedTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; aCounter: Longint): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewCounterTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; aCounter: Longint): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewCounter(am: xmlAutomataPtr; min, max: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlAutomataCompile(am: xmlAutomataPtr): xmlRegexpPtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataIsDeterminist(am: xmlAutomataPtr): Longint; cdecl; external LIBXML2_SO;
 

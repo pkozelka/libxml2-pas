@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.1] xmlschemas.h
+// CVS-SIGN: [1.3] xmlschemas.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -16,41 +16,42 @@
 type
   xmlSchemaValidError =  Longint;
 const
-  XML_SCHEMAS_ERR_OK = 0;
-  XML_SCHEMAS_ERR_NOROOT = 1;
-  XML_SCHEMAS_ERR_UNDECLAREDELEM = 2;
-  XML_SCHEMAS_ERR_NOTTOPLEVEL = 3;
-  XML_SCHEMAS_ERR_MISSING = 4;
-  XML_SCHEMAS_ERR_WRONGELEM = 5;
-  XML_SCHEMAS_ERR_NOTYPE = 6;
-  XML_SCHEMAS_ERR_NOROLLBACK = 7;
-  XML_SCHEMAS_ERR_ISABSTRACT = 8;
-  XML_SCHEMAS_ERR_NOTEMPTY = 9;
-  XML_SCHEMAS_ERR_ELEMCONT = 10;
-  XML_SCHEMAS_ERR_HAVEDEFAULT = 11;
-  XML_SCHEMAS_ERR_NOTNILLABLE = 12;
-  XML_SCHEMAS_ERR_EXTRACONTENT = 13;
-  XML_SCHEMAS_ERR_INVALIDATTR = 14;
-  XML_SCHEMAS_ERR_INVALIDELEM = 15;
-  XML_SCHEMAS_ERR_CONSTRUCT = 16;
-  XML_SCHEMAS_ERR_INTERNAL = 17;
-  XML_SCHEMAS_ERR_NOTSIMPLE = 18;
-  XML_SCHEMAS_ERR_ATTRUNKNOWN = 19;
-  XML_SCHEMAS_ERR_ATTRINVALID = 20;
-  XML_SCHEMAS_ERR_ = 21;
-  XML_SCHEMAS_ERR_XXX = 22;
-(*
- *  The schemas related types are kept internal
- *)
+  XML_SCHEMAS_ERR_OK              = 0;
+  XML_SCHEMAS_ERR_NOROOT          = 1;
+  XML_SCHEMAS_ERR_UNDECLAREDELEM  = 2;
+  XML_SCHEMAS_ERR_NOTTOPLEVEL     = 3;
+  XML_SCHEMAS_ERR_MISSING         = 4;
+  XML_SCHEMAS_ERR_WRONGELEM       = 5;
+  XML_SCHEMAS_ERR_NOTYPE          = 6;
+  XML_SCHEMAS_ERR_NOROLLBACK      = 7;
+  XML_SCHEMAS_ERR_ISABSTRACT      = 8;
+  XML_SCHEMAS_ERR_NOTEMPTY        = 9;
+  XML_SCHEMAS_ERR_ELEMCONT        = 10;
+  XML_SCHEMAS_ERR_HAVEDEFAULT     = 11;
+  XML_SCHEMAS_ERR_NOTNILLABLE     = 12;
+  XML_SCHEMAS_ERR_EXTRACONTENT    = 13;
+  XML_SCHEMAS_ERR_INVALIDATTR     = 14;
+  XML_SCHEMAS_ERR_INVALIDELEM     = 15;
+  XML_SCHEMAS_ERR_NOTDETERMINIST  = 16;
+  XML_SCHEMAS_ERR_CONSTRUCT       = 17;
+  XML_SCHEMAS_ERR_INTERNAL        = 18;
+  XML_SCHEMAS_ERR_NOTSIMPLE       = 19;
+  XML_SCHEMAS_ERR_ATTRUNKNOWN     = 20;
+  XML_SCHEMAS_ERR_ATTRINVALID     = 21;
+  XML_SCHEMAS_ERR_                = 22;
+  XML_SCHEMAS_ERR_XXX             = 23;
 type
+  (*
+   *  The schemas related types are kept internal
+   *)
   xmlSchema = record end;
   xmlSchemaPtr = ^xmlSchema;
 
   (*
    *  A schemas validation context
    *)
-  xmlSchemaValidityErrorFunc = procedure (ctx: Pointer; msg: Pchar; args: array of const);cdecl;
-  xmlSchemaValidityWarningFunc = procedure (ctx: Pointer; msg: Pchar; args: array of const);cdecl;
+  xmlSchemaValidityErrorFunc = procedure (ctx: Pointer; msg: Pchar; args: array of const); cdecl;
+  xmlSchemaValidityWarningFunc = procedure (ctx: Pointer; msg: Pchar; args: array of const); cdecl;
 
   xmlSchemaParserCtxt = record end;
   xmlSchemaParserCtxtPtr = ^xmlSchemaParserCtxt;

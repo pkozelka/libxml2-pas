@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.107] tree.h
+// CVS-SIGN: [1.108] tree.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -541,8 +541,8 @@ function  xmlNewCDataBlock(doc: xmlDocPtr; content: PxmlChar; len: Longint): xml
 function  xmlNewCharRef(doc: xmlDocPtr; name: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlNewReference(doc: xmlDocPtr; name: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlCopyNode(node: xmlNodePtr; recursive: Longint): xmlNodePtr; cdecl; external LIBXML2_SO;
-function  xmlDocCopyNode(node: xmlNodePtr; doc: xmlDocPtr; recursive: Longint): xmlNodePtr; cdecl; external LIBXML2_SO;
-function  xmlCopyNodeList(node: xmlNodePtr): xmlNodePtr; cdecl; external LIBXML2_SO;
+function  xmlDocCopyNode(const node: xmlNodePtr; doc: xmlDocPtr; recursive: Longint): xmlNodePtr; cdecl; external LIBXML2_SO;
+function  xmlCopyNodeList(const node: xmlNodePtr): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlNewDocFragment(doc: xmlDocPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
 
 (*

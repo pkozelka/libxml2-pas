@@ -4,6 +4,8 @@ unit libxml2;
   This unit collects all the translated headers of libxml2 (aka gnome-xml).
   2001 (C) Petr Kozelka <pkozelka@email.cz>
   ------------------------------------------------------------------------------
+  Project site:
+    http://sourceforge.net/projects/libxml2-pas
   See also:
     http://www.xmlsoft.org  - the libxml2 homepage
     http://kozelka.hyperlink.cz  - my homepage
@@ -79,6 +81,7 @@ type
 
 {$I libxml_xmlunicode.inc}
 {$I libxml_xmlregexp.inc}
+{$I libxml_xmlautomata.inc}
 {$I libxml_schemasInternals.inc}
 {$I libxml_xmlschemastypes.inc}
 {$I libxml_xmlschemas.inc}
