@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/parser.h:1.82:
+// CVS-REV:gnome-xml/include/libxml/parser.h:1.88:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -52,7 +52,14 @@ type
     length: Longint;                (* length if known  *)
     line: Longint;                  (* Current line  *)
     col: Longint;                   (* Current column  *)
-    consumed: Longint;              (* How many xmlChars already consumed  *)
+
+    (*
+     *     NOTE: consumed is only tested for equality in the parser code,
+     *           so even if there is an overflow this should not give troubles
+     *           for parsing very large instances.
+     *
+     *)
+    consumed: DWORD;                (* How many xmlChars already consumed  *)
     free: xmlParserInputDeallocate; (* function to deallocate the base  *)
     encoding: PxmlChar;             (* the encoding string for entity  *)
     version: PxmlChar;              (* the version string for entity  *)
@@ -103,6 +110,14 @@ const
    * Use it to initialize xmlLoadExtDtdDefaultValue.
    *)
   XML_COMPLETE_ATTRS = 4;
+
+  (*
+   * XML_SKIP_IDS:
+   *
+   * Bit in the loadsubset context field to tell to not do ID/REFs registration.
+   * Used to initialize xmlLoadExtDtdDefaultValue in some special cases.
+   *)
+  XML_SKIP_IDS = 8;
 
 type
   xmlSAXHandlerPtr = ^xmlSAXHandler;
@@ -204,6 +219,10 @@ type
     linenumbers: Longint;                 (* set line number in element content *)
     catalogs: Pointer;                    (* document's own catalog *)
     recovery: Longint;                    (* run in recovery mode *)
+    progressive: Longint;                 (* is this a progressive parsing *)
+    dict: xmlDictPtr;                     (* dictionnary for the parser *)
+    atts : ^PxmlChar;                     (* array for the attributes callbacks *)
+    maxatts: Longint;                     (* the size of the array *)
   end;
 
   (**
@@ -668,7 +687,7 @@ function  xmlParseCtxtExternalEntity(ctx: xmlParserCtxtPtr; URL: PxmlChar; ID: P
 (*
  * Parser contexts handling.
  *)
-procedure xmlInitParserCtxt(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  xmlInitParserCtxt(ctxt: xmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
 procedure xmlClearParserCtxt(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
 procedure xmlFreeParserCtxt(ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
 procedure xmlSetupParserForBuffer(ctxt: xmlParserCtxtPtr; buffer: PxmlChar; filename: PChar); cdecl; external LIBXML2_SO;

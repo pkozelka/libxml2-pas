@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/HTMLparser.h:1.28:
+// CVS-REV:gnome-xml/include/libxml/HTMLparser.h:1.31:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -71,6 +71,7 @@ function  htmlAutoCloseTag(doc: htmlDocPtr; name: PxmlChar; elem: htmlNodePtr): 
 function  htmlParseEntityRef(ctxt: htmlParserCtxtPtr; str: PPxmlChar): htmlEntityDescPtr; cdecl; external LIBXML2_SO;
 function  htmlParseCharRef(ctxt: htmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
 procedure htmlParseElement(ctxt: htmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  htmlCreateMemoryParserCtxt(buffer: Pchar; size: Longint): htmlParserCtxtPtr; cdecl; external LIBXML2_SO;
 function  htmlParseDocument(ctxt: htmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO; 
 function  htmlSAXParseDoc(cur: PxmlChar; encoding: PChar; sax: htmlSAXHandlerPtr; userData: Pointer): htmlDocPtr; cdecl; external LIBXML2_SO;
 function  htmlParseDoc(cur: PxmlChar; encoding: PChar): htmlDocPtr; cdecl; external LIBXML2_SO;
@@ -106,10 +107,37 @@ function htmlAttrAllowed(_para1: htmlElemDescPtr; _para2: PxmlChar; _para3: Long
 function htmlElementAllowedHere(_para1: htmlElemDescPtr; _para2: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 function htmlElementStatusHere(_para1: htmlElemDescPtr; _para2: htmlElemDescPtr): htmlStatus; cdecl; external LIBXML2_SO;
 function htmlNodeStatus(_para1: htmlNodePtr; _para2: Longint): htmlStatus; cdecl; external LIBXML2_SO;
-{TODO: translate macros
+
+(*
+ * htmlDefaultSubelement:
+ * @elt: HTML element
+ *
+ * Returns the default subelement for this element
+ *)
+{TODO: translate macro
 #define htmlDefaultSubelement(elt) elt->defaultsubelt
-#define htmlElementAllowedHereDesc(parent,elt) \
-	htmlElementAllowedHere((parent), (elt)->name)
+}
+
+(*
+ * htmlElementAllowedHereDesc:
+ * @parent: HTML parent element
+ * @elt: HTML element
+ *
+ * Checks whether an HTML element description may be a
+ * direct child of the specified element.
+ *
+ * Returns 1 if allowed; 0 otherwise.
+ *)
+{TODO: translate macro
+#define htmlElementAllowedHereDesc(parent,elt) 	htmlElementAllowedHere((parent), (elt)->name)
+}
+
+(*
+ * htmlRequiredAttrs:
+ * @elt: HTML element
+ * Returns the attributes required for the specified element.
+ *)
+{TODO: translate macro
 #define htmlRequiredAttrs(elt) (elt)->attrs_req
 }
 

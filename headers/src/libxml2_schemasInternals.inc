@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/schemasInternals.h:1.8:
+// CVS-REV:gnome-xml/include/libxml/schemasInternals.h:1.10:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -250,6 +250,7 @@ type
     occurs: Longint;
     defValue: PxmlChar;
     subtypes: xmlSchemaTypePtr;
+    node: xmlNodePtr;
   end;
 
   (**
@@ -268,6 +269,7 @@ type
     refNs: PxmlChar;
     annot: xmlSchemaAnnotPtr;
     attributes: xmlSchemaAttributePtr;
+    node: xmlNodePtr;
   end;
 
   (*
@@ -378,6 +380,7 @@ type
     schemasImports: xmlHashTablePtr;
 
     _private: Pointer; (* unused by the library for users or bindings *)
+    groupDecl: xmlHashTablePtr;
   end;
 
 procedure xmlSchemaFreeType(aType: xmlSchemaTypePtr); cdecl; external LIBXML2_SO;

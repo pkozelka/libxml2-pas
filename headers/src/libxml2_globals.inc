@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/globals.h:1.10:
+// CVS-REV:gnome-xml/include/libxml/globals.h:1.12:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -17,6 +17,8 @@
  * daniel@veillard.com
  *)
 
+procedure xmlInitGlobals; cdecl; external LIBXML2_SO;
+procedure xmlCleanupGlobals; cdecl; external LIBXML2_SO;
 (*
  * Externally global symbols which need to be protected for backwards
  * compatibility support.
@@ -55,6 +57,7 @@ type
     xmlTreeIndentString: PChar;
     xmlRegisterNodeDefaultValue: xmlRegisterNodeFunc;
     xmlDeregisterNodeDefaultValue: xmlDeregisterNodeFunc;
+    xmlMallocAtomic: xmlMallocFunc;
   end;
 
 procedure xmlInitializeGlobalState(gs: xmlGlobalStatePtr); cdecl; external LIBXML2_SO;
@@ -70,68 +73,56 @@ function xmlDeregisterNodeDefault(func: xmlDeregisterNodeFunc): xmlDeregisterNod
  *    - xmlFree
  *)
 {$IFDEF LIBXML_THREAD_ALLOC_ENABLED}
-{$IFDEF LIBXML_THREAD_ENABLED}
 
+{$IFDEF LIBXML_THREAD_ENABLED}
 //[pk] function __xmlMalloc:^xmlMallocFunc;cdecl;external LIBXML2_SO;
-(* error
-#define xmlMalloc \
-in define line 105 *)
-(* error
-( *(__xmlMalloc()))
-{$else}
-in declaration at line 108 *)
+//// extern xmlMallocFunc *__xmlMalloc(void);
+//// #define xmlMalloc ( *(__xmlMalloc()))
+{$ELSE}
+//// LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMalloc;
 {$ENDIF}
-{$IFDEF LIBXML_THREAD_ENABLED}
 
+{$IFDEF LIBXML_THREAD_ENABLED}
+//[pk] function __xmlMallocAtomic:^xmlMallocFunc; cdecl; external LIBXML2_SO;
+//// extern xmlMallocFunc *__xmlMallocAtomic(void);
+//// #define xmlMallocAtomic ( *(__xmlMallocAtomic()))
+{$ELSE}
+//// LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMallocAtomic;
+{$ENDIF}
+
+{$IFDEF LIBXML_THREAD_ENABLED}
 //[pk] function __xmlRealloc:^xmlReallocFunc;cdecl;external LIBXML2_SO;
-(* error
-#define xmlRealloc \
-in define line 113 *)
-(* error
-( *(__xmlRealloc()))
-{$else}
-in declaration at line 116 *)
+//// extern xmlReallocFunc *__xmlRealloc(void);
+#define xmlRealloc ( *(__xmlRealloc()))
+{$ELSE}
+LIBXML_DLL_IMPORT extern xmlReallocFunc xmlRealloc;
 {$ENDIF}
-{$IFDEF LIBXML_THREAD_ENABLED}
 
-//function __xmlFree:^xmlFreeFunc;cdecl;external LIBXML2_SO;
-(* error
-#define xmlFree \
-in define line 121 *)
-(* error
-( *(__xmlFree()))
-{$else}
-in declaration at line 124 *)
+{$IFDEF LIBXML_THREAD_ENABLED}
+//[pk] function __xmlFree:^xmlFreeFunc;cdecl;external LIBXML2_SO;
+//// extern xmlFreeFunc *__xmlFree(void);
+//// #define xmlFree ( *(__xmlFree()))
+{$ELSE}
+//// LIBXML_DLL_IMPORT extern xmlFreeFunc xmlFree;
 {$ENDIF}
-{$IFDEF LIBXML_THREAD_ENABLED}
 
+{$IFDEF LIBXML_THREAD_ENABLED}
 //[pk] function __xmlMemStrdup:^xmlStrdupFunc;cdecl;external LIBXML2_SO;
-(* error
-#define xmlMemStrdup \
-in define line 129 *)
-(* error
-( *(__xmlMemStrdup()))
-{$else}
-in declaration at line 132 *)
+//// extern xmlStrdupFunc *__xmlMemStrdup(void);
+//// #define xmlMemStrdup ( *(__xmlMemStrdup()))
+{$ELSE}
+//// LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
 {$ENDIF}
+
 {$ELSE}
     { !LIBXML_THREAD_ALLOC_ENABLED  }
-(* error
-LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMalloc;
-in declaration at line 135 *)
-(* error
-LIBXML_DLL_IMPORT extern xmlReallocFunc xmlRealloc;
-in declaration at line 136 *)
-(* error
-LIBXML_DLL_IMPORT extern xmlFreeFunc xmlFree;
-in declaration at line 137 *)
-(* error
-LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
-in declaration at line 138 *)
+//// LIBXML_DLL_IMPORT extern xmlMallocFunc xmlMalloc;
+//// LIBXML_DLL_IMPORT extern xmlReallocFunc xmlRealloc;
+//// LIBXML_DLL_IMPORT extern xmlFreeFunc xmlFree;
+//// LIBXML_DLL_IMPORT extern xmlStrdupFunc xmlMemStrdup;
 {$ENDIF}
     { LIBXML_THREAD_ALLOC_ENABLED  }
 
-//TODO following part is mostly untranslated; its corresponding source was generated
 {$IFDEF LIBXML_THREAD_ENABLED}
 
 //[pk] function __docbDefaultSAXHandler:^xmlSAXHandler;cdecl;external LIBXML2_SO;
@@ -325,7 +316,6 @@ in define line 270 *)
 in declaration at line 273 *)
 {$ENDIF}
 {$IFDEF LIBXML_THREAD_ENABLED}
-(* Const before type ignored *)
 
 //[pk] function __xmlParserVersion:^^Char; cdecl; external LIBXML2_SO;
 (* error
@@ -391,5 +381,3 @@ in define line 353 *)
 {$ELSE}
 in declaration at line 356 *)
 {$ENDIF}
-
-
