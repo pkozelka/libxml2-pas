@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.104 2002-02-07 21:01:49 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.105 2002-02-10 16:29:12 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -39,9 +39,9 @@ unit libxmldom;
 interface
 
 uses
-  {$ifdef VER130} //Delphi 5
-    unicode,
-  {$endif}
+{$ifdef VER130} //Delphi 5
+  unicode,
+{$endif}
   classes,
   idom2,
   libxml2,
@@ -725,6 +725,7 @@ begin
   if (Length(aStr)=0) then exit;
   if xmlIsDigit(Ord(aStr[1])) then exit;
   for i:=1 to Length(aStr) do begin
+    if (aStr[i] = ':') then exit;
     if not isNameChar(Ord(aStr[i])) then exit;
   end;
   Result := true;
