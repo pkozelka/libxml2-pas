@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.52 2002-01-16 19:36:31 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.53 2002-01-16 19:54:45 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -330,7 +330,6 @@ type
 		function  get_doctype: IDOMDocumentType;
 		function  get_domImplementation: IDOMImplementation;
 		function  get_documentElement: IDOMElement;
-		procedure set_documentElement(const IDOMElement: IDOMElement); //[pk] not a dom method, useless
 		function  createElement(const tagName: DOMString): IDOMElement;
 		function  createDocumentFragment: IDomDocumentFragment;
 		function  createTextNode(const data: DOMString): IDOMText;
@@ -381,7 +380,8 @@ type
 	TGDOMDocumentFragment = class(TGDOMNode, IDOMDocumentFragment)
 	end;
 
-	TGDOMDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
+	TGDOMDocumentBuilderFactory = class(TInterfacedObject,
+		IDomDocumentBuilderFactory)
 	private
 		FFreeThreading : Boolean;
 	protected //IDomDocumentBuilderFactory
@@ -394,9 +394,7 @@ type
 	TGDOMDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
 	private
 		FFreeThreading : Boolean;
-	public
-		constructor Create(AFreeThreading : Boolean);
-		destructor Destroy; override;
+	protected //IDomDocumentBuilder
 		function  Get_DomImplementation : IDomImplementation;
 		function  Get_IsNamespaceAware : Boolean;
 		function  Get_IsValidating : Boolean;
@@ -405,6 +403,9 @@ type
 		function  newDocument : IDomDocument;
 		function  parse(const xml : DomString) : IDomDocument;
 		function  load(const url : DomString) : IDomDocument;
+	public
+		constructor Create(AFreeThreading : Boolean);
+		destructor Destroy; override;
 	end;
 
 var
@@ -596,9 +597,9 @@ begin
 	end;
 end;
 
-(*
- *  TXDomDocumentBuilder
-*)
+
+{ TXDomDocumentBuilder }
+
 constructor TGDOMDocumentBuilder.Create(AFreeThreading : Boolean);
 begin
 	inherited Create;
@@ -627,13 +628,22 @@ end;
 
 function TGDOMDocumentBuilder.Get_HasAbsoluteURLSupport : Boolean;
 begin
-	Result := false;
+	Result := False;
 end;
 
 function TGDOMDocumentBuilder.Get_HasAsyncSupport : Boolean;
 begin
-	Result := false;
+	Result := False;
 end;
+
+{ TGDOMInterface }
+
+function TGDOMInterface.SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT;
+begin
+	Result := 0; //todo
+end;
+
+{ TGDOMImplementation }
 
 class function TGDOMImplementation.getInstance(aFreeThreading: boolean): IDomImplementation;
 begin
@@ -648,11 +658,6 @@ begin
 	if (uppercase(feature) ='CORE') and (version = '2.0')
 		then result:=true
 		else result:=false;
-end;
-
-function TGDOMInterface.SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT;
-begin
-	result:=0; //todo
 end;
 
 function TGDOMImplementation.createDocumentType(const qualifiedName, publicId, systemId: DOMString): IDOMDocumentType;
@@ -672,16 +677,13 @@ begin
 	Result := TGDOMDocument.Create(self,namespaceURI, qualifiedName, doctype) as IDOMDocument;
 end;
 
-// *************************************************************
-// TGDomeNode Implementation
-// *************************************************************
+{ TGDomeNode }
 
 function TGDOMNode.LibXml2NodePtr: xmlNodePtr;
 begin
 	Result := FGNode;
 end;
 
-// IDOMNode
 function TGDOMNode.get_nodeName: DOMString;
 begin
 	case FGNode.type_ of
@@ -853,15 +855,15 @@ const
 begin
 	DomAssert(newChild<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.insertBefore: cannot append null');
 	DomAssert(not IsReadOnly, NO_MODIFICATION_ALLOWED_ERR);
-	DomAssert((newChild.NodeType in CHILD_TYPES), HIERARCHY_REQUEST_ERR);
+	DomAssert((newChild.nodeType in CHILD_TYPES), HIERARCHY_REQUEST_ERR, 'TGDOMNode.insertBefore: newChild cannot be inserted, nodetype = '+IntToStr(get_nodeType));
 	if (FGNode.type_=XML_DOCUMENT_NODE) and (newChild.nodeType = ELEMENT_NODE) then begin
-		DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR);
+		DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR, 'TGDOMNode.insertBefore: document already has a documentElement');
 	end;
 
 	child := GetGNode(newChild);
 	DomAssert(not IsAncestorOrSelf(child), HIERARCHY_REQUEST_ERR);
-	DomAssert(child.doc=FGNode.doc, WRONG_DOCUMENT_ERR);
-	DomAssert(not IsReadOnlyNode(child.parent), NO_MODIFICATION_ALLOWED_ERR);
+	DomAssert(child.doc=FGNode.doc, WRONG_DOCUMENT_ERR, 'TGDOMNode.insertBefore: cannot insert a node from other document');
+	DomAssert(not IsReadOnlyNode(child.parent), NO_MODIFICATION_ALLOWED_ERR, 'TGDOMNode.insertBefore: modification not allowed here');
 
 	UnregisterFlyingNode(child);
 	if (refChild=nil) then begin
@@ -1664,11 +1666,6 @@ begin
 	Result := GetDOMObject(xmlDocGetRootElement(GDoc)) as IDomElement;
 end;
 
-procedure TGDOMDocument.set_documentElement(const IDOMElement: IDOMElement);
-begin
-	DomAssert(false, NOT_SUPPORTED_ERR);
-end;
-
 function TGDOMDocument.createElement(const tagName: DOMString): IDomElement;
 var
 	node: xmlNodePtr;
@@ -1772,9 +1769,9 @@ begin
 	if importedNode=nil then exit;
 	case integer(importedNode.nodeType) of
 		DOCUMENT_NODE,DOCUMENT_TYPE_NODE,NOTATION_NODE,ENTITY_NODE:
-			DomAssert(false, 21);
+			DomAssert(false, NOT_SUPPORTED_ERR);
 		ATTRIBUTE_NODE:
-			DomAssert(false, 21); //ToDo: implement this case
+			DomAssert(false, NOT_SUPPORTED_ERR); //ToDo: implement this case
 	else
 		if deep
 		then recurse:=1
