@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.22] debugXML.h
+// CVS-REV:gnome-xml/include/libxml/debugXML.h:1.22:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.1] c14n.h
+// CVS-REV:gnome-xml/include/libxml/c14n.h:1.1:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

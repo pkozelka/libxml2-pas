@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.27] xmlmemory.h
+// CVS-REV:gnome-xml/include/libxml/xmlmemory.h:1.27:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

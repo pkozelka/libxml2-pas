@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.54] xpath.h
+// CVS-REV:gnome-xml/include/libxml/xpath.h:1.54:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.5] libxslt/namespaces.h
+// CVS-REV:libxslt/libxslt/namespaces.h:1.5:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.65] libxslt/xsltInternals.h
+// CVS-REV:libxslt/libxslt/xsltInternals.h:1.65:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

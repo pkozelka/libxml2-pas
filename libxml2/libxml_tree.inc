@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.108] tree.h
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.108:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.77] parser.h
+// CVS-REV:gnome-xml/include/libxml/parser.h:1.77:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

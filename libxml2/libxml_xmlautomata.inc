@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.5] xmlautomata.h
+// CVS-REV:gnome-xml/include/libxml/xmlautomata.h:1.5:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

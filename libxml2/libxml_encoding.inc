@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.28] encoding.h
+// CVS-REV:gnome-xml/include/libxml/encoding.h:1.28:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.4] threads.h
+// CVS-REV:gnome-xml/include/libxml/threads.h:1.4:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

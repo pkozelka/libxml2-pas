@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.9] libxslt/templates.h
+// CVS-REV:libxslt/libxslt/templates.h:1.9:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

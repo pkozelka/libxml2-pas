@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.14] uri.h
+// CVS-REV:gnome-xml/include/libxml/uri.h:1.14:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

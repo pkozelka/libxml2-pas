@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.35] xmlIO.h
+// CVS-REV:gnome-xml/include/libxml/xmlIO.h:1.35:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

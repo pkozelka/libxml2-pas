@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.6] libxslt/imports.h
+// CVS-REV:libxslt/libxslt/imports.h:1.6:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.3] xmlschemas.h
+// CVS-REV:gnome-xml/include/libxml/xmlschemas.h:1.3:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.16] libxslt/variables.h
+// CVS-REV:libxslt/libxslt/variables.h:1.16:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

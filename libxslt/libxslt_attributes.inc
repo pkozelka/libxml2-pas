@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.4] libxslt/attributes.h
+// CVS-REV:libxslt/libxslt/attributes.h:1.4:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

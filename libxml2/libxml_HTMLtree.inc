@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.21] HTMLtree.h
+// CVS-REV:gnome-xml/include/libxml/HTMLtree.h:1.21:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.1] xmlregexp.h
+// CVS-REV:gnome-xml/include/libxml/xmlregexp.h:1.1:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

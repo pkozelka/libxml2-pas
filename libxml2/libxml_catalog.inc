@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.19] catalog.h
+// CVS-REV:gnome-xml/include/libxml/catalog.h:1.19:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

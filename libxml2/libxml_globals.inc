@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.7] globals.h
+// CVS-REV:gnome-xml/include/libxml/globals.h:1.7:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

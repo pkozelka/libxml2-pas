@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.48] parserInternals.h
+// CVS-REV:gnome-xml/include/libxml/parserInternals.h:1.48:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.28] libxslt/utils.h
+// CVS-REV:libxslt/libxslt/xsltutils.h:1.28:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.16] SAX.h
+// CVS-REV:gnome-xml/include/libxml/SAX.h:1.16:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.35] valid.h
+// CVS-REV:gnome-xml/include/libxml/valid.h:1.35:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

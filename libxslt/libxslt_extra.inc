@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.11] libxslt/extra.h
+// CVS-REV:libxslt/libxslt/extra.h:1.11:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

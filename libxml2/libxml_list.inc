@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.6] list.h
+// CVS-REV:gnome-xml/include/libxml/list.h:1.6:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

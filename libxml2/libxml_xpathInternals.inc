@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.30] xpathInternals.h
+// CVS-REV:gnome-xml/include/libxml/xpathInternals.h:1.30:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

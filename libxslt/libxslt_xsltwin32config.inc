@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.22] libxslt/xsltwin32config.h
+// CVS-REV:libxslt/libxslt/xsltwin32config.h:1.22:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

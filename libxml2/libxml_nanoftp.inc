@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.10] nanoftp.h
+// CVS-REV:gnome-xml/include/libxml/nanoftp.h:1.10:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

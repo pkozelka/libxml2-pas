@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.34] xmlwin32version.h
+// CVS-REV:gnome-xml/include/libxml/xmlwin32version.h:1.34:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.35] entities.h
+// CVS-REV:gnome-xml/include/libxml/entities.h:1.35:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.12] nanohttp.h
+// CVS-REV:gnome-xml/include/libxml/nanohttp.h:1.12:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
