@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.70 2002-01-20 21:26:47 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.71 2002-01-20 21:32:52 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -1129,9 +1129,22 @@ function TGDOMNode.selectNode(const nodePath: WideString): IDOMNode;
 // todo: raise  exceptions
 //       a) if invalid nodePath expression
 //       b) if result type <> nodelist
-//       c) perhaps if nodelist.length > 1 ???
+var
+	ctxt: xmlXPathContextPtr;
+	rv: xmlXPathObjectPtr;
+	node: xmlNodePtr;
 begin
-  Result := selectNodes(nodePath)[0];
+	ctxt := xmlXPathNewContext(GNode.doc);
+	rv := xmlXPathEval(PChar(UTF8Encode(nodePath)), ctxt);
+	Result := nil;
+	if (rv=nil) then exit;
+	if (rv.type_ = XPATH_NODESET) then begin
+		if (rv.nodesetval.nodeNr > 0) then begin
+			node := rv.nodesetval.nodeTab^;
+			Result := GetDomObject(node) as IDomNode;
+		end;
+	end;
+	xmlXPathFreeObject(rv);
 end;
 
 function TGDOMNode.selectNodes(const nodePath: WideString): IDOMNodeList;
