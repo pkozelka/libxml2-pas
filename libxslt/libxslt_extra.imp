@@ -1,0 +1,40 @@
+{
+    ------------------------------------------------------------------------------
+    Translated into pascal with help of h2pas utility from the FreePascal project.
+    Copyright for the header translation:
+        4commerce technologies AG
+        Kamerbalken 10-14
+        22525 Hamburg, Germany
+    Published under a double license:
+    a) the GNU Library General Public License: 
+       http://www.gnu.org/copyleft/lgpl.html
+    b) the Mozilla Public License:
+       http://www.mozilla.org/MPL/MPL-1.1.html
+    Please send corrections to: ufechner@4commerce.de
+    ------------------------------------------------------------------------------
+}
+
+  function XSLT_LIBXSLT_NAMESPACE : PxmlChar;
+      begin
+         XSLT_LIBXSLT_NAMESPACE:=PxmlChar('http://xmlsoft.org/XSLT/namespace');
+      end;
+
+    function XSLT_SAXON_NAMESPACE : PxmlChar;
+      begin
+         XSLT_SAXON_NAMESPACE:=PxmlChar('http://icl.com/saxon');
+      end;
+
+    function XSLT_XT_NAMESPACE : PxmlChar;
+      begin
+         XSLT_XT_NAMESPACE:=PxmlChar('http://www.jclark.com/xt');
+      end;
+
+    function XSLT_XALAN_NAMESPACE : PxmlChar;
+      begin
+         XSLT_XALAN_NAMESPACE:=PxmlChar('org.apache.xalan.xslt.extensions.Redirect');
+      end;
+
+    function XSLT_NORM_SAXON_NAMESPACE : PxmlChar;
+      begin
+         XSLT_NORM_SAXON_NAMESPACE:=PxmlChar('http://nwalsh.com/xslt/ext/com.nwalsh.saxon.CVS');
+      end;
