@@ -382,12 +382,12 @@ type
     function get_xml: DOMString; 
     function asyncLoadState: Integer; 
     function load(source: OleVariant): WordBool; 
-    function loadFromStream(const stream: TStream): WordBool; 
-    function loadxml(const Value: DOMString): WordBool; 
-    procedure save(destination: OleVariant); 
-    procedure saveToStream(const stream: TStream); 
+    function loadFromStream(const stream: TStream): WordBool;
+    function loadxml(const Value: DOMString): WordBool;
+    procedure save(destination: OleVariant);
+    procedure saveToStream(const stream: TStream);
     procedure set_OnAsyncLoad(const Sender: TObject;
-      EventHandler: TAsyncEventHandler); 
+      EventHandler: TAsyncEventHandler);
   public
     constructor Create(
          GDOMImpl:IDOMImplementation;
@@ -1629,14 +1629,12 @@ end;
 
 function TGDOMDocument.createDocumentFragment: IDOMDocumentFragment; 
 var
-  exc:GdomeException;
-  //ADocumentFragment: PGdomeDocumentFragment;
+  node: xmlNodePtr;
 begin
-  {ADocumentFragment:=gdome_doc_createDocumentFragment(FPGdomeDoc,@exc);
-  CheckError(exc);
-  if ADocumentFragment<>nil
-    then result:=TGDOMDocumentFragment.Create(xmlNodePtr(ADocumentFragment),self)
-    else result:=nil;}
+  node := xmlNewDocFragment(FPGdomeDoc);
+  if node<>nil
+    then result:=TGDOMDocumentFragment.Create(node,self)
+    else result:=nil;
 end;
 
 function TGDOMDocument.createTextNode(const data: DOMString): IDOMText; 
@@ -1682,20 +1680,17 @@ end;
 function TGDOMDocument.createProcessingInstruction(const target,
   data: DOMString): IDOMProcessingInstruction;
 var
-  exc:GdomeException;
   name1,name2: TGdomString;
   AProcessingInstruction: PGdomeProcessingInstruction;
 begin
-  {name1:=TGdomString.create(target);
+  name1:=TGdomString.create(target);
   name2:=TGdomString.create(data);
-  AProcessingInstruction:=gdome_doc_createProcessingInstruction(FPGdomeDoc,
-    name1.GetPString, name2.GetPString,@exc);
-  CheckError(exc);
+  AProcessingInstruction:=xmlNewPI(name1.CString, name2.CString);
   name1.free;
   name2.free;
   if AProcessingInstruction <>nil
     then result:=TGDOMProcessingInstruction.Create(xmlNodePtr(AProcessingInstruction),self)
-    else result:=nil;}
+    else result:=nil;
 end;
 
 function TGDOMDocument.createAttribute(const name: DOMString): IDOMAttr; 
@@ -2047,7 +2042,6 @@ function TGDOMCharacterData.substringData(offset,
   count: Integer): DOMString;
 var
   temp:PGdomeDomString;
-  exc: GdomeException;
 begin
   {temp:=gdome_cd_substringData(GCharacterData,offset,count,@exc);
   CheckError(exc);
@@ -2061,7 +2055,6 @@ begin
 end;
 
 destructor TGDOMCharacterData.destroy;
-var exc: GdomeException;
 begin
   inherited destroy;
 end;
@@ -2070,32 +2063,29 @@ end;
 
 function TGDOMText.splitText(offset: Integer): IDOMText;
 var
-  exc: GdomeException;
-  //temp:PGdomeText;
+  s: WideString;
 begin
-  {temp:=gdome_t_splitText(PGdomeText(GCharacterData),offset,@exc);
-  CheckError(exc);
-  result:=MakeNode(xmlNodePtr(temp),FOwnerDocument) as IDOMText;}
+  s := Get_data;
+  s:= Copy(s, 1, offset);
+  Set_data(s);
+  result:= self;
 end;
 
 { TMSDOMEntity }
 
 function TGDOMEntity.get_notationName: DOMString;
-var exc: GdomeException;
 begin
   //result:=GdomeDOMStringToString(gdome_ent_notationName(GEntity,@exc));
   //CheckError(exc);
 end;
 
 function TGDOMEntity.get_publicId: DOMString;
-var exc: GdomeException;
 begin
   //result:=GdomeDOMStringToString(gdome_ent_publicID(GEntity,@exc));
   //CheckError(exc);
 end;
 
 function TGDOMEntity.get_systemId: DOMString;
-var exc: GdomeException;
 begin
   //result:=GdomeDOMStringToString(gdome_ent_systemID(GEntity,@exc));
 end;
@@ -2108,33 +2098,26 @@ end;
 { TGDOMProcessingInstruction }
 
 function TGDOMProcessingInstruction.get_data: DOMString;
-var exc: GdomeException;
 begin
-  //result:=GdomeDOMStringToString(gdome_pi_data(GProcessingInstruction,@exc));
-  //CheckError(exc);
+  result:=inherited get_nodeValue;
 end;
 
 function TGDOMProcessingInstruction.get_target: DOMString;
 var exc: GdomeException;
 begin
-  //result:=GdomeDOMStringToString(gdome_pi_target(GProcessingInstruction,@exc));
-  //CheckError(exc);
+  result:=inherited get_nodeName;
 end;
 
 function TGDOMProcessingInstruction.GetGProcessingInstruction: PGdomeProcessingInstruction;
 begin
-  //result:=PGdomeProcessingInstruction(GNode);
+  result:=PGdomeProcessingInstruction(GNode);
 end;
 
 procedure TGDOMProcessingInstruction.set_data(const value: DOMString);
 var
-  exc:GdomeException;
   value1: TGdomString;
 begin
-  {value1:=TGdomString.create(value);
-  gdome_pi_set_data(GProcessingInstruction,value1.GetPString,@exc);
-  CheckError(exc);
-  value1.free;}
+  inherited set_nodeValue(value);
 end;
 
 { TGDOMDocumentType }

@@ -21,9 +21,9 @@ document                    createElement          1             X
 document                    createElementNS        1             X                                                                
 document                    createCDATASection     2             X                                                                
 document                    createComment          2             X                                                                
-document                    createDocumentFragment 3                                                                             
+document                    createDocumentFragment 3             X                                                                
 document                    createEntityReference  3                                                                             
-document                    createProcessingInstr. 3                                                                             
+document                    createProcessingInstr. 3             X                                                                
 document                    createTextNode         1             X                                                                
 document                    documentElement        1             X                                                                
 document                    getElementByID         2                    jk: not able to test now                              
@@ -102,14 +102,15 @@ nodelist                    item                   1             X
 nodelist                    length                 1             X                                                                
 notation                    publicId               3                   
 notation                    systemId               3                   
-processingInstruction       data                   3                                                                             
-processingInstruction       target                 3                                                                             
+processingInstruction       data                   3             X                                                                
+processingInstruction       target                 3             X                                                                
+text                        splittext              3             X
 
 Summary: 
 
-99 methods at all    = 100,0 %
+100 methods at all    = 100,0 %
 
 43 high priority methods
 all done
 
-84 methods done totally       
+89 methods done totally       
