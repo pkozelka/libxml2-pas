@@ -555,10 +555,6 @@ procedure xmlNodeSetBase(cur:xmlNodePtr; uri:PxmlChar);cdecl;external LIBXML2_SO
 	Removing content.
 }
 function  xmlRemoveProp(attr:xmlAttrPtr):longint;cdecl;external LIBXML2_SO;
-function  xmlRemoveNode(node:xmlNodePtr):longint;cdecl;external LIBXML2_SO;
-
-{ TODO  }
-
 function  xmlUnsetProp(node:xmlNodePtr; name:PxmlChar):longint;cdecl;external LIBXML2_SO;
 function  xmlUnsetNsProp(node:xmlNodePtr; ns:xmlNsPtr; name:PxmlChar):longint;cdecl;external LIBXML2_SO;
 
