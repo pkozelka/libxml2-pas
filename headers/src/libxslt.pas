@@ -48,6 +48,8 @@ type
 {$I libxslt_security.inc}
 
 {TODO: $I  libxslt_xsltconfig.inc}
+{TODO: $I  libxslt_trio.inc}
+{TODO: $I  libxslt_triodef.inc}
 
 {$I libexslt_exslt.inc}
 {$I libexslt_exsltconfig.inc}

@@ -91,6 +91,8 @@ type
 {$I libxml2_relaxng.inc}
 {$I libxml2_xmlreader.inc}
 
+{TODO: $I  libxslt_dict.inc}
+
 // functions existing only in some compilers
 
 {$IFNDEF HAS_STRNEXTCHAR_SUPPORT}
