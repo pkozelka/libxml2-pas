@@ -1,4 +1,4 @@
-unit Dom2;
+unit xdom2;
 (*
  * Interface specifications for Dom level 2.
  *
