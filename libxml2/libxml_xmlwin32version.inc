@@ -43,7 +43,7 @@ const
    the version number string, 1.2.3 value is "1002003"
   }
    LIBXML_VERSION_STRING = '20412';
-{ 
+{
    LIBXML_TEST_VERSION:
   
    Macro to check that the libxml version in use is compatible with
@@ -75,7 +75,7 @@ const
 {$if 1}
 {$define LIBXML_FTP_ENABLED}
 {$endif}
-    { 
+		{
        LIBXML_HTTP_ENABLED:
       
        Whether the HTTP support is configured in
@@ -107,7 +107,7 @@ const
 {$if 1}
 {$define LIBXML_DOCB_ENABLED}
 {$endif}
-    { 
+		{
        LIBXML_XPATH_ENABLED:
       
        Whether XPath is configured in
@@ -139,7 +139,7 @@ const
 {$if 0}
 {$define LIBXML_ICONV_ENABLED}
 {$endif}
-    { 
+		{
        LIBXML_DEBUG_ENABLED:
       
        Whether Debugging module is configured in
@@ -171,14 +171,6 @@ const
        code which links against libxml statically. 
       }
 {$ifndef LIBXML_DLL_IMPORT}
-{$if defined(_MSC_VER) && !defined(IN_LIBXML) && !defined(LIBXML_STATIC)}
-    { was #define dname def_expr }
-    function LIBXML_DLL_IMPORT : longint;
-        { return type might be wrong }
-
-{$else}
-{$define LIBXML_DLL_IMPORT}
-{$endif}
 {$endif}
     { 
        ATTRIBUTE_UNUSED:
