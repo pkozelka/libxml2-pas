@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.57 2002-01-16 21:02:57 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.58 2002-01-16 21:15:09 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -317,7 +317,7 @@ type
 		FpreserveWhiteSpace: boolean; //difficult to support
 		FresolveExternals: boolean;   //difficult to support
 		Fvalidate: boolean;           //check if default is ok
-		FFlyingNodes: TList;          // list of nodes not attached to the document tree
+		FFlyingNodes: TList;          // on-demand created list of nodes not attached to the document tree (=they have no parent)
 	protected //IDomNode
 		function  get_ownerDocument: IDOMDocument; override;
 	protected //IDomDocument
@@ -356,14 +356,14 @@ type
 		procedure save(destination: OleVariant);
 		procedure saveToStream(const stream: TStream);
 		procedure set_OnAsyncLoad(const Sender: TObject; EventHandler: TAsyncEventHandler);
-		//
+	protected //
 		function  requestDocPtr: xmlDocPtr;
 		function  GetGDoc: xmlDocPtr;
 		procedure SetGDoc(aNewDoc: xmlDocPtr);
-
+		function  GetFlyingNodes: TList;
 		property  GDoc: xmlDocPtr read GetGDoc write SetGDoc;
-	protected
 		property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
+		property  FlyingNodes: TList read GetFlyingNodes;
 	public
 		destructor Destroy; override;
 	end;
@@ -566,8 +566,8 @@ begin
 	else
 		GetDOMObject(aNode.doc);  //temporary - ensure that the document's wrapper exists (though it should be almost unneccessary)
 		doc := aNode.doc._private; //get the class internal interface
-		if doc.FFlyingNodes.IndexOf(aNode)<0 then begin
-			doc.FFlyingNodes.Add(aNode);
+		if doc.FlyingNodes.IndexOf(aNode)<0 then begin
+			doc.FlyingNodes.Add(aNode);
 		end;
 	end;
 end;
@@ -584,9 +584,9 @@ var
 begin
 	GetDOMObject(aNode.doc);  //temporary - ensure that the document's wrapper exists (though it should be almost unneccessary)
 	doc := aNode.doc._private; //get the class internal interface
-	idx := doc.FFlyingNodes.IndexOf(aNode);
+	idx := doc.FlyingNodes.IndexOf(aNode);
 	if (idx>0) then begin
-		doc.FFlyingNodes.Delete(idx);
+		doc.FlyingNodes.Delete(idx);
 	end;
 end;
 
@@ -986,7 +986,6 @@ begin
 		end;
 	end else begin
 		// this is a document node
-		TGDOMDocument(self).FFlyingNodes := TList.Create; //DIRTY - beutify this (with virtual constructor)
 		Inc(doccount);
 		_AddRef; //todo: replace with better solution
 		// if this is not the document itself, pretend having a reference to the owner document.
@@ -1304,6 +1303,15 @@ end;
 function TGDOMAttr.get_value: DOMString;
 begin
 	Result := UTF8Decode(xmlNodeListGetString(FGNode.doc, FGNode.children, 1));
+end;
+
+(**
+ * This function implements null return value for all the traversal functions
+ * where null is required by DOM spec. in Attr interface
+ *)
+function TGDOMAttr.noDomNode: IDOMNode;
+begin
+	Result := nil;
 end;
 
 procedure TGDOMAttr.set_value(const attributeValue: DOMString);
@@ -1937,13 +1945,102 @@ begin
 	DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
-(**
- * This function implements null return value for all the traversal functions
- * where null is required by DOM spec. in Attr interface 
- *)
-function TGDOMAttr.noDomNode: IDOMNode;
+function TGDOMDocument.GetGDoc: xmlDocPtr;
 begin
-	Result := nil;
+	Result := xmlDocPtr(FGNode);
+end;
+
+procedure TGDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
+	procedure _DestroyFlyingNodes;
+	var
+		i: integer;
+		node: xmlNodePtr;
+		p: pointer;
+	begin
+		if FFlyingNodes=nil then exit;
+		for i:=FFlyingNodes.Count-1 downto 0 do begin
+			p := FFlyingNodes[i];
+			node := p;
+			case node.type_ of
+			XML_HTML_DOCUMENT_NODE,
+			XML_DOCB_DOCUMENT_NODE,
+			XML_DOCUMENT_NODE:
+				DomAssert(false, -1, 'This node may never be flying');
+			XML_ATTRIBUTE_NODE:
+				xmlFreeProp(p);
+			XML_DTD_NODE:
+				xmlFreeDtd(p);
+			else
+				xmlFreeNode(p);
+			end;
+		end;
+	end;
+
+	procedure _ReallocateFlyingNodes;
+	var
+		i: integer;
+		node: xmlNodePtr;
+	begin
+		if FFlyingNodes=nil then exit;
+		for i:=FFlyingNodes.Count-1 downto 0 do begin
+			node := FFlyingNodes[i];
+			case node.type_ of
+			XML_HTML_DOCUMENT_NODE,
+			XML_DOCB_DOCUMENT_NODE,
+			XML_DOCUMENT_NODE:
+				DomAssert(false, -1, 'This node may never be flying');
+			else
+				node.doc := aNewDoc;
+			end;
+		end;
+	end;
+
+var
+	old: xmlDocPtr;
+begin
+	old := GetGDoc;
+	if (old<>nil) then begin
+		old._private := nil;
+		xmlFreeDoc(old);
+		FGNode := nil;
+	end;
+	if (aNewDoc<>nil) then begin
+		_ReallocateFlyingNodes;
+		aNewDoc._private := self;
+	end else begin
+		_DestroyFlyingNodes;
+	end;
+	FGNode := xmlNodePtr(aNewDoc);
+end;
+
+(**
+ * On-demand creation of the underlying document.
+ *)
+function TGDOMDocument.requestDocPtr: xmlDocPtr;
+var
+	doc: xmlDocPtr;
+begin
+	Result := GetGDoc;
+	if Result<>nil then exit; //the document is already created so we have to use it
+	// otherwise, we create the document, using all the parameters specified so far
+
+	//todo: distinguish empty doc, parsing, and push-parsing cases (for async)
+	doc := xmlNewDoc(XML_DEFAULT_VERSION);
+
+	SetGDoc(doc);
+end;
+
+function TGDOMDocument.get_ownerDocument: IDOMDocument;
+begin
+	Result := nil; // required by DOM spec.
+end;
+
+function TGDOMDocument.GetFlyingNodes: TList;
+begin
+	if FFlyingNodes=nil then begin
+		FFlyingNodes := TList.Create;
+	end;
+	Result := FFlyingNodes;
 end;
 
 { TGDOMCharacterData }
@@ -2192,9 +2289,8 @@ begin
 	xmlXPathFreeContext(ctxt);
 end;
 
-(*
- *  TXDomDocumentBuilderFactory
-*)
+{ TXDomDocumentBuilderFactory }
+
 constructor TGDOMDocumentBuilderFactory.Create(AFreeThreading : Boolean);
 begin
 	FFreeThreading := AFreeThreading;
@@ -2273,94 +2369,6 @@ begin
 		node:=node.parent;
 	end;
 	result:=false;
-end;
-
-function TGDOMDocument.GetGDoc: xmlDocPtr;
-begin
-	Result := xmlDocPtr(FGNode);
-end;
-
-procedure TGDOMDocument.SetGDoc(aNewDoc: xmlDocPtr);
-	procedure _DestroyFlyingNodes;
-	var
-		i: integer;
-		node: xmlNodePtr;
-		p: pointer;
-	begin
-		for i:=FFlyingNodes.Count-1 downto 0 do begin
-			p := FFlyingNodes[i];
-			node := p;
-			case node.type_ of
-			XML_HTML_DOCUMENT_NODE,
-			XML_DOCB_DOCUMENT_NODE,
-			XML_DOCUMENT_NODE:
-				DomAssert(false, -1, 'This node may never be flying');
-			XML_ATTRIBUTE_NODE:
-				xmlFreeProp(p);
-			XML_DTD_NODE:
-				xmlFreeDtd(p);
-			else
-				xmlFreeNode(p);
-			end;
-		end;
-	end;
-
-	procedure _ReallocateFlyingNodes;
-	var
-		i: integer;
-		node: xmlNodePtr;
-	begin
-		for i:=FFlyingNodes.Count-1 downto 0 do begin
-			node := FFlyingNodes[i];
-			case node.type_ of
-			XML_HTML_DOCUMENT_NODE,
-			XML_DOCB_DOCUMENT_NODE,
-			XML_DOCUMENT_NODE:
-				DomAssert(false, -1, 'This node may never be flying');
-			else
-				node.doc := aNewDoc;
-			end;
-		end;
-	end;
-
-var
-	old: xmlDocPtr;
-begin
-	old := GetGDoc;
-	if (old<>nil) then begin
-		old._private := nil;
-		xmlFreeDoc(old);
-		FGNode := nil;
-	end;
-	if (aNewDoc<>nil) then begin
-		_ReallocateFlyingNodes;
-		aNewDoc._private := self;
-	end else begin
-		_DestroyFlyingNodes;
-	end;
-	FGNode := xmlNodePtr(aNewDoc);
-end;
-
-(**
- * On-demand creation of the underlying document.
- *)
-function TGDOMDocument.requestDocPtr: xmlDocPtr;
-var
-	doc: xmlDocPtr;
-begin
-	Result := GetGDoc;
-	if Result<>nil then exit; //the document is already created so we have to use it
-	// otherwise, we create the document, using all the parameters specified so far
-
-	//todo: distinguish empty doc, parsing, and push-parsing cases (for async)
-	doc := xmlNewDoc(XML_DEFAULT_VERSION);
-
-	SetGDoc(doc);
-end;
-
-function TGDOMDocument.get_ownerDocument: IDOMDocument;
-begin
-	Result := nil; // required by DOM spec.
 end;
 
 initialization
