@@ -1,0 +1,32 @@
+TODO:
+-----
+
+GENERAL
+	- create test functions and a mechanism to invoke them
+	-
+
+KYLIX
+	- xmlParseFile is crashing when marked as cdecl; marked as register it does not crash, but always returns NIL - but aparently it must be cdecl.
+	- the same applies for many other functions
+	- IDE refuses to load the library; therefore any attempt to debug the code fails (with no message!!)
+
+DELPHI
+
+FREEPASCAL
+
+
+
+
+DONE:
+-----
+
+GENERAL
+
+
+KYLIX
+	- xmlNewNode works
+
+DELPHI
+
+FREEPASCAL
+
