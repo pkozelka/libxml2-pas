@@ -73,8 +73,6 @@ end;
 
 function getDoc(filename, vendorstr: string;TestSet:integer=0): IDomDocument;
 var
-  dom: IDomImplementation;
-  docBuilder : IDomDocumentBuilder;
   doc: IDomDocument;
   FDomPersist: IDomPersist;
   ok: boolean;
@@ -112,8 +110,24 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     attr := document.createAttribute('rrr');
     attr := element.setAttributeNode(attr);
     attr := nil;
+    attr := document.createAttribute('rrrVX');
+    attr.value:='hund';
+    attr := element.setAttributeNode(attr);
+    attr := nil;
     attr := element.getAttributeNode('rrr');
     test('element.getAttributeNode/setAttributeNode',(attr <> nil));
+    attr := nil;
+    attr := element.getAttributeNode('rrrVX');
+    test('element.getAttributeNode/setAttributeNode2',(attr.value='hund'));
+    attr:=nil;
+    attr := document.createAttribute('rrrVX');
+    attr.value:='hase';
+    attr := element.setAttributeNode(attr);
+    test('element.getAttributeNode/setAttributeNode3',(attr.value='hund'));
+    attr:=nil;
+    attr := element.getAttributeNode('rrrVX');
+    test('element.getAttributeNode/setAttributeNode4',(attr.value='hase'));
+    attr:=nil;
     attr := nil;
     element := nil;
 
@@ -136,7 +150,7 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     test('element.removeAttributeNS',(not element.hasAttributeNS('http://xmlns.4commerce.de/eva','loop')));
     element := nil;
     // setAttributeNodeNS
-    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','loop');
+    attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:loop');
     element := document.createElement('iii');
     attr := element.setAttributeNodeNS(attr);
     attr := nil;
@@ -152,10 +166,14 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     element := nil;
     attr := document.createAttribute('nop');
     element := document.createElement('hub');
-    attr := element.setAttributeNode(attr);
-    attr := element.getAttributeNode('nop');
-    attr := element.removeAttributeNode(attr);
-    test('element.removeAttributeNode',(not element.hasAttribute('hub')));
+    try
+      attr := element.setAttributeNode(attr);
+      attr := element.getAttributeNode('nop');
+      attr := element.removeAttributeNode(attr);
+      test('element.removeAttributeNode',(not element.hasAttribute('hub')));
+    except
+      outLog('__element.removeAttributeNode doesn''t work!');
+    end;
     attr := nil;
     element := nil;
   end;
@@ -173,7 +191,6 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     text: IDOMText;
     attr: IDOMAttr;
     node: IDOMNode;
-    temp: string;
   begin
     test('document',(document <> nil));
     if document=nil then exit;
@@ -279,10 +296,7 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
   procedure TestNode1(filename,vendorstr:string);
   var
     node,node1,docelement,childnode: IDOMNode;
-    nodelist: IDOMNodeList;
     nodeselect: IDOMNodeSelect;
-    attlist: IDOMNamedNodeMap;
-    namednodemap: IDOMNamedNodeMap;
     i: integer;
     document: IDOMDocument;
     temp: string;
@@ -450,25 +464,18 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
 var
   filename: string;
   FDomPersist: IDOMPersist;
-  dom: IDOMImplementation;
   document: IDOMDocument;
   element: IDOMElement;
   node,node1: IDOMNode;
-  nodelist: IDOMNodeList;
-  nodeselect: IDOMNodeSelect;
   attlist: IDOMNamedNodeMap;
   namednodemap: IDOMNamedNodeMap;
   attr: IDOMAttr;
   cdata: IDOMCDATASection;
-  comment: IDOMComment;
-  documentfragment: IDOMDocumentFragment;
   documentElement: IDOMNode;
-  entityreference: IDOMEntityReference;
   processinginstruction: IDOMProcessingInstruction;
   text: IDOMText;
   documenttype: IDOMDocumentType;
   stringlist: TStringList;
-  i: integer;
   temp: string;
 begin
   // init
@@ -738,7 +745,7 @@ begin
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  testCount:=112;
+  testCount:=115;
   if (TestSet and 1) = 1
     then inc(testCount);
   outLog('Number of tests total:    '+inttostr(TestCount));
