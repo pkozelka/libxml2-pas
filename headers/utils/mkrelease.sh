@@ -32,13 +32,16 @@ function copySourceFilesToDist()
 	# copy files to be released there
 	mkdir $DIST/src
 	cp $SRC/*.inc $SRC/*.pas $DIST/src
-	local pkgName="libxml2_pas_$LIBXML_MAJOR_VERSION"_"$LIBXML_MINOR_VERSION"_"$LIBXML_MICRO_VERSION"
-sed -f - $SRC/libxml2_pas.dpk >$DIST/src/$pkgName.dpk <<EOF
-s/package libxml2_pas;/package $pkgName;/
-EOF
 	cp $HEADERS_DIR/*.txt $DIST
 	cp $HEADERS_DIR/../common/license/COPYING* $DIST
 
+	local pkgVer="$LIBXML_MAJOR_VERSION"_"$LIBXML_MINOR_VERSION"_"$LIBXML_MICRO_VERSION"
+	# update LIBSUFIX and remove resource include directive
+sed -f - $SRC/libxml2_pas.dpk >$DIST/src/libxml2_pas.dpk <<EOF
+s/devel/_$pkgVer/
+s/\$R \*.res//
+EOF
+	# prepare JEDI info file
 sed -f - INFO.txt.template > $DIST/INFO.txt <<EOF
 s:@DATE@:`date +'%d %b %Y'`:g
 s:@LIBXML_VERSION@:$LIBXML_VER:g
