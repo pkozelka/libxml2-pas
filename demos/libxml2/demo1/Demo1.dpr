@@ -13,7 +13,7 @@ kamerbalken 10-14
 
 uses
   SysUtils,
-  TestXPATH,
+  TestXPATH in 'TestXPATH.pas',
   conapp in 'conapp.pas';
 
 begin
