@@ -295,7 +295,7 @@ begin
   document := fDomImplementation.createDocument('', '', nil);
   fragment := document.createDocumentFragment;
   check(fragment.childNodes.length = 0, 'number of childs <> 0');
-  check(fragment.nodeName = '#document-fragment', 'nodeName <> #comment');
+  check(fragment.nodeName = '#document-fragment', 'nodeName <> #document-fragment');
   check(fragment.nodeValue = '', 'nodevalue not correct');
   check(fragment.nodeType = DOCUMENT_FRAGMENT_NODE);
 end;
@@ -311,7 +311,7 @@ var
 begin
   document := fDomImplementation.createDocument('', '', nil);
   node := document.createElement(ELEMENT_NAME);
-  check(node.nodeName = ELEMENT_NAME, 'nodeName <> #comment');
+  check(node.nodeName = ELEMENT_NAME, 'nodeName <> "'+ELEMENT_NAME+'"');
   check(node.nodeValue = '', 'nodevalue not correct');
   check(node.nodeType = ELEMENT_NODE);
   check(node.localName = '', 'localname <> ''''');
