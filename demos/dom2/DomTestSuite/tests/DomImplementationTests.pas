@@ -11,7 +11,7 @@ interface
 
 uses
   TestFrameWork,
-  xDom2,
+  idom2,
   DomSetup;
 
 type
