@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/uri.h:1.14:
+// CVS-REV:gnome-xml/include/libxml/uri.h:1.15:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -53,4 +53,4 @@ function  xmlURIUnescapeString(str: PChar; len: Longint; target: PChar): PChar; 
 function  xmlNormalizeURIPath(path: PChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlURIEscape(str: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
 procedure xmlFreeURI(uri: xmlURIPtr); cdecl; external LIBXML2_SO;
-
+function xmlCanonicPath(path: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO;

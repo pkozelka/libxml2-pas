@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xinclude.h:1.4:
+// CVS-REV:gnome-xml/include/libxml/xinclude.h:1.5:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -17,4 +17,4 @@
  * daniel@veillard.com
  *)
 function  xmlXIncludeProcess(doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
-
+function  xmlXIncludeProcessTree(tree: xmlNodePtr): Longint; cdecl; external LIBXML2_SO; 

@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/extensions.h:1.13:
+// CVS-REV:libxslt/libxslt/extensions.h:1.14:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -117,6 +117,12 @@ procedure xsltFreeCtxtExts(ctxt: xsltTransformContextPtr); cdecl; external LIBXS
 procedure xsltFreeExts(style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
 function  xsltPreComputeExtModuleElement(style: xsltStylesheetPtr; inst: xmlNodePtr): xsltElemPreCompPtr; cdecl; external LIBXSLT_SO;
 
+(*
+ * Extension Infos access.
+ * Used by exslt initialisation
+ *)
+function xsltGetExtInfo(style: xsltStylesheetPtr; URI: PxmlChar): xmlHashTablePtr; cdecl; external LIBXSLT_SO;
+ 
 (**
  * Test module http: //xmlsoft.org/XSLT/
  *)

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/encoding.h:1.31:
+// CVS-REV:gnome-xml/include/libxml/encoding.h:1.32:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -172,4 +172,5 @@ function  xmlUTF8Strpos(utf: PxmlChar; pos: Longint): PxmlChar; cdecl; external 
 function  xmlUTF8Strloc(utf: PxmlChar; utfchar: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlUTF8Strsub(utf: PxmlChar; start: Longint; len: Longint): PxmlChar; cdecl; external LIBXML2_SO;
 function  xmlUTF8Strlen(utf: PxmlChar): Longint; cdecl; external LIBXML2_SO;
-
+function  xmlUTF8Size(utf: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlUTF8Charcmp(utf1: PxmlChar; utf2: PxmlChar): Longint; cdecl; external LIBXML2_SO; 

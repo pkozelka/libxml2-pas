@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlschemas.h:1.5:
+// CVS-REV:gnome-xml/include/libxml/xmlschemas.h:1.7:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -37,6 +37,8 @@ type
     XML_SCHEMAS_ERR_NOTSIMPLE,
     XML_SCHEMAS_ERR_ATTRUNKNOWN,
     XML_SCHEMAS_ERR_ATTRINVALID,
+    XML_SCHEMAS_ERR_VALUE,
+    XML_SCHEMAS_ERR_FACET,
     XML_SCHEMAS_ERR_,
     XML_SCHEMAS_ERR_XXX
   );

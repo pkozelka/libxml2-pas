@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xpath.h:1.54:
+// CVS-REV:gnome-xml/include/libxml/xpath.h:1.55:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -360,6 +360,7 @@ procedure xmlXPathFreeContext(ctxt: xmlXPathContextPtr); cdecl; external LIBXML2
 (**
  * Evaluation functions.
  *)
+function  xmlXPathOrderDocElems(doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlXPathEval(str: PxmlChar; ctxt: xmlXPathContextPtr): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
 function  xmlXPathEvalExpression(str: PxmlChar; ctxt: xmlXPathContextPtr): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
 function  xmlXPathEvalPredicate(ctxt: xmlXPathContextPtr; res: xmlXPathObjectPtr): Longint; cdecl; external LIBXML2_SO;

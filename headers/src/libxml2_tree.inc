@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.119:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.125:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -40,9 +40,9 @@ const
   (**
    * BASE_BUFFER_SIZE:
    *
-   * default buffer size 4000.
+   * default buffer size 4096.
    *)
-  BASE_BUFFER_SIZE = 4000;
+  BASE_BUFFER_SIZE = 4096;
   (**
    * XML_XML_NAMESPACE:
    *
@@ -458,6 +458,17 @@ LIBXML_DLL_IMPORT extern int xmlDefaultBufferSize; (* default buffer size *)
 {$ENDIF}
 
 (*
+ * Some helper functions
+ *)
+function  xmlValidateNCName(value: PxmlChar; space: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidateQName(value: PxmlChar; space: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidateName(value: PxmlChar; space: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidateNMToken(value: PxmlChar; space: Longint): Longint; cdecl; external LIBXML2_SO;
+function  xmlBuildQName(ncname: PxmlChar; prefix: PxmlChar; memory: PxmlChar; len: Longint): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlSplitQName2(name: PxmlChar; prefix: PPxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+function  xmlSplitQName3(name: PxmlChar; len: PLongint): PxmlChar; cdecl; external LIBXML2_SO; 
+
+(*
  * Handling Buffers.
  *)
 procedure xmlSetBufferAllocationScheme(scheme: xmlBufferAllocationScheme); cdecl; external LIBXML2_SO;
@@ -550,7 +561,7 @@ function  xmlAddPrevSibling(cur: xmlNodePtr; elem: xmlNodePtr): xmlNodePtr; cdec
 function  xmlAddNextSibling(cur: xmlNodePtr; elem: xmlNodePtr): xmlNodePtr; cdecl; external LIBXML2_SO;
 procedure xmlUnlinkNode(cur: xmlNodePtr); cdecl; external LIBXML2_SO;
 function  xmlTextMerge(first: xmlNodePtr; second: xmlNodePtr): xmlNodePtr; cdecl; external LIBXML2_SO;
-procedure xmlTextConcat(node: xmlNodePtr; content: PxmlChar; len: Longint); cdecl; external LIBXML2_SO;
+function  xmlTextConcat(node: xmlNodePtr; content: PxmlChar; len: Longint): Longint; cdecl; external LIBXML2_SO;
 procedure xmlFreeNodeList(cur: xmlNodePtr); cdecl; external LIBXML2_SO;
 procedure xmlFreeNode(cur: xmlNodePtr); cdecl; external LIBXML2_SO;
 procedure xmlSetTreeDoc(tree: xmlNodePtr; doc: xmlDocPtr); cdecl; external LIBXML2_SO;

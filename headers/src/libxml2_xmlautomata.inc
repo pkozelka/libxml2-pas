@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlautomata.h:1.7:
+// CVS-REV:gnome-xml/include/libxml/xmlautomata.h:1.8:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -39,6 +39,7 @@ function  xmlAutomataGetInitState(am: xmlAutomataPtr): xmlAutomataStatePtr; cdec
 function  xmlAutomataSetFinalState(am: xmlAutomataPtr; state: xmlAutomataStatePtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlAutomataNewState(am: xmlAutomataPtr): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
 function  xmlAutomataNewTransition(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; token: PxmlChar; data: Pointer): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
+function  xmlAutomataNewTransition2(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; token: PxmlChar; token2: PxmlChar; data: Pointer): xmlAutomataStatePtr; cdecl; external LIBXML2_SO; 
 function  xmlAutomataNewCountTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; token: PxmlChar; min, max: Longint; data: Pointer): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
 function  xmlAutomataNewOnceTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; token: PxmlChar; min, max: Longint; data: Pointer): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;
 function  xmlAutomataNewAllTrans(am: xmlAutomataPtr; aFrom, aTo: xmlAutomataStatePtr; lax: Longint): xmlAutomataStatePtr; cdecl; external LIBXML2_SO;

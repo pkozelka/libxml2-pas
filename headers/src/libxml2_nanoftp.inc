@@ -78,6 +78,7 @@ function  xmlNanoFTPCheckResponse(ctx: Pointer): Longint; cdecl; external LIBXML
  * CD/DIR/GET handlers.
  *)
 function  xmlNanoFTPCwd(ctx: Pointer; directory: PChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlNanoFTPDele(ctx: Pointer; aFile: Pchar): Longint; cdecl; external LIBXML2_SO; 
 function  xmlNanoFTPGetConnection(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
 function  xmlNanoFTPCloseConnection(ctx: Pointer): Longint; cdecl; external LIBXML2_SO;
 function  xmlNanoFTPList(ctx: Pointer; callback: ftpListCallback; userData: Pointer; filename: PChar): Longint; cdecl; external LIBXML2_SO;

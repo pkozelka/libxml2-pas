@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlregexp.h:1.4:
+// CVS-REV:gnome-xml/include/libxml/xmlregexp.h:1.5:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -53,3 +53,4 @@ type
 function xmlRegNewExecCtxt(comp: xmlRegexpPtr; callback: xmlRegExecCallbacks; data: Pointer): xmlRegExecCtxtPtr; cdecl; external LIBXML2_SO;
 procedure xmlRegFreeExecCtxt(exec: xmlRegExecCtxtPtr); cdecl; external LIBXML2_SO;
 function xmlRegExecPushString(exec: xmlRegExecCtxtPtr; value: PxmlChar; data: Pointer): Longint; cdecl; external LIBXML2_SO;
+function xmlRegExecPushString2(exec: xmlRegExecCtxtPtr; value: PxmlChar; value2: PxmlChar; data: Pointer): Longint; cdecl; external LIBXML2_SO;

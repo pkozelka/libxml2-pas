@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.13:
+// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.15:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,6 +30,25 @@ type
     XML_PARSER_SEVERITY_ERROR             // 4
   );
 
+  xmlReaderTypes = (XML_READER_TYPE_NONE,  // 0
+     XML_READER_TYPE_ELEMENT,
+     XML_READER_TYPE_ATTRIBUTE,
+     XML_READER_TYPE_TEXT,
+     XML_READER_TYPE_CDATA,
+     XML_READER_TYPE_ENTITY_REFERENCE,
+     XML_READER_TYPE_ENTITY,
+     XML_READER_TYPE_PROCESSING_INSTRUCTION,
+     XML_READER_TYPE_COMMENT,
+     XML_READER_TYPE_DOCUMENT,
+     XML_READER_TYPE_DOCUMENT_TYPE,
+     XML_READER_TYPE_DOCUMENT_FRAGMENT,
+     XML_READER_TYPE_NOTATION,
+     XML_READER_TYPE_WHITESPACE,
+     XML_READER_TYPE_SIGNIFICANT_WHITESPACE,
+     XML_READER_TYPE_END_ELEMENT,
+     XML_READER_TYPE_END_ENTITY,
+     XML_READER_TYPE_XML_DECLARATION
+  );
   xmlTextReader = record end;
   xmlTextReaderPtr = ^xmlTextReader;
 

@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/valid.h:1.39:
+// CVS-REV:gnome-xml/include/libxml/valid.h:1.42:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -110,8 +110,9 @@ type
   xmlRefTable = xmlHashTable;
   xmlRefTablePtr = ^xmlRefTable;
 
-(* helper *)
-function  xmlSplitQName2(name: PxmlChar; prefix: PPxmlChar): PxmlChar; cdecl; external LIBXML2_SO;
+(* Allocate/Release Validation Contexts *)
+function  xmlNewValidCtxt: xmlValidCtxtPtr;
+procedure xmlFreeValidCtxt(validCtxtPtr: xmlValidCtxtPtr); 
 
 (* Notation *)
 function  xmlAddNotationDecl(ctxt: xmlValidCtxtPtr; dtd: xmlDtdPtr; name: PxmlChar; PublicID: PxmlChar; SystemID: PxmlChar): xmlNotationPtr; cdecl; external LIBXML2_SO;
