@@ -71,7 +71,6 @@ const
 	IID_IServerXMLHTTPRequest2: TGUID = '{2E01311B-C322-4B0A-BD77-B90CFDC8DCE7}';
 	IID_IMXNamespacePrefixes: TGUID = '{C90352F4-643C-4FBC-BB23-E996EB2D51FD}';
 	IID_IMXNamespaceManager: TGUID = '{C90352F6-643C-4FBC-BB23-E996EB2D51FD}';
-	CLASS_DOMDocument: TGUID = '{F6D90F11-9C73-11D3-B32E-00C04F990BB4}';
 
 // *********************************************************************//
 // Declaration of Enumerations defined in Type Library
@@ -206,12 +205,6 @@ type
 	IServerXMLHTTPRequest2 = interface;
 	IMXNamespacePrefixes = interface;
 	IMXNamespaceManager = interface;
-
-// *********************************************************************//
-// Declaration of CoClasses defined in Type Library
-// (NOTE: Here we map each CoClass to its Default Interface)
-// *********************************************************************//
-	DOMDocument = IXMLDOMDocument2;
 
 // *********************************************************************//
 // Declaration of structures, unions and aliases.
@@ -1019,21 +1012,9 @@ type
                          var pcchPrefix: SYSINT): HResult; stdcall;
     function  _getURI(var pwchPrefix: Word; const pContextNode: IXMLDOMNode; var pwchUri: Word; 
                       var pcchUri: SYSINT): HResult; stdcall;
-  end;
-
-// *********************************************************************//
-// The Class CoDOMDocument provides a Create and CreateRemote method to          
-// create instances of the default interface IXMLDOMDocument2 exposed by              
-// the CoClass DOMDocument. The functions are intended to be used by             
-// clients wishing to automate the CoClass objects exposed by the         
-// server of this typelibrary.                                            
-// *********************************************************************//
-  CoDOMDocument = class
-		class function Create: IXMLDOMDocument2;
-		class function CreateRemote(const MachineName: string): IXMLDOMDocument2;
 	end;
 
-
 implementation
+
 end.
 
