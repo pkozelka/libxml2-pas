@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlwin32version.h:1.37:
+// CVS-REV:gnome-xml/include/libxml/xmlwin32version.h:1.39:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,21 +30,21 @@ const
    *
    * the version string like "1.2.3"
    *)
-  LIBXML_DOTTED_VERSION = '2.4.24';
+  LIBXML_DOTTED_VERSION = '2.4.25';
 
   (**
    * LIBXML_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBXML_VERSION = 20424;
+  LIBXML_VERSION = 20425;
 
   (**
    * LIBXML_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-  LIBXML_VERSION_STRING = '20424';
+  LIBXML_VERSION_STRING = '20425';
 
   (**
    * LIBXML_TEST_VERSION:
@@ -53,7 +53,7 @@ const
    * the version the software has been compiled against
    *)
 
-//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20424);
+//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20425);
 
 {$IFDEF ALWAYS_FALSE}
 
@@ -224,17 +224,4 @@ const
 {$DEFINE ATTRIBUTE_UNUSED}
 {$ENDIF}
 
-(**
- * #pragma comment(lib, "iconv.lib")
- *
- * pragma understood my MS compiler which enables a conditional link with
- * iconv.
- *)
-{$IFDEF _MSC_VER}
-{$IFDEF LIBXML_ICONV_ENABLED)}
-{$IFNDEF LIBXML2_COMPILING_MSCCDEF}
-(** unsupported pragma#pragma comment(lib, "iconv.lib")*)
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
 

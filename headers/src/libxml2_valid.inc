@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/valid.h:1.37:
+// CVS-REV:gnome-xml/include/libxml/valid.h:1.38:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -177,6 +177,7 @@ function  xmlValidateDocument(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr): Longint; c
 function  xmlValidateElement(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateOneElement(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlNodePtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateOneAttribute(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlNodePtr; attr: xmlAttrPtr; value: PxmlChar): Longint; cdecl; external LIBXML2_SO;
+function  xmlValidateOneNamespace(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlNodePtr; prefix: PxmlChar; ns: xmlNsPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateDocumentFinal(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr): Longint; cdecl; external LIBXML2_SO;
 function  xmlValidateNotationUse(ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; notationName: PxmlChar): Longint; cdecl; external LIBXML2_SO;
 function  xmlIsMixedElement(doc: xmlDocPtr; name: PxmlChar): Longint; cdecl; external LIBXML2_SO;

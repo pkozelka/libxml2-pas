@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlschemas.h:1.3:
+// CVS-REV:gnome-xml/include/libxml/xmlschemas.h:1.4:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -62,7 +62,8 @@ type
 (*
  * Interfaces for parsing.
  *)
-function  xmlSchemaNewParserCtxt(URL: Pchar): xmlSchemaParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  xmlSchemaNewParserCtxt(URL: PChar): xmlSchemaParserCtxtPtr; cdecl; external LIBXML2_SO;
+function  xmlSchemaNewMemParserCtxt(buffer: PChar; size: Longint): xmlSchemaParserCtxtPtr; cdecl; external LIBXML2_SO;
 procedure xmlSchemaFreeParserCtxt(ctxt: xmlSchemaParserCtxtPtr); cdecl; external LIBXML2_SO;
 procedure xmlSchemaSetParserErrors(ctxt: xmlSchemaParserCtxtPtr; err: xmlSchemaValidityErrorFunc; warn: xmlSchemaValidityWarningFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
 function  xmlSchemaParse(ctxt: xmlSchemaParserCtxtPtr): xmlSchemaPtr; cdecl; external LIBXML2_SO;
