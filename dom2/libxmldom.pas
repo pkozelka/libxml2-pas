@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.92 2002-01-29 02:30:51 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.93 2002-01-29 02:43:51 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -1759,6 +1759,8 @@ function TGDOMDocument.createAttribute(const name: DomString): IDomAttr;
 var
   attr: xmlAttrPtr;
 begin
+  DomAssert(isNotReserved(name), NAMESPACE_ERR, 'name starts with reserved string "XML".');
+  DomAssert(isNCName(name), NAMESPACE_ERR, 'name');
   attr := xmlNewDocProp(requestDocPtr, PChar(UTF8Encode(name)), nil);
   Result := GetDOMObject(attr) as IDomAttr;
 end;
@@ -1881,13 +1883,19 @@ var
   ns: xmlNsPtr;
   uprefix, ulocal: String;
 begin
-  if (namespaceURI<>'') then begin
-    uprefix := prefix(qualifiedName);
+  DomAssert(isNotReserved(qualifiedName), NAMESPACE_ERR, 'qualifiedName starts with reserved string "XML".');
+  uprefix := prefix(qualifiedName);
+  if (uprefix<>'') then begin
+    DomAssert(isNamespaceUri(namespaceURI), NAMESPACE_ERR, 'namespace:'+namespaceURI);
     ulocal := localName(qualifiedName);
+    DomAssert(isNotReserved(ulocal), INVALID_CHARACTER_ERR, 'localName starts with reserved string "XML".');
+    DomAssert(isNCName(ulocal), INVALID_CHARACTER_ERR, 'localName invalid');
+    DomAssert(isNCName(uprefix), INVALID_CHARACTER_ERR, 'prefix invalid');
     ns := xmlNewNs(nil, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
     attr := xmlNewNsProp(nil, ns, PChar(ulocal), nil);
     attr.doc := requestDocPtr;
   end else begin
+    DomAssert(isNCName(qualifiedName), NAMESPACE_ERR, 'qualifiedName');
     ulocal := UTF8Encode(qualifiedName);
     attr := xmlNewDocProp(requestDocPtr, PChar(ulocal), nil);
   end;
