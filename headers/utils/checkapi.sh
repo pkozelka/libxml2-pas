@@ -37,7 +37,7 @@ function getCvsRevision()
 	local dirName=${aFileName%/*}
 	local entry=${aFileName:${#dirName}+1}
 
-	sed -n '/^\/'$entry'\//{s:^/'$entry'/\([^/]*\)/.*:\1:;p}' $dirName/CVS/Entries
+	sed -n '/^\/'$entry'\//{s:^/'$entry'/\([^/]*\)/.*:\1:;p;}' $dirName/CVS/Entries
 }
 
 function cacheGet()
@@ -97,7 +97,7 @@ THISPATH=`pwd`
 for fn in $FILELIST ; do
 	cd $THISPATH
 	echo -n "  checking: $fn:  "
-	revInfo=`head $fn | sed -n '/CVS-REV/{s#.*CVS-REV:\([^:]*\):\([^:]*\):#\1:\2#;p}'`
+	revInfo=`head $fn | sed -n '/CVS-REV/{s#.*CVS-REV:\([^:]*\):\([^:]*\):#\1:\2#;p;}'`
 	if [ "$revInfo" = "" ]; then
 		echo
 		echo "ERROR: no CVS-REV in $fn" >&2
