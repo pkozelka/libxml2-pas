@@ -34,7 +34,7 @@ const
 {$ASSERTIONS OFF}
 
 type
-  DWORD = Integer;
+  DWORD = Cardinal;
   PLongint = ^Longint;
   PByte = ^Byte;
   PPChar = ^PChar;
