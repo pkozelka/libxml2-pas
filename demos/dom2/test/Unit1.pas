@@ -92,9 +92,26 @@ begin
 end;
 
 procedure TForm1.Button5Click(Sender: TObject);
+var
+  testset: integer;
+  i,j: integer;
 begin
-  OutLog('Disabled!');
-  //native1(Combobox1.Text)
+  Memo1.lines.Clear;
+  EnableOutput.Checked:=false;
+  TestSet:=0;
+  if Test1.Checked then TestSet:=1;
+  if Test2.Checked then TestSet:=TestSet+2;
+  if Test3.Checked then TestSet:=TestSet+4;
+  if Test4.Checked then TestSet:=TestSet+8;
+  if Test5.Checked then TestSet:=TestSet+16;
+  if Test6.Checked then TestSet:=TestSet+32;
+  if Test7.Checked then TestSet:=TestSet+64;
+  if Test8.Checked then TestSet:=TestSet+128;
+  if Test9.Checked then TestSet:=TestSet+256;
+  for i:=1 to 100 do begin
+    for j:=1 to 100 do TestNode1('..\data\test.xml',GetVendorStr,TestSet);
+    OutDebugLog('Passed OK: '+inttostr(i*100));
+  end;
 end;
 
 procedure TForm1.TestGdome100Click(Sender: TObject);

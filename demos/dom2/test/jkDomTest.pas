@@ -12,8 +12,8 @@ unit jkDomTest;
 
    Copyright:
    4commerce technologies AG
-        Kamerbalken 10-14
-        22525 Hamburg, Germany
+   Kamerbalken 10-14
+   22525 Hamburg, Germany
 
     Published under a double license:
     a) the GNU Library General Public License:
@@ -36,6 +36,7 @@ function test(name: string; testexpr: boolean): boolean;
 // Call this function 10000 times for stability test
 procedure TestDocument(filename,vendorstr:string;testset: integer);
 procedure TestElement0(filename,vendorstr:string;TestSet: integer);
+procedure TestNode1(filename,vendorstr:string; testset: integer);
 
 implementation
 
@@ -92,6 +93,7 @@ begin
     else doc:=GetEmptyDoc1(vendorstr);
   (doc as IDOMParseOptions).validate := true; // we want to use a dtd
   (doc as IDOMParseOptions).resolveExternals := true;
+  (doc as IDOMParseOptions).preserveWhiteSpace := false;
   FDomPersist := doc as IDomPersist;
   ok := FDomPersist.load(filename);
   
@@ -136,6 +138,7 @@ begin
   node := document.createElement('abc');
   test('document.createElement',(node <> nil)) ;
   test('document.createElement (nodeName)',(node.nodeName = 'abc')) ;
+
 
   if dom2 then begin
     //p=1
@@ -200,6 +203,7 @@ begin
   test('document.createCDATASection',(cdata <> nil));
   cdata := nil;
 
+
   //p=2
   try
     comment := document.createComment('xxx');
@@ -222,6 +226,7 @@ begin
   documentfragment := document.createDocumentFragment;
   test('document.createDocumentFragment',(documentfragment <> nil));
   documentfragment := nil;
+
 
   //p=3
   entityreference := document.createEntityReference('iii');
@@ -321,164 +326,167 @@ begin
   element := nil;
 end;
 
+procedure TestNode1(filename,vendorstr:string; testset: integer);
+var
+  node,node1,docelement,childnode: IDOMNode;
+  nodeselect: IDOMNodeSelect;
+  i: integer;
+  document: IDOMDocument;
+  temp: string;
+  dom2: boolean;
+begin
+  if (testset and 512) = 512 then dom2:=true else dom2:=false;
+  document:=nil;
+  document := getDoc(filename,vendorstr);
+  if document=nil then exit;
+  node := document.documentElement as IDOMNode;
+  test('node.ownerDocument',(node.ownerDocument.nodeName = document.nodeName));
+  node := nil;
+
+  node := document.documentElement as IDOMNode;
+  test('node.nodeType (ELEMENT_NODE)',(node.nodeType = ELEMENT_NODE));
+  node := nil;
+
+  node := document as IDOMNode;
+  test('node.nodeType (DOCUMENT_NODE)',(node.nodeType = DOCUMENT_NODE));
+  node := nil;
+
+  //p=1
+  node := document.documentElement as IDOMNode;
+  //FE: The following line causes a problem:
+  //outlog(node.firstchild.nodeName);
+  test('node.parentNode',(document.documentElement.firstChild.parentNode.nodeName = node.nodeName));
+  node := nil;
+
+  //p=1
+  node := (document.documentElement as IDOMNode);
+  test('node.hasChildNodes',node.hasChildNodes) ;
+  node := nil;
+
+  //p=1
+  node := (document.documentElement as IDOMNode).firstChild;
+  test('node.firstChild',(node <> nil)) ;
+
+  //p=1
+  test('node.nodeName',(node.nodeName = 'sometag')) ;
+
+  //p=1
+  test('node.firstChild.hasChildNodes',node.hasChildNodes) ;
+
+  //P=1
+  for i := 0 to node.childNodes.length-1 do begin
+    if node.childNodes[i].nodeType = TEXT_NODE then begin
+       test('node.nodeValue of TEXT_NODE (get)',(node.childNodes[i].nodeValue = 'abc')) ;
+       node.childNodes[i].nodeValue := 'def';
+       test('node.nodeValue of TEXT_NODE (set)',(node.childNodes[i].nodeValue = 'def')) ;
+    end;
+  end;
+  node := nil;
+
+  //p=1
+  node := document.documentElement.firstChild;
+  node := node.nextSibling;
+  test('node.nextSibling',(node <> nil)) ;
+
+  //p=1
+  node := node.previousSibling;
+  test('node.previousSibling',(node <> nil)) ;
+  node := nil;
+
+  //p=1
+  node := document.documentElement.firstChild.lastChild;
+  test('node.lastChild',(node <> nil)) ;
+  node := nil;
+
+  document:=nil;
+  document := getDoc(filename,vendorstr);
+
+  // supported by LIBXML and MSXML but not by W3C
+  nodeselect := document.documentElement as IDOMNodeSelect;
+  node := nodeselect.selectNode('sometag/@name');
+  if node <> nil
+    then test('IDOMNodeSelect.selectNode',(node.nodeValue = '1st child of DocumentElement'))
+    else outlog('__IDOMNodeSelect.selectNode => failed');
+  node := nil;
+  nodeselect := nil;
+
+  //p=1   
+  node := document.documentElement.firstChild.cloneNode(True);
+  test('node.cloneNode',(node <> nil));
+
+
+  //p=1   
+  docelement:=document.documentElement;
+  node1:=docelement.firstChild;
+  node := docelement.insertBefore(node,node1);
+  test('node.insertBefore',(node <> nil)) ;
+  test('node.clone & insert',(node.nodeName = 'sometag')) ;
+  node := nil;
+  node1:=nil;
+  docelement:=nil;
+
+  //p=1 
+  node := document.documentElement.removeChild(document.documentElement.firstChild);
+  test('node.removeChild',(node <> nil)) ;
+
+  //p=1
+  node := (document.documentElement as IDOMNode).appendChild(node);
+  test('node.appendChild',(node <> nil)) ;
+  //outlog('___'+node.nodeName);
+  test('node.remove & append',(node.nodeName = 'sometag')) ;
+  node := nil;
+
+  try  
+    //p=2
+    node := document.documentElement.lastChild.cloneNode(True);
+    node := document.documentElement.replaceChild(node,document.documentElement.firstChild);
+    test('node.replaceChild',(node <> nil)) ;
+    test('node.clone & replace',(node.nodeName = 'sometag')) ;
+    node := nil;
+  except
+    outLog('__node.replaceChild doesn''t work!');
+    outLog('__node.clone & replace doesn''t work!');
+  end;
+
+  test('node.isSupported "Core"',(document.documentElement.isSupported('Core','2.0'))) ;
+  test('node.isSupported "XML"',(document.documentElement.isSupported('XML','2.0'))) ;
+
+  try   //bis hier ok
+    //p=2
+    // testing normalize
+  temp:='';
+  document := getDoc(filename,vendorstr);
+  node:=document.documentElement as IDOMNode;
+    for i := 0 to node.firstChild.childNodes.length-1 do begin
+      if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
+        childnode := node.firstChild.childNodes[i].cloneNode(True);
+        Break;
+      end;
+    end;
+    childnode:=document.importNode(childnode,false);
+    node.firstChild.appendChild(childnode);
+    //node.firstChild.appendChild(childnode);
+    for i := 0 to node.firstChild.childNodes.length-1 do begin
+      if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
+        temp:=temp+node.firstChild.childNodes[i].nodeValue;
+      end;
+    end;
+    node.firstChild.normalize;
+    for i := 0 to node.firstChild.childNodes.length-1 do begin
+      if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
+        test('node.normalize',node.firstChild.childNodes[i].nodeValue=temp);
+        //outLog('text after normalize: '+node.firstChild.childNodes[i].nodeValue);
+      end;
+    end;
+  except
+    outLog('__node.normalize doesn''t work!');
+  end;
+end;
+
 
 procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
 // shall Test every Method of GDOM2
 
-  procedure TestNode1(filename,vendorstr:string);
-  var
-    node,node1,docelement,childnode: IDOMNode;
-    nodeselect: IDOMNodeSelect;
-    i: integer;
-    document: IDOMDocument;
-    temp: string;
-    dom2: boolean;
-  begin
-    if (testset and 512) = 512 then dom2:=true else dom2:=false;
-    document:=nil;
-    document := getDoc(filename,vendorstr);
-    if document=nil then exit;
-    node := document.documentElement as IDOMNode;
-    test('node.ownerDocument',(node.ownerDocument.nodeName = document.nodeName));
-    node := nil;
-
-    node := document.documentElement as IDOMNode;
-    test('node.nodeType (ELEMENT_NODE)',(node.nodeType = ELEMENT_NODE));
-    node := nil;
-
-    node := document as IDOMNode;
-    test('node.nodeType (DOCUMENT_NODE)',(node.nodeType = DOCUMENT_NODE));
-    node := nil;
-
-    //p=1
-    node := document.documentElement as IDOMNode;
-    //FE: The following line causes a problem:
-    //outlog(node.firstchild.nodeName);
-    test('node.parentNode',(document.documentElement.firstChild.parentNode.nodeName = node.nodeName));
-    node := nil;
-
-    //p=1
-    node := (document.documentElement as IDOMNode);
-    test('node.hasChildNodes',node.hasChildNodes) ;
-    node := nil;
-
-    //p=1
-    node := (document.documentElement as IDOMNode).firstChild;
-    test('node.firstChild',(node <> nil)) ;
-
-    //p=1
-    test('node.nodeName',(node.nodeName = 'sometag')) ;
-
-    //p=1
-    test('node.firstChild.hasChildNodes',node.hasChildNodes) ;
-
-    //P=1
-    for i := 0 to node.childNodes.length-1 do begin
-      if node.childNodes[i].nodeType = TEXT_NODE then begin
-         test('node.nodeValue of TEXT_NODE (get)',(node.childNodes[i].nodeValue = 'abc')) ;
-         node.childNodes[i].nodeValue := 'def';
-         test('node.nodeValue of TEXT_NODE (set)',(node.childNodes[i].nodeValue = 'def')) ;
-      end;
-    end;
-    node := nil;
-
-    //p=1
-    node := document.documentElement.firstChild;
-    node := node.nextSibling;
-    test('node.nextSibling',(node <> nil)) ;
-
-    //p=1
-    node := node.previousSibling;
-    test('node.previousSibling',(node <> nil)) ;
-    node := nil;
-
-    //p=1
-    node := document.documentElement.firstChild.lastChild;
-    test('node.lastChild',(node <> nil)) ;
-    node := nil;
-
-    document:=nil;
-    document := getDoc(filename,vendorstr);
-
-    // supported by LIBXML and MSXML but not by W3C
-    nodeselect := document.documentElement as IDOMNodeSelect;
-    node := nodeselect.selectNode('sometag/@name');
-    if node <> nil
-      then test('IDOMNodeSelect.selectNode',(node.nodeValue = '1st child of DocumentElement'))
-      else outlog('__IDOMNodeSelect.selectNode => failed');
-    node := nil;
-    nodeselect := nil;
-
-    //p=1
-    node := document.documentElement.firstChild.cloneNode(True);
-    test('node.cloneNode',(node <> nil));
-
-    //p=1
-    docelement:=document.documentElement;
-    node1:=docelement.firstChild;
-    node := docelement.insertBefore(node,node1);
-    test('node.insertBefore',(node <> nil)) ;
-    test('node.clone & insert',(node.nodeName = 'sometag')) ;
-    node := nil;
-    node1:=nil;
-    docelement:=nil;
-
-    //p=1
-    node := document.documentElement.removeChild(document.documentElement.firstChild);
-    test('node.removeChild',(node <> nil)) ;
-
-    //p=1
-    node := (document.documentElement as IDOMNode).appendChild(node);
-    test('node.appendChild',(node <> nil)) ;
-    //outlog('___'+node.nodeName);
-    test('node.remove & append',(node.nodeName = 'sometag')) ;
-    node := nil;
-
-    try
-      //p=2
-      node := document.documentElement.lastChild.cloneNode(True);
-      node := document.documentElement.replaceChild(node,document.documentElement.firstChild);
-      test('node.replaceChild',(node <> nil)) ;
-      test('node.clone & replace',(node.nodeName = 'sometag')) ;
-      node := nil;
-    except
-      outLog('__node.replaceChild doesn''t work!');
-      outLog('__node.clone & replace doesn''t work!');
-    end;
-
-    test('node.isSupported "Core"',(document.documentElement.isSupported('Core','2.0'))) ;
-    test('node.isSupported "XML"',(document.documentElement.isSupported('XML','2.0'))) ;
-
-    try
-      //p=2
-      // testing normalize
-    temp:='';
-    node:=document.documentElement as IDOMNode;
-      for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
-          childnode := node.firstChild.childNodes[i].cloneNode(True);
-          Break;
-        end;
-      end;
-      childnode:=document.importNode(childnode,false);
-      node.firstChild.appendChild(childnode);
-      //node.firstChild.appendChild(childnode);
-      for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
-          temp:=temp+node.firstChild.childNodes[i].nodeValue;
-        end;
-      end;
-      node.firstChild.normalize;
-      for i := 0 to node.firstChild.childNodes.length-1 do begin
-        if node.firstChild.childNodes[i].nodeType = TEXT_NODE then begin
-          test('node.normalize',node.firstChild.childNodes[i].nodeValue=temp);
-          //outLog('text after normalize: '+node.firstChild.childNodes[i].nodeValue);
-        end;
-      end;
-    except
-      outLog('__node.normalize doesn''t work!');
-    end;
-  end;
 
   procedure TestNode2(filename,vendorstr:string);
   var
@@ -723,9 +731,11 @@ begin
   test('element.tagName',(element.tagName = 'sometag'));
   element := nil;
 
+  // bis hier ok
   element := document.documentElement.firstChild as IDOMElement;
-  element.setAttribute('test','hallo welt');
-  test('element.getAttribute/setAttribute',(element.getAttribute('test') = 'hallo welt'));
+  element.setAttribute('test','hallo welt 1234567890 1234567890');
+  test('element.getAttribute/setAttribute',
+    (element.getAttribute('test') = 'hallo welt 1234567890 1234567890'));
   element := nil;
 
   if dom2 then begin
@@ -735,6 +745,7 @@ begin
   end;
 
   element := nil;
+
   attlist := document.documentElement.firstChild.attributes;
 
   test('namedNodeMap',(attlist <> nil)) ;
@@ -745,6 +756,7 @@ begin
   attlist := document.documentElement.firstChild.attributes;
   node := attlist.item[0];
   attlist := nil;
+  
   test('namedNodeMap.item[i].nodeType = ATTRIBUTE_NODE (attributes)',(node.nodeType = ATTRIBUTE_NODE)) ;
   attr := node as IDOMAttr;
   node := nil;
@@ -754,12 +766,13 @@ begin
   test('attribute.specified',attr.specified) ;
   test('attribute.nodeType = ATTRIBUTE_NODE',(attr.nodeType = ATTRIBUTE_NODE)) ;
   attr := nil;
+
   element := document.documentElement.firstChild as IDOMElement;
   test('element.hasAttribute',element.hasAttribute('name')) ;
+  // bis hier ok
   element.removeAttribute('name');
   test('element.removeAttribute',(not element.hasAttribute('name'))) ;
   element := nil;
-
   if dom2 then begin
     attr := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:name1');
     element := document.documentElement;
@@ -769,10 +782,11 @@ begin
     test('element.hasAttributeNS/setAttributeNodeNS',element.hasAttributeNS('http://xmlns.4commerce.de/eva','name1'));
     element := nil;
   end;
+  element:=nil;
 end;
 
 var
-  filename: string;
+  filename,tmp: string;
   FDomPersist: IDOMPersist;
   document: IDOMDocument;
   element: IDOMElement;
@@ -808,7 +822,7 @@ begin
   // testing node, part 1
   if (testset and 8) = 8
     then begin
-      TestNode1(filename,vendorstr);
+      TestNode1(filename,vendorstr,testset);
       if dom2
         then TestNode2(filename,vendorstr);
     end;
