@@ -230,7 +230,7 @@ type
               const version : DomString) : Boolean;
     function selectNode(const nodePath: WideString): IDOMNode;
     function selectNodes(const nodePath: WideString): IDOMNodeList;
-    procedure RegisterNS(const prefix,URI: DomString);
+    procedure registerNS(const prefix : DomString; uri : DomString);
   end;
 
 
@@ -1946,27 +1946,27 @@ begin
 end;
 
 
-function TMSXMLNode.selectNode(const nodePath: WideString): IDOMNode;
+function TMSXMLNode.selectNode(const nodePath : WideString): IDOMNode;
 var
-  Node: IXMLDOMNode;
+  node : IXMLDOMNode;
 begin
-  Node := fMSDomNode.selectSingleNode(nodePath);
-  if Assigned(Node)
-    then Result := createXMLNode(Node)
-    else Result := nil;
+  node := fMSDomNode.selectSingleNode(nodePath);
+  if assigned(node)
+    then result := createXMLNode(node)
+    else result := nil;
 end;
 
-function TMSXMLNode.selectNodes(const nodePath: WideString): IDOMNodeList;
+function TMSXMLNode.selectNodes(const nodePath : WideString): IDOMNodeList;
 var
-  NodeList: IXMLDOMNodeList;
+  nodeList : IXMLDOMNodeList;
 begin
-  NodeList := fMSDomNode.selectNodes(nodePath);
-  if Assigned(NodeList)
-    then Result :=  TMSXMLNodeList.Create(NodeList)
-    else Result := nil;
+  nodeList := fMSDomNode.selectNodes(nodePath);
+  if assigned(nodeList)
+    then result :=  TMSXMLNodeList.create(nodeList)
+    else result := nil;
 end;
 
-procedure TMSXMLNode.RegisterNS(const prefix, URI: DomString);
+procedure TMSXMLNode.registerNS(const prefix : DomString; uri : DomString);
 begin
 
 end;
