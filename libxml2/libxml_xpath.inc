@@ -87,7 +87,7 @@ type
     type_ : xmlXPathObjectType;
     nodesetval : xmlNodeSetPtr;
 {$IFDEF LINUX}
-    boolval : longInt;
+    boolval : Longint;
 {$ELSE}
     boolval : int64; //??? IS THIS REALLY OK ???
 {$ENDIF}

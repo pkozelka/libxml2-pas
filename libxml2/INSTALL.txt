@@ -1,0 +1,10 @@
+Using libxml2-pas in your projects:
+-----------------------------------
+
+- make sure that the directory libxml2 is in your "search path" list.
+	In the Delphi/Kylix IDE, you can set it here: Project | Options... | Directories/Conditionals | Search path
+
+- make sure that the libxml2.so file is listed either in /etc/ld.so.conf system file or in LD_LIBRARY_PATH env. variable.
+- now you can start the program
+
+	
