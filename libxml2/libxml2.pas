@@ -1,12 +1,12 @@
 unit libxml2;
 {
-	------------------------------------------------------------------------------
-	This unit collects all the translated headers of libxml2 (aka gnome-xml).
-	2001 (C) Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
-	See also:
-		http://www.xmlsoft.org  - the libxml2 homepage
-		http://kozelka.hyperlink.cz  - my homepage
+  ------------------------------------------------------------------------------
+  This unit collects all the translated headers of libxml2 (aka gnome-xml).
+  2001 (C) Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+  See also:
+    http://www.xmlsoft.org  - the libxml2 homepage
+    http://kozelka.hyperlink.cz  - my homepage
 }
 
 interface
@@ -27,8 +27,6 @@ const
   LIBXML2_SO = 'libxml2.so';
 {$endif}
 
-//{$WEAKPACKAGEUNIT}
-
 {$ifdef VER140}
 {$ALIGN 4}
 {$endif}
@@ -36,10 +34,10 @@ const
 {$ASSERTIONS OFF}
 
 type
-	DWORD = integer;
-	PLongInt = ^LongInt;
-	PByte = ^byte;
-	PPChar = ^PChar;
+  DWORD = integer;
+  PLongInt = ^LongInt;
+  PByte = ^byte;
+  PPChar = ^PChar;
 
 {$define LIBXML_THREAD_ALLOC_ENABLED}
 {$define LIBXML_THREAD_ENABLED}
@@ -98,9 +96,9 @@ procedure xmlFree(str: PxmlChar);
 
 type
   (**
-  * This interface is intended for libxml2 wrappers. It provides a way
-  * back - i.e. from the wrapper object to the libxml2 node.
-  *)
+   * This interface is intended for libxml2 wrappers. It provides a way
+   * back - i.e. from the wrapper object to the libxml2 node.
+   *)
   ILibXml2Node = interface ['{1D4BD646-0AB9-4810-B4BD-7277FB0CFA30}']
     function  LibXml2NodePtr: xmlNodePtr;
   end;

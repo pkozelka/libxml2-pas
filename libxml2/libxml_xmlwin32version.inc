@@ -35,32 +35,32 @@ const
    *
    * the version string like "1.2.3"
    *)
-   LIBXML_DOTTED_VERSION = '2.4.13';
+   LIBXML_DOTTED_VERSION = '2.4.14';
 
   (**
    * LIBXML_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBXML_VERSION = 20413;
+  LIBXML_VERSION = 20414;
 
   (**
    * LIBXML_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-   LIBXML_VERSION_STRING = '20413';
+   LIBXML_VERSION_STRING = '20414';
 {
    LIBXML_TEST_VERSION:
-  
+
    Macro to check that the libxml version in use is compatible with
    the version the software has been compiled against
   }
 //TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20412);
 {$if false}
-    { 
+    {
        WITH_TRIO:
-      
+
        defined if the trio support need to be configured in
       }
 {$define WITH_TRIO}
@@ -98,7 +98,7 @@ const
 {$if true}
 {$define LIBXML_HTTP_ENABLED}
 {$ifend}
-    { 
+    {
        LIBXML_HTML_ENABLED:
       
        Whether the HTML support is configured in
@@ -181,7 +181,7 @@ const
        For this to work, we need three macros. One tells us which compiler is
        being used and luckily the compiler defines such a thing: _MSC_VER. The
        second macro tells us if we are compiling libxml or the client code and
-       we define the macro IN_LIBXML on the compiler's command line for this 
+       we define the macro IN_LIBXML on the compiler's command line for this
        purpose. The third macro, LIBXML_STATIC, must be defined by any client 
        code which links against libxml statically. 
       }
