@@ -103,7 +103,7 @@ function  xsltUnregisterExtModuleFunction(name:PxmlChar; URI:PxmlChar):longint;c
 			 xsltTransformFunction function);
 in declaration at line 119 *)
 
-function  xsltNewElemPreComp(style:xsltStylesheetPtr; inst:xmlNodePtr; function_:xsltTransformFunction):xsltElemPreCompPtr;cdecl;external LIBXSLT_SO;
+function  xsltNewElemPreComp(style:xsltStylesheetPtr; inst:xmlNodePtr; transformfunction:xsltTransformFunction):xsltElemPreCompPtr;cdecl;external LIBXSLT_SO;
 procedure xsltInitElemPreComp(comp:xsltElemPreCompPtr; style:xsltStylesheetPtr; inst:xmlNodePtr; function_:xsltTransformFunction; freeFunc:xsltElemPreCompDeallocator);cdecl;external LIBXSLT_SO;
 function  xsltRegisterExtModuleElement(name:PxmlChar; URI:PxmlChar; precomp:xsltPreComputeFunction; transform:xsltTransformFunction):longint;cdecl;external LIBXSLT_SO;
 //function xsltExtElementLookup(ctxt:xsltTransformContextPtr; name:PxmlChar; URI:PxmlChar):xsltTransformFunction;cdecl;external LIBXSLT_SO;
