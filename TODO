@@ -6,9 +6,6 @@ GENERAL
 	-
 
 KYLIX
-	- xmlParseFile is crashing when marked as cdecl; marked as register it does not crash, but always returns NIL - but aparently it must be cdecl.
-	- the same applies for many other functions
-	- IDE refuses to load the library; therefore any attempt to debug the code fails (with no message!!)
 
 DELPHI
 
@@ -25,6 +22,12 @@ GENERAL
 
 KYLIX
 	- xmlNewNode works
+	- xmlParseFile is crashing when marked as cdecl; marked as register it does not crash, but always returns NIL - but aparently it must be cdecl.
+		- solved in libxml2 by Bjorn Reese
+	- the same applies for many other functions
+		- solved in libxml2 by Bjorn Reese
+	- IDE refuses to load the library; therefore any attempt to debug the code fails (with no message!!)
+		- was a consequence of above bugs
 
 DELPHI
 
