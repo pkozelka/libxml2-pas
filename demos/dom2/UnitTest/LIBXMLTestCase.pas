@@ -29,6 +29,7 @@ type TTestDOM2Methods = class(TTestCase)
 		procedure TestDocCount;
 		procedure TestElementByID;
 		procedure LoadFiles;
+    procedure LoadFilesII;
 	end;
 
 type TTestDomExceptions = class(TTestCase)
@@ -386,7 +387,7 @@ var
 	rv: integer; // returned value
 	cnt: integer; // tested file counter
 begin
-	fd := '../../data';
+	fd := '../data';
 	try
 		cnt := 0;
 		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
@@ -400,7 +401,39 @@ begin
 			rv := FindNext(sr);
 		end;
 		if (cnt=0) then begin
-			check(false, 'No XML file available for testing in directory '+fd); 
+			check(false, 'No XML file available for testing in directory '+fd);
+		end;
+	finally
+		FindClose(sr);
+	end;
+end;
+
+procedure TTestDOM2Methods.LoadFilesII;
+var
+	mydoc: IDomDocument;
+	fd: string; // file directory
+	fn: string; // file name
+	sr: TSearchRec;
+	rv: integer; // returned value
+	cnt: integer; // tested file counter
+begin
+  impl := GetDom(domvendor);
+  mydoc := impl.createDocument('','',nil);
+	fd := '../data';
+	try
+		cnt := 0;
+		rv := FindFirst(fd+'/*.xml', faAnyFile, sr);
+		while (rv=0) do begin
+			Inc(cnt);
+			builder := getDocumentBuilderFactory(DomVendor).newDocumentBuilder;
+			fn := fd + '/' + sr.Name;
+      (mydoc as IDOMPersist).load(fn);
+			check(mydoc<>nil, fn+': document not loaded');
+			check(mydoc.documentElement<>nil, fn+': documentElement is nil');
+			rv := FindNext(sr);
+		end;
+		if (cnt=0) then begin
+			check(false, 'No XML file available for testing in directory '+fd);
 		end;
 	finally
 		FindClose(sr);
