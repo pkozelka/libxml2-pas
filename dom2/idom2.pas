@@ -889,7 +889,7 @@ type
 
     { Methods }
 
-    (*
+     (*
      * Indicates the current state of the XML document. 
     *)
     function  asyncLoadState : Integer;
@@ -897,7 +897,7 @@ type
     (*
      * loads and parses the xml document from URL source.
     *)
-    function  load(source : OleVariant) : Boolean;
+    function  load(source: DOMString) : Boolean;
     function  loadFromStream(const stream : TStream) : Boolean;
 
     (*
@@ -908,7 +908,7 @@ type
     *)
     function  loadxml(const value : DOMString) : Boolean;
 
-    procedure save(destination : OleVariant);
+    procedure save(destination: DOMString);
     procedure saveToStream(const stream : TStream);
     procedure set_OnAsyncLoad(
             const sender : TObject;
@@ -953,16 +953,16 @@ type
     function selectNodes(const nodePath : DomString) : IDomNodeList;
     procedure registerNs(const prefix : DomString; const uri : DomString);
   end;
-
-	IDomNodeEx = interface(IDomNode)
+	
+	IDOMNodeEx = interface(IDOMNode)
     ['{17D937A2-C6EE-448F-8530-221D744AC083}']
 	  { Property Acessors }
     //function get_text: DOMString; safecall;
     //function get_xml: DOMString; safecall;
     //procedure set_text(const Value: DOMString); safecall;
     { Methods }
-    procedure transformNode(const stylesheet: IDomNode; var output: WideString); overload;
-    procedure transformNode(const stylesheet: IDomNode; var output: IDomDocument); overload;
+    procedure transformNode(const stylesheet: IDOMNode; var output: WideString); overload;
+    procedure transformNode(const stylesheet: IDOMNode; var output: IDOMDocument); overload;
     { Properties }
     //property text: DOMString read get_text write set_text;
     //property xml: DOMString read get_xml;
