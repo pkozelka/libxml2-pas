@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.98 2002-01-30 11:46:21 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.99 2002-01-30 12:02:31 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -94,6 +94,7 @@ type
     function  returnNullDomNode: IDomNode;
     function  returnEmptyString: DomString;
     function  returnChildNodes: IDomNodeList;
+    function  isAncestorOrSelf(aNode:xmlNodePtr): boolean; //new
   protected //ILibXml2Node
     function  LibXml2NodePtr: xmlNodePtr;
   protected //IDomNode
@@ -134,11 +135,8 @@ type
   protected
     constructor Create(aLibXml2Node: pointer); virtual;
     function  requestNodePtr: xmlNodePtr; virtual;
-    //function supports(const feature, version: DomString): Boolean;
-    function  IsReadOnly: boolean;
-    function  IsAncestorOrSelf(newNode:xmlNodePtr): boolean; //new
-    property  GNode: xmlNodePtr read FGNode;
   public
+    property  GNode: xmlNodePtr read FGNode;
     destructor Destroy; override;
   end;
 
@@ -1187,23 +1185,17 @@ begin
 //todo
 end;
 
-function TGDOMNode.IsReadOnly: boolean;
-begin
-  Result:=IsReadOnlyNode(FGNode)
-end;
-
-function TGDOMNode.IsAncestorOrSelf(newNode: xmlNodePtr): boolean;
+function TGDOMNode.isAncestorOrSelf(aNode: xmlNodePtr): boolean;
 var
-  node:xmlNodePtr;
+  node: xmlNodePtr;
 begin
-  node:=FGNode;
-  Result:=true;
-  while node<>nil do begin
-    if node=newNode
-      then exit;
-    node:=node.parent;
+  node := FGNode;
+  Result := True;
+  while (node<>nil) do begin
+    if (node=aNode) then exit;
+    node := node.parent;
   end;
-  Result:=false;
+  Result := False;
 end;
 
 function TGDOMNode.requestNodePtr: xmlNodePtr;
@@ -1230,9 +1222,8 @@ const
   ];
 begin
   DomAssert(newChild<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.insertBefore: cannot append null');
-  DomAssert(not IsReadOnly, NO_MODIFICATION_ALLOWED_ERR);
   DomAssert((newChild.nodeType in CHILD_TYPES), HIERARCHY_REQUEST_ERR, 'TGDOMNode.insertBefore: newChild cannot be inserted, nodetype = '+IntToStr(get_nodeType));
-
+  DomAssert(not IsReadOnlyNode(requestNodePtr), NO_MODIFICATION_ALLOWED_ERR);
   if (requestNodePtr.type_=XML_DOCUMENT_NODE) and (newChild.nodeType = ELEMENT_NODE) then begin
     DomAssert((xmlDocGetRootElement(xmlDocPtr(FGNode))=nil), HIERARCHY_REQUEST_ERR, 'TGDOMNode.insertBefore: document already has a documentElement');
   end;
