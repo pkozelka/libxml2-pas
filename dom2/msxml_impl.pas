@@ -53,7 +53,7 @@ uses
   {$endif}
   windows,
   ComObj,
-  Dom2;
+  xDom2;
 
   const MSXML2Rental = 'MSXML2_RENTAL_MODEL';
   const MSXML2Free = 'MSXML2_FREETHREADING_MODEL';

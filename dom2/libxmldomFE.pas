@@ -43,7 +43,7 @@ uses
     unicode,
   {$endif}
   classes,
-  dom2,
+  xdom2,
   libxml2,
   sysutils;
 
@@ -684,41 +684,7 @@ end;
 
 (**
 /**
- * gdome_xmlSetAttrValue:
- * @attr:  the attribute which the value is to be set
- * @value:  the value to set
- *
- * Set a new value to an Attribute node.
- */
-void
-gdome_xmlSetAttrValue(xmlAttr *attr, xmlChar *value) {
-  if(attr == NULL)
-    return;
-
-  if (attr->children != NULL)
-    xmlFreeNodeList(attr->children);
-  attr->children = NULL;
-  attr->last = NULL;
-
-  if (value != NULL) {
-    xmlChar *buffer;
-    xmlNode *tmp;
-
-    buffer = xmlEncodeEntitiesReentrant(attr->doc, value);
-    attr->children = xmlStringGetNodeList(attr->doc, buffer);
-    attr->last = NULL;
-    tmp = attr->children;
-    for(tmp = attr->children; tmp != NULL; tmp = tmp->next) {
-      tmp->parent = (xmlNode *  )attr;
-      tmp->doc = attr->doc;
-      if (tmp->next == NULL)
-        attr->last = tmp;
-    }
-    xmlFree (buffer);
-  }
-
-  return;
-}
+ * gdome_xmlSetAttrValue:  * @attr:  the attribute which the value is to be set  * @value:  the value to set  *  * Set a new value to an Attribute node.  */ void gdome_xmlSetAttrValue(xmlAttr *attr, xmlChar *value) {   if(attr == NULL)     return;    if (attr->children != NULL)     xmlFreeNodeList(attr->children);   attr->children = NULL;   attr->last = NULL;    if (value != NULL) {     xmlChar *buffer;     xmlNode *tmp;      buffer = xmlEncodeEntitiesReentrant(attr->doc, value);     attr->children = xmlStringGetNodeList(attr->doc, buffer);     attr->last = NULL;     tmp = attr->children;     for(tmp = attr->children; tmp != NULL; tmp = tmp->next) {       tmp->parent = (xmlNode *  )attr;       tmp->doc = attr->doc;       if (tmp->next == NULL)         attr->last = tmp;     }     xmlFree (buffer);   }    return; }
 **)
 
 procedure TGDOMNode.set_nodeValue(const value: DOMString);
@@ -2795,12 +2761,7 @@ begin
 end;
 
 procedure TGDOMDocument.appendNs(ns: xmlNsPtr);
-begin
-  if ns<>nil
-    then FNsList.add(ns);
-end;
-
-initialization
+begin   if ns<>nil     then FNsList.add(ns); end;  initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
 finalization
 end.
