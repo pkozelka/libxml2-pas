@@ -15,6 +15,9 @@ compile-cygwin:
 compile-linux-gnu:
 	dcc $(DCCOPTS) $(LIBNAME).pas
 
+checkapi:
+	../utils/checkApiChanges.sh :pserver:anonymous@anoncvs.gnome.org:/cvs/gnome libxslt HEAD *.inc
+
 cvsexport: clean
 	mkdir $(MYTMP)
 	cvs -z4 -d $(CVSROOT) export -l -r HEAD -d $(MYTMP) .
