@@ -165,24 +165,27 @@ function compressDist()
 
 function compile()
 {
-	if $CYGWIN; then
-		prepareWin32Src
-		pack='zip -qr '
-	else
-		prepareLinuxSrc
-		pack='tar -zcf '
-	fi
 	pwd=`pwd`
 	cd $DIST/src
+	mkdir -p $DIST/lib
+
+	if $CYGWIN; then
+		prepareWin32Src
+		archName=$HEADERS_DIR/libxml2-pas-$LIBXML_VER-$DV.zip
+		pack="zip -qr "
+	else
+		prepareLinuxSrc
+		archName=$HEADERS_DIR/libxml2-pas-$LIBXML_VER-$DV.tgz
+		pack="tar -zcf $HEADERS_DIR/libxml2-pas-$LIBXML_VER-$DV.tgz "
+	fi
 	for fn in *.pas libxml2_pas.dpk; do
 		echo "Compiling $fn:"
 		$DCC -H -Q -N. -E. $fn
 	done
-	rm libxml2_pas.dcu
-	mkdir -p $DIST/lib
-	cp *.dcp *.bpl *.dcu $DIST/lib
+	rm -f libxml2_pas.dcu $archName
+	cp *.dcp *.bpl *.dcu *.so $DIST/lib
 	cd $DIST
-	$pack $HEADERS_DIR/libxml2-pas-$LIBXML_VER-$DV.zip lib
+	$pack $archName lib
 	cd $pwd
 }
 
