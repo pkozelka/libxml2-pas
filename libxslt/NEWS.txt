@@ -1,0 +1,11 @@
+libxslt-pas
+
+
+Version 1.0.16:
+---------------
+- API adjusted to match libxslt-1.0.16
+- translations use the CVS-SIGN format which improves maintenance
+
+Version 0.0.9:
+--------------
+- most important header files converted
