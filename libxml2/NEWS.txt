@@ -1,6 +1,12 @@
 libxml2-pas
 
 
+Version 2.4.21:
+---------------
+- API adjusted to match libxml2-2.4.21
+- added translations for new schema-related headers
+- many enums, originally translated as sets of constants, retranslated as pascal enums
+
 Version 2.4.20:
 ---------------
 - API adjusted to match libxml2-2.4.20

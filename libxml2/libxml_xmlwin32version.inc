@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.33] xmlwin32version.h
+// CVS-SIGN: [1.34] xmlwin32version.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -25,34 +25,36 @@ procedure xmlCheckVersion(version: Longint); cdecl; external LIBXML2_SO;
 {$ENDIF}
 { LIBXML2_COMPILING_MSCCDEF  }
 const
-(**
- * LIBXML_DOTTED_VERSION:
- *
- * the version string like "1.2.3"
- *)
-  LIBXML_DOTTED_VERSION = '2.4.20';
+  (**
+   * LIBXML_DOTTED_VERSION:
+   *
+   * the version string like "1.2.3"
+   *)
+  LIBXML_DOTTED_VERSION = '2.4.21';
 
-(**
- * LIBXML_VERSION:
- *
- * the version number: 1.2.3 value is 1002003
- *)
-  LIBXML_VERSION = 20420;
+  (**
+   * LIBXML_VERSION:
+   *
+   * the version number: 1.2.3 value is 1002003
+   *)
+  LIBXML_VERSION = 20421;
 
-(**
- * LIBXML_VERSION_STRING:
- *
- * the version number string, 1.2.3 value is "1002003"
- *)
-  LIBXML_VERSION_STRING = '20420';
+  (**
+   * LIBXML_VERSION_STRING:
+   *
+   * the version number string, 1.2.3 value is "1002003"
+   *)
+  LIBXML_VERSION_STRING = '20421';
 
-(**
- * LIBXML_TEST_VERSION:
- *
- * Macro to check that the libxml version in use is compatible with
- * the version the software has been compiled against
- *)
-//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20419);
+  (**
+   * LIBXML_TEST_VERSION:
+   *
+   * Macro to check that the libxml version in use is compatible with
+   * the version the software has been compiled against
+   *)
+
+//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20421);
+
 {$IF False}
 
 (**
