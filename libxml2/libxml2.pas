@@ -80,6 +80,7 @@ type
 {$I libxml_xmlunicode.inc}
 {$I libxml_xmlregexp.inc}
 {$I libxml_schemasInternals.inc}
+{$I libxml_xmlschemastypes.inc}
 
 {$IFDEF WIN32}
 { this function should release memory using the same mem.manager that libxml2

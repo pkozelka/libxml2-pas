@@ -95,7 +95,8 @@ const
 type
   xmlSchemaVal = record end;
   xmlSchemaValPtr = ^xmlSchemaVal;
-
+  PxmlSchemaValPtr = ^xmlSchemaValPtr;
+  
   xmlSchemaType = record end;
   xmlSchemaTypePtr = ^xmlSchemaType;
 
