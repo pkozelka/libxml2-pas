@@ -189,6 +189,23 @@ function compile()
 	cd $pwd
 }
 
+function uploadToSourceforge()
+{
+	local ftpfile="$TMP/uploadcmd.ftp"
+
+	>$ftpfile
+	echo "user anonymous libxml2-pas@sourceforge.net" >>$ftpfile
+	echo "binary" >>$ftpfile
+	echo "cd incoming" >>$ftpfile
+	while [ -f "$1" ]; do
+		echo "put $1 $1" >>$ftpfile
+		shift
+	done
+	echo "bye" >>$ftpfile
+
+	ftp -n upload.sourceforge.net < $ftpfile
+}
+
 # check that LIBXML2_PAS env. var. is correct
 if [ ! -d "$LIBXML2_PAS" ]; then
 	echo "ERROR - variable LIBXML2_PAS must point to the root of libxml2-pas working copy" >/dev/stderr
@@ -266,16 +283,14 @@ dist)
 	checkSrcVersions
 	compressDist
 	;;
-upload)
-#ftp-put.sh upload.log upload.sourceforge.net incoming $1 $1 anonymous libxml2-pas@sourceforge.net
-#cat upload.log
-#rm -f upload.log
-	echo "NOT IMPLEMENTED YET"
-	;;
 bin)
 	checkSrcVersions
 	copyCommonSourcesToDist
 	compile
+	;;
+
+upload)
+	uploadToSourceforge libxml2-pas-${LIBXML_VER}*
 	;;
 *)
 	echo "Invalid command: $aCmd" >/dev/stderr
