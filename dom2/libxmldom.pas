@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.93 2002-01-29 02:43:51 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.94 2002-01-29 02:56:20 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -956,9 +956,10 @@ begin
     Result := '#document';
   XML_CDATA_SECTION_NODE:
     Result := '#cdata-section';
-  XML_TEXT_NODE,
-  XML_COMMENT_NODE,
   XML_DOCUMENT_FRAG_NODE:
+    Result := '#document-fragment';
+  XML_TEXT_NODE,
+  XML_COMMENT_NODE:
     Result := '#'+UTF8Decode(FGNode.name);
   else
     Result := UTF8Decode(FGNode.name);
@@ -1022,9 +1023,12 @@ function TGDOMNode.get_childNodes: IDomNodeList;
 begin
   if (FChildNodes=nil) then begin
     // create wrapper for child list, if relevant
+    //todo: change this to VMT redirection
     case get_nodeType of
     DOCUMENT_NODE,
-    ELEMENT_NODE:
+    DOCUMENT_FRAGMENT_NODE,
+    ELEMENT_NODE,
+    ENTITY_REFERENCE_NODE:
       TGDOMChildNodeList.Create(self); // assigns FChildNodes
     end;
   end;
