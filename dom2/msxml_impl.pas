@@ -133,8 +133,9 @@ type
 
   TMSXMLDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
     private
-      fFreeThreading    : Boolean;
-      fDomImplementation: IDOMImplementation;
+      fFreeThreading     : Boolean;
+      fDomImplementation : IDOMImplementation;
+
     public
       constructor create(freeThreading : Boolean);
       destructor destroy; override;
@@ -602,18 +603,27 @@ constructor TMSXMLDocumentBuilder.create(freeThreading : Boolean);
 begin
   inherited create;
   fFreeThreading := freeThreading;
-  fDomImplementation:=TMSXMLImplementation.create(nil);
 end;
 
 destructor TMSXMLDocumentBuilder.destroy;
 begin
   inherited destroy;
+  fDomImplementation := nil;
 end;
 
 
 function TMSXMLDocumentBuilder.get_DomImplementation : IDomImplementation;
 begin
-  result:=fDOMImplementation;
+  (*
+   * MSXML does not provide a direct way of creating a DomImplementation
+   * without creating a document. To support get_DomImplementation a empty
+   * document will be created
+  *)
+  if fDOMImplementation = nil then
+  begin
+    fDomImplementation := newDocument.domImplementation;
+  end;
+  result := fDOMImplementation;
 end;
 
 function TMSXMLDocumentBuilder.newDocument : IDomDocument;
@@ -682,9 +692,11 @@ function TMSXMLImplementation.hasFeature(
         const version : DomString) : Boolean;
 begin
   //todo: check version of msdom installed
-  if (uppercase(feature) = 'CORE') and (version = '2.0')
+  if (uppercase(feature) = 'CORE') and
+     ( (version = '2.0') or (version = '1.0') or (version = '') )
     then result := true
-    else result := false;
+    else
+      result := fMSDomImplementation.hasFeature(feature, version);
 end;
 
 
@@ -713,7 +725,6 @@ end;
 (*
  *  TMSXMLDocument
 *)
-
 constructor TMSXMLDocument.create(msDomDocument : IXMLDOMDocument);
 begin
   inherited create(msDomDocument);
