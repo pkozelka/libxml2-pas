@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.68 2002-01-20 20:20:43 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.69 2002-01-20 20:32:16 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -162,12 +162,7 @@ type
 
   { TGDOMAttr }
 
-  TGDOMAttr = class(TGDOMNode,
-    IDomNode,
-    IDomAttr)
-  private
-    //ns:
-    function  GetGAttribute: xmlAttrPtr;
+  TGDOMAttr = class(TGDOMNode, IDomNode, IDomAttr)
   protected //IDomNode
     function  IDomNode.get_nodeValue = get_value;
     procedure IDomNode.set_nodeValue = set_value;
@@ -177,26 +172,18 @@ type
     function  IDomNode.get_previousSibling = returnNullDomNode;
     function  IDomNode.get_nextSibling = returnNullDomNode;
   protected //IDomAttr
-  protected
-    { Property Get/Set }
     function  get_name: DOMString;
     function  get_specified: Boolean;
     function  get_value: DOMString;
     procedure set_value(const attributeValue: DOMString);
     function  get_ownerElement: IDOMElement;
-    { Properties }
-    property name: DOMString read get_name;
-    property specified: Boolean read get_specified;
-    property value: DOMString read get_value write set_value;
-    property ownerElement: IDOMElement read get_ownerElement;
-  public
-    property GAttribute: xmlAttrPtr read GetGAttribute;
   end;
 
+  { TGDOMCharacterData }
+  
   TGDOMCharacterData = class(TGDOMNode, IDOMCharacterData)
   private
-  protected
-    { IDOMCharacterData }
+  protected // IDOMCharacterData
     function  get_data: DOMString;
     procedure set_data(const data: DOMString);
     function  get_length: Integer;
@@ -233,82 +220,68 @@ type
     function  hasAttribute(const name: DOMString): Boolean;
     function  hasAttributeNS(const namespaceURI, localName: DOMString): Boolean;
     procedure normalize;
-  public
+  protected
     constructor Create(aLibXml2Node: pointer); override;
+  public
     destructor Destroy; override;
   end;
 
   { TMSDOMText }
 
-  TGDOMText = class(TGDOMCharacterData, IDOMText)
-  protected
+  TGDOMText = class(TGDOMCharacterData, IDomText)
+  protected // IDomText
     function splitText(offset: Integer): IDOMText;
   end;
 
   { TGDOMComment }
 
-  TGDOMComment = class(TGDOMCharacterData, IDOMComment)
+  TGDOMComment = class(TGDOMCharacterData, IDomComment)
   end;
 
   { TGDOMCDATASection }
 
-  TGDOMCDATASection = class(TGDOMText, IDOMCDATASection)
+  TGDOMCDATASection = class(TGDOMText, IDomCDataSection)
   private
   public
   end;
 
-  TGDOMDocumentType = class(TGDOMNode, IDOMDocumentType)
+  TGDOMDocumentType = class(TGDOMNode, IDomDocumentType)
   private
     function GetGDocumentType: xmlDtdPtr;
-  protected
-    { IDOMDocumentType }
+  protected // IDOMDocumentType
     function get_name: DOMString;
     function get_entities: IDOMNamedNodeMap;
     function get_notations: IDOMNamedNodeMap;
     function get_publicId: DOMString;
     function get_systemId: DOMString;
     function get_internalSubset: DOMString;
-  public
-    property GDocumentType: xmlDtdPtr read GetGDocumentType;
   end;
 
   { TGDOMNotation }
-  
-  TGDOMNotation = class(TGDOMNode,
-    IDomNode,
-    IDomNotation)
-  private
-    function GetGNotation: xmlNotationPtr;
+
+  TGDOMNotation = class(TGDOMNode, IDomNode, IDomNotation)
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomNotation
     function get_publicId: DOMString;
     function get_systemId: DOMString;
-  public
-    property GNotation: xmlNotationPtr read GetGNotation;
   end;
 
-  TGDOMEntity = class(TGDOMNode,
-    IDomNode,
-    IDomEntity)
-  private
-    function GetGEntity: xmlEntityPtr;
+  TGDOMEntity = class(TGDOMNode, IDomNode, IDomEntity)
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
   protected //IDomEntity
     function get_publicId: DOMString;
     function get_systemId: DOMString;
     function get_notationName: DOMString;
-  public
-    property GEntity: xmlEntityPtr read GetGEntity;
   end;
 
-  TGDOMEntityReference = class(TGDOMNode, IDOMEntityReference)
+  TGDOMEntityReference = class(TGDOMNode, IDomEntityReference)
   end;
 
   { TGDOMProcessingInstruction }
 
-  TGDOMProcessingInstruction = class(TGDOMNode, IDOMProcessingInstruction)
+  TGDOMProcessingInstruction = class(TGDOMNode, IDomProcessingInstruction)
   private
   protected
     { IDOMProcessingInstruction }
@@ -318,11 +291,7 @@ type
   public
   end;
 
-  TGDOMDocument = class(TGDOMNode,
-    IDomNode,
-    IDomDocument,
-    IDomParseOptions,
-    IDomPersist)
+  TGDOMDocument = class(TGDOMNode, IDomNode, IDomDocument, IDomParseOptions, IDomPersist)
   private
     FGDOMImpl: IDOMImplementation;
     FAsync: boolean;              //for compatibility, not really supported
@@ -379,6 +348,7 @@ type
     procedure saveToStream(const stream: TStream);
     procedure set_OnAsyncLoad(const Sender: TObject; EventHandler: TAsyncEventHandler);
   protected //
+    constructor Create(aLibXml2Node: pointer); override;
     function  requestDocPtr: xmlDocPtr;
     function  requestNodePtr: xmlNodePtr; override;
     function  GetGDoc: xmlDocPtr;
@@ -388,27 +358,23 @@ type
     property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
     property  FlyingNodes: TList read GetFlyingNodes;
   public
-    constructor Create(aLibXml2Node: pointer); override;
     destructor Destroy; override;
   end;
 
   { TMSDOMDocumentFragment }
 
-  TGDOMDocumentFragment = class(TGDOMNode,
-    IDomNode,
-    IDomDocumentFragment)
+  TGDOMDocumentFragment = class(TGDOMNode, IDomNode, IDomDocumentFragment)
   protected //IDomNode
     function  IDomNode.get_parentNode = returnNullDomNode;
   end;
 
-  TGDOMDocumentBuilderFactory = class(TInterfacedObject,
-    IDomDocumentBuilderFactory)
+  TGDOMDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
   private
     FFreeThreading : Boolean;
   protected //IDomDocumentBuilderFactory
     function  NewDocumentBuilder : IDomDocumentBuilder;
     function  Get_VendorID : DomString;
-  public
+  protected
     constructor Create(AFreeThreading : Boolean);
   end;
 
@@ -424,8 +390,9 @@ type
     function  newDocument : IDomDocument;
     function  parse(const xml : DomString) : IDomDocument;
     function  load(const url : DomString) : IDomDocument;
-  public
+  protected
     constructor Create(AFreeThreading : Boolean);
+  public
     destructor Destroy; override;
   end;
 
@@ -951,13 +918,13 @@ end;
 function TGDOMNode.get_prefix: DOMString;
 begin
   case FGNode.type_ of
-    XML_ELEMENT_NODE,
-    XML_ATTRIBUTE_NODE:
-      begin
-        if FGNode.ns=nil then exit;
-        Result := UTF8Decode(FGNode.ns.prefix);
-      end;
+  XML_ELEMENT_NODE,
+  XML_ATTRIBUTE_NODE:
+    begin
+      if FGNode.ns=nil then exit;
+      Result := UTF8Decode(FGNode.ns.prefix);
     end;
+  end;
 end;
 
 function TGDOMNode.get_localName: DOMString;
@@ -1318,11 +1285,6 @@ begin
 end;
 
 { TGDOMAttr }
-
-function TGDOMAttr.GetGAttribute: xmlAttrPtr;
-begin
-  result:=xmlAttrPtr(GNode);
-end;
 
 function TGDOMAttr.get_name: DOMString;
 var
@@ -2197,11 +2159,6 @@ begin
   //result:=GdomeDOMStringToString(gdome_ent_systemID(GEntity,@exc));
 end;
 
-function TGDOMEntity.GetGEntity: xmlEntityPtr;
-begin
-  Result := xmlEntityPtr(GNode);
-end;
-
 { TGDOMProcessingInstruction }
 
 function TGDOMProcessingInstruction.get_data: DOMString;
@@ -2299,11 +2256,6 @@ begin
   //temp:=GdomeDOMStringToString(gdome_not_systemId(GNotation, @exc));
   //DomAssert(exc);
   //result:=temp;
-end;
-
-function TGDOMNotation.GetGNotation: xmlNotationPtr;
-begin
-  Result := pointer(GNode);
 end;
 
 initialization
