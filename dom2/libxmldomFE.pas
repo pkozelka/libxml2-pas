@@ -3577,7 +3577,7 @@ end;
 
 initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
-  InitExportedVar;
+  //InitExportedVar;
 finalization
 end.
 
