@@ -183,7 +183,8 @@ type
   TGDOMNamedNodeMap = class(TGDOMInterface, IDOMNamedNodeMap)
   // this class is used for attributes, entities and notations
   private
-    FGNamedNodeMap: xmlNodePtr;
+    FGNamedNodeMap: xmlNodePtr;  //for attribute-lists only
+    FGHashList: Pointer;          //for dtd.enties etc
     FOwnerDocument: IDOMDocument;
   protected
     { IDOMNamedNodeMap }
@@ -197,7 +198,7 @@ type
     function setNamedItemNS(const newItem: IDOMNode): IDOMNode;
     function removeNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
   public
-    constructor Create(ANamedNodeMap: xmlNodePtr; AOwnerDocument: IDOMDocument);
+    constructor Create(ANamedNodeMap: xmlNodePtr; AOwnerDocument: IDOMDocument;typ:integer=0);
     destructor destroy; override;
     property GNamedNodeMap: xmlNodePtr read get_GNamedNodeMap;
   end;
@@ -980,9 +981,7 @@ begin
       cur := GetGNode(newChild);
       node:=xmlReplaceNode(old, cur);
       old.parent:=nil;
-      (FOwnerDocument as IDOMInternal).appendNode(old);
       result:=oldChild;
-      //result:=MakeNode(node,FOwnerDocument) as IDOMNode
     end
     else result:=nil;
 end;
@@ -1427,11 +1426,17 @@ begin
     else result:=nil;
 end;
 
-constructor TGDOMNamedNodeMap.Create(ANamedNodeMap: xmlNodePtr;AOwnerDocument:IDOMDocument);
+constructor TGDOMNamedNodeMap.Create(ANamedNodeMap: xmlNodePtr;AOwnerDocument:IDOMDocument;typ:integer=0);
 // ANamedNodeMap=nil for empty NodeMap
 begin
 	FOwnerDocument:=AOwnerDocument;
-  FGNamedNodeMap:=ANamedNodeMap;
+  if typ=0 then begin
+    FGHashList:=nil;
+    FGNamedNodeMap:=ANamedNodeMap;
+  end else begin
+    FGHashList:=ANamedNodeMap;
+    FGNamedNodeMap:=nil;
+  end;
 	inherited create;
 end;
 
@@ -2404,12 +2409,10 @@ var
   CString,encoding:pchar;
   length:LongInt;
 begin
-  //CString:='';
   encoding:=FPGdomeDoc.encoding;
   xmlDocDumpMemoryEnc(FPGdomeDoc,CString,@length,encoding);
-  //xmlRealloc(CString,length);
-  //xmlFreeFunc(CString);
   result:=CString;
+  xmlFree(CString);  //this works with the new dll from 2001-01-25
 end;
 
 function TGDOMDocument.asyncLoadState: Integer;
@@ -2742,11 +2745,12 @@ end;
 
 function TGDOMDocumentType.get_entities: IDOMNamedNodeMap;
 var
-  entities: xmlNodePtr;
+  entities: Pointer;
+  dtd:xmlDtdPtr;
 begin
-  entities:=xmlNodePtr(GDocumentType);
+  entities:=GDocumentType.entities;
   if entities<>nil
-    then result:=TGDOMNamedNodeMap.Create(entities,FOwnerDocument) as IDOMNamedNodeMap
+    then result:=TGDOMNamedNodeMap.Create(entities,FOwnerDocument,1) as IDOMNamedNodeMap
     else result:=nil;
 end;
 
