@@ -20,7 +20,7 @@
                       They are not part of the API or ABI, i.e. they can change
                       without prior notice, use carefully.
 
-     See Copyright for the status of this software.
+		 See Copyright for the status of this software.
 
      daniel@veillard.com
     }
@@ -36,7 +36,7 @@
 
   const
      XSLT_MAX_SORT = 5;
-  {
+	{
      XSLT_PAT_NO_PRIORITY:
 
      specific value for pattern without priority expressed
@@ -68,7 +68,7 @@
   { the number of time the template was called  }
   { the time spent in this template  }
      xsltTemplate = record
-          next : xsltTemplatePtr;
+					next : xsltTemplatePtr;
           style : xsltStylesheetPtr;
           match : PxmlChar;
           priority : double;
@@ -100,7 +100,7 @@
   { Used for interpretation of pattern and may appear in result  }
      xsltDecimalFormat = record
           next : xsltDecimalFormatPtr;
-          name : PxmlChar;
+					name : PxmlChar;
           digit : PxmlChar;
           patternSeparator : PxmlChar;
           minusSign : PxmlChar;
@@ -164,7 +164,7 @@ in declaration at line 131 *)
          XSLT_FUNC_WITHPARAM,XSLT_FUNC_PARAM,
          XSLT_FUNC_VARIABLE,XSLT_FUNC_WHEN,
          XSLT_FUNC_EXTENSION);
-    {
+		{
        xsltElemPreCompDeallocator:
        @comp:  the #xsltElemPreComp to free up
 
@@ -196,7 +196,7 @@ in declaration at line 164 *)
             next : xsltElemPreCompPtr;
             type_ : xsltStyleType;
             func : xsltTransformFunction;
-            inst : xmlNodePtr;
+						inst : xmlNodePtr;
             free : xsltElemPreCompDeallocator;
          end;
 
@@ -228,7 +228,7 @@ in declaration at line 164 *)
     { element  }
     { element  }
     { apply-templates  }
-    { apply-templates  }
+		{ apply-templates  }
     { if  }
     { call-template  }
     { sort, copy-of, value-of, apply-templates  }
@@ -260,7 +260,7 @@ in declaration at line 164 *)
             mode : PxmlChar;
             modeURI : PxmlChar;
             test : PxmlChar;
-            templ : xsltTemplatePtr;
+						templ : xsltTemplatePtr;
             select : PxmlChar;
             ver11 : longint;
             filename : PxmlChar;
@@ -292,7 +292,7 @@ in declaration at line 164 *)
             nameURI : PxmlChar;
             select : PxmlChar;
             tree : xmlNodePtr;
-            value : xmlXPathObjectPtr;
+						value : xmlXPathObjectPtr;
          end;
 
     {
@@ -324,7 +324,7 @@ in declaration at line 164 *)
            Template descriptions
           }
     { the ordered list of templates  }
-    { hash table or wherever compiled templates
+		{ hash table or wherever compiled templates
     				   informations are stored  }
     { template based on /  }
     { template based on key()  }
@@ -356,7 +356,7 @@ in declaration at line 164 *)
           }
     { the output method  }
     { associated namespace if any  }
-    { version string  }
+		{ version string  }
     { encoding string  }
     { omit-xml-declaration = "yes" | "no"  }
     { Number formatting  }
@@ -388,7 +388,7 @@ in declaration at line 164 *)
             doc : xmlDocPtr;
             stripSpaces : xmlHashTablePtr;
             stripAll : longint;
-            cdataSection : xmlHashTablePtr;
+						cdataSection : xmlHashTablePtr;
             variables : xsltStackElemPtr;
             templates : xsltTemplatePtr;
             templatesHash : pointer;
@@ -420,7 +420,7 @@ in declaration at line 164 *)
             warnings : longint;
             errors : longint;
             exclPrefix : PxmlChar;
-            exclPrefixTab : PPxmlChar;
+						exclPrefixTab : PPxmlChar;
             exclPrefixNr : longint;
             exclPrefixMax : longint;
             _private : pointer;
@@ -452,7 +452,7 @@ in declaration at line 164 *)
           }
     { the extension functions  }
     { the extension elements  }
-    { the extension data  }
+		{ the extension data  }
     { the current mode  }
     { the current mode URI  }
     { the document list  }
@@ -484,7 +484,7 @@ in declaration at line 164 *)
             templNr : longint;
             templMax : longint;
             templTab : xsltTemplatePtr;
-            vars : xsltStackElemPtr;
+						vars : xsltStackElemPtr;
             varsNr : longint;
             varsMax : longint;
             varsTab : xsltStackElemPtr;
@@ -547,17 +547,17 @@ in declaration at line 454 *)
     						   xmlChar  name);
       }
 
-function xsltNewStylesheet:xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-function xsltParseStylesheetFile(filename:PxmlChar):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function  xsltNewStylesheet:xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function  xsltParseStylesheetFile(filename:PxmlChar):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
 procedure xsltFreeStylesheet(sheet:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
-function xsltIsBlank(str:PxmlChar):longint;cdecl;external LIBXSLT_SO;
+function  xsltIsBlank(str:PxmlChar):longint;cdecl;external LIBXSLT_SO;
 procedure xsltFreeStackElemList(elem:xsltStackElemPtr);cdecl;external LIBXSLT_SO;
-function xsltDecimalFormatGetByName(sheet:xsltStylesheetPtr; name:PxmlChar):xsltDecimalFormatPtr;cdecl;external LIBXSLT_SO;
-function xsltParseStylesheetProcess(ret:xsltStylesheetPtr; doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function  xsltDecimalFormatGetByName(sheet:xsltStylesheetPtr; name:PxmlChar):xsltDecimalFormatPtr;cdecl;external LIBXSLT_SO;
+function  xsltParseStylesheetProcess(ret:xsltStylesheetPtr; doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
 procedure xsltParseStylesheetOutput(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
-function xsltParseStylesheetDoc(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-function xsltLoadStylesheetPI(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function  xsltParseStylesheetDoc(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function  xsltLoadStylesheetPI(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
 procedure xsltNumberFormat(ctxt:xsltTransformContextPtr; data:xsltNumberDataPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
-function xsltFormatNumberConversion(self:xsltDecimalFormatPtr; format:PxmlChar; number:double; result:PPxmlChar):xmlXPathError;cdecl;external LIBXSLT_SO;
+function  xsltFormatNumberConversion(self:xsltDecimalFormatPtr; format:PxmlChar; number:double; result:PPxmlChar):TxmlXPathError;cdecl;external LIBXSLT_SO;
 procedure xsltParseTemplateContent(style:xsltStylesheetPtr; templ:xmlNodePtr);cdecl;external LIBXSLT_SO;
 
