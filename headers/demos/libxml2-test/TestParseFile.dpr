@@ -18,8 +18,8 @@ begin
   if (ctxt.wellFormed<>0) then begin
     Result := ctxt.myDoc;
   end else begin
-     xmlFreeDoc(ctxt.myDoc);
-     ctxt.myDoc := nil;
+    xmlFreeDoc(ctxt.myDoc);
+    ctxt.myDoc := nil;
   end;
   xmlFreeParserCtxt(ctxt);
 end;
@@ -32,9 +32,9 @@ begin
   Write(aFilename, ': ');
   doc := myParseFile(PChar(aFileName));
   if (doc=nil) then begin
-    WriteLN('failed');
+    WriteLN('File is NOT well-formed');
   end else begin
-    WriteLN('ok');
+    WriteLN('File is well-formed');
     xmlFreeDoc(doc);
   end;
 end;
