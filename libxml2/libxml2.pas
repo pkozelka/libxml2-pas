@@ -113,7 +113,7 @@ implementation
 uses
   SysUtils;
 
-// functions from globals.h
+// functions from libxml_globals.pas
 
 procedure xmlFree(str: PxmlChar);
 begin
@@ -182,12 +182,12 @@ end;
 function  DelphiMallocFunc(size:size_t):pointer;
 begin
   GetMem(Result, size);
-  FillChar(Result^, size+10, 0);
+  FillChar(Result^, size, 0);
 end;
 
 function  DelphiReallocFunc(ptr:pointer; size:size_t):pointer;
 begin
-  Result := ReallocMemory(ptr, size+10);
+  Result := ReallocMemory(ptr, size);
 end;
 
 function  DelphiStrdupFunc(str:PChar):Pchar;
