@@ -180,7 +180,7 @@ function compile()
 	fi
 	for fn in *.pas libxml2_pas.dpk; do
 		echo "Compiling $fn:"
-		$DCC -H -Q -N. -E. $fn
+		$DCC -H -Q -N. -E. $fn | grep -i 'error\|warning\|hint'
 	done
 	rm -f libxml2_pas.dcu $archName
 	cp *.dcp *.bpl *.dcu *.so $DIST/lib
