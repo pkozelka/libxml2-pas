@@ -5,8 +5,15 @@ Petr Kozelka (C) 2002
 	- the repository content should always be independent of any concrete working environment
 1.1. checkout
 	- it is always assumed that the whole repository including all modules is checked out ("cvs co .")
+1.2. commit
+	- always commit a semantically closed block, and make the description really descriptive. 
+	  The "cvs log" should be always a good start for documentation. So, descriptions like 
+	  "many various changes" should never be there. 
+	- it is better to commit 20 times with good description of changes than once with a no-description.
+
 2. Directory structure
 	TODO (as agreed earlier, I will fill this later)
+
 3. Files under revision control
 3.1. What should never be uploaded
 	- long binary files (archives, executables, photos, other binary data)
