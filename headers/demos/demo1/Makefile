@@ -19,6 +19,6 @@ testDemo1: ./Demo1 ./transform
 	./Demo1 calServer.xml '//*'
 
 testtransform: ./transform
-	./transform.exe 17-1.xml 17-2.xsl 17-3.html
+	./transform 17-1.xml 17-2.xsl 17-3.html
 
 test: testDemo1 testtransform
