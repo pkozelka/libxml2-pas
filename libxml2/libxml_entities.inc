@@ -33,23 +33,23 @@ type
    *)
   xmlEntityPtr = ^xmlEntity; //[pk] cannot be moved to tree.inc
   xmlEntity = record
-    _private : pointer;             { application data  }
-    type_ : xmlElementType;         { XML_ENTITY_DECL, must be second !  }
-    name : PxmlChar;                { Entity name  }
+    _private : pointer;             (* application data  *)
+    type_ : xmlElementType;         (* XML_ENTITY_DECL, must be second !  *)
+    name : PxmlChar;                (* Entity name  *)
     children : ^xmlNode;            (* First child link *)
     last : ^xmlNode;                (* Last child link *)
-    parent : ^xmlDtd;               { -> DTD  }
-    next : ^xmlNode;                { next sibling link   }
-    prev : ^xmlNode;                { previous sibling link   }
-    doc : ^xmlDoc;                  { the containing document  }
-    orig : PxmlChar;                { content without ref substitution  }
-    content : PxmlChar;             { content or ndata if unparsed  }
-    length : longint;               { the content length  }
-    etype : xmlEntityType;          { The entity type  }
-    ExternalID : PxmlChar;          { External identifier for PUBLIC  }
-    SystemID : PxmlChar;            { URI for a SYSTEM or PUBLIC Entity  }
-    nexte : xmlEntityPtr;           { unused  }
-    URI : PxmlChar;                 { the full URI as computed  }
+    parent : ^xmlDtd;               (* -> DTD  *)
+    next : ^xmlNode;                (* next sibling link   *)
+    prev : ^xmlNode;                (* previous sibling link   *)
+    doc : ^xmlDoc;                  (* the containing document  *)
+    orig : PxmlChar;                (* content without ref substitution  *)
+    content : PxmlChar;             (* content or ndata if unparsed  *)
+    length : longint;               (* the content length  *)
+    etype : xmlEntityType;          (* The entity type  *)
+    ExternalID : PxmlChar;          (* External identifier for PUBLIC  *)
+    SystemID : PxmlChar;            (* URI for a SYSTEM or PUBLIC Entity  *)
+    nexte : xmlEntityPtr;           (* unused  *)
+    URI : PxmlChar;                 (* the full URI as computed  *)
   end;
 
   (*
