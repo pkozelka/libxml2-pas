@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.41 2002-01-15 13:49:22 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.42 2002-01-15 14:16:46 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -129,8 +129,8 @@ type
 		function get_item(index: Integer): IDOMNode;
 		function get_length: Integer;
 	public
-		constructor Create(AParent: xmlNodePtr; AOwnerDocument: IDomDocument); overload;
-		constructor Create(AXpathObject: xmlXPathObjectPtr;ADocument:IDOMDocument); overload;
+		constructor Create(aParent: xmlNodePtr; aOwnerDocument: IDomDocument); overload;
+		constructor Create(aXPathObject: xmlXPathObjectPtr; aOwnerDocument: IDOMDocument); overload;
 		destructor destroy; override;
 	end;
 
@@ -194,7 +194,7 @@ type
 		procedure replaceData(offset, count: Integer; const data: DOMString);
 	public
 		constructor Create(ACharacterData: xmlNodePtr);
-		destructor destroy; override;
+		destructor Destroy; override;
 	end;
 
 	{ TGDOMElement }
@@ -222,7 +222,7 @@ type
 		procedure normalize;
 	public
 		constructor Create(AElement: xmlNodePtr);
-		destructor destroy; override;
+		destructor Destroy; override;
 	end;
 
 	{ TMSDOMText }
@@ -959,19 +959,18 @@ end;
 
 { TGDOMNodeList }
 
-constructor TGDOMNodeList.Create(AParent: xmlNodePtr; aOwnerDocument: IDomDocument);
+constructor TGDOMNodeList.Create(aParent: xmlNodePtr; aOwnerDocument: IDomDocument);
 // create a IDOMNodeList from a var of type xmlNodePtr
 // xmlNodePtr is the same as xmlNodePtrList, because in libxml2 there is no
 // difference in the definition of both
 begin
 	inherited Create;
-	FParent := AParent;
+	FParent := aParent;
 	FXpathObject := nil;
 	FOwnerDocument := aOwnerDocument;
 end;
 
-constructor TGDOMNodeList.Create(AXpathObject: xmlXPathObjectPtr;
-	ADocument: IDOMDocument);
+constructor TGDOMNodeList.Create(aXPathObject: xmlXPathObjectPtr; aOwnerDocument: IDOMDocument);
 // create a IDOMNodeList from a var of type xmlNodeSetPtr
 //	xmlNodeSetPtr = ^xmlNodeSet;
 //	xmlNodeSet = record
@@ -982,12 +981,14 @@ constructor TGDOMNodeList.Create(AXpathObject: xmlXPathObjectPtr;
 begin
 	inherited Create;
 	FParent := nil;
-	FXpathObject := AXpathObject;
+	FXPathObject := aXPathObject;
 end;
 
 destructor TGDOMNodeList.destroy;
 begin
-	if FXPathObject<>nil then xmlXPathFreeObject(FXPathObject);
+	if FXPathObject<>nil then begin
+		xmlXPathFreeObject(FXPathObject);
+	end;
 	inherited destroy;
 end;
 
@@ -1782,8 +1783,8 @@ begin
 	if (namespaceURI<>'') then begin
 		uprefix := prefix(qualifiedName);
 		ulocal := localName(qualifiedName);
-		ns := xmlNewNs(FGNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
-		attr := xmlNewNsProp(FGNode, ns, PChar(ulocal), nil);
+		ns := xmlNewNs(nil, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+		attr := xmlNewNsProp(nil, ns, PChar(ulocal), nil);
 		attr.doc := requestDocPtr;
 	end else begin
 		ulocal := UTF8Encode(qualifiedName);
