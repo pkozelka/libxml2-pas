@@ -118,7 +118,7 @@ uses
   Windows;
 {$ENDIF}
 {$IFDEF LINUX}
-  libc;
+  Libc;
 {$ENDIF}
 
 { This is the exported variable really.  }
