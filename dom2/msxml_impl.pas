@@ -199,7 +199,7 @@ type
       function  get_NodeName : DomString;
       procedure set_NodeValue(const value : DomString);
       function  get_NodeValue : DomString;
-      function  get_NodeType : TNodeType;
+      function  get_NodeType : DomNodeType;
       function  get_ParentNode : IDomNode;
       function  get_ChildNodes : IDomNodeList;
       function  get_FirstChild : IDomNode;
@@ -1084,9 +1084,9 @@ begin
     result := Value;
 end;
 
-function TMSXMLNode.get_NodeType : TNodeType;
+function TMSXMLNode.get_NodeType : DomNodeType;
 begin
-  result := domOrdToNodeType(fMSDomNode.nodeType);
+  result:=DomNodeType(fMSDomNode.nodeType);
 end;
 
 function TMSXMLNode.get_ParentNode : IDomNode;
