@@ -14,8 +14,13 @@ TRANSLATED_FILES="`find libxml2 libxslt -name '*.inc'`"
 LOCALROOT=/home/pk/cvs/gnome.org
 TMP=CHECKAPI.TMP
 
-rm -rf $TMP
+RESULTFILE=checkapi-results.zip
+
+rm -rf $TMP $RESULTFILE
+
+THISPATH=`pwd`
 for fn in $TRANSLATED_FILES ; do
+	cd $THISPATH
 	echo -n "$fn:  "
 	LINE=`head $fn | grep CVS-REV`
 	if [ "x$LINE" = "x" ]; then
@@ -77,11 +82,16 @@ for fn in $TRANSLATED_FILES ; do
 	$cmd >$TARGETFILE.diff
 
 	# get log entries
-	origpwd=`pwd`
 	cd $LOCALROOT
 	cmd="cvs -z4 -d$CVSROOT log -N -r$REV:$NEWREV $ORIGFILE"
 	echo "    Extracting log file ($TARGETFILE.log):"
 	echo "    $cmd"
 	$cmd >$origpwd/$TARGETFILE.log
-	cd $origpwd
+	cd $THISPATH
 done
+
+echo "Compressing results into $RESULTFILE..."
+cd $TMP
+zip -r ../$RESULTFILE *
+cd $THISPATH
+rm -rf $TMP
