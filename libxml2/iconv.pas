@@ -1,3 +1,4 @@
+// [1.7] iconv.h
 unit iconv;
 
 interface
@@ -10,8 +11,6 @@ interface
     -c
     iconv.h
 }
-
-{$PACKRECORDS C}
 
 { Copyright (C) 1999-2001 Free Software Foundation, Inc.
    This file is part of the GNU LIBICONV Library.
@@ -57,7 +56,7 @@ in declaration at line 32 *)
        for LIBICONV_PLUG, we need the proper iconv_t type in order to produce
        binary compatible code.
        But gcc's #include_next is not portable. Thus, once libiconv's iconv.h
-       has been installed in /usr/local/include, there is no way any more to
+			 has been installed in /usr/local/include, there is no way any more to
        include the original /usr/include/iconv.h. We simply have to get away
        without it.
        Ad 1. The risk that a system header file does
@@ -69,11 +68,11 @@ in declaration at line 32 *)
     { Define iconv_t ourselves.  }
 {$undef iconv_t}
 
-    const
-       iconv_t = libiconv_t;
+//[pk]    const
+//[pk]       iconv_t = libiconv_t;
     type
 
-       iconv_t = void;
+       iconv_t = pointer; //[pk] ???
     { Get size_t declaration.  }
 {$include <stddef.h>}
     { Get errno declaration and values.  }
@@ -91,36 +90,30 @@ in declaration at line 32 *)
        encoding `tocode'.  }
 {$ifndef LIBICONV_PLUG}
 
-    const
-       iconv_open = libiconv_open;
+		const
+			 iconv_open = libiconv_open;
 {$endif}
-(* error 
+(* error
 extern LIBICONV_DLL_EXPORTED iconv_t iconv_open (const char* tocode, const char* fromcode);
-(* error 
 extern LIBICONV_DLL_EXPORTED iconv_t iconv_open (const char* tocode, const char* fromcode);
- in declarator_list *)
- in declarator_list *)
-    { Converts, using conversion descriptor `cd', at most ` inbytesleft' bytes
-       starting at ` inbuf', writing at most ` outbytesleft' bytes starting at
-       ` outbuf'.
-       Decrements ` inbytesleft' and increments ` inbuf' by the same amount.
-       Decrements ` outbytesleft' and increments ` outbuf' by the same amount.  }
+*)
+		{ Converts, using conversion descriptor `cd', at most ` inbytesleft' bytes
+			 starting at ` inbuf', writing at most ` outbytesleft' bytes starting at
+			 ` outbuf'.
+			 Decrements ` inbytesleft' and increments ` inbuf' by the same amount.
+			 Decrements ` outbytesleft' and increments ` outbuf' by the same amount.  }
 {$ifndef LIBICONV_PLUG}
 
-    const
-       iconv = libiconv;
+		const
+			 iconv = libiconv;
 {$endif}
-(* error 
+(* error
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
-(* error 
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
-(* error 
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
-(* error 
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
-(* error 
 extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size_t *inbytesleft, char* * outbuf, size_t *outbytesleft);
- in declarator_list *)
+*)
  in declarator_list *)
  in declarator_list *)
  in declarator_list *)
@@ -133,33 +126,33 @@ extern LIBICONV_DLL_EXPORTED size_t iconv (iconv_t cd, const char* * inbuf, size
 {$endif}
 (* error 
 extern LIBICONV_DLL_EXPORTED int iconv_close (iconv_t cd);
-in declaration at line 95 *)
+*)
 {$ifndef LIBICONV_PLUG}
-    { Nonstandard extensions.  }
-    { Control of attributes.  }
+		{ Nonstandard extensions.  }
+		{ Control of attributes.  }
 
-    const
-       iconvctl = libiconvctl;
-(* error 
+		const
+			 iconvctl = libiconvctl;
+(* error
 extern LIBICONV_DLL_EXPORTED int iconvctl (iconv_t cd, int request, void* argument);
-in declaration at line 104 *)
-    { Requests for iconvctl.  }
-    { int  argument  }
-       ICONV_TRIVIALP = 0;
-    { int  argument  }
-       ICONV_GET_TRANSLITERATE = 1;
-    { const int  argument  }
-       ICONV_SET_TRANSLITERATE = 2;
+*)
+		{ Requests for iconvctl.  }
+		{ int  argument  }
+			 ICONV_TRIVIALP = 0;
+		{ int  argument  }
+			 ICONV_GET_TRANSLITERATE = 1;
+		{ const int  argument  }
+			 ICONV_SET_TRANSLITERATE = 2;
 {$endif}
 { C++ end of extern C conditionnal removed }
 {$endif}
-    { _LIBICONV_H  }
+		{ _LIBICONV_H  }
 
 implementation
 
 { was #define dname def_expr }
 function LIBICONV_DLL_EXPORTED : longint;
-    { return type might be wrong }
+		{ return type might be wrong }
 begin
 	LIBICONV_DLL_EXPORTED:=__declspec(dllexport);
 end;

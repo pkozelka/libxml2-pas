@@ -1,17 +1,16 @@
+{ [1.19] HTMLtree.h
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
-	tree.h : describes the structures found in an tree resulting
+	HTMLtree.h : describes the structures found in an tree resulting
 					 from an XML parsing.
 
 	See Copyright for the status of this software.
 
 	daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 const

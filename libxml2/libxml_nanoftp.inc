@@ -1,16 +1,15 @@
-{
-	nanohttp.c: minimalist FTP implementation to fetch external LIBXML2_SO subsets.
-
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
-
-{
+{ [1.8] nanoftp.h
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
+}
+{
+	nanoftp.c: minimalist FTP implementation to fetch external LIBXML2_SO subsets.
+
+	See Copyright for the status of this software.
+
+	daniel@veillard.com
 }
 
 type
@@ -33,7 +32,7 @@ type
 		Note that only one of year and day:minute are specified
 	}
 	ftpListCallback = procedure (userData: pointer; filename, attrib, owner, group: PChar;
-		size: Longint; links: integer; year: integer; month: byte; day, hour, minute: integer); cdecl;
+		size: Longint; links: longint; year: longint; month: byte; day, hour, minute: longint); cdecl;
 
 	{
 		ftpDataCallback:
@@ -43,11 +42,11 @@ type
 
 		A callback for the xmlNanoFTPGet command
 	}
-	ftpDataCallback = procedure (userData: pointer; data: PChar; len: integer);
+	ftpDataCallback = procedure (userData: pointer; data: PChar; len: longint);
 
 {
 	Init
-} 
+}
 procedure xmlNanoFTPInit;cdecl;external LIBXML2_SO;
 procedure xmlNanoFTPCleanup;cdecl;external LIBXML2_SO;
 
@@ -78,7 +77,7 @@ function  xmlNanoFTPCheckResponse(ctx:pointer):longint;cdecl;external LIBXML2_SO
 {
 	CD/DIR/GET handlers
 }
-function  xmlNanoFTPCwd(ctx:pointer; directory:Pchar):longint;cdecl;external LIBXML2_SO;
+function  xmlNanoFTPCwd(ctx:pointer; directory:PChar):longint;cdecl;external LIBXML2_SO;
 function  xmlNanoFTPGetConnection(ctx:pointer):longint;cdecl;external LIBXML2_SO;
 function  xmlNanoFTPCloseConnection(ctx:pointer):longint;cdecl;external LIBXML2_SO;
 function  xmlNanoFTPList(ctx:pointer; callback:ftpListCallback; userData:pointer; filename:Pchar):longint;cdecl;external LIBXML2_SO;

@@ -1,5 +1,4 @@
 unit libxml2;
-
 {
 	------------------------------------------------------------------------------
 	This unit collects all the translated headers of libxml2 (aka gnome-xml).
@@ -8,7 +7,6 @@ unit libxml2;
 	See also:
 		http://www.xmlsoft.org  - the libxml2 homepage
 		http://kozelka.hyperlink.cz  - my homepage
-
 }
 
 interface
@@ -36,9 +34,13 @@ type
 	PPChar = ^PChar;
 	size_t = longint;
 
+{$define LIBXML_THREAD_ALLOC_ENABLED}
+{$define LIBXML_THREAD_ENABLED}
+{$define LIBXML_HTML_ENABLED}
+{$define LIBXML_DOCB_ENABLED}
+
 {TODO: $I libxml_xmlversion.inc}
 {TODO: $I libxml_xmlwin32version.inc}
-{TODO: $I libxml_globals.inc}
 
 {$I libxml_xmlmemory.inc}
 {$I libxml_tree.inc}
@@ -48,14 +50,11 @@ type
 {$I libxml_entities.inc}
 {$I libxml_list.inc}
 {$I libxml_valid.inc}
-{TODO: $I libxml_parserInternals.inc}
 {$I libxml_parser.inc}
 {$I libxml_SAX.inc}
-
 {$I libxml_xpath.inc}
-{TODO: $I libxml_xpathInternals.inc}
+{$I libxml_xpathInternals.inc}
 {$I libxml_xpointer.inc}
-
 {$I libxml_xmlerror.inc}
 {$I libxml_xlink.inc}
 {$I libxml_xinclude.inc}
@@ -65,21 +64,11 @@ type
 {$I libxml_uri.inc}
 {$I libxml_HTMLparser.inc}
 {$I libxml_HTMLtree.inc}
+{$I libxml_parserInternals.inc}
 {$I libxml_DOCBparser.inc}
 {$I libxml_catalog.inc}
-{TODO: $I libxml_threads.inc}
-
-// this will later be in libxml_xpathInternals.inc
-function  xmlXPathRegisterNs(ctxt:xmlXPathContextPtr;prefix,ns_uri:PxmlChar):longint;cdecl;external LIBXML2_SO;
-
-// xmlFree overloaded functions
-procedure xmlFree(str: PxmlChar); overload;
-procedure xmlFree(cur: xmlNodePtr);cdecl;external LIBXML2_SO name 'xmlFreeNode'; overload;
-procedure xmlFree(cur: xmlDocPtr);cdecl;external LIBXML2_SO name 'xmlFreeDoc'; overload;
-procedure xmlFree(cur: xmlDtdPtr);cdecl;external LIBXML2_SO name 'xmlFreeDtd'; overload;
-procedure xmlFree(uri: xmlURIPtr);cdecl;external LIBXML2_SO name 'xmlFreeURI'; overload;
-procedure xmlFree(cur: xmlAttrPtr);cdecl;external LIBXML2_SO name 'xmlFreeProp'; overload;
-procedure xmlFree(cur: xmlNsPtr);cdecl;external LIBXML2_SO name 'xmlFreeNs'; overload;
+{$I libxml_globals.inc}
+{$I libxml_threads.inc}
 
 // functions that reference symbols defined later - by header file:
 
@@ -126,6 +115,31 @@ function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): boolean;
 begin
 	Result := ((ns = nil) or (ns.nodeNr = 0) or (ns.nodeTab = nil));
 end;
+
+// macros from parserInternals
+
+procedure SKIP_EOL(var p: PxmlChar);
+begin
+	if (p^=#13) then begin
+		Inc(p);
+		if (p^=#10) then Inc(p);
+	end;
+	if (p^=#10) then begin
+		Inc(p);
+		if (p^=#13) then Inc(p);
+	end;
+end;
+
+procedure MOVETO_ENDTAG(var p: PxmlChar);
+begin
+	while ((p^<>#0) and (p^<>'>')) do Inc(p);
+end;
+
+procedure MOVETO_STARTTAG(var p: PxmlChar);
+begin
+	while ((p^<>#0) and (p^<>'<')) do Inc(p);
+end;
+
 end.
 
 

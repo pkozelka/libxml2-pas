@@ -47,10 +47,10 @@ procedure namespaceDecl(ctx:pointer; href:PxmlChar; prefix:PxmlChar);cdecl;exter
 procedure comment(ctx:pointer; value:PxmlChar);cdecl;external LIBXML2_SO;
 procedure cdataBlock(ctx:pointer; value:PxmlChar; len:longint);cdecl;external LIBXML2_SO;
 {$ifdef LIBXML_HTML_ENABLED}
-procedure inithtmlDefaultSAXHandler	(hdlr: xmlSAXHandlerPtr);
+procedure inithtmlDefaultSAXHandler	(hdlr: xmlSAXHandlerPtr); cdecl;external LIBXML2_SO;
 {$endif}
 {$ifdef LIBXML_DOCB_ENABLED}
-procedure initdocbDefaultSAXHandler	(hdlr: xmlSAXHandlerPtr);
+procedure initdocbDefaultSAXHandler	(hdlr: xmlSAXHandlerPtr); cdecl;external LIBXML2_SO;
 {$endif}
 procedure xmlDefaultSAXHandlerInit;cdecl;external LIBXML2_SO;
 procedure htmlDefaultSAXHandlerInit;cdecl;external LIBXML2_SO;

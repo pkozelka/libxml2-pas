@@ -1,3 +1,9 @@
+{ [1.13] uri.h
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	uri.c: library of generic URI related routines
 
@@ -6,13 +12,6 @@
 	See Copyright for the status of this software.
 
 	daniel@veillard.com
-}
-
-{
- 	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 type
@@ -33,17 +32,18 @@ type
 		path : Pchar;                   { the path string  }
 		query : Pchar;                  { the query string  }
 		fragment : Pchar;               { the fragment identifier  }
+		cleanup : longint;              { parsing potentially unclean URI }
 	end;
 
-{
-	This function is in tree.h:
-	xmlChar  	xmlNodeGetBase	(xmlDocPtr doc,
-																 xmlNodePtr cur);
-}
+(*
+ *	This function is in tree.h:
+ *	xmlChar  	xmlNodeGetBase	(xmlDocPtr doc,
+ *																 xmlNodePtr cur);
+ *)
 
 function  xmlCreateURI:xmlURIPtr;cdecl;external LIBXML2_SO;
 function  xmlBuildURI(URI:PxmlChar; base:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
-function  xmlParseURI(URI:Pchar):xmlURIPtr;cdecl;external LIBXML2_SO;
+function  xmlParseURI(str:PChar):xmlURIPtr;cdecl;external LIBXML2_SO;
 function  xmlParseURIReference(uri:xmlURIPtr; str:Pchar):longint;cdecl;external LIBXML2_SO;
 function  xmlSaveUri(uri:xmlURIPtr):PxmlChar;cdecl;external LIBXML2_SO;
 procedure xmlPrintURI(var stream:TextFile; uri:xmlURIPtr);cdecl;external LIBXML2_SO;
@@ -52,3 +52,4 @@ function  xmlURIUnescapeString(str:Pchar; len:longint; target:Pchar):Pchar;cdecl
 function  xmlNormalizeURIPath(path:Pchar):longint;cdecl;external LIBXML2_SO;
 function  xmlURIEscape(str:PxmlChar):PxmlChar;cdecl;external LIBXML2_SO;
 procedure xmlFreeURI(uri:xmlURIPtr);cdecl;external LIBXML2_SO;
+

@@ -1,16 +1,15 @@
+{ [1.24] HTMLparser.h
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
 	HTMLparser.h : inf=terface for an HTML 4.0 non-verifying parser
 
 	See Copyright for the status of this software.
 
 	daniel@veillard.com
-}
-
-{
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
 }
 
 type

@@ -16,7 +16,7 @@
 }
 
 type
-	xmlXPathError =  Longint;
+	TxmlXPathError = longint; //[pk]: prefixed with 'T' to avoid name collision with function xmlXPatherror
 	xmlXPathObjectType =  Longint;
 
 const

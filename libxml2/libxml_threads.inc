@@ -1,51 +1,49 @@
-{$PACKRECORDS C}
-
-{ 
-   threads.c: set of generic threading related routines 
-  
-   See Copyright for the status of this software.
-  
-   daniel@veillard.com
-  }
-{$ifndef __XML_THREADS_H__}
-{$define __XML_THREADS_H__}
-{$include <libxml/globals.h>}
-{ C++ extern C conditionnal removed }
+{ [1.2] threads.h
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 {
-   xmlMutex are a simple mutual exception locks
-  }
+	threads.c: set of generic threading related routines
+
+	See Copyright for the status of this software.
+
+	daniel@veillard.com
+}
+
+{
+	xmlMutex are a simple mutual exception locks
+}
 type
-   _xmlMutex = xmlMutex;
+	xmlMutex = pointer;
+	xmlMutexPtr = ^xmlMutex;
 
-   xmlMutexPtr = xmlMutex;
+function  xmlNewMutex:xmlMutexPtr;cdecl;external LIBXML2_SO;
+procedure xmlMutexLock(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
+procedure xmlMutexUnlock(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
+procedure xmlFreeMutex(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
 
-function xmlNewMutex:xmlMutexPtr;cdecl;external;
-procedure xmlMutexLock(tok:xmlMutexPtr);cdecl;external;
-procedure xmlMutexUnlock(tok:xmlMutexPtr);cdecl;external;
-procedure xmlFreeMutex(tok:xmlMutexPtr);cdecl;external;
 {
-   xmlRMutex are reentrant mutual exception locks
-  }
+	xmlRMutex are reentrant mutual exception locks
+}
 type
-   _xmlRMutex = xmlRMutex;
+	xmlRMutex = pointer;
+	xmlRMutexPtr = ^xmlRMutex;
 
-   xmlRMutexPtr = xmlRMutex;
+function  xmlNewRMutex:xmlRMutexPtr;cdecl;external LIBXML2_SO;
+procedure xmlRMutexLock(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
+procedure xmlRMutexUnlock(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
+procedure xmlFreeRMutex(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;
 
-function xmlNewRMutex:xmlRMutexPtr;cdecl;external;
-procedure xmlRMutexLock(tok:xmlRMutexPtr);cdecl;external;
-procedure xmlRMutexUnlock(tok:xmlRMutexPtr);cdecl;external;
-procedure xmlFreeRMutex(tok:xmlRMutexPtr);cdecl;external;
 {
-   Library wide APIs
-  }
-procedure xmlInitThreads;cdecl;external;
-procedure xmlLockLibrary;cdecl;external;
-procedure xmlUnlockLibrary;cdecl;external;
-function xmlGetThreadId:longint;cdecl;external;
-function xmlIsMainThread:longint;cdecl;external;
-procedure xmlCleanupThreads;cdecl;external;
-function xmlGetGlobalState:xmlGlobalStatePtr;cdecl;external;
-{ C++ end of extern C conditionnal removed }
-{$endif}
-{ __XML_THREADS_H__  }
+	Library wide APIs
+}
+procedure xmlInitThreads;cdecl;external LIBXML2_SO;
+procedure xmlLockLibrary;cdecl;external LIBXML2_SO;
+procedure xmlUnlockLibrary;cdecl;external LIBXML2_SO;
+function  xmlGetThreadId:longint;cdecl;external LIBXML2_SO;
+function  xmlIsMainThread:longint;cdecl;external LIBXML2_SO;
+procedure xmlCleanupThreads;cdecl;external LIBXML2_SO;
+function  xmlGetGlobalState:xmlGlobalStatePtr;cdecl;external LIBXML2_SO;
 

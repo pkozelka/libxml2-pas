@@ -1,16 +1,15 @@
-{
-	SGMLparser.h : interface for a DocBook SGML non-verifying parser
-
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
-
-{
+{ [1.4] DOCBparser.h
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
+}
+{
+	DOCBparser.h : interface for a DocBook SGML non-verifying parser
+
+	See Copyright for the status of this software.
+
+	daniel@veillard.com
 }
 
 type
