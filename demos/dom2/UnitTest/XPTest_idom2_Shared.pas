@@ -18,9 +18,12 @@ const
   xmlstr1 = xmldecl + '<test xmlns=''http://ns.4ct.de''/>';
   xmlstr2 = xmldecl +
             '<!DOCTYPE root [' + '<!ELEMENT root (test*)>' +
-            '<!ELEMENT test (#PCDATA)>' + '<!ATTLIST test name CDATA #IMPLIED>' +
-            '<!ENTITY ct "4 commerce technologies">' + '<!NOTATION type2 SYSTEM "program2">' +
-            '<!ENTITY FOO2 SYSTEM "file.type2" NDATA type2>' + ']>' + '<root />';
+            '<!ELEMENT test (#PCDATA)>' +
+            '<!ATTLIST test name CDATA #IMPLIED>' +
+            '<!ENTITY ct "4 commerce technologies">' +
+            '<!NOTATION type2 SYSTEM "program2">' +
+            '<!ENTITY FOO2 SYSTEM "file.type2" NDATA type2>' + ']>' +
+            '<root />';
   xmlstr3 = xmldecl + '<test xmlns:ct=''http://ns.4ct.de''/>';
   xslstr  = xmldecl +
             '<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"' +

@@ -369,7 +369,7 @@ begin
   check(attr.nodeType = ATTRIBUTE_NODE, 'wrong nodeType');
   check(attr.namespaceURI = nsuri, 'wrong namespaceURI');
   check(attr.prefix = prefix, 'wrong prefix');
-  check(attr.localName = Name, 'wrong localName');
+  check(attr.localName = Name, 'wrong localName - expected: "'+Name+'" found: "'+attr.localName+'"');
   check(attr.specified, 'is false');
   check(attr.Value = 'kamel', 'wrong value');
 end;
@@ -482,7 +482,7 @@ begin
   (doc as IDomPersist).loadxml(xmlstr2);
   check(doc.docType <> nil, 'doc.doctype is nil, but must not');
   check(doc.docType.entities <> nil, 'doc.docType.entities is nil, but must not');
-  check(doc.docType.entities.length = 1, 'wrong entities length');
+  check(doc.docType.entities.length = 2, 'wrong entities length');
   //ent := doc.docType.entities[0] as IDomEntity;
   // to be continued ...
   {
