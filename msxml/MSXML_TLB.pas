@@ -10,7 +10,6 @@ uses
 // GUIDS declared in the TypeLibrary. Following prefixes are used:        
 //   Type Libraries     : LIBID_xxxx                                      
 //   CoClasses          : CLASS_xxxx                                      
-//   DISPInterfaces     : DIID_xxxx                                       
 //   Non-DISP interfaces: IID_xxxx                                        
 // *********************************************************************//
 const
@@ -142,51 +141,28 @@ type
 // Forward declaration of types defined in TypeLibrary                    
 // *********************************************************************//
   IXMLDOMImplementation = interface;
-  IXMLDOMImplementationDisp = dispinterface;
-  IXMLDOMNode = interface;
-  IXMLDOMNodeDisp = dispinterface;
-  IXMLDOMNodeList = interface;
-  IXMLDOMNodeListDisp = dispinterface;
-  IXMLDOMNamedNodeMap = interface;
-  IXMLDOMNamedNodeMapDisp = dispinterface;
-  IXMLDOMDocument = interface;
-  IXMLDOMDocumentDisp = dispinterface;
-  IXMLDOMDocumentType = interface;
-  IXMLDOMDocumentTypeDisp = dispinterface;
-  IXMLDOMElement = interface;
-  IXMLDOMElementDisp = dispinterface;
-  IXMLDOMAttribute = interface;
-  IXMLDOMAttributeDisp = dispinterface;
-  IXMLDOMDocumentFragment = interface;
-  IXMLDOMDocumentFragmentDisp = dispinterface;
-  IXMLDOMCharacterData = interface;
-  IXMLDOMCharacterDataDisp = dispinterface;
-  IXMLDOMText = interface;
-  IXMLDOMTextDisp = dispinterface;
-  IXMLDOMComment = interface;
-  IXMLDOMCommentDisp = dispinterface;
-  IXMLDOMCDATASection = interface;
-  IXMLDOMCDATASectionDisp = dispinterface;
-  IXMLDOMProcessingInstruction = interface;
-  IXMLDOMProcessingInstructionDisp = dispinterface;
-  IXMLDOMEntityReference = interface;
-  IXMLDOMEntityReferenceDisp = dispinterface;
-  IXMLDOMParseError = interface;
-  IXMLDOMParseErrorDisp = dispinterface;
+	IXMLDOMNode = interface;
+	IXMLDOMNodeList = interface;
+	IXMLDOMNamedNodeMap = interface;
+	IXMLDOMDocument = interface;
+	IXMLDOMDocumentType = interface;
+	IXMLDOMElement = interface;
+	IXMLDOMAttribute = interface;
+	IXMLDOMDocumentFragment = interface;
+	IXMLDOMCharacterData = interface;
+	IXMLDOMText = interface;
+	IXMLDOMComment = interface;
+	IXMLDOMCDATASection = interface;
+	IXMLDOMProcessingInstruction = interface;
+	IXMLDOMEntityReference = interface;
+	IXMLDOMParseError = interface;
 	IXMLDOMDocument2 = interface;
-	IXMLDOMDocument2Disp = dispinterface;
 	IXMLDOMSchemaCollection = interface;
-	IXMLDOMSchemaCollectionDisp = dispinterface;
 	IXMLDOMNotation = interface;
-	IXMLDOMNotationDisp = dispinterface;
 	IXMLDOMEntity = interface;
-	IXMLDOMEntityDisp = dispinterface;
 	IXTLRuntime = interface;
-	IXTLRuntimeDisp = dispinterface;
 	IXSLTemplate = interface;
-	IXSLTemplateDisp = dispinterface;
 	IXSLProcessor = interface;
-	IXSLProcessorDisp = dispinterface;
 	ISAXXMLReader = interface;
 	ISAXEntityResolver = interface;
 	ISAXContentHandler = interface;
@@ -198,68 +174,37 @@ type
 	ISAXLexicalHandler = interface;
 	ISAXDeclHandler = interface;
 	IMXWriter = interface;
-	IMXWriterDisp = dispinterface;
-  IMXAttributes = interface;
-  IMXAttributesDisp = dispinterface;
-  IMXReaderControl = interface;
-  IMXReaderControlDisp = dispinterface;
-  IMXSchemaDeclHandler = interface;
-  IMXSchemaDeclHandlerDisp = dispinterface;
-  ISchemaItem = interface;
-  ISchemaItemDisp = dispinterface;
-  ISchemaParticle = interface;
-  ISchemaParticleDisp = dispinterface;
-  ISchemaElement = interface;
-  ISchemaElementDisp = dispinterface;
-  ISchema = interface;
-  ISchemaDisp = dispinterface;
-  ISchemaItemCollection = interface;
-  ISchemaItemCollectionDisp = dispinterface;
-  ISchemaStringCollection = interface;
-  ISchemaStringCollectionDisp = dispinterface;
-  ISchemaType = interface;
-  ISchemaTypeDisp = dispinterface;
-  ISchemaComplexType = interface;
-  ISchemaComplexTypeDisp = dispinterface;
-  ISchemaAny = interface;
-  ISchemaAnyDisp = dispinterface;
-  ISchemaModelGroup = interface;
-  ISchemaModelGroupDisp = dispinterface;
-  IXMLDOMSchemaCollection2 = interface;
-  IXMLDOMSchemaCollection2Disp = dispinterface;
-  ISchemaAttribute = interface;
-  ISchemaAttributeDisp = dispinterface;
-  ISchemaAttributeGroup = interface;
-  ISchemaAttributeGroupDisp = dispinterface;
-  ISchemaIdentityConstraint = interface;
-  ISchemaIdentityConstraintDisp = dispinterface;
-  ISchemaNotation = interface;
-  ISchemaNotationDisp = dispinterface;
-  IXMLElementCollection = interface;
-  IXMLElementCollectionDisp = dispinterface;
-  IXMLDocument = interface;
-  IXMLDocumentDisp = dispinterface;
-  IXMLElement = interface;
-  IXMLElementDisp = dispinterface;
-  IXMLDocument2 = interface;
-  IXMLElement2 = interface;
-  IXMLElement2Disp = dispinterface;
-  IXMLAttribute = interface;
-  IXMLAttributeDisp = dispinterface;
-  IXMLError = interface;
-  IXMLDOMSelection = interface;
-  IXMLDOMSelectionDisp = dispinterface;
-  XMLDOMDocumentEvents = dispinterface;
-  IDSOControl = interface;
-  IDSOControlDisp = dispinterface;
-  IXMLHTTPRequest = interface;
-  IXMLHTTPRequestDisp = dispinterface;
-  IServerXMLHTTPRequest = interface;
-  IServerXMLHTTPRequestDisp = dispinterface;
-  IServerXMLHTTPRequest2 = interface;
-  IServerXMLHTTPRequest2Disp = dispinterface;
-  IMXNamespacePrefixes = interface;
-  IMXNamespacePrefixesDisp = dispinterface;
+	IMXAttributes = interface;
+	IMXReaderControl = interface;
+	IMXSchemaDeclHandler = interface;
+	ISchemaItem = interface;
+	ISchemaParticle = interface;
+	ISchemaElement = interface;
+	ISchema = interface;
+	ISchemaItemCollection = interface;
+	ISchemaStringCollection = interface;
+	ISchemaType = interface;
+	ISchemaComplexType = interface;
+	ISchemaAny = interface;
+	ISchemaModelGroup = interface;
+	IXMLDOMSchemaCollection2 = interface;
+	ISchemaAttribute = interface;
+	ISchemaAttributeGroup = interface;
+	ISchemaIdentityConstraint = interface;
+	ISchemaNotation = interface;
+	IXMLElementCollection = interface;
+	IXMLDocument = interface;
+	IXMLElement = interface;
+	IXMLDocument2 = interface;
+	IXMLElement2 = interface;
+	IXMLAttribute = interface;
+	IXMLError = interface;
+	IXMLDOMSelection = interface;
+	IDSOControl = interface;
+	IXMLHTTPRequest = interface;
+	IServerXMLHTTPRequest = interface;
+	IServerXMLHTTPRequest2 = interface;
+	IMXNamespacePrefixes = interface;
 	IMXNamespaceManager = interface;
 
 // *********************************************************************//
@@ -300,16 +245,6 @@ type
     ['{2933BF8F-7B36-11D2-B20E-00C04F983E60}']
     function  hasFeature(const feature: WideString; const version: WideString): WordBool; safecall;
 	end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMImplementationDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF8F-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMImplementationDisp = dispinterface
-    ['{2933BF8F-7B36-11D2-B20E-00C04F983E60}']
-    function  hasFeature(const feature: WideString; const version: WideString): WordBool; dispid 157;
-  end;
 
 // *********************************************************************//
 // Interface: IXMLDOMNode
@@ -378,47 +313,6 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMNodeDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF80-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMNodeDisp = dispinterface
-    ['{2933BF80-7B36-11D2-B20E-00C04F983E60}']
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-		function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-	end;
-
-// *********************************************************************//
 // Interface: IXMLDOMNodeList
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF82-7B36-11D2-B20E-00C04F983E60}
@@ -434,20 +328,6 @@ type
     property length: Integer read Get_length;
     property _newEnum: IUnknown read Get__newEnum;
 	end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMNodeListDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF82-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMNodeListDisp = dispinterface
-    ['{2933BF82-7B36-11D2-B20E-00C04F983E60}']
-    property item[index: Integer]: IXMLDOMNode readonly dispid 0; default;
-    property length: Integer readonly dispid 74;
-    function  nextNode: IXMLDOMNode; dispid 76;
-    procedure reset; dispid 77;
-    property _newEnum: IUnknown readonly dispid -4;
-  end;
 
 // *********************************************************************//
 // Interface: IXMLDOMNamedNodeMap
@@ -469,25 +349,6 @@ type
     property item[index: Integer]: IXMLDOMNode read Get_item; default;
     property length: Integer read Get_length;
     property _newEnum: IUnknown read Get__newEnum;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMNamedNodeMapDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF83-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMNamedNodeMapDisp = dispinterface
-    ['{2933BF83-7B36-11D2-B20E-00C04F983E60}']
-    function  getNamedItem(const name: WideString): IXMLDOMNode; dispid 83;
-    function  setNamedItem(const newItem: IXMLDOMNode): IXMLDOMNode; dispid 84;
-    function  removeNamedItem(const name: WideString): IXMLDOMNode; dispid 85;
-    property item[index: Integer]: IXMLDOMNode readonly dispid 0; default;
-    property length: Integer readonly dispid 74;
-    function  getQualifiedItem(const baseName: WideString; const namespaceURI: WideString): IXMLDOMNode; dispid 87;
-    function  removeQualifiedItem(const baseName: WideString; const namespaceURI: WideString): IXMLDOMNode; dispid 88;
-    function  nextNode: IXMLDOMNode; dispid 89;
-    procedure reset; dispid 90;
-    property _newEnum: IUnknown readonly dispid -4;
   end;
 
 // *********************************************************************//
@@ -546,132 +407,19 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMDocumentDisp
-// Flags:     (4560) Hidden Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF81-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-	IXMLDOMDocumentDisp = dispinterface
-    ['{2933BF81-7B36-11D2-B20E-00C04F983E60}']
-    property doctype: IXMLDOMDocumentType readonly dispid 38;
-    property implementation_: IXMLDOMImplementation readonly dispid 39;
-    property documentElement: IXMLDOMElement dispid 40;
-    function  createElement(const tagName: WideString): IXMLDOMElement; dispid 41;
-    function  createDocumentFragment: IXMLDOMDocumentFragment; dispid 42;
-    function  createTextNode(const data: WideString): IXMLDOMText; dispid 43;
-    function  createComment(const data: WideString): IXMLDOMComment; dispid 44;
-    function  createCDATASection(const data: WideString): IXMLDOMCDATASection; dispid 45;
-    function  createProcessingInstruction(const target: WideString; const data: WideString): IXMLDOMProcessingInstruction; dispid 46;
-    function  createAttribute(const name: WideString): IXMLDOMAttribute; dispid 47;
-    function  createEntityReference(const name: WideString): IXMLDOMEntityReference; dispid 49;
-    function  getElementsByTagName(const tagName: WideString): IXMLDOMNodeList; dispid 50;
-    function  createNode(type_: OleVariant; const name: WideString; const namespaceURI: WideString): IXMLDOMNode; dispid 54;
-    function  nodeFromID(const idString: WideString): IXMLDOMNode; dispid 56;
-    function  load(xmlSource: OleVariant): WordBool; dispid 58;
-    property readyState: Integer readonly dispid -525;
-    property parseError: IXMLDOMParseError readonly dispid 59;
-    property url: WideString readonly dispid 60;
-    property async: WordBool dispid 61;
-    procedure abort; dispid 62;
-		function  loadXML(const bstrXML: WideString): WordBool; dispid 63;
-    procedure save(destination: OleVariant); dispid 64;
-    property validateOnParse: WordBool dispid 65;
-    property resolveExternals: WordBool dispid 66;
-    property preserveWhiteSpace: WordBool dispid 67;
-    property onreadystatechange: OleVariant writeonly dispid 68;
-    property ondataavailable: OleVariant writeonly dispid 69;
-    property ontransformnode: OleVariant writeonly dispid 70;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-		property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-		procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMDocumentType
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF8B-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-  IXMLDOMDocumentType = interface(IXMLDOMNode)
-    ['{2933BF8B-7B36-11D2-B20E-00C04F983E60}']
-    function  Get_name: WideString; safecall;
-    function  Get_entities: IXMLDOMNamedNodeMap; safecall;
-    function  Get_notations: IXMLDOMNamedNodeMap; safecall;
-    property name: WideString read Get_name;
-    property entities: IXMLDOMNamedNodeMap read Get_entities;
-    property notations: IXMLDOMNamedNodeMap read Get_notations;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMDocumentTypeDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF8B-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMDocumentTypeDisp = dispinterface
-    ['{2933BF8B-7B36-11D2-B20E-00C04F983E60}']
-    property name: WideString readonly dispid 131;
-    property entities: IXMLDOMNamedNodeMap readonly dispid 132;
-    property notations: IXMLDOMNamedNodeMap readonly dispid 133;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-		function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-		property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
+	IXMLDOMDocumentType = interface(IXMLDOMNode)
+		['{2933BF8B-7B36-11D2-B20E-00C04F983E60}']
+		function  Get_name: WideString; safecall;
+		function  Get_entities: IXMLDOMNamedNodeMap; safecall;
+		function  Get_notations: IXMLDOMNamedNodeMap; safecall;
+		property name: WideString read Get_name;
+		property entities: IXMLDOMNamedNodeMap read Get_entities;
+		property notations: IXMLDOMNamedNodeMap read Get_notations;
+	end;
 
 // *********************************************************************//
 // Interface: IXMLDOMElement
@@ -693,161 +441,27 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMElementDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF86-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMElementDisp = dispinterface
-    ['{2933BF86-7B36-11D2-B20E-00C04F983E60}']
-    property tagName: WideString readonly dispid 97;
-    function  getAttribute(const name: WideString): OleVariant; dispid 99;
-    procedure setAttribute(const name: WideString; value: OleVariant); dispid 100;
-    procedure removeAttribute(const name: WideString); dispid 101;
-    function  getAttributeNode(const name: WideString): IXMLDOMAttribute; dispid 102;
-    function  setAttributeNode(const DOMAttribute: IXMLDOMAttribute): IXMLDOMAttribute; dispid 103;
-    function  removeAttributeNode(const DOMAttribute: IXMLDOMAttribute): IXMLDOMAttribute; dispid 104;
-		function  getElementsByTagName(const tagName: WideString): IXMLDOMNodeList; dispid 105;
-    procedure normalize; dispid 106;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-		property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMAttribute
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF85-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-  IXMLDOMAttribute = interface(IXMLDOMNode)
-    ['{2933BF85-7B36-11D2-B20E-00C04F983E60}']
-    function  Get_name: WideString; safecall;
-    function  Get_value: OleVariant; safecall;
-    procedure Set_value(attributeValue: OleVariant); safecall;
-    property name: WideString read Get_name;
-    property value: OleVariant read Get_value write Set_value;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMAttributeDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF85-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMAttributeDisp = dispinterface
-    ['{2933BF85-7B36-11D2-B20E-00C04F983E60}']
-    property name: WideString readonly dispid 118;
-    property value: OleVariant dispid 120;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-		property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
+	IXMLDOMAttribute = interface(IXMLDOMNode)
+		['{2933BF85-7B36-11D2-B20E-00C04F983E60}']
+		function  Get_name: WideString; safecall;
+		function  Get_value: OleVariant; safecall;
+		procedure Set_value(attributeValue: OleVariant); safecall;
+		property name: WideString read Get_name;
+		property value: OleVariant read Get_value write Set_value;
+	end;
 
 // *********************************************************************//
 // Interface: IXMLDOMDocumentFragment
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {3EFAA413-272F-11D2-836F-0000F87A7782}
 // *********************************************************************//
-  IXMLDOMDocumentFragment = interface(IXMLDOMNode)
-    ['{3EFAA413-272F-11D2-836F-0000F87A7782}']
+	IXMLDOMDocumentFragment = interface(IXMLDOMNode)
+		['{3EFAA413-272F-11D2-836F-0000F87A7782}']
 	end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMDocumentFragmentDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {3EFAA413-272F-11D2-836F-0000F87A7782}
-// *********************************************************************//
-  IXMLDOMDocumentFragmentDisp = dispinterface
-    ['{3EFAA413-272F-11D2-836F-0000F87A7782}']
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-		property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
 
 // *********************************************************************//
 // Interface: IXMLDOMCharacterData
@@ -869,111 +483,14 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMCharacterDataDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF84-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMCharacterDataDisp = dispinterface
-    ['{2933BF84-7B36-11D2-B20E-00C04F983E60}']
-    property data: WideString dispid 109;
-    property length: Integer readonly dispid 110;
-    function  substringData(offset: Integer; count: Integer): WideString; dispid 111;
-    procedure appendData(const data: WideString); dispid 112;
-    procedure insertData(offset: Integer; const data: WideString); dispid 113;
-    procedure deleteData(offset: Integer; count: Integer); dispid 114;
-    procedure replaceData(offset: Integer; count: Integer; const data: WideString); dispid 115;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-		property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMText
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF87-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-  IXMLDOMText = interface(IXMLDOMCharacterData)
-    ['{2933BF87-7B36-11D2-B20E-00C04F983E60}']
+	IXMLDOMText = interface(IXMLDOMCharacterData)
+		['{2933BF87-7B36-11D2-B20E-00C04F983E60}']
 		function  splitText(offset: Integer): IXMLDOMText; safecall;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMTextDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF87-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMTextDisp = dispinterface
-    ['{2933BF87-7B36-11D2-B20E-00C04F983E60}']
-    function  splitText(offset: Integer): IXMLDOMText; dispid 123;
-    property data: WideString dispid 109;
-    property length: Integer readonly dispid 110;
-    function  substringData(offset: Integer; count: Integer): WideString; dispid 111;
-    procedure appendData(const data: WideString); dispid 112;
-    procedure insertData(offset: Integer; const data: WideString); dispid 113;
-    procedure deleteData(offset: Integer; count: Integer); dispid 114;
-    procedure replaceData(offset: Integer; count: Integer; const data: WideString); dispid 115;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-		property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
+	end;
 
 // *********************************************************************//
 // Interface: IXMLDOMComment
@@ -985,109 +502,12 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMCommentDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF88-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMCommentDisp = dispinterface
-    ['{2933BF88-7B36-11D2-B20E-00C04F983E60}']
-    property data: WideString dispid 109;
-    property length: Integer readonly dispid 110;
-    function  substringData(offset: Integer; count: Integer): WideString; dispid 111;
-    procedure appendData(const data: WideString); dispid 112;
-    procedure insertData(offset: Integer; const data: WideString); dispid 113;
-    procedure deleteData(offset: Integer; count: Integer); dispid 114;
-    procedure replaceData(offset: Integer; count: Integer; const data: WideString); dispid 115;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-		property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMCDATASection
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF8A-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
   IXMLDOMCDATASection = interface(IXMLDOMText)
     ['{2933BF8A-7B36-11D2-B20E-00C04F983E60}']
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMCDATASectionDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF8A-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMCDATASectionDisp = dispinterface
-    ['{2933BF8A-7B36-11D2-B20E-00C04F983E60}']
-    function  splitText(offset: Integer): IXMLDOMText; dispid 123;
-    property data: WideString dispid 109;
-    property length: Integer readonly dispid 110;
-    function  substringData(offset: Integer; count: Integer): WideString; dispid 111;
-    procedure appendData(const data: WideString); dispid 112;
-    procedure insertData(offset: Integer; const data: WideString); dispid 113;
-    procedure deleteData(offset: Integer; count: Integer); dispid 114;
-    procedure replaceData(offset: Integer; count: Integer; const data: WideString); dispid 115;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-		property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
   end;
 
 // *********************************************************************//
@@ -1105,96 +525,12 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMProcessingInstructionDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF89-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMProcessingInstructionDisp = dispinterface
-    ['{2933BF89-7B36-11D2-B20E-00C04F983E60}']
-    property target: WideString readonly dispid 127;
-    property data: WideString dispid 128;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-		property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMEntityReference
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF8E-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
   IXMLDOMEntityReference = interface(IXMLDOMNode)
     ['{2933BF8E-7B36-11D2-B20E-00C04F983E60}']
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMEntityReferenceDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF8E-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMEntityReferenceDisp = dispinterface
-    ['{2933BF8E-7B36-11D2-B20E-00C04F983E60}']
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
   end;
 
 // *********************************************************************//
@@ -1221,22 +557,6 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMParseErrorDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {3EFAA426-272F-11D2-836F-0000F87A7782}
-// *********************************************************************//
-  IXMLDOMParseErrorDisp = dispinterface
-    ['{3EFAA426-272F-11D2-836F-0000F87A7782}']
-    property errorCode: Integer readonly dispid 0;
-    property url: WideString readonly dispid 191;
-    property reason: WideString readonly dispid 192;
-    property srcText: WideString readonly dispid 193;
-    property line: Integer readonly dispid 194;
-    property linepos: Integer readonly dispid 195;
-    property filepos: Integer readonly dispid 196;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMDocument2
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF95-7B36-11D2-B20E-00C04F983E60}
@@ -1254,85 +574,11 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMDocument2Disp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF95-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMDocument2Disp = dispinterface
-    ['{2933BF95-7B36-11D2-B20E-00C04F983E60}']
-    property namespaces: IXMLDOMSchemaCollection readonly dispid 213;
-    property schemas: OleVariant dispid 214;
-    function  validate: IXMLDOMParseError; dispid 215;
-    procedure setProperty(const name: WideString; value: OleVariant); dispid 216;
-    function  getProperty(const name: WideString): OleVariant; dispid 217;
-    property doctype: IXMLDOMDocumentType readonly dispid 38;
-    property implementation_: IXMLDOMImplementation readonly dispid 39;
-    property documentElement: IXMLDOMElement dispid 40;
-    function  createElement(const tagName: WideString): IXMLDOMElement; dispid 41;
-    function  createDocumentFragment: IXMLDOMDocumentFragment; dispid 42;
-    function  createTextNode(const data: WideString): IXMLDOMText; dispid 43;
-    function  createComment(const data: WideString): IXMLDOMComment; dispid 44;
-    function  createCDATASection(const data: WideString): IXMLDOMCDATASection; dispid 45;
-    function  createProcessingInstruction(const target: WideString; const data: WideString): IXMLDOMProcessingInstruction; dispid 46;
-		function  createAttribute(const name: WideString): IXMLDOMAttribute; dispid 47;
-    function  createEntityReference(const name: WideString): IXMLDOMEntityReference; dispid 49;
-    function  getElementsByTagName(const tagName: WideString): IXMLDOMNodeList; dispid 50;
-    function  createNode(type_: OleVariant; const name: WideString; const namespaceURI: WideString): IXMLDOMNode; dispid 54;
-    function  nodeFromID(const idString: WideString): IXMLDOMNode; dispid 56;
-    function  load(xmlSource: OleVariant): WordBool; dispid 58;
-    property readyState: Integer readonly dispid -525;
-    property parseError: IXMLDOMParseError readonly dispid 59;
-    property url: WideString readonly dispid 60;
-    property async: WordBool dispid 61;
-    procedure abort; dispid 62;
-    function  loadXML(const bstrXML: WideString): WordBool; dispid 63;
-    procedure save(destination: OleVariant); dispid 64;
-    property validateOnParse: WordBool dispid 65;
-    property resolveExternals: WordBool dispid 66;
-    property preserveWhiteSpace: WordBool dispid 67;
-    property onreadystatechange: OleVariant writeonly dispid 68;
-    property ondataavailable: OleVariant writeonly dispid 69;
-    property ontransformnode: OleVariant writeonly dispid 70;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-		property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMSchemaCollection
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {373984C8-B845-449B-91E7-45AC83036ADE}
 // *********************************************************************//
-  IXMLDOMSchemaCollection = interface(IDispatch)
+	IXMLDOMSchemaCollection = interface(IDispatch)
     ['{373984C8-B845-449B-91E7-45AC83036ADE}']
     procedure add(const namespaceURI: WideString; var_: OleVariant); safecall;
     function  get(const namespaceURI: WideString): IXMLDOMNode; safecall;
@@ -1344,22 +590,6 @@ type
     property length: Integer read Get_length;
     property namespaceURI[index: Integer]: WideString read Get_namespaceURI; default;
     property _newEnum: IUnknown read Get__newEnum;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMSchemaCollectionDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {373984C8-B845-449B-91E7-45AC83036ADE}
-// *********************************************************************//
-  IXMLDOMSchemaCollectionDisp = dispinterface
-		['{373984C8-B845-449B-91E7-45AC83036ADE}']
-    procedure add(const namespaceURI: WideString; var_: OleVariant); dispid 2;
-    function  get(const namespaceURI: WideString): IXMLDOMNode; dispid 3;
-    procedure remove(const namespaceURI: WideString); dispid 4;
-    property length: Integer readonly dispid 5;
-    property namespaceURI[index: Integer]: WideString readonly dispid 0; default;
-    procedure addCollection(const otherCollection: IXMLDOMSchemaCollection); dispid 6;
-    property _newEnum: IUnknown readonly dispid -4;
   end;
 
 // *********************************************************************//
@@ -1376,105 +606,18 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLDOMNotationDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF8C-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMNotationDisp = dispinterface
-    ['{2933BF8C-7B36-11D2-B20E-00C04F983E60}']
-    property publicId: OleVariant readonly dispid 136;
-    property systemId: OleVariant readonly dispid 137;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-		property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-  end;
-
-// *********************************************************************//
 // Interface: IXMLDOMEntity
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF8D-7B36-11D2-B20E-00C04F983E60}
 // *********************************************************************//
-  IXMLDOMEntity = interface(IXMLDOMNode)
-    ['{2933BF8D-7B36-11D2-B20E-00C04F983E60}']
-    function  Get_publicId: OleVariant; safecall;
+	IXMLDOMEntity = interface(IXMLDOMNode)
+		['{2933BF8D-7B36-11D2-B20E-00C04F983E60}']
+		function  Get_publicId: OleVariant; safecall;
     function  Get_systemId: OleVariant; safecall;
     function  Get_notationName: WideString; safecall;
     property publicId: OleVariant read Get_publicId;
     property systemId: OleVariant read Get_systemId;
 		property notationName: WideString read Get_notationName;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXMLDOMEntityDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF8D-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXMLDOMEntityDisp = dispinterface
-    ['{2933BF8D-7B36-11D2-B20E-00C04F983E60}']
-    property publicId: OleVariant readonly dispid 140;
-    property systemId: OleVariant readonly dispid 141;
-    property notationName: WideString readonly dispid 142;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-		function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
   end;
 
 // *********************************************************************//
@@ -1498,58 +641,6 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXTLRuntimeDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {3EFAA425-272F-11D2-836F-0000F87A7782}
-// *********************************************************************//
-  IXTLRuntimeDisp = dispinterface
-    ['{3EFAA425-272F-11D2-836F-0000F87A7782}']
-    function  uniqueID(const pNode: IXMLDOMNode): Integer; dispid 199;
-    function  depth(const pNode: IXMLDOMNode): Integer; dispid 200;
-    function  childNumber(const pNode: IXMLDOMNode): Integer; dispid 201;
-    function  ancestorChildNumber(const bstrNodeName: WideString; const pNode: IXMLDOMNode): Integer; dispid 202;
-		function  absoluteChildNumber(const pNode: IXMLDOMNode): Integer; dispid 203;
-    function  formatIndex(lIndex: Integer; const bstrFormat: WideString): WideString; dispid 204;
-    function  formatNumber(dblNumber: Double; const bstrFormat: WideString): WideString; dispid 205;
-    function  formatDate(varDate: OleVariant; const bstrFormat: WideString; 
-                         varDestLocale: OleVariant): WideString; dispid 206;
-    function  formatTime(varTime: OleVariant; const bstrFormat: WideString; 
-                         varDestLocale: OleVariant): WideString; dispid 207;
-    property nodeName: WideString readonly dispid 2;
-    property nodeValue: OleVariant dispid 3;
-    property nodeType: DOMNodeType readonly dispid 4;
-    property parentNode: IXMLDOMNode readonly dispid 6;
-    property childNodes: IXMLDOMNodeList readonly dispid 7;
-    property firstChild: IXMLDOMNode readonly dispid 8;
-    property lastChild: IXMLDOMNode readonly dispid 9;
-    property previousSibling: IXMLDOMNode readonly dispid 10;
-    property nextSibling: IXMLDOMNode readonly dispid 11;
-    property attributes: IXMLDOMNamedNodeMap readonly dispid 12;
-    function  insertBefore(const newChild: IXMLDOMNode; refChild: OleVariant): IXMLDOMNode; dispid 13;
-    function  replaceChild(const newChild: IXMLDOMNode; const oldChild: IXMLDOMNode): IXMLDOMNode; dispid 14;
-    function  removeChild(const childNode: IXMLDOMNode): IXMLDOMNode; dispid 15;
-    function  appendChild(const newChild: IXMLDOMNode): IXMLDOMNode; dispid 16;
-    function  hasChildNodes: WordBool; dispid 17;
-    property ownerDocument: IXMLDOMDocument readonly dispid 18;
-    function  cloneNode(deep: WordBool): IXMLDOMNode; dispid 19;
-    property nodeTypeString: WideString readonly dispid 21;
-    property text: WideString dispid 24;
-    property specified: WordBool readonly dispid 22;
-    property definition: IXMLDOMNode readonly dispid 23;
-    property nodeTypedValue: OleVariant dispid 25;
-    function  dataType: OleVariant; dispid 26;
-    property xml: WideString readonly dispid 27;
-    function  transformNode(const stylesheet: IXMLDOMNode): WideString; dispid 28;
-    function  selectNodes(const queryString: WideString): IXMLDOMNodeList; dispid 29;
-    function  selectSingleNode(const queryString: WideString): IXMLDOMNode; dispid 30;
-    property parsed: WordBool readonly dispid 31;
-    property namespaceURI: WideString readonly dispid 32;
-    property prefix: WideString readonly dispid 33;
-    property baseName: WideString readonly dispid 34;
-    procedure transformNodeToObject(const stylesheet: IXMLDOMNode; outputObject: OleVariant); dispid 35;
-	end;
-
-// *********************************************************************//
 // Interface: IXSLTemplate
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {2933BF93-7B36-11D2-B20E-00C04F983E60}
@@ -1560,17 +651,6 @@ type
     function  Get_stylesheet: IXMLDOMNode; safecall;
     function  createProcessor: IXSLProcessor; safecall;
     property stylesheet: IXMLDOMNode read Get_stylesheet write Set_stylesheet;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXSLTemplateDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF93-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXSLTemplateDisp = dispinterface
-    ['{2933BF93-7B36-11D2-B20E-00C04F983E60}']
-    property stylesheet: IXMLDOMNode dispid 2;
-    function  createProcessor: IXSLProcessor; dispid 3;
   end;
 
 // *********************************************************************//
@@ -1602,28 +682,6 @@ type
     property output: OleVariant read Get_output write Set_output;
     property readyState: Integer read Get_readyState;
     property stylesheet: IXMLDOMNode read Get_stylesheet;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IXSLProcessorDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {2933BF92-7B36-11D2-B20E-00C04F983E60}
-// *********************************************************************//
-  IXSLProcessorDisp = dispinterface
-    ['{2933BF92-7B36-11D2-B20E-00C04F983E60}']
-    property input: OleVariant dispid 2;
-    property ownerTemplate: IXSLTemplate readonly dispid 3;
-    procedure setStartMode(const mode: WideString; const namespaceURI: WideString); dispid 4;
-    property startMode: WideString readonly dispid 5;
-    property startModeURI: WideString readonly dispid 6;
-    property output: OleVariant dispid 7;
-    function  transform: WordBool; dispid 8;
-    procedure reset; dispid 9;
-    property readyState: Integer readonly dispid 10;
-    procedure addParameter(const baseName: WideString; parameter: OleVariant; 
-                           const namespaceURI: WideString); dispid 11;
-    procedure addObject(const obj: IDispatch; const namespaceURI: WideString); dispid 12;
-    property stylesheet: IXMLDOMNode readonly dispid 13;
   end;
 
 // *********************************************************************//
@@ -1841,24 +899,6 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IMXWriterDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {4D7FF4BA-1565-4EA8-94E1-6E724A46F98D}
-// *********************************************************************//
-  IMXWriterDisp = dispinterface
-    ['{4D7FF4BA-1565-4EA8-94E1-6E724A46F98D}']
-    property output: OleVariant dispid 1385;
-    property encoding: WideString dispid 1387;
-    property byteOrderMark: WordBool dispid 1388;
-    property indent: WordBool dispid 1389;
-    property standalone: WordBool dispid 1390;
-    property omitXMLDeclaration: WordBool dispid 1391;
-    property version: WideString dispid 1392;
-    property disableOutputEscaping: WordBool dispid 1393;
-    procedure flush; dispid 1394;
-  end;
-
-// *********************************************************************//
 // Interface: IMXAttributes
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {F10D27CC-3EC0-415C-8ED8-77AB1C5E7262}
@@ -1883,30 +923,6 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IMXAttributesDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {F10D27CC-3EC0-415C-8ED8-77AB1C5E7262}
-// *********************************************************************//
-  IMXAttributesDisp = dispinterface
-    ['{F10D27CC-3EC0-415C-8ED8-77AB1C5E7262}']
-    procedure addAttribute(const strURI: WideString; const strLocalName: WideString; 
-                           const strQName: WideString; const strType: WideString; 
-                           const strValue: WideString); dispid 1373;
-    procedure addAttributeFromIndex(varAtts: OleVariant; nIndex: SYSINT); dispid 1383;
-    procedure clear; dispid 1374;
-    procedure removeAttribute(nIndex: SYSINT); dispid 1375;
-    procedure setAttribute(nIndex: SYSINT; const strURI: WideString; 
-                           const strLocalName: WideString; const strQName: WideString; 
-                           const strType: WideString; const strValue: WideString); dispid 1376;
-		procedure setAttributes(varAtts: OleVariant); dispid 1377;
-    procedure setLocalName(nIndex: SYSINT; const strLocalName: WideString); dispid 1378;
-    procedure setQName(nIndex: SYSINT; const strQName: WideString); dispid 1379;
-    procedure setType(nIndex: SYSINT; const strType: WideString); dispid 1380;
-    procedure setURI(nIndex: SYSINT; const strURI: WideString); dispid 1381;
-    procedure setValue(nIndex: SYSINT; const strValue: WideString); dispid 1382;
-  end;
-
-// *********************************************************************//
 // Interface: IMXReaderControl
 // Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
 // GUID:      {808F4E35-8D5A-4FBE-8466-33A41279ED30}
@@ -1917,18 +933,6 @@ type
     procedure resume; safecall;
     procedure suspend; safecall;
   end;
-
-// *********************************************************************//
-// DispIntf:  IMXReaderControlDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {808F4E35-8D5A-4FBE-8466-33A41279ED30}
-// *********************************************************************//
-	IMXReaderControlDisp = dispinterface
-		['{808F4E35-8D5A-4FBE-8466-33A41279ED30}']
-		procedure abort; dispid 1398;
-		procedure resume; dispid 1399;
-		procedure suspend; dispid 1400;
-	end;
 
 // *********************************************************************//
 // Interface: IXMLHTTPRequest
@@ -1963,30 +967,6 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IXMLHTTPRequestDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {ED8C108D-4349-11D2-91A4-00C04F7969E8}
-// *********************************************************************//
-  IXMLHTTPRequestDisp = dispinterface
-    ['{ED8C108D-4349-11D2-91A4-00C04F7969E8}']
-		procedure open(const bstrMethod: WideString; const bstrUrl: WideString; varAsync: OleVariant;
-                   bstrUser: OleVariant; bstrPassword: OleVariant); dispid 1;
-    procedure setRequestHeader(const bstrHeader: WideString; const bstrValue: WideString); dispid 2;
-    function  getResponseHeader(const bstrHeader: WideString): WideString; dispid 3;
-		function  getAllResponseHeaders: WideString; dispid 4;
-    procedure send(varBody: OleVariant); dispid 5;
-    procedure abort; dispid 6;
-		property status: Integer readonly dispid 7;
-    property statusText: WideString readonly dispid 8;
-    property responseXML: IDispatch readonly dispid 9;
-    property responseText: WideString readonly dispid 10;
-    property responseBody: OleVariant readonly dispid 11;
-    property responseStream: OleVariant readonly dispid 12;
-    property readyState: Integer readonly dispid 13;
-    property onreadystatechange: IDispatch writeonly dispid 14;
-  end;
-
-// *********************************************************************//
 // Interface: IServerXMLHTTPRequest
 // Flags:     (4416) Dual OleAutomation Dispatchable
 // GUID:      {2E9196BF-13BA-4DD4-91CA-6C571F281495}
@@ -2001,77 +981,16 @@ type
   end;
 
 // *********************************************************************//
-// DispIntf:  IServerXMLHTTPRequestDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {2E9196BF-13BA-4DD4-91CA-6C571F281495}
-// *********************************************************************//
-  IServerXMLHTTPRequestDisp = dispinterface
-    ['{2E9196BF-13BA-4DD4-91CA-6C571F281495}']
-    procedure setTimeouts(resolveTimeout: Integer; connectTimeout: Integer; sendTimeout: Integer; 
-                          receiveTimeout: Integer); dispid 15;
-    function  waitForResponse(timeoutInSeconds: OleVariant): WordBool; dispid 16;
-    function  getOption(option: SERVERXMLHTTP_OPTION): OleVariant; dispid 17;
-    procedure setOption(option: SERVERXMLHTTP_OPTION; value: OleVariant); dispid 18;
-		procedure open(const bstrMethod: WideString; const bstrUrl: WideString; varAsync: OleVariant;
-                   bstrUser: OleVariant; bstrPassword: OleVariant); dispid 1;
-    procedure setRequestHeader(const bstrHeader: WideString; const bstrValue: WideString); dispid 2;
-		function  getResponseHeader(const bstrHeader: WideString): WideString; dispid 3;
-    function  getAllResponseHeaders: WideString; dispid 4;
-    procedure send(varBody: OleVariant); dispid 5;
-    procedure abort; dispid 6;
-    property status: Integer readonly dispid 7;
-    property statusText: WideString readonly dispid 8;
-    property responseXML: IDispatch readonly dispid 9;
-    property responseText: WideString readonly dispid 10;
-    property responseBody: OleVariant readonly dispid 11;
-    property responseStream: OleVariant readonly dispid 12;
-    property readyState: Integer readonly dispid 13;
-    property onreadystatechange: IDispatch writeonly dispid 14;
-  end;
-
-// *********************************************************************//
 // Interface: IServerXMLHTTPRequest2
 // Flags:     (4416) Dual OleAutomation Dispatchable
 // GUID:      {2E01311B-C322-4B0A-BD77-B90CFDC8DCE7}
 // *********************************************************************//
-  IServerXMLHTTPRequest2 = interface(IServerXMLHTTPRequest)
-    ['{2E01311B-C322-4B0A-BD77-B90CFDC8DCE7}']
-    procedure setProxy(proxySetting: SXH_PROXY_SETTING; varProxyServer: OleVariant; 
-                       varBypassList: OleVariant); safecall;
-    procedure setProxyCredentials(const bstrUserName: WideString; const bstrPassword: WideString); safecall;
-  end;
-
-// *********************************************************************//
-// DispIntf:  IServerXMLHTTPRequest2Disp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {2E01311B-C322-4B0A-BD77-B90CFDC8DCE7}
-// *********************************************************************//
-  IServerXMLHTTPRequest2Disp = dispinterface
-    ['{2E01311B-C322-4B0A-BD77-B90CFDC8DCE7}']
-    procedure setProxy(proxySetting: SXH_PROXY_SETTING; varProxyServer: OleVariant; 
-                       varBypassList: OleVariant); dispid 19;
-    procedure setProxyCredentials(const bstrUserName: WideString; const bstrPassword: WideString); dispid 20;
-		procedure setTimeouts(resolveTimeout: Integer; connectTimeout: Integer; sendTimeout: Integer;
-                          receiveTimeout: Integer); dispid 15;
-    function  waitForResponse(timeoutInSeconds: OleVariant): WordBool; dispid 16;
-		function  getOption(option: SERVERXMLHTTP_OPTION): OleVariant; dispid 17;
-    procedure setOption(option: SERVERXMLHTTP_OPTION; value: OleVariant); dispid 18;
-    procedure open(const bstrMethod: WideString; const bstrUrl: WideString; varAsync: OleVariant; 
-                   bstrUser: OleVariant; bstrPassword: OleVariant); dispid 1;
-    procedure setRequestHeader(const bstrHeader: WideString; const bstrValue: WideString); dispid 2;
-    function  getResponseHeader(const bstrHeader: WideString): WideString; dispid 3;
-    function  getAllResponseHeaders: WideString; dispid 4;
-    procedure send(varBody: OleVariant); dispid 5;
-    procedure abort; dispid 6;
-    property status: Integer readonly dispid 7;
-    property statusText: WideString readonly dispid 8;
-    property responseXML: IDispatch readonly dispid 9;
-    property responseText: WideString readonly dispid 10;
-    property responseBody: OleVariant readonly dispid 11;
-    property responseStream: OleVariant readonly dispid 12;
-    property readyState: Integer readonly dispid 13;
-    property onreadystatechange: IDispatch writeonly dispid 14;
-  end;
+	IServerXMLHTTPRequest2 = interface(IServerXMLHTTPRequest)
+		['{2E01311B-C322-4B0A-BD77-B90CFDC8DCE7}']
+		procedure setProxy(proxySetting: SXH_PROXY_SETTING; varProxyServer: OleVariant;
+											 varBypassList: OleVariant); safecall;
+		procedure setProxyCredentials(const bstrUserName: WideString; const bstrPassword: WideString); safecall;
+	end;
 
 // *********************************************************************//
 // Interface: IMXNamespacePrefixes
@@ -2087,18 +1006,6 @@ type
     property length: Integer read Get_length;
     property _newEnum: IUnknown read Get__newEnum;
   end;
-
-// *********************************************************************//
-// DispIntf:  IMXNamespacePrefixesDisp
-// Flags:     (4544) Dual NonExtensible OleAutomation Dispatchable
-// GUID:      {C90352F4-643C-4FBC-BB23-E996EB2D51FD}
-// *********************************************************************//
-	IMXNamespacePrefixesDisp = dispinterface
-		['{C90352F4-643C-4FBC-BB23-E996EB2D51FD}']
-		property item[index: Integer]: WideString readonly dispid 0; default;
-		property length: Integer readonly dispid 1416;
-		property _newEnum: IUnknown readonly dispid -4;
-	end;
 
 // *********************************************************************//
 // Interface: IMXNamespaceManager
