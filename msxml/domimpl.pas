@@ -1,3 +1,8 @@
+{$A+,B-,C+,D+,E-,F-,G+,H+,I+,J+,K-,L+,M-,N+,O+,P+,Q-,R-,S-,T-,U-,V+,W-,X+,Y+,Z1}
+{$MINSTACKSIZE $00004000}
+{$MAXSTACKSIZE $00100000}
+{$IMAGEBASE $00400000}
+{$APPTYPE GUI}
 unit domimpl;
 (**
  * This unit is an object-oriented wrapper for libxml2.
@@ -207,6 +212,8 @@ type
 		procedure Set_onreadystatechange(Param1: OleVariant); safecall;
 		procedure Set_ondataavailable(Param1: OleVariant); safecall;
 		procedure Set_ontransformnode(Param1: OleVariant); safecall;
+	protected //
+		constructor Create(aNode: xmlNodePtr);
 	end;
 
 	TXMLDOMDocumentType = class(TXMLDOMNode,
@@ -570,7 +577,7 @@ var
 	node: xmlNodePtr;
 begin
 	node := GetNodePtr(childNode);
-	xmlRemoveNode(node);
+	xmlUnlinkNode(node);
 end;
 
 function TXMLDOMNode.replaceChild(const newChild, oldChild: IXMLDOMNode): IXMLDOMNode;
@@ -588,8 +595,24 @@ begin
 end;
 
 function TXMLDOMNode.selectSingleNode(const queryString: WideString): IXMLDOMNode;
+var
+	s: string;
+	ctxt: xmlXPathContextPtr;
+	rv: xmlXPathObjectPtr;
+	node: xmlNodePtr;
 begin
-	ENotImpl('selectSingleNode');
+	ctxt := xmlXPathNewContext(FNode.node.doc);
+	s := queryString;
+	rv := xmlXPathEval(PChar(s), ctxt);
+	Result := nil;
+	if (rv=nil) then exit;
+	if (rv.type_ = XPATH_NODESET) then begin
+		if (rv.nodesetval.nodeNr > 0) then begin
+			node := rv.nodesetval.nodeTab^[0];
+			Result := GetDOMObject(node) as IXMLDOMNode;
+		end;
+	end;
+	xmlXPathFreeObject(rv);
 end;
 
 procedure TXMLDOMNode.Set_dataType(const dataTypeName: WideString);
@@ -603,13 +626,21 @@ begin
 end;
 
 procedure TXMLDOMNode.Set_nodeValue(value: OleVariant);
+var
+	s: string;
 begin
-	ENotImpl('Set_nodeValue');
+	//todo: check node type
+	s := VarToStr(value);
+	xmlNodeSetContent(FNode.node, PChar(s));
 end;
 
 procedure TXMLDOMNode.Set_text(const text: WideString);
+var
+	s: string;
 begin
-	ENotImpl('Set_text');
+	//todo: check node type
+	s := VarToStr(text);
+	xmlNodeSetContent(FNode.node, PChar(s));
 end;
 
 function TXMLDOMNode.transformNode(const stylesheet: IXMLDOMNode): WideString;
@@ -636,27 +667,27 @@ end;
 
 function TXMLDOMNodeCollection.Get__newEnum: IUnknown;
 begin
-	ENotImpl('Get__newEnum');
+	ENotImpl('TXMLDOMNodeCollection.Get__newEnum');
 end;
 
 function TXMLDOMNodeCollection.Get_item(index: Integer): IXMLDOMNode;
 begin
-	ENotImpl('Get_item');
+	ENotImpl('TXMLDOMNodeCollection.Get_item');
 end;
 
 function TXMLDOMNodeCollection.Get_length: Integer;
 begin
-	ENotImpl('Get_length');
+	ENotImpl('TXMLDOMNodeCollection.Get_length');
 end;
 
 function TXMLDOMNodeCollection.nextNode: IXMLDOMNode;
 begin
-	ENotImpl('nextNode');
+	ENotImpl('TXMLDOMNodeCollection.nextNode');
 end;
 
 procedure TXMLDOMNodeCollection.reset;
 begin
-	ENotImpl('reset');
+	ENotImpl('TXMLDOMNodeCollection.reset');
 end;
 
 { TChildNodeList }
@@ -793,12 +824,12 @@ end;
 
 function TXMLDOMElement.getElementsByTagName(const tagName: WideString): IXMLDOMNodeList;
 begin
-	ENotImpl('getElementsByTagName');
+	ENotImpl('TXMLDOMElement.getElementsByTagName');
 end;
 
 procedure TXMLDOMElement.normalize;
 begin
-	ENotImpl('normalize');
+	ENotImpl('TXMLDOMElement.normalize');
 end;
 
 procedure TXMLDOMElement.removeAttribute(const name: WideString);
@@ -851,7 +882,19 @@ end;
 
 procedure TXMLDOMDocument.abort;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.abort');
+end;
+
+constructor TXMLDOMDocument.Create(aNode: xmlNodePtr);
+begin
+	inherited Create(aNode);
+	// we have to ensure that this node does not just disappear when all
+	// object references are released, because it holds some data not present in
+	// the underlying xmlDoc object. One way of doing this is to pretend that
+	// one reference always exists.
+
+	//todo: PROBLEM - therefore it will never be automaticaly destroyed... 
+	_AddRef;
 end;
 
 function TXMLDOMDocument.createAttribute(const name: WideString): IXMLDOMAttribute;
@@ -914,7 +957,7 @@ end;
 
 function TXMLDOMDocument.createNode(type_: OleVariant; const name, namespaceURI: WideString): IXMLDOMNode;
 begin
-	//todo
+	ENotImpl('TXMLDOMDocument.createNode');
 end;
 
 function TXMLDOMDocument.createProcessingInstruction(const target, data: WideString): IXMLDOMProcessingInstruction;
@@ -940,12 +983,12 @@ end;
 
 function TXMLDOMDocument.Get_async: WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_async');
 end;
 
 function TXMLDOMDocument.Get_doctype: IXMLDOMDocumentType;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_doctype');
 end;
 
 function TXMLDOMDocument.Get_documentElement: IXMLDOMElement;
@@ -958,102 +1001,126 @@ end;
 
 function TXMLDOMDocument.Get_implementation_: IXMLDOMImplementation;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_implementation_');
 end;
 
 function TXMLDOMDocument.Get_parseError: IXMLDOMParseError;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_parseError');
 end;
 
 function TXMLDOMDocument.Get_preserveWhiteSpace: WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_parseError');
 end;
 
 function TXMLDOMDocument.Get_readyState: Integer;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_readyState');
 end;
 
 function TXMLDOMDocument.Get_resolveExternals: WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_resolveExternals');
 end;
 
 function TXMLDOMDocument.Get_url: WideString;
+var
+	s: string;
 begin
-	Result := ''; //todo
+	s := FNode.doc.URL;
+	Result := s;
 end;
 
 function TXMLDOMDocument.Get_validateOnParse: WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Get_validateOnParse');
 end;
 
 function TXMLDOMDocument.getElementsByTagName(const tagName: WideString): IXMLDOMNodeList;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.getElementsByTagName');
 end;
 
 function TXMLDOMDocument.load(xmlSource: OleVariant): WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.load');
 end;
 
 function TXMLDOMDocument.loadXML(const bstrXML: WideString): WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.loadXML');
 end;
 
 function TXMLDOMDocument.nodeFromID(const idString: WideString): IXMLDOMNode;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.nodeFromID');
 end;
 
 procedure TXMLDOMDocument.save(destination: OleVariant);
+var
+	fn: string;
+	rv: integer;
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	//todo: handle stream (and perhaps other) variant types!
+	case TVarData(destination).VType of
+	varEmpty,
+	varNull:
+		begin
+			rv := xmlSaveFile(FNode.doc.URL, FNode.doc);
+		end;
+	varString:
+		begin
+			fn := destination;
+			rv := xmlSaveFile(PChar(fn), FNode.doc);
+		end;
+	else
+		rv := -1;
+		ENotImpl('TXMLDOMDocument.save(unknown variant type)');
+	end;
+	if (rv < 0) then begin
+		raise Exception.Create('Error while saving document'); //todo: DOMException
+	end;
 end;
 
 procedure TXMLDOMDocument.Set_async(isAsync: WordBool);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_async');
 end;
 
 procedure TXMLDOMDocument.Set_documentElement(const DOMElement: IXMLDOMElement);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_documentElement');
 end;
 
 procedure TXMLDOMDocument.Set_ondataavailable(Param1: OleVariant);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_ondataavailable');
 end;
 
 procedure TXMLDOMDocument.Set_onreadystatechange(Param1: OleVariant);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_onreadystatechange');
 end;
 
 procedure TXMLDOMDocument.Set_ontransformnode(Param1: OleVariant);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_ontransformnode');
 end;
 
 procedure TXMLDOMDocument.Set_preserveWhiteSpace(isPreserving: WordBool);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_preserveWhiteSpace');
 end;
 
 procedure TXMLDOMDocument.Set_resolveExternals(isResolving: WordBool);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_resolveExternals');
 end;
 
 procedure TXMLDOMDocument.Set_validateOnParse(isValidating: WordBool);
 begin
-	ENotImpl('TXMLDOMDocument.xxx');
+	ENotImpl('TXMLDOMDocument.Set_validateOnParse');
 end;
 
 { TXMLDOMCharacterData }
@@ -1068,7 +1135,7 @@ end;
 
 procedure TXMLDOMCharacterData.deleteData(offset, count: Integer);
 begin
-	ENotImpl('TXMLDOMCharacterData.xxx');
+	replaceData(offset, count, '');
 end;
 
 function TXMLDOMCharacterData.Get_length: Integer;
@@ -1078,12 +1145,19 @@ end;
 
 procedure TXMLDOMCharacterData.insertData(offset: Integer; const data: WideString);
 begin
-	ENotImpl('TXMLDOMCharacterData.xxx');
+	replaceData(offset, 0, data);
 end;
 
 procedure TXMLDOMCharacterData.replaceData(offset, count: Integer; const data: WideString);
+var
+	s: widestring;
 begin
-	ENotImpl('TXMLDOMCharacterData.xxx');
+	//todo: check bounds !
+	//todo: needs testing
+	s := Get_data;
+	s := Copy(s, 1, offset) + data + Copy(s, offset + count, Length(s));   
+	Delete(s, offset, count);
+	Set_data(s);
 end;
 
 function TXMLDOMCharacterData.substringData(offset, count: Integer): WideString;
@@ -1101,8 +1175,11 @@ end;
 { TXMLDOMEntity }
 
 function TXMLDOMEntity.Get_notationName: WideString;
+var
+	s: string;
 begin
-	ENotImpl('TXMLDOMEntity.Get_notationName');
+	s := FNode.notation.name;
+	Result := s;
 end;
 
 function TXMLDOMEntity.Get_publicId: OleVariant;
