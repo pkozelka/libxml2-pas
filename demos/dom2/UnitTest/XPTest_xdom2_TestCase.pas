@@ -8,7 +8,7 @@ uses
 
 const
   //datapath='L:\@Demos\Open_xdom\Data\';  //set to the directory with test.xml
-  datapath='p:\dom2\data';
+  datapath='p:\dom2\data\';
   xmlstr  = '<?xml version="1.0" encoding="iso-8859-1"?><test />';
   xmlstr1 = '<?xml version="1.0" encoding="iso-8859-1"?><test xmlns=''http://ns.4ct.de''/>';
   xmlstr2 = '<?xml version="1.0" encoding="iso-8859-1"?>'+
@@ -534,7 +534,7 @@ begin
     for i:=1 to 100 do begin
       TestsOK:=TestDocument(datapath+'test.xml',domvendor,TestSet);
       //OutLog('Passed OK: '+inttostr(TestsOK));
-      Check((TestsOK >= 1),(inttostr(1-TestsOK)+' Tests failed!')); //15
+      Check((TestsOK >= 15),(inttostr(15-TestsOK)+' Tests failed!')); //15
     end;
     OutLog('Passed OK: '+inttostr(j*100));
   end;
