@@ -27,8 +27,8 @@ interface
 
 uses dom2,libxmldom,msxml_impl; // IDOMIMplementation, IDOMDocument
 
-function TestGDom3(name,vendorstr:string):double;
-function getDoc(filename,vendorstr: string): IDOMDocument;
+function TestGDom3(name,vendorstr:string;TestSet:integer):double;
+function getDoc(filename,vendorstr: string;TestSet:integer=0): IDOMDocument;
 function getEmptyDoc(vendorstr: string): IDomDocument;
 function test(name: string; testexpr: boolean): boolean;
 
@@ -62,7 +62,15 @@ begin
   result := dom.createDocument('','',nil);
 end;
 
-function getDoc(filename, vendorstr: string): IDomDocument;
+function getEmptyDoc1(vendorstr: string): IDomDocument;
+var
+  docbuilder: IDOMDocumentBuilder;
+begin
+  docbuilder:=(GetDocumentBuilderFactory(vendorstr)).newDocumentBuilder;
+  result:=docbuilder.newDocument;
+end;
+
+function getDoc(filename, vendorstr: string;TestSet:integer=0): IDomDocument;
 var
   dom: IDomImplementation;
   docBuilder : IDomDocumentBuilder;
@@ -70,11 +78,15 @@ var
   FDomPersist: IDomPersist;
   ok: boolean;
 begin
-  doc:=GetEmptyDoc(vendorstr);
+  if (TestSet and 1) = 0
+    then doc:=GetEmptyDoc(vendorstr)
+    else doc:=GetEmptyDoc1(vendorstr);
   (doc as IDOMParseOptions).validate := true; // we want to use a dtd
   (doc as IDOMParseOptions).resolveExternals := true;
   FDomPersist := doc as IDomPersist;
   ok := FDomPersist.load(filename);
+  if (TestSet and 1) =1
+    then Test('IDomDocumentBuilder.NewDocument',ok);
   if not ok and (vendorstr='MSXML') then begin
     //outLog('ErrorCode: '+inttostr((doc as IDOMParseError).errorCode));
     //outLog('ErrorLine: '+inttostr((doc as IDOMParseError).line));
@@ -83,7 +95,7 @@ begin
   if ok then result := doc else result := nil;
 end;
 
-procedure TestGDom3b(name,vendorstr:string);
+procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
 // shall Test every Method of GDOM2
   procedure TestElement(document: IDOMDocument;vendorstr:string);
     var
@@ -460,7 +472,7 @@ begin
   TestsOK:=0; //Number of passed Tests
   stringlist := TStringList.Create;
   filename := '..\data\'+name;
-  document := getDoc(filename,vendorstr);
+  document := getDoc(filename,vendorstr,TestSet);
 
   // testing document
   TestDocument(document,vendorstr);
@@ -587,28 +599,25 @@ begin
 
   node := namednodemap.getNamedItem('age');
   test('namedNodeMap.getNamedItem/setNamedItem',(node.nodeValue = '13'));
-  if vendorstr<>'LIBXML' then begin
-    node := namednodemap.removeNamedItem('age');
-    test('namedNodeMap.removeNamedItem',(namednodemap.length = 0));
+  node := namednodemap.removeNamedItem('age');
+  test('namedNodeMap.removeNamedItem',(namednodemap.length = 0));
+  node := nil;
+  namednodemap := nil;
+  try
+    namednodemap := document.documentElement.attributes;
+    node := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:age') as IDOMNode;
+    node.nodeValue := '13';
+    node := namednodemap.setNamedItemNS(node);
+    node := nil;
+    node := namednodemap.getNamedItemNS('http://xmlns.4commerce.de/eva','age');
+    test('namedNodeMap.getNamedItemNS/setNamedItemNS',(node.nodeValue = '13'));
+    node := namednodemap.removeNamedItemNS('http://xmlns.4commerce.de/eva','age');
+    test('namedNodeMap.removeNamedItemNS',(namednodemap.length = 0));
     node := nil;
     namednodemap := nil;
-
-    try
-      namednodemap := document.documentElement.attributes;
-      node := document.createAttributeNS('http://xmlns.4commerce.de/eva','eva:age') as IDOMNode;
-      node.nodeValue := '13';
-      node := namednodemap.setNamedItemNS(node);
-      node := nil;
-      node := namednodemap.getNamedItemNS('http://xmlns.4commerce.de/eva','age');
-      test('namedNodeMap.getNamedItemNS/setNamedItemNS',(node.nodeValue = '13'));
-      node := namednodemap.removeNamedItemNS('http://xmlns.4commerce.de/eva','age');
-      test('namedNodeMap.removeNamedItemNS',(namednodemap.length = 0));
-      node := nil;
-      namednodemap := nil;
-    except
-      OutLog('__namedNodeMap.getNamedItemNS/setNamedItemNS doesn''t work!');
-      OutLog('__namedNodeMap.removeNamedItemNS doesn''t work!');
-    end;
+  except
+    OutLog('__namedNodeMap.getNamedItemNS/setNamedItemNS doesn''t work!');
+    OutLog('__namedNodeMap.removeNamedItemNS doesn''t work!');
   end;
   // testing element
   element := document.documentElement.firstChild as IDOMElement;
@@ -700,14 +709,18 @@ begin
   document := nil;
 end;
 
-function TestGDom3(name,vendorstr:string):double;
+function TestGDom3(name,vendorstr:string;TestSet:integer):double;
+var testCount: integer;
 begin
   StartTimer;
-  TestGdom3b(name,vendorstr);
+  TestGdom3b(name,vendorstr,TestSet);
   result:=EndTime;
   outLog('');
   outLog('Number of tests passed OK:  '+inttostr(TestsOK));
-  outLog('Number of tests total:     111');
+  testCount:=111;
+  if (TestSet and 1) = 1
+    then inc(testCount);
+  outLog('Number of tests total:    '+inttostr(TestCount));
   //outLog('doccount='+inttostr(doccount));
   //outLog('nodecount='+inttostr(nodecount));
   //outLog('elementcount='+inttostr(elementcount));

@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 382
+  Left = 319
   Top = 121
-  Width = 600
+  Width = 663
   Height = 542
   Caption = 'Dom2Demo'
   Color = clBtnFace
@@ -16,7 +16,7 @@ object Form1: TForm1
   object Memo1: TMemo
     Left = 0
     Top = 177
-    Width = 592
+    Width = 655
     Height = 338
     Align = alClient
     Font.Charset = ANSI_CHARSET
@@ -31,7 +31,7 @@ object Form1: TForm1
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 592
+    Width = 655
     Height = 145
     Align = alTop
     TabOrder = 1
@@ -42,8 +42,15 @@ object Form1: TForm1
       Height = 13
       Caption = 'TestFile for Test and Traverse:'
     end
-    object Button2: TButton
+    object Label2: TLabel
       Left = 200
+      Top = 16
+      Width = 78
+      Height = 13
+      Caption = 'Additional Tests:'
+    end
+    object Button2: TButton
+      Left = 352
       Top = 8
       Width = 89
       Height = 25
@@ -52,7 +59,7 @@ object Form1: TForm1
       OnClick = Button2Click
     end
     object Button6: TButton
-      Left = 200
+      Left = 352
       Top = 40
       Width = 89
       Height = 25
@@ -61,7 +68,7 @@ object Form1: TForm1
       OnClick = Button6Click
     end
     object Button7: TButton
-      Left = 200
+      Left = 352
       Top = 72
       Width = 89
       Height = 25
@@ -70,7 +77,7 @@ object Form1: TForm1
       OnClick = Button7Click
     end
     object TestGdome100: TButton
-      Left = 296
+      Left = 448
       Top = 8
       Width = 89
       Height = 25
@@ -119,7 +126,7 @@ object Form1: TForm1
       end
     end
     object Button9: TButton
-      Left = 296
+      Left = 448
       Top = 72
       Width = 89
       Height = 25
@@ -128,7 +135,7 @@ object Form1: TForm1
       OnClick = Button9Click
     end
     object Button12: TButton
-      Left = 296
+      Left = 448
       Top = 40
       Width = 89
       Height = 25
@@ -137,7 +144,7 @@ object Form1: TForm1
       OnClick = Button12Click
     end
     object Button1: TButton
-      Left = 400
+      Left = 552
       Top = 8
       Width = 89
       Height = 25
@@ -145,14 +152,25 @@ object Form1: TForm1
       TabOrder = 8
       OnClick = Button1Click
     end
+    object Test1: TCheckBox
+      Left = 200
+      Top = 40
+      Width = 137
+      Height = 17
+      Caption = 'IDOMDocumentBuilder'
+      TabOrder = 9
+    end
   end
   object Panel2: TPanel
     Left = 0
     Top = 145
-    Width = 592
+    Width = 655
     Height = 32
     Align = alTop
     TabOrder = 2
+    DesignSize = (
+      655
+      32)
     object EnableOutput: TCheckBox
       Left = 8
       Top = 8
@@ -164,7 +182,7 @@ object Form1: TForm1
       TabOrder = 0
     end
     object Button4: TButton
-      Left = 503
+      Left = 566
       Top = 7
       Width = 81
       Height = 17

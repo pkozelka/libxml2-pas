@@ -25,6 +25,8 @@ type
     RbLIBXML: TRadioButton;
     Button12: TButton;
     Button1: TButton;
+    Test1: TCheckBox;
+    Label2: TLabel;
     procedure Button2Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -35,9 +37,6 @@ type
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button10Click(Sender: TObject);
-    procedure Button11Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
   private
     { Private declarations }
@@ -107,9 +106,12 @@ begin
 end;
 
 procedure TForm1.Button7Click(Sender: TObject);
+var TestSet:integer;
 begin
   EnableOutput.Checked:=true;
-  TestGDom3('test.xml',GetVendorStr);
+  TestSet:=0;
+  if Test1.Checked then TestSet:=1;
+  TestGDom3('test.xml',GetVendorStr,TestSet);
 end;
 
 procedure TForm1.Button8Click(Sender: TObject);
@@ -127,14 +129,16 @@ end;
 
 procedure TForm1.Button9Click(Sender: TObject);
 var
-  i: integer;
+  i,TestSet: integer;
   time: double;
 begin
   EnableOutput.Checked:=false;
+  TestSet:=0;
+  if Test1.Checked then TestSet:=1;
   time:=0;
   OutDebugLog('Start!');
   for i:=1 to 100 do
-    time:=time+TestGDom3('test.xml',GetVendorStr);
+    time:=time+TestGDom3('test.xml',GetVendorStr,TestSet);
   outDebugLog('Everage time: '+format('%8.1f',[time*1000/100])+' ms');
 end;
 
@@ -156,29 +160,6 @@ begin
     end;
   outDebugLog('Everage time parsing events.xml: '+format('%8.1f',[time1*1000/100])+' ms');
   outDebugLog('Everage time parsing xslbenchdream.xml: '+format('%8.1f',[time2*1000/100])+' ms');
-end;
-
-
-procedure TForm1.Button3Click(Sender: TObject);
-var i: integer;
-begin
-  OutLog('Disabled!');
-  //for i:=1 to 100 do
-    //native3(Combobox1.Text);
-end;
-
-procedure TForm1.Button10Click(Sender: TObject);
-begin
-  OutLog('Disabled!');
-  //SimpleDom(Combobox1.Text,GetVendorStr);
-end;
-
-procedure TForm1.Button11Click(Sender: TObject);
-var i: integer;
-begin
-  OutLog('Disabled!');
-  //for i:=1 to 100 do
-    //SimpleDom(Combobox1.Text,GetVendorStr);
 end;
 
 procedure TForm1.Button12Click(Sender: TObject);
