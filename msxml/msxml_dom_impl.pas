@@ -13,11 +13,14 @@ unit msxml_dom_impl;
 interface
 
 uses
+{$ifdef VER130}
 	ComObj,
+{$endif}
 {$ifdef VER140}
 	Variants,
 {$endif}
 	libxml2,
+	libxslt,
 	msxml_libxml,
 	Classes;
 
