@@ -164,15 +164,15 @@ LIBXML_DLL_IMPORT extern const xmlChar xmlStringComment[];
 {
 	Function to finish the work of the macros where needed
 }
-function  xmlIsBaseChar(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsBlank(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsPubidChar(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsLetter(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsDigit(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsIdeographic(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsCombining(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsExtender(c:longint):longint;cdecl;external LIBXML2_SO;
-function  xmlIsChar(c:longint):longint;cdecl;external LIBXML2_SO;
+function  xmlIsBaseChar(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsBlank(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsPubidChar(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsLetter(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsDigit(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsIdeographic(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsCombining(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsExtender(c:longint): LongBool; cdecl;external LIBXML2_SO;
+function  xmlIsChar(c:longint): LongBool; cdecl;external LIBXML2_SO;
 
 {
 	Parser context
