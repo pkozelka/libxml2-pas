@@ -6,7 +6,7 @@ uses
   libxml2,
   SysUtils;
 
-function myParseFile(aFileName: PxmlChar): xmlDocPtr;
+function myParseFile(aFileName: PChar): xmlDocPtr;
 var
   ctxt: xmlParserCtxtPtr;
 begin
