@@ -16,9 +16,6 @@
  *
  *)
 
-type
-  xmlElementType = Longint;
-
 {[pk] following declarations are in xmlIO.inc:
 xmlParserInputBuffer
 xmlParserInputBufferPtr
@@ -63,7 +60,6 @@ const
    * Actually this had diverged a bit, and now XML_DOCUMENT_TYPE_NODE should
    * be deprecated to use an XML_DTD_NODE.
    *)
-  //[pk] note: all these constants are declared unconditionally, as it makes more sense
   XML_ELEMENT_NODE       = 1;
   XML_ATTRIBUTE_NODE     = 2;
   XML_TEXT_NODE          = 3;
@@ -87,6 +83,8 @@ const
   XML_DOCB_DOCUMENT_NODE = 21;
 
 type
+  xmlElementType = Longint;
+
   (**
    * xmlChar:
    *
@@ -108,72 +106,6 @@ const
    *)
   XML_LOCAL_NAMESPACE = XML_NAMESPACE_DECL;
 
-const
-  (**
-   * xmlAttributeType:
-   *
-   * a DTD Attribute type definition
-   *)
-  XML_ATTRIBUTE_CDATA       = 1;
-  XML_ATTRIBUTE_ID          = 2;
-  XML_ATTRIBUTE_IDREF       = 3;
-  XML_ATTRIBUTE_IDREFS      = 4;
-  XML_ATTRIBUTE_ENTITY      = 5;
-  XML_ATTRIBUTE_ENTITIES    = 6;
-  XML_ATTRIBUTE_NMTOKEN     = 7;
-  XML_ATTRIBUTE_NMTOKENS    = 8;
-  XML_ATTRIBUTE_ENUMERATION = 9;
-  XML_ATTRIBUTE_NOTATION    = 10;
-
-const
-  (**
-   * xmlAttributeDefault:
-   *
-   * a DTD Attribute default definition
-   *)
-  XML_ATTRIBUTE_NONE     = 1;
-  XML_ATTRIBUTE_REQUIRED = 2;
-  XML_ATTRIBUTE_IMPLIED  = 3;
-  XML_ATTRIBUTE_FIXED    = 4;
-
-const
-  XML_ELEMENT_TYPE_UNDEFINED = 0;
-  XML_ELEMENT_TYPE_EMPTY     = 1;
-  XML_ELEMENT_TYPE_ANY       = 2;
-  XML_ELEMENT_TYPE_MIXED     = 3;
-  XML_ELEMENT_TYPE_ELEMENT   = 4;
-
-const
-  (**
-   * xmlElementContentType:
-   *
-   * Possible definitions of element content types
-   *)
-  XML_ELEMENT_CONTENT_PCDATA  = 1;
-  XML_ELEMENT_CONTENT_ELEMENT = 2;
-  XML_ELEMENT_CONTENT_SEQ     = 3;
-  XML_ELEMENT_CONTENT_OR      = 4;
-
-const
-  (**
-   * xmlElementContentOccur:
-   *
-   * Possible definitions of element content occurrences
-   *)
-  XML_ELEMENT_CONTENT_ONCE = 1;
-  XML_ELEMENT_CONTENT_OPT  = 2;
-  XML_ELEMENT_CONTENT_MULT = 3;
-  XML_ELEMENT_CONTENT_PLUS = 4;
-
-const
-  (**
-   * xmlBufferAllocationScheme:
-   *
-   * A buffer allocation scheme can be defined to either match exactly the
-   * need or double it's allocated size each time it is found too small
-   *)
-  XML_BUFFER_ALLOC_DOUBLEIT = 0;
-  XML_BUFFER_ALLOC_EXACT    = 1;
 type
   xmlDocPtr = ^xmlDoc;
   xmlDtdPtr = ^xmlDtd;
@@ -199,14 +131,30 @@ type
    * A DTD Attribute type definition.
    *)
 
-  xmlAttributeType = Longint;
+  xmlAttributeType = (
+    XML_ATTRIBUTE_CDATA       = 1,
+    XML_ATTRIBUTE_ID,
+    XML_ATTRIBUTE_IDREF,
+    XML_ATTRIBUTE_IDREFS,
+    XML_ATTRIBUTE_ENTITY,
+    XML_ATTRIBUTE_ENTITIES,
+    XML_ATTRIBUTE_NMTOKEN,
+    XML_ATTRIBUTE_NMTOKENS,
+    XML_ATTRIBUTE_ENUMERATION,
+    XML_ATTRIBUTE_NOTATION
+  );
 
   (**
    * xmlAttributeDefault:
    *
    * A DTD Attribute default definition.
    *)
-  xmlAttributeDefault = Longint;
+  xmlAttributeDefault = (
+    XML_ATTRIBUTE_NONE     = 1,
+    XML_ATTRIBUTE_REQUIRED,
+    XML_ATTRIBUTE_IMPLIED,
+    XML_ATTRIBUTE_FIXED
+  );
 
   (**
    * xmlEnumeration:
@@ -249,14 +197,24 @@ type
    *
    * Possible definitions of element content types.
    *)
-  xmlElementContentType = Longint;
+  xmlElementContentType = (
+    XML_ELEMENT_CONTENT_PCDATA  = 1,
+    XML_ELEMENT_CONTENT_ELEMENT,
+    XML_ELEMENT_CONTENT_SEQ,
+    XML_ELEMENT_CONTENT_OR
+  );
 
   (**
    * xmlElementContentOccur:
    *
    * Possible definitions of element content occurences.
    *)
-  xmlElementContentOccur = Longint;
+  xmlElementContentOccur = (
+    XML_ELEMENT_CONTENT_ONCE = 1,
+    XML_ELEMENT_CONTENT_OPT,
+    XML_ELEMENT_CONTENT_MULT,
+    XML_ELEMENT_CONTENT_PLUS
+  );
 
   (**
    * xmlElementContent:
@@ -280,7 +238,13 @@ type
    *
    * The differnt possibility for an element content type.
    *)
-  xmlElementTypeVal = Longint;
+  xmlElementTypeVal = (
+    XML_ELEMENT_TYPE_UNDEFINED = 0,
+    XML_ELEMENT_TYPE_EMPTY,
+    XML_ELEMENT_TYPE_ANY,
+    XML_ELEMENT_TYPE_MIXED,
+    XML_ELEMENT_TYPE_ELEMENT
+  );
 
   (**
    * xmlElement:
@@ -398,8 +362,10 @@ type
    * A buffer allocation scheme can be defined to either match exactly the
    * need or double it's allocated size each time it is found too small.
    *)
-
-  xmlBufferAllocationScheme = Longint;
+  xmlBufferAllocationScheme = (
+    XML_BUFFER_ALLOC_DOUBLEIT = 0,
+    XML_BUFFER_ALLOC_EXACT
+  );
 
   (**
    * xmlBuffer:
