@@ -81,6 +81,12 @@ var
   FDomPersist: IDomPersist;
   ok: boolean;
 begin
+  if not fileexists(filename)
+    then begin
+      Outlog('File: '+filename+' doesn''t exist');
+      result:=nil;
+      exit
+    end;
   if (TestSet and 1) = 0
     then doc:=GetEmptyDoc(vendorstr)
     else doc:=GetEmptyDoc1(vendorstr);
@@ -88,6 +94,7 @@ begin
   (doc as IDOMParseOptions).resolveExternals := true;
   FDomPersist := doc as IDomPersist;
   ok := FDomPersist.load(filename);
+  
   if (TestSet and 1) =1
     then Test('IDomDocumentBuilder.NewDocument',ok);
   if not ok and (vendorstr='MSXML') then begin
@@ -116,9 +123,9 @@ var
 begin
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   document := getDoc(filename,vendorstr,TestSet);
+  if document=nil then exit;
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   test('document',(document <> nil));
-  if document=nil then exit;
 
   //p=1
   element := document.documentElement;
@@ -236,6 +243,7 @@ var
   dom2: boolean;
 begin
   document := getDoc(filename,vendorstr,TestSet);
+  if document=nil then exit;
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   element := document.documentElement;
   test('element.tagName',(element.tagName = 'test')) ;
@@ -333,6 +341,7 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     if (testset and 512) = 512 then dom2:=true else dom2:=false;
     document:=nil;
     document := getDoc(filename,vendorstr);
+    if document=nil then exit;
     node := document.documentElement as IDOMNode;
     test('node.ownerDocument',(node.ownerDocument.nodeName = document.nodeName));
     node := nil;
@@ -482,6 +491,7 @@ procedure TestGDom3b(name,vendorstr:string;TestSet:integer);
     document: IDOMDocument;
   begin
     document := getDoc(filename,vendorstr);
+    if document=nil then exit;
     if (testset and 512) = 512 then dom2:=true else dom2:=false;
     node := document.createElement('urgs') as IDOMNode;
     test('node.prefix',(node.prefix = '')) ;
@@ -504,6 +514,7 @@ var
     temp: string;
 begin
   document := getDoc(filename,vendorstr);
+  if document=nil then exit;
   // testing documenttype
   documenttype:=document.doctype;
   test('document.docType',(documenttype <> nil));
@@ -556,6 +567,7 @@ var
   documentType: IDOMDocumentType;
 begin
   document := getDoc(filename,vendorstr);
+  if document=nil then exit;
   try
     documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','test');
     test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
@@ -582,6 +594,7 @@ var
 begin
   // testing character data
   document := getDoc(filename,vendorstr);
+  if document=nil then exit;
   cdata := document.createCDATASection('yyy');
   test('document.createCDATASection',(cdata <> nil));
   test('characterData.data (get)',(cdata.data = 'yyy'));
@@ -630,6 +643,7 @@ var
 begin
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   document := getDoc(filename,vendorstr);
+  if document=nil then exit;
   documentElement:= document.documentElement;
   namednodemap := documentElement.attributes;
   if namednodemap<>nil
@@ -695,6 +709,7 @@ var
 begin
   if (testset and 512) = 512 then dom2:=true else dom2:=false;
   document := getDoc(filename,vendorstr);
+  if document=nil then exit;
   element := document.documentElement.firstChild as IDOMElement;
   test('element-interface of Node',(element <> nil));
   test('element.tagName',(element.tagName = 'sometag'));
@@ -810,6 +825,7 @@ begin
   if (testset and 256) =256 then begin
     document := nil;
     document := getDoc(filename,vendorstr,TestSet);
+    if document=nil then exit;
     FDomPersist := document as IDomPersist;
     FDomPersist.save('..\data\saved.xml');
     //todo: test .xml with large xml-file
