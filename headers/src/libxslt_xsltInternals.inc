@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltInternals.h:1.65:
+// CVS-REV:libxslt/libxslt/xsltInternals.h:1.66:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -376,6 +376,12 @@ type
     profMax: Longint;                            (* Size of the templtaes stack *)
     profTab: PLongint;                           (* the profile template stack *)
     _private: Pointer;                           (* user defined data *)
+
+    extrasNr: Longint;		                       (* the number of extras used *)
+    extrasMax: Longint;                          (* the number of extras allocated *)
+    extras: xsltRuntimeExtraPtr;                 (* extra per runtime informations *)
+
+    styleList: xsltDocumentPtr;                  (* the stylesheet docs list *)
   end;
 
 (**

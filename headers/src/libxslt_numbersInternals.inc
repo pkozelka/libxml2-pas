@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/numbersInternals.h:1.9:
+// CVS-REV:libxslt/libxslt/numbersInternals.h:1.10:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -42,5 +42,6 @@ type
    *)
   xsltFormatNumberInfoPtr = ^xsltFormatNumberInfo;
   xsltFormatNumberInfo = record
-    integer_digits: Longint;                     { Number of '0' in integer part  }    frac_digits: Longint;                        { Number of '0' in fractional part  }    frac_hash: Longint;                          { Number of '#' in fractional part  }    group: Longint;                              { Number of chars per display 'group'  }    multiplier: Longint;                         { Scaling for percent or permille  }    is_multiplier_set: char;                     { Flag to catch multiple occurences of percent/permille  }    is_negative_pattern: char;                   { Flag for processing -ve prefix/suffix  }  end;
+    integer_hash: Longint;                       (* Number of '#' in integer part *)
+    integer_digits: Longint;                     (* Number of '0' in integer part *)    frac_digits: Longint;                        (* Number of '0' in fractional part *)    frac_hash: Longint;                          (* Number of '#' in fractional part *)    group: Longint;                              (* Number of chars per display 'group' *)    multiplier: Longint;                         (* Scaling for percent or permille *)    add_decimal: char;                           (* Flag for whether decimal point appears in pattern *)    is_multiplier_set: char;                     (* Flag to catch multiple occurences of percent/permille *)    is_negative_pattern: char;                   (* Flag for processing -ve prefix/suffix *)  end;
 

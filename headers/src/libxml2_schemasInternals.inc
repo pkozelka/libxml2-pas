@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/schemasInternals.h:1.4:
+// CVS-REV:gnome-xml/include/libxml/schemasInternals.h:1.5:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -256,6 +256,8 @@ type
     notaDecl: xmlHashTablePtr;
 
     schemasImports: xmlHashTablePtr;
+
+    _private: Pointer; (* unused by the library for users or bindings *)
   end;
 
 procedure xmlSchemaFreeType(aType: xmlSchemaTypePtr); cdecl; external LIBXML2_SO;
