@@ -91,7 +91,7 @@ begin
   if (TestSet and 1) = 0
     then doc:=GetEmptyDoc(vendorstr)
     else doc:=GetEmptyDoc1(vendorstr);
-  (doc as IDOMParseOptions).validate := true; // we want to use a dtd
+  //(doc as IDOMParseOptions).validate := true; // we want to use a dtd
   (doc as IDOMParseOptions).resolveExternals := true;
   (doc as IDOMParseOptions).preserveWhiteSpace := false;
   FDomPersist := doc as IDomPersist;
