@@ -150,7 +150,7 @@ type
     procedure RegisterNS(const prefix,URI: DomString);
     { IDOMNodeEx}
     procedure transformNode(const stylesheet: IDOMNode; var output: WideString); overload;
-    procedure transformNode(const stylesheet: IDOMNode; const output: IDOMDocument); overload;
+    procedure transformNode(const stylesheet: IDOMNode; var output: IDOMDocument); overload;
     { IDOMNodeCompare }
     function IsSameNode(node:IDOMNode): boolean;
   public
@@ -158,9 +158,6 @@ type
     destructor destroy; override;
     property GNode: xmlNodePtr read FGNode;
   end;
-
-  //xmlNodePtrList=xmlNodePtr;
-  PGDomeNamedNodeMap=Pointer;
 
   TGDOMNodeList = class(TGDOMInterface, IDOMNodeList)
   private
@@ -374,12 +371,18 @@ type
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
+
+    {managing stylesheets}
+    procedure set_FtempXSL(tempXSL:xsltStylesheetPtr);
   end;
 
   TGDOMDocument = class(TGDOMNode, IDOMDocument, IDOMParseOptions, IDOMPersist, IDOMInternal)
   private
     FGDOMImpl: IDOMImplementation;
     FPGdomeDoc: xmlDocPtr;
+    FtempXSL: xsltStylesheetPtr;   //if the document was used as stylesheet,
+                                  //this Pointer has to be freed and not
+                                  //the xmlDocPtr
     FAsync: boolean;              //for compatibility, not really supported
     FpreserveWhiteSpace: boolean; //difficult to support
     FresolveExternals: boolean;   //difficult to support
@@ -434,6 +437,7 @@ type
     procedure removeAttr(attr: xmlAttrPtr);
     procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
+    procedure set_FtempXSL(tempXSL:xsltStylesheetPtr);
   public
     constructor Create(
       GDOMImpl:IDOMImplementation;
@@ -2008,6 +2012,7 @@ begin
   root:= xmlNodePtr(FPGdomeDoc);
   FAttrList:=TList.Create;
   FNodeList:=TList.Create;
+  FtempXSL:=nil;
   //Create root-node as pascal object
   inherited create(root,nil);
   inc(doccount);
@@ -2035,7 +2040,6 @@ begin
             xmlFreeNode(ANode)
           end;
     end;
-
     for i:=0 to FAttrList.Count-1 do begin
       AAttr:=FAttrList[i];
       if AAttr<>nil then
@@ -2048,13 +2052,12 @@ begin
               xmlFreeProp(AAttr);
             end;
     end;
-
-    xmlFreeDoc(FPGdomeDoc);
+    if FtempXSL=nil
+      then xmlFreeDoc(FPGdomeDoc)
+      else xsltFreeStylesheet(FtempXSL);
     dec(doccount);
-
     FAttrList.Free;
     FNodeList.Free;
-    //FNsList.Free;
   end;
   inherited Destroy;
 end;
@@ -3136,11 +3139,6 @@ begin
     end else begin
       ctxt.validate := 0;
     end;
-    if FpreserveWhiteSpace then begin
-      ctxt.space^ := -1;
-    end else begin
-      ctxt.space^ := 0;
-    end;
     //todo: async (separate thread)
     //todo: resolveExternals
     xmlParseDocument(ctxt);
@@ -3153,6 +3151,7 @@ begin
     xmlFreeParserCtxt(ctxt);
   end;
   if (FPGdomeDoc<>nil) then begin
+    FtempXSL:=nil;
     FAttrList:=TList.Create;
     FNodeList:=TList.Create;
     inherited create(xmlNodePtr(FPGdomeDoc),nil);
@@ -3390,6 +3389,10 @@ begin
   if (styleDoc=nil) or (doc=nil) then exit;
   tempXSL:=xsltParseStyleSheetDoc(styleDoc);
   if tempXSL=nil then exit;
+  // mark the document as stylesheetdocument;
+  // it holds additional information, so a different free method must
+  // be used
+  (stylesheet.ownerDocument as IDOMInternal).set_FtempXSL(tempXSL);
   outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
   if outputDoc=nil then exit;
   encoding:=outputDoc.encoding;
@@ -3399,9 +3402,29 @@ begin
 end;
 
 procedure TGDOMNode.transformNode(const stylesheet: IDOMNode;
-  const output: IDOMDocument);
+  var output: IDOMDocument);
+var
+  doc:       xmlDocPtr;
+  styleDoc:  xmlDocPtr;
+  outputDoc: xmlDocPtr;
+  styleNode: xmlNodePtr;
+  tempXSL:   xsltStylesheetPtr;
+  encoding:  pchar;
+  length:    longInt;
 begin
-
+  doc:=FGNode.doc;
+  styleNode:=GetGNode(stylesheet);
+  styleDoc:=styleNode.doc;
+  if (styleDoc=nil) or (doc=nil) then exit;
+  tempXSL:=xsltParseStyleSheetDoc(styleDoc);
+  if tempXSL=nil then exit;
+  // mark the document as stylesheetdocument;
+  // it holds additional information, so a different free method must
+  // be used
+  (stylesheet.ownerDocument as IDOMInternal).set_FtempXSL(tempXSL);
+  outputDoc:=xsltApplyStylesheet(tempXSL,doc,nil);
+  if outputDoc=nil then exit;
+  output:=MakeNode(xmlNodePtr(outputDoc),nil) as IDOMDocument;
 end;
 
 function TGDOMNode.IsSameNode(node: IDOMNode): boolean;
@@ -3419,6 +3442,11 @@ begin
   if xnode1=xnode2
     then result:=true
     else result:=false;
+end;
+
+procedure TGDOMDocument.set_FtempXSL(tempXSL: xsltStylesheetPtr);
+begin
+  FtempXSL:=tempXSL;
 end;
 
 initialization

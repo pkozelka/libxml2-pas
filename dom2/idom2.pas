@@ -962,7 +962,7 @@ type
     //procedure set_text(const Value: DOMString); safecall;
     { Methods }
     procedure transformNode(const stylesheet: IDOMNode; var output: WideString); overload;
-    procedure transformNode(const stylesheet: IDOMNode; const output: IDOMDocument); overload;
+    procedure transformNode(const stylesheet: IDOMNode; var output: IDOMDocument); overload;
     { Properties }
     //property text: DOMString read get_text write set_text;
     //property xml: DOMString read get_xml;

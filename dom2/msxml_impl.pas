@@ -50,7 +50,7 @@ uses
   {$endif}
   windows,
   ComObj,
-  xDom2;
+  iDom2;
 
   const MSXML2Rental = 'MSXML2_RENTAL_MODEL';
   const MSXML2Free = 'MSXML2_FREETHREADING_MODEL';
@@ -814,8 +814,6 @@ begin
     end;
   if not assigned(result) then
     raise EDOMException.create(NOT_FOUND_ERR,'MSDOM not installed!');
-
-  result.async := false;  
 end;
 
 
@@ -1010,10 +1008,6 @@ function TMSXMLImplementation.createDocument(
         const qualifiedName : DomString;
         docType             : IDomDocumentType) : IDomDocument;
 begin
-  if (namespaceURI <> '') or (qualifiedName <> '') then
-    raise EDomException.create(NOT_SUPPORTED_ERR, 'namespace not supported');
-  if (docType <> nil) then
-    raise EDomException.create(NOT_SUPPORTED_ERR, 'doctype not supported');
   result := domCreateDocument(createDOMDocument(fFreeThreading));
 end;
 
@@ -2301,6 +2295,5 @@ initialization
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(false));
   {register Free-threading factory}
   registerDomVendorFactory(TMSXMLDocumentBuilderFactory.create(true));
-  {create the global 'memory manager' managing all wrappers}
   gDomWrapperRepository := TDomWrapperRepository.create;
 end.
