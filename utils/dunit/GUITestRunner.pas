@@ -1,7 +1,7 @@
-{ $Id: GUITestRunner.pas,v 1.1 2002-01-10 12:55:31 ufechner Exp $ }
+{ $Id: GUITestRunner.pas,v 1.2 2002-01-10 14:46:52 ufechner Exp $ }
 {: DUnit: An XTreme testing framework for Delphi programs.
    @author  The DUnit Group.
-   @version $Revision: 1.1 $ 2001/03/08 uberto
+   @version $Revision: 1.2 $ 2001/03/08 uberto
 }
 (*
  * The contents of this file are subject to the Mozilla Public
@@ -167,6 +167,9 @@ type
     ToolButton5: TToolButton;
     Alt_R_RunAction: TAction;
     Alt_S_StopAction: TAction;
+    RadioButton1: TRadioButton;
+    RadioButton2: TRadioButton;
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
     procedure TestTreeClick(Sender: TObject);
     procedure FailureListViewSelectItem(Sender: TObject; Item: TListItem;
@@ -199,6 +202,7 @@ type
     procedure StopActionExecute(Sender: TObject);
     procedure StopActionUpdate(Sender: TObject);
     procedure TestTreeChange(Sender: TObject; Node: TTreeNode);
+    procedure Button1Click(Sender: TObject);
   private
     procedure ResetProgress;
   protected
@@ -279,10 +283,19 @@ type
 procedure RunTest(test: ITest);
 procedure RunRegisteredTests;
 
+{Print the msg in the lowest output window}
+procedure OutLog(msg:string='');
+
+{If Radiobutton MSXML is checked, it returns 'MSXML', else 'LIBXML'}
+function DomVendor: string;
+
 implementation
+
 uses
   Registry, Clipbrd;
 
+var
+  myform: TGUITestRunner;
 {$R *.dfm}
 
 type
@@ -290,8 +303,8 @@ type
 
 
 procedure RunTest(test: ITest);
-var
-  myform: TGUITestRunner;
+//var
+//  myform: TGUITestRunner;
 begin
   Application.Title := 'DUnit';
   Application.CreateForm(TGUITestRunner, MyForm);
@@ -309,6 +322,18 @@ end;
 procedure RunRegisteredTests;
 begin
    RunTest(registeredTests)
+end;
+
+procedure OutLog(msg:string='');
+begin
+  myform.ErrorMessageRTF.Lines.Append(msg);
+end;
+
+function DomVendor: string;
+begin
+  if myform.RadioButton2.Checked
+    then result:='LIBXML'
+    else result:='MSXML2_RENTAL_MODEL';
 end;
 
 { TGUITestRunner }
@@ -1379,6 +1404,11 @@ end;
 procedure TGUITestRunner.Status(test: ITest; const Msg: ShortString);
 begin
   ErrorMessageRTF.Lines.Add(Format('%s: %s', [test.Name, Msg]));
+end;
+
+procedure TGUITestRunner.Button1Click(Sender: TObject);
+begin
+  ErrorMessageRTF.Lines.Clear;
 end;
 
 end.
