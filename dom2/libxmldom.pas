@@ -48,7 +48,6 @@ uses
 	sysutils;
 
 const
-
 	SLIBXML = 'LIBXML';  { Do not localize }
 
 type
@@ -279,7 +278,7 @@ type
 	public
 		property GDocumentType: xmlDtdPtr read GetGDocumentType;
 		constructor Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
-		destructor destroy; override;
+		destructor Destroy; override;
 	end;
 
 	{ TMSDOMNotation }
@@ -559,17 +558,6 @@ begin
 		then result:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
 			length(qualifiedName)-length(prefix)-1))
 		else result:=qualifiedName;
-end;
-
-function libxmlStringToString(libstring:pchar):String;
-var s: string;
-begin
-	if libstring<>nil
-		then begin
-			s := libstring;
-			result:= s;
-		end
-		else result:='';
 end;
 
 (*
@@ -1306,8 +1294,13 @@ begin
 end;
 
 function TGDOMElement.getAttribute(const name: DOMString): DOMString;
+var
+	p: PxmlChar;
 begin
-	result:=libxmlstringToString(xmlGetProp(FGNode,PChar(UTF8Encode(name))));
+	//todo: handle prefixed case
+	p := xmlGetProp(FGNode,PChar(UTF8Encode(name)));
+	Result := UTF8Decode(p);
+	xmlFree(p);
 end;
 
 procedure TGDOMElement.setAttribute(const name, value: DOMString);
@@ -2120,17 +2113,17 @@ end;
 
 function TGDOMDocumentType.get_internalSubset: DOMString;
 var
-	buff:xmlBufferPtr;
+	buff: xmlBufferPtr;
 begin
-	buff:=xmlBufferCreate();
+	buff := xmlBufferCreate();
 	xmlNodeDump(buff,nil,xmlNodePtr(GetGDocumentType),0,0);
-	result:=libxmlStringToString(buff.content);
+	Result := UTF8Decode(buff.content);
 	xmlBufferFree(buff);
 end;
 
 function TGDOMDocumentType.get_name: DOMString;
 begin
-	result:=self.get_nodeName;
+	Result := self.get_nodeName;
 end;
 
 function TGDOMDocumentType.get_notations: IDOMNamedNodeMap;
@@ -2151,12 +2144,12 @@ end;
 
 function TGDOMDocumentType.get_publicId: DOMString;
 begin
-	result:=libxmlStringToString(GetGDocumentType.ExternalID);
+	Result := UTF8Decode(GetGDocumentType.ExternalID);
 end;
 
 function TGDOMDocumentType.get_systemId: DOMString;
 begin
-	result:=libxmlStringToString(GetGDocumentType.SystemID);
+	Result := UTF8Decode(GetGDocumentType.SystemID);
 end;
 
 function TGDOMDocumentType.GetGDocumentType: xmlDtdPtr;
@@ -2167,7 +2160,7 @@ end;
 constructor TGDOMDocumentType.Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
 begin
 	//Create root-node as pascal object
-	inherited create(xmlNodePtr(dtd));
+	inherited Create(xmlNodePtr(dtd));
 end;
 
 
