@@ -13,16 +13,26 @@ unit libxml2;
 interface
 
 const
+{$ifdef WIN32}
+	LIBXML2_SO = 'libxml2.dll';
+{$endif}
+{$ifdef LINUX}
 	LIBXML2_SO = 'libxml2.so';
+{$endif}
 
 {$WEAKPACKAGEUNIT}
 
+{$ifdef VER140}
 {$ALIGN 4}
+{$endif}
 {$MINENUMSIZE 4}
 {$ASSERTIONS OFF}
 
 type
 	DWORD = integer;
+	PLongInt = ^LongInt;
+	PByte = ^byte;
+	PPChar = ^PChar;
 
 {$I libxml_xmlmemory.inc}
 {$I libxml_tree.inc}

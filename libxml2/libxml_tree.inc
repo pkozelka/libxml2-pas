@@ -252,8 +252,8 @@ type
 	xmlNs = record
 		next : xmlNsPtr;                { next Ns link for this node   }
 		nodetype : xmlNsType;           { global or local  }
-		href : ^xmlChar;                { URL for the namespace  }
-		prefix : ^xmlChar;              { prefix for the namespace  }
+		href : PxmlChar;                { URL for the namespace  }
+		prefix : PxmlChar;              { prefix for the namespace  }
 	end;
 
 	{

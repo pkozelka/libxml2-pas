@@ -125,10 +125,10 @@ procedure xmlSetGenericErrorFunc(ctx:pointer; handler:xmlGenericErrorFunc);cdecl
 	Default message routines used by SAX and Valid context for error
 	and warning reporting
 }
-procedure xmlParserError(ctx:pointer; msg:Pchar);cdecl;varargs;external LIBXML2_SO;
-procedure xmlParserWarning(ctx:pointer; msg:Pchar);cdecl;varargs;external LIBXML2_SO;
-procedure xmlParserValidityError(ctx:pointer; msg:Pchar);cdecl;varargs;external LIBXML2_SO;
-procedure xmlParserValidityWarning(ctx:pointer; msg:Pchar);cdecl;varargs;external LIBXML2_SO;
-procedure xmlParserPrintFileInfo(input:xmlParserInputPtr);cdecl;varargs;external LIBXML2_SO;
-procedure xmlParserPrintFileContext(input:xmlParserInputPtr);cdecl;varargs;external  LIBXML2_SO;
+procedure xmlParserError(ctx:pointer; msg:Pchar);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
+procedure xmlParserWarning(ctx:pointer; msg:Pchar);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
+procedure xmlParserValidityError(ctx:pointer; msg:Pchar);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
+procedure xmlParserValidityWarning(ctx:pointer; msg:Pchar);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
+procedure xmlParserPrintFileInfo(input:xmlParserInputPtr);cdecl; {$ifdef VER140} varargs; {$endif} external LIBXML2_SO;
+procedure xmlParserPrintFileContext(input:xmlParserInputPtr);cdecl; {$ifdef VER140} varargs; {$endif} external  LIBXML2_SO;
 
