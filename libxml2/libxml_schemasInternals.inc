@@ -1,4 +1,10 @@
 // CVS-SIGN: [1.1] schemasInternals.h
+{
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+}
 (*
  * schemasInternals.h: internal interfaces for the XML Schemas handling
  *                      and schema validity checking

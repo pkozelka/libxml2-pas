@@ -1,4 +1,10 @@
 // CVS-SIGN: [1.1] xmlregexp.h
+{
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+}
 (*
  * regexp.h: describes the basic API for libxml regular expressions handling
  *

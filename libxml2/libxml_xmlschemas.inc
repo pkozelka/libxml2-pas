@@ -1,4 +1,10 @@
 // CVS-SIGN: [1.1] xmlschemas.h
+{
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+}
 (*
  * schemas.h: interface to the XML Schemas handling and schema validity
  *             checking

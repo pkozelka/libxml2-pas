@@ -1,4 +1,10 @@
 // CVS-SIGN: [1.1] xmlschemastypes.h
+{
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
+}
 (*
  * schemastypes.c : interface of the XML Schema Datatypes
  *             definition and validity checking
