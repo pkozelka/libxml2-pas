@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 VERSION=`grep "_DOTTED_VERSION = '" libxml_xmlwin32version.inc | cut -d\' -f2`
 LIBNAME=libxml2
 PACKAGE=$LIBNAME-pas
@@ -8,15 +8,14 @@ MYTMP=./$TAG.tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
 
 ############################################################################
-function queryExtension()
-{
+queryExtension() {
 	case $TERM in
 	cygwin*) EXT=zip ;;
 	*) EXT=tgz ;;
 	esac
 }
 ############################################################################
-function createArchive() 
+queryArchiveFile()
 {
 	queryExtension
 	case "$EXT" in
@@ -29,7 +28,11 @@ function createArchive()
 		PACKCMD="tar -zcf ../$ARCHIVEFILE *"
 	;;
 	esac
-
+}
+############################################################################
+createArchive() 
+{
+	queryArchiveFile
 	echo "Extracting $LIBNAME-pas from CVS tag $TAG ..."
 	rm -rf $MYTMP
 	cvs -z4 -d $CVSROOT export -r $TAG -d $MYTMP .
@@ -43,7 +46,9 @@ function createArchive()
 ############################################################################
 function uploadToSourceForge()
 {
-	ftp-put.sh upload.log upload.sourceforge.net incoming $ARCHIVE.tgz $ARCHIVE.tgz anonymous libxml2-pas@sourceforge.net
+	queryArchiveFile
+	echo "Uploading $ARCHIVEFILE to sourceforge.net FTP server (incoming)"
+	ftp-put.sh upload.log upload.sourceforge.net incoming $ARCHIVEFILE $ARCHIVEFILE anonymous libxml2-pas@sourceforge.net
 	cat upload.log
 	rm upload.log
 }
