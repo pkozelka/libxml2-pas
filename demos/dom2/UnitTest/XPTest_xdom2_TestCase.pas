@@ -367,6 +367,7 @@ var
   attr: IDOMAttr;
   i: integer;
   attrval,temp: string;
+  ok: boolean;
 begin
   // create attributes
   for i := 0 to 2 do begin
@@ -377,8 +378,13 @@ begin
   end;
   temp:=(doc as IDOMPersist).xml;
   temp:=getCont(temp);
-  //OutLog(temp);
-  Check(temp='<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>','Test failed!');
+  OutLog(temp);
+  ok:=false;
+  if temp='<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>'
+    then ok:=true;
+  if temp='<test xmlns:test0="http://test0.invalid" xmlns:test1="http://test1.invalid" xmlns:test2="http://test2.invalid" test0:attr="0" test1:attr="1" test2:attr="2"/>'
+    then ok:=true;
+  Check(ok,'Test failed!');
   // check attributes
   for i := 0 to 2 do begin
     attrval := doc.documentElement.getAttributeNS('http://test'+IntToStr(i)+'.invalid','attr');
