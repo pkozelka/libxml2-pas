@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.97] tree.h
+// CVS-SIGN: [1.100] tree.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -6,14 +6,16 @@
 	------------------------------------------------------------------------------
 }
 
-{
-	tree.h : describes the structures found in an tree resulting
-					 from an XML parsing.
+(*
+ * tree.h : describes the structures found in an tree resulting
+ *          from an XML parsing.
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *
+ *)
 
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
 
 type
 	xmlElementType =  Longint;
@@ -33,6 +35,11 @@ xmlParserCtxtPtr
 }
 
 const
+  (**
+   * BASE_BUFFER_SIZE:
+   *
+   * default buffer size 4000
+   *)
 	BASE_BUFFER_SIZE = 4000;
 	(**
 	 * XML_XML_NAMESPACE:
@@ -42,15 +49,16 @@ const
 	 *)
 	XML_XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace';
 
-	{
-		The different element types carried by an XML tree
 
-		NOTE: This is synchronized with DOM Level1 values
-				 See http://www.w3.org/TR/REC-DOM-Level-1/
-
-		Actually this had diverged a bit, and now XML_DOCUMENT_TYPE_NODE should
-		be deprecated to use an XML_DTD_NODE.
-	}
+  (*
+   * The different element types carried by an XML tree
+   *
+   * NOTE: This is synchronized with DOM Level1 values
+   *       See http://www.w3.org/TR/REC-DOM-Level-1/
+   *
+   * Actually this had diverged a bit, and now XML_DOCUMENT_TYPE_NODE should
+   * be deprecated to use an XML_DTD_NODE.
+   *)
 	//[pk] note: all these constants are declared unconditionally, as it makes more sense
 	XML_ELEMENT_NODE       = 1;
 	XML_ATTRIBUTE_NODE     = 2;
@@ -75,19 +83,18 @@ const
 	XML_DOCB_DOCUMENT_NODE = 21;
 
 type
-	{
-		xmlChar:
-
-		This is a basic byte in an UTF-8 encoded string.
-		It's unsigned allowing to pinpoint case where char   are assigned
-		to xmlChar   (possibly making serialization back impossible).
-	}
+  (**
+   * xmlChar:
+   *
+   * This is a basic byte in an UTF-8 encoded string.
+   * It's unsigned allowing to pinpoint case where char * are assigned
+   * to xmlChar * (possibly making serialization back impossible).
+   *)
 	xmlChar = char;
 	PxmlChar = PChar;
 	PPxmlChar = ^PxmlChar;
 
-	// BAD_CAST: not needed in Pascal
-
+// BAD_CAST: not necessary in Pascal
 
 const
 	(**
@@ -98,12 +105,11 @@ const
 	XML_LOCAL_NAMESPACE = XML_NAMESPACE_DECL;
 
 const
-	XML_ELEMENT_CONTENT_PCDATA = 1;
-	XML_ELEMENT_CONTENT_ELEMENT = 2;
-	XML_ELEMENT_CONTENT_SEQ = 3;
-	XML_ELEMENT_CONTENT_OR = 4;
-
-const
+  (**
+   * xmlAttributeType:
+   *
+   * a DTD Attribute type definition
+   *)
 	XML_ATTRIBUTE_CDATA = 1;
 	XML_ATTRIBUTE_ID = 2;
 	XML_ATTRIBUTE_IDREF = 3;
@@ -116,16 +122,15 @@ const
 	XML_ATTRIBUTE_NOTATION = 10;
 
 const
+  (**
+   * xmlAttributeDefault:
+   *
+   * a DTD Attribute default definition
+   *)
 	XML_ATTRIBUTE_NONE = 1;
 	XML_ATTRIBUTE_REQUIRED = 2;
 	XML_ATTRIBUTE_IMPLIED = 3;
 	XML_ATTRIBUTE_FIXED = 4;
-
-const
-	XML_ELEMENT_CONTENT_ONCE = 1;
-	XML_ELEMENT_CONTENT_OPT = 2;
-	XML_ELEMENT_CONTENT_MULT = 3;
-	XML_ELEMENT_CONTENT_PLUS = 4;
 
 const
 	XML_ELEMENT_TYPE_UNDEFINED = 0;
@@ -135,6 +140,34 @@ const
 	XML_ELEMENT_TYPE_ELEMENT = 4;
 
 const
+  (**
+   * xmlElementContentType:
+   *
+   * Possible definitions of element content types
+   *)
+	XML_ELEMENT_CONTENT_PCDATA = 1;
+	XML_ELEMENT_CONTENT_ELEMENT = 2;
+	XML_ELEMENT_CONTENT_SEQ = 3;
+	XML_ELEMENT_CONTENT_OR = 4;
+
+const
+  (**
+   * xmlElementContentOccur:
+   *
+   * Possible definitions of element content occurrences
+   *)
+	XML_ELEMENT_CONTENT_ONCE = 1;
+	XML_ELEMENT_CONTENT_OPT = 2;
+	XML_ELEMENT_CONTENT_MULT = 3;
+	XML_ELEMENT_CONTENT_PLUS = 4;
+
+const
+  (**
+   * xmlBufferAllocationScheme:
+   *
+   * A buffer allocation scheme can be defined to either match exactly the
+   * need or double it's allocated size each time it is found too small
+   *)
 	XML_BUFFER_ALLOC_DOUBLEIT = 0;
 	XML_BUFFER_ALLOC_EXACT = 1;
 type
@@ -422,7 +455,6 @@ type
 		Variables.
 	}
 (* TODO: translate somehow
-LIBXML_DLL_IMPORT extern xmlNsPtr baseDTD;
 LIBXML_DLL_IMPORT extern int oldXMLWDcompatibility;/* maintain compatibility with old WD */
 LIBXML_DLL_IMPORT extern int xmlIndentTreeOutput;  /* try to indent the tree dumps */
 LIBXML_DLL_IMPORT extern xmlBufferAllocationScheme xmlBufferAllocScheme; /* alloc scheme to use */
@@ -604,9 +636,9 @@ procedure xmlNodeDumpOutput(buf: xmlOutputBufferPtr; doc: xmlDocPtr; cur: xmlNod
 function  xmlSaveFormatFileEnc(filename: PChar; cur: xmlDocPtr; encoding: PChar; format: integer): integer; cdecl;external LIBXML2_SO;
 function  xmlSaveFileEnc(filename:Pchar; cur:xmlDocPtr; encoding:Pchar):longint;cdecl;external LIBXML2_SO;
 
-{
-	Compression
-}
+(*
+ * Compression
+ *)
 function  xmlGetDocCompressMode(doc:xmlDocPtr):longint;cdecl;external LIBXML2_SO;
 procedure xmlSetDocCompressMode(doc:xmlDocPtr; mode:longint);cdecl;external LIBXML2_SO;
 function  xmlGetCompressMode:longint;cdecl;external LIBXML2_SO;

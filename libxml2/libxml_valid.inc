@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.31] valid.h
+// CVS-SIGN: [1.32] valid.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -6,26 +6,45 @@
 	------------------------------------------------------------------------------
 }
 
-{
-	valid.h : interface to the DTD handling and the validity checking
-  
-	See Copyright for the status of this software.
-  
-	daniel@veillard.com
-}
+(*
+ * valid.h : interface to the DTD handling and the validity checking
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
 
 type
-	{
-		Validation state added for non-determinist content model
-	}
+  (*
+   * Validation state added for non-determinist content model
+   *)
 	xmlValidStatePtr = pointer;
 
-	{
-		an xmlValidCtxt is used for error reporting when validating
-	}
+  (**
+   * xmlValidityErrorFunc:
+   * @ctx:  an xmlValidCtxtPtr validity error context
+   * @msg:  the string to format *printf like vararg
+   * @...:  remaining arguments to the format
+   *
+   * Callback called when a validity error is found, this is a message
+   * oriented function similar to an *printf function.
+   *)
 	xmlValidityErrorFunc = procedure (ctx: pointer; msg: PChar; var aVarArgList);
+  (**
+   * xmlValidityWarningFunc:
+   * @ctx:  an xmlValidCtxtPtr validity error context
+   * @msg:  the string to format *printf like vararg
+   * @...:  remaining arguments to the format
+   *
+   * Callback called when a validity warning is found, this is a message
+   * oriented function similar to an *printf function.
+   *)
 	xmlValidityWarningFunc = procedure (ctx: pointer; msg: PChar; var aVarArgList);
 
+  (**
+   * xmlValidCtxt:
+   * an xmlValidCtxt is used for error reporting when validating
+   *)
 	xmlValidCtxtPtr = ^xmlValidCtxt;
 	xmlValidCtxt = record
 		userData : pointer;                 { user specific data block  }

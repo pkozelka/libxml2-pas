@@ -1,21 +1,21 @@
-// CVS-SIGN: [1.42] parserInternals.h
+// CVS-SIGN: [1.44] parserInternals.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
 }
-{
-	 parserInternals.h : internals routines exported by the parser.
-
-	 See Copyright for the status of this software.
-
-	 daniel@veillard.com
-
-	 14 Nov 2000 ht - truncated declaration of xmlParseElementChildrenContentDecl
-	 for VMS
-
-	}
+(*
+ * parserInternals.h : internals routines exported by the parser.
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *
+ * 14 Nov 2000 ht - truncated declaration of xmlParseElementChildrenContentDecl
+ * for VMS
+ *
+ *)
 
 const
 	{
@@ -327,5 +327,23 @@ procedure xmlParserInputShrink(inp:xmlParserInputPtr);cdecl;external LIBXML2_SO;
 }
 procedure htmlInitAutoClose;cdecl;external LIBXML2_SO;
 function  htmlCreateFileParserCtxt(filename:Pchar; encoding:Pchar):htmlParserCtxtPtr;cdecl;external LIBXML2_SO;
+(**
+ * xmlEntityReferenceFunc:
+ * @ent: the entity
+ * @firstNode:  the fist node in the chunk
+ * @lastNode:  the last nod in the chunk
+ *
+ * Callback function used when one need to be able to track back the
+ * provenance of a chunk of nodes inherited from an entity replacement
+ *)
+type
+  xmlEntityReferenceFunc = procedure (ent: xmlEntityPtr; firstNode, lastNode: xmlNodePtr); cdecl; 
+
+(*
+ * Specific function to keep track of entities references
+ * and used by the XSLT debugger
+ *)
+procedure xmlSetEntityReferenceFunc(func: xmlEntityReferenceFunc); cdecl; external LIBXML2_SO;
+
 {$endif}
 

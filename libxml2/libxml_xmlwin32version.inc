@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.22] xmlwin32version.h
+// CVS-SIGN: [1.24] xmlwin32version.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,29 +30,34 @@ procedure xmlCheckVersion(version:longint);cdecl;external LIBXML2_SO;
 	}
 
 const
-   LIBXML_DOTTED_VERSION = '2.4.12';
-{ 
-   LIBXML_VERSION:
-  
-   the version number: 1.2.3 value is 1002003
-  }
-   LIBXML_VERSION = 20412;
-{ 
-   LIBXML_VERSION_STRING:
-  
-   the version number string, 1.2.3 value is "1002003"
-  }
-   LIBXML_VERSION_STRING = '20412';
+  (**
+   * LIBXML_DOTTED_VERSION:
+   *
+   * the version string like "1.2.3"
+   *)
+   LIBXML_DOTTED_VERSION = '2.4.13';
+
+  (**
+   * LIBXML_VERSION:
+   *
+   * the version number: 1.2.3 value is 1002003
+   *)
+  LIBXML_VERSION = 20413;
+
+  (**
+   * LIBXML_VERSION_STRING:
+   *
+   * the version number string, 1.2.3 value is "1002003"
+   *)
+   LIBXML_VERSION_STRING = '20413';
 {
    LIBXML_TEST_VERSION:
   
    Macro to check that the libxml version in use is compatible with
    the version the software has been compiled against
   }
-(*todo
-#define LIBXML_TEST_VERSION xmlCheckVersion(20412);
-*)
-{$ifdef NEVER}
+//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20412);
+{$if false}
     { 
        WITH_TRIO:
       
@@ -60,14 +65,24 @@ const
       }
 {$define WITH_TRIO}
 {$else}
-    { 
+    {
        WITHOUT_TRIO:
-      
+
        defined if the trio support should not be configured in
       }
 {$define WITHOUT_TRIO}
-{$endif}
-    { 
+{$ifend}
+
+(**
+ * LIBXML_THREADS_ENABLED:
+ *
+ * Whether the thread support is configured in
+ *)
+{$if false}
+{$define LIBXML_THREAD_ENABLED}
+{$ifend}
+
+    {
        LIBXML_FTP_ENABLED:
 
 			 Whether the FTP support is configured in

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.9] hash.h
+// CVS-SIGN: [1.10] hash.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -31,9 +31,43 @@ type
 	{
 		 function types:
 	}
+  (**
+   * xmlHashDeallocator:
+   * @payload:  the data in the hash
+   * @name:  the name associated
+   *
+   * Callback to free data from a hash
+   *)
 	xmlHashDeallocator = procedure (payload:pointer; name:PxmlChar);cdecl;
+  (**
+   * xmlHashCopier:
+   * @payload:  the data in the hash
+   * @name:  the name associated
+   *
+   * Callback to copy data from a hash
+   *
+   * Returns a copy of the data or NULL in case of error
+   *)
 	xmlHashCopier = function (payload:pointer; name:PxmlChar):pointer;cdecl;
-	xmlHashScanner = function (payload:pointer; data:pointer; name:PxmlChar):pointer;cdecl;
+  (**
+   * xmlHashScanner:
+   * @payload:  the data in the hash
+   * @data:  extra scannner data
+   * @name:  the name associated
+   *
+   * Callback when scanning data in a hash with the simple scanner
+   *)
+	xmlHashScanner = procedure (payload:pointer; data:pointer; name:PxmlChar);cdecl;
+  (**
+   * xmlHashScannerFull:
+   * @payload:  the data in the hash
+   * @data:  extra scannner data
+   * @name:  the name associated
+   * @name2:  the second name associated
+   * @name3:  the third name associated
+   *
+   * Callback when scanning data in a hash with the full scanner
+   *)
 	xmlHashScannerFull = function (payload:pointer; data:pointer; name,name2,name3:PxmlChar):pointer;cdecl;
 
 {

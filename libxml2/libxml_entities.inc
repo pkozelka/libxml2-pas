@@ -1,24 +1,24 @@
-// CVS-SIGN: [1.31] entities.h
+// CVS-SIGN: [1.32] entities.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>
 	------------------------------------------------------------------------------
 }
-{
-	entities.h : interface for the XML entities handking
-
-	See Copyright for the status of this software.
-
-	daniel@veillard.com
-}
+(*
+ * entities.h : interface for the XML entities handling
+ *
+ * See Copyright for the status of this software.
+ *
+ * daniel@veillard.com
+ *)
 
 type
 	xmlEntityType =  Longint;
 const
-	{
-		The different valid entity types
-	}
+  (*
+   * The different valid entity types
+   *)
 	XML_INTERNAL_GENERAL_ENTITY = 1;
 	XML_EXTERNAL_GENERAL_PARSED_ENTITY = 2;
 	XML_EXTERNAL_GENERAL_UNPARSED_ENTITY = 3;
@@ -26,18 +26,18 @@ const
 	XML_EXTERNAL_PARAMETER_ENTITY = 5;
 	XML_INTERNAL_PREDEFINED_ENTITY = 6;
 
-{
-	An unit of storage for an entity, contains the string, the value
-	and the linkind data needed for the linking in the hash table.
-}
 type
+  (*
+   * An unit of storage for an entity, contains the string, the value
+   * and the linking data needed for the linking in the hash table.
+   *)
 	xmlEntityPtr = ^xmlEntity;
 	xmlEntity = record
 		_private : pointer;             { application data  }
 		type_ : xmlElementType;         { XML_ENTITY_DECL, must be second !  }
 		name : PxmlChar;                { Attribute name  }
-		children : ^xmlNode;            { NULL  }
-		last : ^xmlNode;                { NULL  }
+		children : ^xmlNode;            (* First child link *)
+		last : ^xmlNode;                (* Last child link *)
 		parent : ^xmlDtd;               { -> DTD  }
 		next : ^xmlNode;                { next sibling link   }
 		prev : ^xmlNode;                { previous sibling link   }
@@ -52,16 +52,16 @@ type
 		URI : PxmlChar;                 { the full URI as computed  }
 	end;
 
-{
-	ALl entities are stored in an hash table
-	there is 2 separate hash tables for global and parmeter entities
-}
+  (*
+   * All entities are stored in an hash table
+   * there is 2 separate hash tables for global and parameter entities
+   *)
 	xmlEntitiesTable = xmlHashTable;
 	xmlEntitiesTablePtr = ^xmlEntitiesTable;
 
-{
-	External functions :
-}
+(*
+ * External functions :
+ *)
 procedure xmlInitializePredefinedEntities;cdecl;external LIBXML2_SO;
 function  xmlAddDocEntity(doc:xmlDocPtr; name:PxmlChar; aType:longint; ExternalID:PxmlChar; SystemID:PxmlChar; content:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;
 function  xmlAddDtdEntity(doc:xmlDocPtr; name:PxmlChar; aType:longint; ExternalID:PxmlChar; SystemID:PxmlChar; content:PxmlChar):xmlEntityPtr;cdecl;external LIBXML2_SO;

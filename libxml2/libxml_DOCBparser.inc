@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.4] DOCBparser.h
+// CVS-SIGN: [1.5] DOCBparser.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.24] HTMLparser.h
+// CVS-SIGN: [1.25] HTMLparser.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -14,9 +14,9 @@
 }
 
 type
-	{
-		Most of the back-end structures from XML and HTML are shared
-	}
+  (*
+   * Most of the back-end structures from XML and HTML are shared
+   *)
 	htmlParserCtxt = xmlParserCtxt;
 	htmlParserCtxtPtr = xmlParserCtxtPtr;
 	htmlParserNodeInfo = xmlParserNodeInfo;
@@ -27,9 +27,9 @@ type
 	htmlDocPtr = xmlDocPtr;
 	htmlNodePtr = xmlNodePtr;
 
-	{
-		Internal description of an HTML element
-	}
+  (*
+   * Internal description of an HTML element
+   *)
 	htmlElemDescPtr = ^htmlElemDesc;
 	htmlElemDesc = record
 		name : Pchar;                   { The tag name  }
@@ -43,9 +43,9 @@ type
 		desc : Pchar;                   { the description  }
 	end;
 
-	{
-		Internal description of an HTML entity
-	}
+  (*
+   * Internal description of an HTML entity
+   *)
 	htmlEntityDescPtr = ^htmlEntityDesc;
 	htmlEntityDesc = record
 		value : dword;                  { the UNICODE value for the character  }
@@ -53,9 +53,9 @@ type
 		desc : Pchar;                   { the description  }
 	end;
 
-	{
-		There is only few public functions.
-	}
+(*
+ * There is only few public functions.
+ *)
 function  htmlTagLookup(tag:PxmlChar):htmlElemDescPtr;cdecl;external LIBXML2_SO;
 function  htmlEntityLookup(name:PxmlChar):htmlEntityDescPtr;cdecl;external LIBXML2_SO;
 function  htmlEntityValueLookup(value:dword):htmlEntityDescPtr;cdecl;external LIBXML2_SO;
@@ -73,9 +73,9 @@ function  htmlEncodeEntities(aOut:Pbyte; outlen:Plongint; aIn:Pbyte; inlen:Plong
 function  htmlIsScriptAttribute(name:PxmlChar):longint;cdecl;external LIBXML2_SO;
 function  htmlHandleOmittedElem(val:longint):longint;cdecl;external LIBXML2_SO;
 
-{
-	Interfaces for the Push mode
-}
+(**
+ * Interfaces for the Push mode
+ *)
 procedure htmlFreeParserCtxt(ctxt:htmlParserCtxtPtr);cdecl;external LIBXML2_SO;
 function  htmlCreatePushParserCtxt(sax:htmlSAXHandlerPtr; user_data:pointer; chunk:Pchar; size:longint; filename:Pchar; enc:xmlCharEncoding):htmlParserCtxtPtr;cdecl;external LIBXML2_SO;
 function  htmlParseChunk(ctxt:htmlParserCtxtPtr; chunk:Pchar; size:longint; terminate:longint):longint;cdecl;external LIBXML2_SO;

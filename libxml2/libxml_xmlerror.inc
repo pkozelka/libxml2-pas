@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.10] xmlerror.h
+// CVS-SIGN: [1.11] xmlerror.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.

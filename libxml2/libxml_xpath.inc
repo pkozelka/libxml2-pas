@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.51] xpath.h
+// CVS-SIGN: [1.52] xpath.h
 {
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -99,10 +99,16 @@ type
 		index2 : longint;
 	end;
 
-	{
-		A conversion function is associated to a type and used to cast
-		the new type to primitive values.
-	}
+  (**
+   * xmlXPathConvertFunc:
+   * @obj:  an XPath object
+   * @type:  the number of the target type
+   *
+   * A conversion function is associated to a type and used to cast
+   * the new type to primitive values.
+   *
+   * Returns -1 in case of error, 0 otherwise
+   *)
 	xmlXPathConvertFunc = function(obj: xmlXPathObjectPtr; aType: integer): integer;cdecl;
 
 	{
@@ -123,13 +129,13 @@ type
 		value : xmlXPathObjectPtr;      { the value  }
 	end;
 
-	(**
-	 * xmlXPathEvalFunc:
-	 * @ctxt: an XPath parser context
-	 * @nargs: the number of arguments passed to the function
-	 *
-	 * an XPath evaluation function, the parameters are on the XPath context stack
-	 *)
+  (**
+   * xmlXPathEvalFunc:
+   * @ctxt: an XPath parser context
+   * @nargs: the number of arguments passed to the function
+   *
+   * an XPath evaluation function, the parameters are on the XPath context stack
+   *)
 	xmlXPathEvalFunc = procedure (ctxt: xmlXPathParserContextPtr; nargs: integer);cdecl;
 
 	{
@@ -141,11 +147,17 @@ type
 		func : xmlXPathEvalFunc;        { the evaluation function  }
 	end;
 
-	{
-		An axis traversal function. To traverse an axis, the engine calls
-		the first time with cur == NULL and repeat until the function returns
-		NULL indicating the end of the axis traversal.
-	}
+  (**
+   * xmlXPathAxisFunc:
+   * @ctxt:  the XPath interpreter context
+   * @cur:  the previous node being explored on that axis
+   *
+   * An axis traversal function. To traverse an axis, the engine calls
+   * the first time with cur == NULL and repeat until the function returns
+   * NULL indicating the end of the axis traversal.
+   *
+   * Returns the next node in that axis or NULL if at the end of the axis
+   *)
 	xmlXPathAxisFunc = function (ctxt: xmlXPathParserContextPtr; cur: xmlXPathObjectPtr):xmlXPathObjectPtr;cdecl;
 
 	{
@@ -237,13 +249,15 @@ type
 		xptr : longint;                 { it this an XPointer expression  }
 	end;
 
-	{
-		xmlXPathFunction:
-
-		An XPath function
-		The arguments (if any) are popped out of the context stack
-		and the result is pushed on the stack.
-	}
+  (**
+   * xmlXPathFunction:
+   * @ctxt:  the XPath interprestation context
+   * @nargs:  the number of arguments
+   *
+   * An XPath function
+   * The arguments (if any) are popped out from the context stack
+   * and the result is pushed on the stack.
+   *)
 	xmlXPathFunction = procedure (ctxt: xmlXPathParserContextPtr; nargs: integer);cdecl;
 
 {
