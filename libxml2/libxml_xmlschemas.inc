@@ -1,3 +1,4 @@
+// CVS-SIGN: [1.0] xmlschemas.h
 /*
  * schemas.h : interface to the XML Schemas handling and schema validity
  *             checking

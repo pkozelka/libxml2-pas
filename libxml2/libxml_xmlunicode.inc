@@ -1,3 +1,4 @@
+// CVS-SIGN: [1.0] xmlunicode.h
 /*
  * xmlunicode.h: this header exports interfaces for the Unicode character APIs
  *

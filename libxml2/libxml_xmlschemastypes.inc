@@ -1,3 +1,4 @@
+// CVS-SIGN: [1.0] xmlschemastypes.h
 /*
  * schemastypes.c : interface of the XML Schema Datatypes
  *             definition and validity checking

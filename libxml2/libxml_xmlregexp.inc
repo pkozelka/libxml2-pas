@@ -1,3 +1,4 @@
+// CVS-SIGN: [1.0] xmlregexp.h
 /*
  * regexp.h : describes the basic API for libxml regular expressions handling
  *

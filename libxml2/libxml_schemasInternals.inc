@@ -1,3 +1,4 @@
+// CVS-SIGN: [1.0] schemasInternals.h
 /*
  * schemasInternals.h : internal interfaces for the XML Schemas handling
  *                      and schema validity checking

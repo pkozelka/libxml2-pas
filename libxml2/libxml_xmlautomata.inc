@@ -1,3 +1,4 @@
+// CVS-SIGN: [1.0] xmlautomata.h
 /*
  * automata.h : description of the API to build regexp automats
  *
