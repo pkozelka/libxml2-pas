@@ -1,5 +1,5 @@
 unit libxml_impl;
-//$Id: libxml_impl.pas,v 1.8 2002-02-11 20:25:12 pkozelka Exp $
+//$Id: libxml_impl.pas,v 1.9 2002-02-11 20:34:50 pkozelka Exp $
 (*
  * Low-level utility functions needed for libxml-based implementation of DOM.
  *
@@ -158,6 +158,27 @@ type
     function  IDomDocumentFragment.get_parentNode = returnNullDomNode;
   end;
 
+  { TLDOMEntity class }
+
+  TLDOMEntity = class(TLDOMNode, IDomNode, IDomEntity)
+  protected //IDomNode
+    function  IDomNode.get_parentNode = returnNullDomNode;
+  protected //IDomEntity
+    function  IDomEntity.get_parentNode = returnNullDomNode;
+    function  get_publicId: DomString;
+    function  get_systemId: DomString;
+    function  get_notationName: DomString;
+  end;
+
+  { TLDOMEntityReference  class }
+
+  TLDOMEntityReference = class(TLDOMNode, IDomEntityReference, IDomNode)
+  protected //IDomNode
+    function  IDomNode.get_childNodes = returnChildNodes;
+  protected //IDomEntityReference
+    function  IDomEntityReference.get_childNodes = returnChildNodes;
+  end;
+
   { TLDOMProcessingInstruction class }
 
   TLDOMProcessingInstruction = class(TLDOMNode, IDomProcessingInstruction)
@@ -244,8 +265,8 @@ var
     nil, //TGDOMAttr,
     TLDOMText,
     TLDOMCDataSection,
-    nil, //TGDOMEntityReference,
-    nil, //TGDOMEntity,
+    TLDOMEntityReference,
+    TLDOMEntity,
     TLDOMProcessingInstruction,
     TLDOMComment,
     nil, //TGDOMDocument,
@@ -1219,6 +1240,23 @@ begin
   if p=nil then exit;
   // nodes must be kept as siblings
   Result := p.insertBefore(Result, get_nextSibling) as IDomText;
+end;
+
+{ TLDOMEntity }
+
+function TLDOMEntity.get_notationName: DomString;
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+function TLDOMEntity.get_publicId: DomString;
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
+end;
+
+function TLDOMEntity.get_systemId: DomString;
+begin
+  DomAssert(false, NOT_SUPPORTED_ERR);
 end;
 
 end.
