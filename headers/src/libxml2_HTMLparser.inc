@@ -104,7 +104,7 @@ const
 *)
 function htmlAttrAllowed(_para1: htmlElemDescPtr; _para2: PxmlChar; _para3: Longint): htmlStatus; cdecl; external LIBXML2_SO;
 function htmlElementAllowedHere(_para1: htmlElemDescPtr; _para2: PxmlChar): Longint; cdecl; external LIBXML2_SO;
-function htmlElementStatusHere(_para1: htmlElemDescPtr; _para2: PhtmlElemDesc): htmlStatus; cdecl; external LIBXML2_SO;
+function htmlElementStatusHere(_para1: htmlElemDescPtr; _para2: htmlElemDescPtr): htmlStatus; cdecl; external LIBXML2_SO;
 function htmlNodeStatus(_para1: htmlNodePtr; _para2: Longint): htmlStatus; cdecl; external LIBXML2_SO;
 {TODO: translate macros
 #define htmlDefaultSubelement(elt) elt->defaultsubelt

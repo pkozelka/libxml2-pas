@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.9:
+// CVS-REV:gnome-xml/include/libxml/xmlreader.h:1.13:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -93,6 +93,11 @@ function xmlTextReaderSetParserProp(reader: xmlTextReaderPtr; prop: Longint; val
 function xmlTextReaderGetParserProp(reader: xmlTextReaderPtr; prop: Longint): Longint; cdecl; external LIBXML2_SO;
 function xmlTextReaderCurrentNode(reader: xmlTextReaderPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
 function xmlTextReaderCurrentDoc(reader: xmlTextReaderPtr): xmlDocPtr; cdecl; external LIBXML2_SO;
+function xmlTextReaderExpand(reader: xmlTextReaderPtr): xmlNodePtr; cdecl; external LIBXML2_SO;
+function xmlTextReaderNext(reader: xmlTextReaderPtr): Longint; cdecl; external LIBXML2_SO;
+function xmlTextReaderIsValid(reader: xmlTextReaderPtr): Longint; cdecl; external LIBXML2_SO;
+function xmlTextReaderRelaxNGValidate(reader: xmlTextReaderPtr; rng: PChar): Longint; cdecl; external LIBXML2_SO;
+function xmlTextReaderRelaxNGSetSchema(reader: xmlTextReaderPtr; schema: xmlRelaxNGPtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Error handling extensions
