@@ -486,13 +486,8 @@ function ErrorString(err:integer):string;
 
 implementation
 
-Type GDomeException=Integer;
-
-resourcestring
-  SNodeExpected = 'Node cannot be null';
-  SGDOMNotInstalled = 'GDOME2 is not installed';
-
 function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
+function IsXmlName(const S: wideString): boolean; forward;
 
 function MakeNode(Node: xmlNodePtr;ADocument:IDOMDocument): IDOMNode;
 const
@@ -591,9 +586,13 @@ end;
 
 function TGDOMImplementation.hasFeature(const feature, version: DOMString): WordBool;
 begin
-  if (uppercase(feature) ='CORE') and (version = '2.0')
-    then result:=true
-    else result:=false;
+  result:=false;
+  if (uppercase(feature) ='CORE') and
+    ((version = '2.0') or (version = '1.0') or (version = ''))
+    then result:=true;
+  if (uppercase(feature) ='XML') and
+    ((version = '2.0') or (version = '1.0') or (version = ''))
+    then result:=true;
 end;
 
 function TGDOMInterface.SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HRESULT;
@@ -606,7 +605,15 @@ function TGDOMImplementation.createDocumentType(const qualifiedName, publicId,
 var
   dtd:xmlDtdPtr;
   name1,name2,name3: TGdomString;
+  alocalName: WideString;
 begin
+  alocalName:=localName(qualifiedName);
+  if ((Pos(':',alocalName))>0)
+    then begin
+      checkError(NAMESPACE_ERR);
+    end;
+  if not IsXmlName(qualifiedName)
+    then checkError(NAMESPACE_ERR);
   name1:=TGdomString.create(qualifiedName);
   name2:=TGdomString.create(publicId);
   name3:=TGdomString.create(systemId);
@@ -684,7 +691,41 @@ end;
 
 (**
 /**
- * gdome_xmlSetAttrValue:  * @attr:  the attribute which the value is to be set  * @value:  the value to set  *  * Set a new value to an Attribute node.  */ void gdome_xmlSetAttrValue(xmlAttr *attr, xmlChar *value) {   if(attr == NULL)     return;    if (attr->children != NULL)     xmlFreeNodeList(attr->children);   attr->children = NULL;   attr->last = NULL;    if (value != NULL) {     xmlChar *buffer;     xmlNode *tmp;      buffer = xmlEncodeEntitiesReentrant(attr->doc, value);     attr->children = xmlStringGetNodeList(attr->doc, buffer);     attr->last = NULL;     tmp = attr->children;     for(tmp = attr->children; tmp != NULL; tmp = tmp->next) {       tmp->parent = (xmlNode *  )attr;       tmp->doc = attr->doc;       if (tmp->next == NULL)         attr->last = tmp;     }     xmlFree (buffer);   }    return; }
+ * gdome_xmlSetAttrValue:
+ * @attr:  the attribute which the value is to be set
+ * @value:  the value to set
+ *
+ * Set a new value to an Attribute node.
+ */
+void
+gdome_xmlSetAttrValue(xmlAttr *attr, xmlChar *value) {
+  if(attr == NULL)
+    return;
+
+  if (attr->children != NULL)
+    xmlFreeNodeList(attr->children);
+  attr->children = NULL;
+  attr->last = NULL;
+
+  if (value != NULL) {
+    xmlChar *buffer;
+    xmlNode *tmp;
+
+    buffer = xmlEncodeEntitiesReentrant(attr->doc, value);
+    attr->children = xmlStringGetNodeList(attr->doc, buffer);
+    attr->last = NULL;
+    tmp = attr->children;
+    for(tmp = attr->children; tmp != NULL; tmp = tmp->next) {
+      tmp->parent = (xmlNode *  )attr;
+      tmp->doc = attr->doc;
+      if (tmp->next == NULL)
+        attr->last = tmp;
+    }
+    xmlFree (buffer);
+  }
+
+  return;
+}
 **)
 
 procedure TGDOMNode.set_nodeValue(const value: DOMString);
@@ -790,13 +831,7 @@ end;
 
 function TGDOMNode.get_ownerDocument: IDOMDocument;
 begin
-  if FGNode.type_<>Document_Node
-    then result:=FOwnerDocument
-    else begin
-      if FOwnerDocument=nil
-        then result:=self as IDOMDocument
-        else result:=FOwnerDocument;
-    end;
+  result:=FOwnerDocument
 end;
 
 function TGDOMNode.get_namespaceURI: DOMString;
@@ -1711,12 +1746,27 @@ constructor TGDOMDocument.create(
 var
   name2: TGdomString;
   root:xmlNodePtr;
+  ns: TGDOMNamespace;
+  alocalName: string;
 begin
   FGdomimpl:=GDOMImpl;
+  if doctype<>nil then
+    if doctype.ownerDocument<>nil
+      then if (doctype.ownerDocument as IUnknown) <> (self as IUnknown)
+        then checkError(WRONG_DOCUMENT_ERR);
+  ns := TGDOMNamespace.create(nil,namespaceURI,qualifiedName,self);
+  alocalName:=ns.localName.CString;
+  if (((Pos(':',alocalName))>0)
+    or ((length(namespaceURI))=0) and ((Pos(':',qualifiedName))>0))
+    then begin
+      ns.Free;
+      checkError(NAMESPACE_ERR);
+    end;
+
   FPGdomeDoc:=xmlNewDoc(XML_DEFAULT_VERSION);
-  name2:=TGdomString.create(qualifiedName);
-  FPGdomeDoc.children:=xmlNewDocNode(FPGdomeDoc,nil,name2.CString,nil);
-  name2.Free;
+  FPGdomeDoc.children:=xmlNewDocNode(FPGdomeDoc,ns.ns,ns.localName.CString,nil);
+  FPGdomeDoc.children.nsDef:=ns.Ns;
+  ns.free;
   //Get root-node
   root:= xmlNodePtr(FPGdomeDoc);
 
@@ -1733,25 +1783,13 @@ var
   i: integer;
   AAttr: xmlAttrPtr;
   ANode: xmlNodePtr;
-  //ANs:   xmlNsPtr;
 begin
   if FPGdomeDoc<>nil then begin
-
-{
-    for i:=0 to FNsList.Count-1 do begin
-      ANs:=FNsList[i];
-      if (ANs<>nil) and (ANs<>FPGdomeDoc.oldNs)
-        then xmlFreeNs(ANs);
-    end;
-}
-
     for i:=0 to FNodeList.Count-1 do begin
       ANode:=FNodeList[i];
       if ANode<>nil
         then if (ANode.parent=nil)
           then begin
-            //ANode.ns:=nil;
-            //ANode.nsDef:=nil;
             if ANode.type_=xml_element_node then begin
               AAttr:=ANode.properties;
               while AAttr<>nil do begin
@@ -1775,8 +1813,6 @@ begin
               xmlFreeProp(AAttr);
             end;
     end;
-
-
 
     xmlFreeDoc(FPGdomeDoc);
     dec(doccount);
@@ -2118,6 +2154,9 @@ end;
 procedure TGDOMDocument.set_preserveWhiteSpace(Value: Boolean);
 begin
   FPreserveWhitespace:=true;
+  if value
+    then xmlKeepBlanksDefault(1)
+    else xmlKeepBlanksDefault(0);
 end;
 
 procedure TGDOMDocument.set_resolveExternals(Value: Boolean);
@@ -2221,7 +2260,7 @@ end;
 function GetGNode(const Node: IDOMNode): xmlNodePtr;
 begin
   if not Assigned(Node) then
-    raise EDOMException.Create(SNodeExpected);
+    checkError(INVALID_ACCESS_ERR);
   Result := (Node as IXMLDOMNodeRef).GetGDOMNode;
 end;
 
@@ -2257,7 +2296,7 @@ end;
 procedure CheckError(err:integer);
 begin
   if err <>0
-    then raise EDOMException.Create(ErrorString(err));
+    then raise EDOMException.Create(err,ErrorString(err));
 end;
 
 function IsReadOnlyNode(node:xmlNodePtr): boolean;
@@ -2557,13 +2596,20 @@ constructor TGDOMNameSpace.create(node:xmlNodePtr;
 var
   name1,name3: TGdomString;
   prefix: string;
+  alocalName: string;
+  temp: integer;
 begin
   FOwnerDoc:=OwnerDoc;
   name1:=TGdomString.create(namespaceURI);
   prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
+  //IF length(prefix)=0
+    //then checkError(NAMESPACE_ERR);
   FqualifiedName:=TGdomString.create(qualifiedName);
-  localName:=TGdomString.create(Copy(qualifiedName,Pos(':',qualifiedName)+1,
+  alocalName:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
     length(qualifiedName)-length(prefix)-1));
+  localName:=TGdomString.create(alocalname);
+  temp:=(Pos(':',alocalName));
+
   name3:=TGdomString.create(prefix);
   ns := xmlNewNs(node, name1.CString, name3.CString);
   name1.free;
@@ -2572,7 +2618,7 @@ end;
 
 destructor TGDOMNameSpace.destroy;
 begin
-  (FOwnerDoc as IDOMInternal).appendNs(Ns);
+  //(FOwnerDoc as IDOMInternal).appendNs(Ns);
   FOwnerDoc:=nil;
   localName.free;
   FqualifiedName.Free;
@@ -2761,7 +2807,159 @@ begin
 end;
 
 procedure TGDOMDocument.appendNs(ns: xmlNsPtr);
-begin   if ns<>nil     then FNsList.add(ns); end;  initialization
+begin
+  if ns<>nil
+    then FNsList.add(ns);
+end;
+
+{function IsXmlNCName(const S: wideString): boolean;
+var
+  i: integer;
+begin
+  Result:= true;
+  if Length(S) = 0 then begin Result:= false; exit; end;
+  if not ( IsXmlLetter(PWideChar(S)^)
+           or (PWideChar(S)^ = '_')   )
+    then begin Result:= false; exit; end;
+  for i:= 2 to length(S) do
+    if not IsXmlNCNameChar(S[i])
+      then begin Result:= false; exit; end;
+end;}
+
+function IsXmlIdeographic(const S: WideChar): boolean;
+begin
+  Case Word(S) of
+    $4E00..$9FA5,$3007,$3021..$3029:
+    result:= true;
+  else
+    result:= false;
+  end;
+end;
+
+function IsXmlBaseChar(const S: WideChar): boolean;
+begin
+  Case Word(S) of
+    $0041..$005a,$0061..$007a,$00c0..$00d6,$00d8..$00f6,$00f8..$00ff,
+    $0100..$0131,$0134..$013E,$0141..$0148,$014a..$017e,$0180..$01c3,
+    $01cd..$01f0,$01f4..$01f5,$01fa..$0217,$0250..$02a8,$02bb..$02c1,
+    $0386,$0388..$038a,$038c,$038e..$03a1,$03a3..$03ce,$03D0..$03D6,
+    $03DA,$03DC,$03DE,$03E0,$03E2..$03F3,$0401..$040C,$040E..$044F,
+    $0451..$045C,$045E..$0481,$0490..$04C4,$04C7..$04C8,$04CB..$04CC,
+    $04D0..$04EB,$04EE..$04F5,$04F8..$04F9,$0531..$0556,$0559,
+    $0561..$0586,$05D0..$05EA,$05F0..$05F2,$0621..$063A,$0641..$064A,
+    $0671..$06B7,$06BA..$06BE,$06C0..$06CE,$06D0..$06D3,$06D5,
+    $06E5..$06E6,$0905..$0939,$093D,$0958..$0961,$0985..$098C,
+    $098F..$0990,$0993..$09A8,$09AA..$09B0,$09B2,$09B6..$09B9,
+    $09DC..$09DD,$09DF..$09E1,$09F0..$09F1,$0A05..$0A0A,$0A0F..$0A10,
+    $0A13..$0A28,$0A2A..$0A30,$0A32..$0A33,$0A35..$0A36,$0A38..$0A39,
+    $0A59..$0A5C,$0A5E,$0A72..$0A74,$0A85..$0A8B,$0A8D,$0A8F..$0A91,
+    $0A93..$0AA8,$0AAA..$0AB0,$0AB2..$0AB3,$0AB5..$0AB9,$0ABD,$0AE0,
+    $0B05..$0B0C,$0B0F..$0B10,$0B13..$0B28,$0B2A..$0B30,$0B32..$0B33,
+    $0B36..$0B39,$0B3D,$0B5C..$0B5D,$0B5F..$0B61,$0B85..$0B8A,
+    $0B8E..$0B90,$0B92..$0B95,$0B99..$0B9A,$0B9C,$0B9E..$0B9F,
+    $0BA3..$0BA4,$0BA8..$0BAA,$0BAE..$0BB5,$0BB7..$0BB9,$0C05..$0C0C,
+    $0C0E..$0C10,$0C12..$0C28,$0C2A..$0C33,$0C35..$0C39,$0C60..$0C61,
+    $0C85..$0C8C,$0C8E..$0C90,$0C92..$0CA8,$0CAA..$0CB3,$0CB5..$0CB9,
+    $0CDE,$0CE0..$0CE1,$0D05..$0D0C,$0D0E..$0D10,$0D12..$0D28,
+    $0D2A..$0D39,$0D60..$0D61,$0E01..$0E2E,$0E30,$0E32..$0E33,
+    $0E40..$0E45,$0E81..$0E82,$0E84,$0E87..$0E88,$0E8A,$0E8D,
+    $0E94..$0E97,$0E99..$0E9F,$0EA1..$0EA3,$0EA5,$0EA7,$0EAA..$0EAB,
+    $0EAD..$0EAE,$0EB0,$0EB2..$0EB3,$0EBD,$0EC0..$0EC4,$0F40..$0F47,
+    $0F49..$0F69,$10A0..$10C5,$10D0..$10F6,$1100,$1102..$1103,
+    $1105..$1107,$1109,$110B..$110C,$110E..$1112,$113C,$113E,$1140,
+    $114C,$114E,$1150,$1154..$1155,$1159,$115F..$1161,$1163,$1165,
+    $1167,$1169,$116D..$116E,$1172..$1173,$1175,$119E,$11A8,$11AB,
+    $11AE..$11AF,$11B7..$11B8,$11BA,$11BC..$11C2,$11EB,$11F0,$11F9,
+    $1E00..$1E9B,$1EA0..$1EF9,$1F00..$1F15,$1F18..$1F1D,$1F20..$1F45,
+    $1F48..$1F4D,$1F50..$1F57,$1F59,$1F5B,$1F5D,$1F5F..$1F7D,
+    $1F80..$1FB4,$1FB6..$1FBC,$1FBE,$1FC2..$1FC4,$1FC6..$1FCC,
+    $1FD0..$1FD3,$1FD6..$1FDB,$1FE0..$1FEC,$1FF2..$1FF4,$1FF6..$1FFC,
+    $2126,$212A..$212B,$212E,$2180..$2182,$3041..$3094,$30A1..$30FA,
+    $3105..$312C,$AC00..$d7a3:
+    result:= true;
+  else
+    result:= false;
+  end;
+end;
+
+function IsXmlLetter(const S: WideChar): boolean;
+begin
+  Result:= IsXmlIdeographic(S) or IsXmlBaseChar(S);
+end;
+
+function IsXmlDigit(const S: WideChar): boolean;
+begin
+  Case Word(S) of
+    $0030..$0039,$0660..$0669,$06F0..$06F9,$0966..$096F,$09E6..$09EF,
+    $0A66..$0A6F,$0AE6..$0AEF,$0B66..$0B6F,$0BE7..$0BEF,$0C66..$0C6F,
+    $0CE6..$0CEF,$0D66..$0D6F,$0E50..$0E59,$0ED0..$0ED9,$0F20..$0F29:
+    result:= true;
+  else
+    result:= false;
+  end;
+end;
+
+function IsXmlCombiningChar(const S: WideChar): boolean;
+begin
+  Case Word(S) of
+    $0300..$0345,$0360..$0361,$0483..$0486,$0591..$05A1,$05A3..$05B9,
+    $05BB..$05BD,$05BF,$05C1..$05C2,$05C4,$064B..$0652,$0670,
+    $06D6..$06DC,$06DD..$06DF,$06E0..$06E4,$06E7..$06E8,$06EA..$06ED,
+    $0901..$0903,$093C,$093E..$094C,$094D,$0951..$0954,$0962..$0963,
+    $0981..$0983,$09BC,$09BE,$09BF,$09C0..$09C4,$09C7..$09C8,
+    $09CB..$09CD,$09D7,$09E2..$09E3,$0A02,$0A3C,$0A3E,$0A3F,
+    $0A40..$0A42,$0A47..$0A48,$0A4B..$0A4D,$0A70..$0A71,$0A81..$0A83,
+    $0ABC,$0ABE..$0AC5,$0AC7..$0AC9,$0ACB..$0ACD,$0B01..$0B03,$0B3C,
+    $0B3E..$0B43,$0B47..$0B48,$0B4B..$0B4D,$0B56..$0B57,$0B82..$0B83,
+    $0BBE..$0BC2,$0BC6..$0BC8,$0BCA..$0BCD,$0BD7,$0C01..$0C03,
+    $0C3E..$0C44,$0C46..$0C48,$0C4A..$0C4D,$0C55..$0C56,$0C82..$0C83,
+    $0CBE..$0CC4,$0CC6..$0CC8,$0CCA..$0CCD,$0CD5..$0CD6,$0D02..$0D03,
+    $0D3E..$0D43,$0D46..$0D48,$0D4A..$0D4D,$0D57,$0E31,$0E34..$0E3A,
+    $0E47..$0E4E,$0EB1,$0EB4..$0EB9,$0EBB..$0EBC,$0EC8..$0ECD,
+    $0F18..$0F19,$0F35,$0F37,$0F39,$0F3E,$0F3F,$0F71..$0F84,
+    $0F86..$0F8B,$0F90..$0F95,$0F97,$0F99..$0FAD,$0FB1..$0FB7,$0FB9,
+    $20D0..$20DC,$20E1,$302A..$302F,$3099,$309A:
+    result:= true;
+  else
+    result:= false;
+  end;
+end;
+
+function IsXmlExtender(const S: WideChar): boolean;
+begin
+  Case Word(S) of
+    $00B7,$02D0,$02D1,$0387,$0640,$0E46,$0EC6,$3005,$3031..$3035,
+    $309D..$309E,$30FC..$30FE:
+    result:= true;
+  else
+    result:= false;
+  end;
+end;
+
+function IsXmlNameChar(const S: WideChar): boolean;
+begin
+  if IsXmlLetter(S) or IsXmlDigit(S) or IsXmlCombiningChar(S)
+    or IsXmlExtender(S) or (S='.') or (S='-') or (S='_') or (S=':')
+    then Result:= true
+    else Result:= false;
+end;
+
+function IsXmlName(const S: wideString): boolean;
+var
+  i: integer;
+begin
+  Result:= true;
+  if Length(S) = 0 then begin Result:= false; exit; end;
+  if not ( IsXmlLetter(PWideChar(S)^)
+           or (PWideChar(S)^ = '_')
+           or (PWideChar(S)^ = ':')   )
+    then begin Result:= false; exit; end;
+  for i:= 2 to length(S) do
+    if not IsXmlNameChar((PWideChar(S)+i-1)^)
+      then begin Result:= false; exit; end;
+end;
+
+initialization
   RegisterDomVendorFactory(TGDOMDocumentBuilderFactory.Create(False));
 finalization
 end.
