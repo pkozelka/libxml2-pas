@@ -20,7 +20,7 @@ document                    createAttributeNS      1             X
 document                    createElement          1             X                                                                
 document                    createElementNS        1             X                                                                
 document                    createCDATASection     2             X                                                                
-document                    createComment          2                                                                             
+document                    createComment          2             X                                                                
 document                    createDocumentFragment 3                                                                             
 document                    createEntityReference  3                                                                             
 document                    createProcessingInstr. 3                                                                             
@@ -44,7 +44,7 @@ documentType                notations              3
 documentType                publicId               2             X                                                                
 documentType                systemId               2             X                                                                
 domImplementation           createDocument         1             X      
-domImplementation           createDocumentType     2                   
+domImplementation           createDocumentType     2             X      
 domImplementation           hasFeature             3             X                               
 element                     getAttribute           1             X                                                                     
 element                     getAttributeNS         1             X                                                                
@@ -54,7 +54,7 @@ element                     getElementsByTagName   2             X
 element                     getElementsByTagNameNS 2                                                                             
 element                     hasAttribute           1             X                                                                
 element                     hasAttributeNS         1             X                                                                
-element                     normalize              2                                                                             
+element                     normalize              2             X      more tests neccessary                                                                
 element                     removeAttribute        2             X                                                                
 element                     removeAttributeNS      2             X                                                               
 element                     removeAttributeNode    2             X                                                               
@@ -89,13 +89,13 @@ node                        nextSibling            1             X
 node                        nodeName               1             X                                                                
 node                        nodeType               2             X                                                                
 node                        nodeValue              1             X                                                                
-node                        normalize              2                                                                             
+node                        normalize              2             X      more tests neccessary                                                                
 node                        parentNode             1             X                                                                
 node                        prefix                 1             X                                                                
 node                        previousSibling        1             X                                                                
 node                        removeChild            1             X                                                                
-node                        replaceChild           2                                                                             
-node                        supports               3       
+node                        replaceChild           2             X                                                                
+node                        supports               3             X
 node/IDOMNodeSelect         selectNode             1             X
 node/IDOMNodeSelect         selectNodes            1             X  
 nodelist                    item                   1             X                                                                
@@ -112,4 +112,4 @@ Summary:
 43 high priority methods
 all done
 
-71 methods done totally       
+78 methods done totally       
