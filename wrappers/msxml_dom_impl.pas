@@ -33,9 +33,9 @@ type
 	end;
 {$endif}
 
-type
 	TChildNodeList = class;
 	TAttrNodeMap = class;
+	TXMLDOMParser = class;
 
 	ILibXml2Node = interface ['{1D4BD646-0AB9-4810-B4BD-7277FB0CFA30}']
 		function  NodePtr: xmlNodePtr;
@@ -54,8 +54,8 @@ type
 	 * Abstract base for node implementations.
 	 *)
 	TXMLDOMNode = class (TMyDispatch,
-		ILibXml2Node,
-		IXMLDOMNode)
+		IXMLDOMNode,
+		ILibXml2Node)
 	private
 		FPtr: TUniNode;
 		FChildren_OnDemand: TChildNodeList;
@@ -164,7 +164,7 @@ type
 		function  IXMLDOMAttribute.Get_name = Get_nodeName;
 		function  IXMLDOMAttribute.Get_value = Get_nodeValue;
 		procedure IXMLDOMAttribute.Set_value = Set_nodeValue;
-	protected //DOM2
+	protected //DOM2 functions
 		function  Get_ownerElement: IXMLDOMElement; safecall;
 		function  Get_parentNode: IXMLDOMNode; safecall;
 	end;
@@ -184,6 +184,7 @@ type
 		ILibXml2Node,
 		IXMLDOMDocument)
 	private
+		FParser: TXMLDOMParser;
 		function  requestDocPtr: xmlDocPtr;
 		procedure releaseDocPtr;
 	protected //ILibXml2Node
@@ -227,6 +228,27 @@ type
 		function  createAttributeNS(const namespaceURI, qualifiedName: WideString): IXMLDOMAttribute; safecall;
 	public
 		constructor Create(aLibXmlObj: xmlNodePtr);
+		destructor Destroy; override;
+	end;
+
+	TXMLDOMParser = class(TMyDispatch,
+		IXMLDOMParseError)
+	private
+		FDoc: TXMLDOMDocument;
+		FParserCtxt: xmlParserCtxtPtr;
+		property  parserCtxt: xmlParserCtxtPtr read FParserCtxt;
+	protected //IXMLDOMParseError
+		function  Get_errorCode: Integer; safecall;
+		function  Get_url: WideString; safecall;
+		function  Get_reason: WideString; safecall;
+		function  Get_srcText: WideString; safecall;
+		function  Get_line: Integer; safecall;
+		function  Get_linepos: Integer; safecall;
+		function  Get_filepos: Integer; safecall;
+	protected
+		constructor Create(aDoc: TXMLDOMDocument);
+	public
+		destructor Destroy; override;
 	end;
 
 	TXMLDOMDocumentType = class(TXMLDOMNode,
@@ -235,6 +257,10 @@ type
 		function  IXMLDOMDocumentType.Get_name = Get_nodeName;
 		function  Get_entities: IXMLDOMNamedNodeMap; safecall;
 		function  Get_notations: IXMLDOMNamedNodeMap; safecall;
+	protected //DOM2 functions
+		function  Get_internalSubset: widestring; safecall;
+		function  Get_publicId: OleVariant; safecall;
+		function  Get_systemId: OleVariant; safecall;
 	end;
 
 	TXMLDOMNotation = class(TXMLDOMNode,
@@ -997,6 +1023,15 @@ begin
 
 	//todo: PROBLEM - therefore it will never be automaticaly destroyed...
 	_AddRef;
+
+	//
+	FParser := TXMLDOMParser.Create(self);
+end;
+
+destructor TXMLDOMDocument.Destroy;
+begin
+	FParser := nil; //??? or .Free ???
+	inherited;
 end;
 
 function TXMLDOMDocument.createAttribute(const name: WideString): IXMLDOMAttribute;
@@ -1156,7 +1191,7 @@ end;
 
 function TXMLDOMDocument.Get_doctype: IXMLDOMDocumentType;
 begin
-	ENotImpl('TXMLDOMDocument.Get_doctype');
+	Result := GetDOMObject(FPtr.doc.intSubset) as IXMLDOMDocumentType;
 end;
 
 function TXMLDOMDocument.Get_documentElement: IXMLDOMElement;
@@ -1174,12 +1209,12 @@ end;
 
 function TXMLDOMDocument.Get_parseError: IXMLDOMParseError;
 begin
-	ENotImpl('TXMLDOMDocument.Get_parseError');
+	Result := FParser;
 end;
 
 function TXMLDOMDocument.Get_preserveWhiteSpace: WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.Get_parseError');
+	Result := (0<>FParser.parserCtxt.space^);
 end;
 
 function TXMLDOMDocument.Get_readyState: Integer;
@@ -1196,18 +1231,19 @@ function TXMLDOMDocument.Get_url: WideString;
 var
 	s: string;
 begin
-	s := requestDocPtr.URL;
+	s := requestDocPtr.URL; //??? shouldn't we take it from parser ???
 	Result := s;
 end;
 
 function TXMLDOMDocument.Get_validateOnParse: WordBool;
 begin
-	ENotImpl('TXMLDOMDocument.Get_validateOnParse');
+	Result := (0 <> FParser.parserCtxt.validate);
 end;
 
 function TXMLDOMDocument.getElementsByTagName(const tagName: WideString): IXMLDOMNodeList;
 begin
-	ENotImpl('TXMLDOMDocument.getElementsByTagName');
+	//todo: restrict to (QName|'*')
+	Result := selectNodes(tagName);
 end;
 
 function TXMLDOMDocument.load(xmlSource: OleVariant): WordBool;
@@ -1293,7 +1329,11 @@ end;
 
 procedure TXMLDOMDocument.Set_preserveWhiteSpace(isPreserving: WordBool);
 begin
-	ENotImpl('TXMLDOMDocument.Set_preserveWhiteSpace');
+	if isPreserving then begin
+		FParser.parserCtxt.space^ := -1;
+	end else begin
+		FParser.parserCtxt.space^ := 0;
+	end;
 end;
 
 procedure TXMLDOMDocument.Set_resolveExternals(isResolving: WordBool);
@@ -1303,7 +1343,11 @@ end;
 
 procedure TXMLDOMDocument.Set_validateOnParse(isValidating: WordBool);
 begin
-	ENotImpl('TXMLDOMDocument.Set_validateOnParse');
+	if (isValidating) then begin
+		FParser.parserCtxt.validate := 1;
+	end else begin
+		FParser.parserCtxt.validate := 0;
+	end;
 end;
 
 procedure TXMLDOMDocument.releaseDocPtr;
@@ -1325,6 +1369,56 @@ end;
 function TXMLDOMDocument.NodePtr: xmlNodePtr;
 begin
 	Result := xmlNodePtr(requestDocPtr);
+end;
+
+{ TXMLDOMParser }
+
+constructor TXMLDOMParser.Create(aDoc: TXMLDOMDocument);
+begin
+	FDoc := aDoc;
+end;
+
+destructor TXMLDOMParser.Destroy;
+begin
+	inherited;
+end;
+
+function TXMLDOMParser.Get_errorCode: Integer;
+begin
+	ENotImpl('TXMLDOMParser.Get_errorCode');
+end;
+
+function TXMLDOMParser.Get_filepos: Integer;
+begin
+	Result := FParserCtxt.input.consumed;
+end;
+
+function TXMLDOMParser.Get_line: Integer;
+begin
+	Result := FParserCtxt.input.line;
+end;
+
+function TXMLDOMParser.Get_linepos: Integer;
+begin
+	Result := FParserCtxt.input.col;
+end;
+
+function TXMLDOMParser.Get_reason: WideString;
+begin
+	ENotImpl('TXMLDOMParser.Get_reason');
+end;
+
+function TXMLDOMParser.Get_srcText: WideString;
+begin
+	ENotImpl('TXMLDOMParser.Get_srcText');
+end;
+
+function TXMLDOMParser.Get_url: WideString;
+var
+	s: string;
+begin
+	s := FParserCtxt.input.filename;
+	Result := s;
 end;
 
 { TXMLDOMCharacterData }
@@ -1400,9 +1494,24 @@ begin
 	ENotImpl('TXMLDOMDocumentType.Get_entities');
 end;
 
+function TXMLDOMDocumentType.Get_internalSubset: widestring;
+begin
+	Result := Get_xml; //???
+end;
+
 function TXMLDOMDocumentType.Get_notations: IXMLDOMNamedNodeMap;
 begin
 	ENotImpl('TXMLDOMDocumentType.Get_notations');
+end;
+
+function TXMLDOMDocumentType.Get_publicId: OleVariant;
+begin
+	Result := UTF8Decode(FPtr.dtd.ExternalID);
+end;
+
+function TXMLDOMDocumentType.Get_systemId: OleVariant; 
+begin
+	Result := UTF8Decode(FPtr.dtd.SystemID);
 end;
 
 { TXMLDOMNotation }
