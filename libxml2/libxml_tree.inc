@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.102] tree.h
+// CVS-SIGN: [1.103] tree.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -418,11 +418,7 @@ type
     doc: xmlDocPtr;                 { the containing document  }
     { End of common part  }
     ns: xmlNsPtr;                   { Pointer to the associated namespace  }
-    {$IFNDEF XML_USE_BUFFER_CONTENT    }
     content: PxmlChar;              { the content  }
-    {$ELSE}
-    content: xmlBufferPtr;          { the content in a buffer  }
-    {$ENDIF}
     properties: xmlAttrPtr;         { properties list  }
     nsDef: xmlNsPtr; { namespace definitions on this node  }
   end;

@@ -1,4 +1,4 @@
-// CVS-SIGN: [1.52] xpath.h
+// CVS-SIGN: [1.53] xpath.h
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -78,6 +78,7 @@ type
     nodeNr: Longint;                { number of nodes in the set  }
     nodeMax: Longint;               { size of the array as allocated  }
     nodeTab: PxmlNodePtr;           { array of nodes in no particular order  }
+    (* @@ with_ns to check whether namespace nodes should be looked at @@ *)
   end;
 
   PxmlXPathObjectPtr = ^xmlXPathObjectPtr;
