@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.35 2002-01-15 01:28:49 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.36 2002-01-15 09:19:04 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -839,7 +839,7 @@ var
 	node: xmlNodePtr;
 begin
 	node:=GetGNode(newChild);
-	if node=nil then CheckError(Not_Supported_Err);
+	if node=nil then CheckError(NOT_SUPPORTED_ERR);
 	if self.IsReadOnly
 		then CheckError(NO_MODIFICATION_ALLOWED_ERR);
 	if not (newChild.NodeType in FAllowedChildTypes)
@@ -924,11 +924,13 @@ begin
 	else result:=false;
 end;
 
-constructor TGDOMNode.Create(ANode: xmlNodePtr);
+constructor TGDOMNode.Create(aNode: xmlNodePtr);
 begin
 	inherited create;
-	Assert(Assigned(ANode));
-	FGNode := ANode;
+	if(not Assigned(aNode)) then begin
+		raise EDomException.Create('TGDOMNode.Create: Cannot wrap unassigned node');
+	end;
+	FGNode := aNode;
 	inc(nodecount);
 end;
 
@@ -1503,7 +1505,9 @@ end;
 
 constructor TGDOMDocument.create(GDOMImpl:IDOMImplementation; const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType);
 begin
-	Assert(doctype=nil, 'TGDOMDocument.create with doctype not implemented yet');
+	if (doctype=nil) then begin
+		raise EDomException.create(NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
+	end;
 	FGdomimpl:=GDOMImpl;
 	//Create doc-node as pascal object
 	inherited create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
