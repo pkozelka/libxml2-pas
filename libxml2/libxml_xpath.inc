@@ -86,7 +86,7 @@ type
 	xmlXPathObject = record
 		type_ : xmlXPathObjectType;
 		nodesetval : xmlNodeSetPtr;
-		boolval : longint;
+		boolval : int64; //??? IS THIS REALLY OK ???
 		floatval : double;
 		stringval : PxmlChar;
 		user : pointer;
