@@ -1,9 +1,27 @@
 unit TestXSLT;
 
+{
+    ------------------------------------------------------------------------------
+    Copyright:
+        4commerce technologies AG
+        Kamerbalken 10-14
+        22525 Hamburg, Germany
+    Published under a double license:
+    a) the GNU Library General Public License: 
+       http://www.gnu.org/copyleft/lgpl.html
+    b) the Mozilla Public License:
+       http://www.mozilla.org/MPL/MPL-1.1.html
+    Please send corrections to: ufechner@4commerce.de
+    ------------------------------------------------------------------------------
+}
+
 interface
 
+// Parses an xml file
 Procedure test1(filename:string);
 
+// Transforms the xmlfile with the xslfile (stylesheet) into the outputfile
+// The strings are the filenames
 procedure test2(xmlfile,xslfile,outputfile: string);
 
 implementation
@@ -43,7 +61,6 @@ begin
     outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
   end
   else exit;
-  //node:=res.children;
   node:=xmlDocGetRootElement(res);
   if node<>nil then begin
     temp:=node.name;
@@ -76,7 +93,6 @@ begin
     outLog('Elapsed time: '+format('%8.1f',[EndTime*1000])+' ms');
   end
   else exit;
-  //node:=doc.children;
   node:=xmlDocGetRootElement(doc);
   if node=nil then exit;
   temp:=node.name;
@@ -91,7 +107,6 @@ begin
     outLog('Created empty document!');
   end;
   doc.children:=xmlNewDocNode(doc,nil,pchar('test'),nil);
-  //node:=doc.children;
   node:=xmlDocGetRootElement(doc);
   temp:=node.name;
   outLog('name of root element: '+temp);
