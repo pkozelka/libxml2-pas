@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.55 2002-01-16 20:34:58 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.56 2002-01-16 20:45:41 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -371,7 +371,6 @@ type
 	protected
 		property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl;
 	public
-		constructor Create(GDOMImpl:IDOMImplementation); overload;
 		destructor Destroy; override;
 	end;
 
@@ -1596,12 +1595,6 @@ end;
 
 { TGDOMDocument }
 
-constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
-begin
-	//Create root-node as pascal object
-	inherited Create(nil);
-end;
-
 destructor TGDOMDocument.Destroy;
 begin
 	GDoc := nil;
@@ -2268,20 +2261,36 @@ begin
 end;
 
 function TGDOMDocumentBuilder.load(const url: DomString): IDomDocument;
+var
+	doc: TGDOMDocument;
+	ok: boolean;
 begin
-	Result := TGDOMDocument.Create(Get_DomImplementation);
-	(Result as IDomPersist).load(url);
+	doc := TGDOMDocument.Create(nil);
+	doc.DomImplementation := Get_DomImplementation;
+	ok := doc.load(url);
+	DomAssert(ok, PARSE_ERR, 'Error while parsing file:'+url);
+	Result := doc;
 end;
 
 function TGDOMDocumentBuilder.newDocument: IDomDocument;
+var
+	doc: TGDOMDocument;
 begin
-	result:=TGDOMDocument.Create(Get_DomImplementation);
+	doc := TGDOMDocument.Create(nil);
+	doc.DomImplementation := Get_DomImplementation;
+	Result := doc;
 end;
 
 function TGDOMDocumentBuilder.parse(const xml: DomString): IDomDocument;
+var
+	doc: TGDOMDocument;
+	ok: boolean;
 begin
-	result:=TGDOMDocument.Create(Get_DomImplementation);
-	(Result as IDomPersist).loadxml(xml);
+	doc := TGDOMDocument.Create(nil);
+	doc.DomImplementation := Get_DomImplementation;
+	ok := doc.loadxml(xml);
+	DomAssert(ok, PARSE_ERR, 'Error while parsing xml:'#13+xml);
+	Result := doc;
 end;
 
 procedure TGDOMNode.RegisterNS(const prefix, URI: DomString);
