@@ -425,10 +425,10 @@ type
     // IDOMPersist
     function get_xml: DOMString;
     function asyncLoadState: Integer;
-    function load(source: OleVariant): WordBool;
+    function load(source: DOMString): WordBool;
     function loadFromStream(const stream: TStream): WordBool;
     function loadxml(const Value: DOMString): WordBool;
-    procedure save(destination: OleVariant);
+    procedure save(source: DOMString);
     procedure saveToStream(const stream: TStream);
     procedure set_OnAsyncLoad(const Sender: TObject;
       EventHandler: TAsyncEventHandler);
@@ -521,8 +521,6 @@ function IsSameNode(node1,node2: IDOMNode):boolean;
 
 implementation
 
-uses Dialogs;
-
 function setAttr(var node:xmlNodePtr; xmlNewAttr:xmlAttrPtr):xmlAttrPtr; forward;
 function removeAttr(element:xmlNodePtr;attr: xmlAttrPtr):xmlAttrPtr; forward;
 function xmlRemoveChild(element:xmlNodePtr;node: xmlNodePtr):xmlNodePtr; forward;
@@ -581,7 +579,7 @@ function libxmlStringToString(libstring:pchar):WideString;
 function IsSameNode(node1,node2: IDOMNode):boolean;
 begin
   try
-    (node1 as IDomNodeCompare).IsSameNode(node2);
+    result := (node1 as IDomNodeCompare).IsSameNode(node2);
   except
     if node1=node2
       then result:=true
@@ -792,7 +790,7 @@ procedure TGDOMNode.set_nodeValue(const value: DOMString);
 var
   temp: TGdomString;
   attr: xmlAttrPtr;
-  //buffer:pchar;
+  buffer:pchar;
   tmp: xmlNodePtr;
 begin
   temp:=TGdomString.create(value);
@@ -802,8 +800,7 @@ begin
       then xmlFreeNodeList(attr.children);
     attr.children:=nil;
     attr.last:=nil;
-    //buffer:='';
-    //buffer:=xmlEncodeEntitiesReentrant(attr.doc, temp.CString);
+    buffer:=xmlEncodeEntitiesReentrant(attr.doc, temp.CString);
     attr.children:=xmlStringGetNodeList(attr.doc, temp.CString);
     tmp:=attr.children;
     while tmp<>nil do begin
@@ -813,12 +810,17 @@ begin
         then attr.last:=tmp;
       tmp:=tmp.next;
     end;
-    //ToDo: get the use of buffer working
-    //xmlFree(buffer);
-
+    xmlFree(buffer);
   end
   else
-    xmlNodeSetContent(FGNode,temp.CString);
+    if (FGNode.type_<>ELEMENT_NODE) and
+       (FGNode.type_<>DOCUMENT_NODE) and
+       (FGNode.type_<>DOCUMENT_FRAGMENT_NODE) and
+       (FGNode.type_<>DOCUMENT_TYPE_NODE) and
+       (FGNode.type_<>ENTITY_REFERENCE_NODE) and
+       (FGNode.type_<>ENTITY_NODE) and
+       (FGNode.type_<>NOTATION_NODE)
+      then xmlNodeSetContent(FGNode,temp.CString);
   temp.free;
 end;
 
@@ -1035,7 +1037,8 @@ const
                         Document_Fragment_Node,
                         Notation_Node];
 var
-  tmp,node: xmlNodePtr;
+  // tmp: xmlNodePtr;
+  node: xmlNodePtr;
 begin
   node:=GetGNode(newChild);
   if node=nil then CheckError(Not_Supported_Err);
@@ -1115,7 +1118,7 @@ end;
 
 procedure TGDOMNode.normalize;
 var
-	node,next,new_next: xmlNodePtr;
+  node,next,new_next: xmlNodePtr;
   nodeType: integer;
   temp:string;
 begin
@@ -1382,7 +1385,7 @@ end;
 function TGDOMNamedNodeMap.setNamedItemNS(const newItem: IDOMNode): IDOMNode;
 var
   attr,oldattr,xmlnewAttr: xmlAttrPtr;
-  value:pchar;
+  //value:pchar;
   temp,slocalName: string;
   ns:xmlNSPtr;
   namespace:pchar;
@@ -1426,9 +1429,10 @@ end;
 
 function TGDOMNamedNodeMap.removeNamedItemNS(const namespaceURI, localName: DOMString): IDOMNode;
 var
-  attr,tmp: xmlAttrPtr;
+  attr: xmlAttrPtr;
+  //tmp: xmlAttrPtr;
   name1,name2:TGdomString;
-  ref: integer;
+  //ref: integer;
 begin
   attr:=nil;
   if FGNamedNodeMap<>nil then begin
@@ -1577,7 +1581,8 @@ end;
 
 procedure TGDOMElement.removeAttribute(const name: DOMString);
 var
-  oldattr,oldattr1,attr,xmlNewAttr: xmlAttrPtr;
+  oldattr: xmlAttrPtr;
+  //attr,oldattr1,xmlNewAttr: xmlAttrPtr;
   name1: TGdomString;
 begin
   name1:=TGdomString.create(name);
@@ -2483,7 +2488,7 @@ begin
   result:=0;
 end;
 
-function TGDOMDocument.load(source: OleVariant): WordBool;
+function TGDOMDocument.load(source: DOMString): WordBool;
 // Load dom from file
 var
   fn: string;
@@ -2495,7 +2500,7 @@ begin
   {$ifdef WIN32}
     fn := UTF8Encode(StringReplace(source, '\', '\\', [rfReplaceAll]));
   {$else}
-    fn := aUrl;
+    fn := source;
   {$endif}
   xmlInitParser();
   ctxt := xmlCreateFileParserCtxt(PChar(fn));
@@ -2584,13 +2589,13 @@ begin
     else result:=false;
 end;
 
-procedure TGDOMDocument.save(destination: OleVariant);
+procedure TGDOMDocument.save(source: DOMString);
 var
-  temp:string;
   encoding:pchar;
   bytes: integer;
+  temp: string;
 begin
-  temp:=destination;
+  temp:=source;
   encoding:=FPGdomeDoc.encoding;
   bytes:=xmlSaveFileEnc(pchar(temp),FPGdomeDoc,encoding);
   if bytes<0 then CheckError(22); //write error
@@ -3409,8 +3414,8 @@ var
   outputDoc: xmlDocPtr;
   styleNode: xmlNodePtr;
   tempXSL:   xsltStylesheetPtr;
-  encoding:  pchar;
-  length:    longInt;
+  //encoding:  pchar;
+  //length:    longInt;
 begin
   doc:=FGNode.doc;
   styleNode:=GetGNode(stylesheet);
