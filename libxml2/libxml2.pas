@@ -204,33 +204,7 @@ begin
   OutputDebugString(msg);
 end;            
 
-//[pk] DEPRECATED, TEMPORARY:
-procedure InitExportedVar;
-{$ifdef WIN32}
-begin
-  xmlDoValidityCheckingDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)),
-   'xmlDoValidityCheckingDefaultValue');
-  Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
-  xmlSubstituteEntitiesDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)),
-   'xmlSubstituteEntitiesDefaultValue');
-  Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);
-end;
-{$else}
-begin
-  // to do:
-  // implement a working solution for linux
-  {xmlDoValidityCheckingDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)),
-    'xmlDoValidityCheckingDefaultValue');
-  Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
-  xmlSubstituteEntitiesDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)),
-    'xmlSubstituteEntitiesDefaultValue');
-  Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);}
-end;
-{$endif}
-
 initialization
-  InitExportedVar;
-//end of deprecated part
   // setup Delphi memory handler
   xmlMemSetup(@DelphiFreeFunc, @DelphiMallocFunc, @DelphiReallocFunc, @DelphiStrdupFunc);
   // redirect error output
