@@ -26,6 +26,9 @@ const
 {$MINENUMSIZE 4}
 {$ASSERTIONS OFF}
 
+type
+  xsltRuntimeExtraPtr = Pointer;
+
 {$I libxslt_xslt.inc}
 {$I libxslt_xsltwin32config.inc}
 {$I libxslt_numbersInternals.inc}
