@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.48 2002-01-16 15:43:53 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.49 2002-01-16 16:02:51 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -1833,18 +1833,15 @@ begin
 end;
 
 function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
-//var
-	//AElement: xmlElementPtr;
-	//name1: string;
+var
+	attr: xmlAttrPtr;
 begin
-	DomAssert(false, NOT_SUPPORTED_ERR);
-	{name1:=TGdomString.create(elementID);
-	AElement:=gdome_doc_getElementById(FPGdomeDoc,name1.GetPString, @exc);
-	DomAssert(false, exc);
-	name1.Free;
-	if AElement <> nil
-		then result:=TGDOMElement.Create(AElement,self)
-		else result:=nil;}
+	attr := xmlGetID(requestDocPtr, PChar(UTF8Encode(elementId)));
+	if (attr<>nil) then begin
+		Result := GetDOMObject(attr.parent) as IDomElement;
+	end else begin
+		Result := nil;
+	end;
 end;
 
 // IDOMParseOptions
@@ -1907,22 +1904,17 @@ end;
 
 function TGDOMDocument.load(source: OleVariant): Boolean;
 // Load dom from file
-var filename: string;
-		root: xmlNodePtr;
+var
+	filename: string;
+	newdoc: xmlDocPtr;
 begin
 //  filename:=StringReplace(source, '\', '/', [rfReplaceAll]);
 	filename:=source;
-	xmlFreeDoc(GDoc);
-//	inherited Destroy;
-	GDoc:=xmlParseFile(pchar(filename));
-	if GDoc<>nil
-		then
-			begin
-				root:= xmlNodePtr(GDoc);
-				inherited create(root);
-				result:=true
-			end
-		else result:=false;
+	newdoc := xmlParseFile(pchar(filename));
+	Result := newdoc<>nil;
+	if Result then begin
+		GDoc := newdoc;
+	end;
 end;
 
 function TGDOMDocument.loadFromStream(const stream: TStream): Boolean;
@@ -1936,9 +1928,6 @@ var
 	newdoc: xmlDocPtr;
 	s: string;
 begin
-//	destroyNode;
-//	xmlFreeDoc(FPGdomeDoc); //DIRTY ! todo: createFPGdomeDoc on demand
-	//FPGdomeDoc:=xmlParseMemory(temp.CString,length(temp.CString));
 	s := UTF8Encode(Value);
 	newdoc := xmlParseMemory(PChar(s), Length(s));
 	Result := newdoc<>nil;
