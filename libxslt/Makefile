@@ -1,14 +1,24 @@
+LIBNAME=libxslt
 VERSION=1.0.8
-PACKAGE=libxslt-pas
+PACKAGE=$(LIBNAME)-pas
 ARCHIVE=$(PACKAGE)-$(VERSION)
 TAG=`echo "LIBXSLT_$(VERSION)" | sed "s/\./_/g"`
 MYTMP=./$(TAG).tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
+DCCOPTS=-U../libxml2
+
+all: compile
+
+compile: compile-$(OSTYPE)
+compile-cygwin:
+	dcc32 $(DCCOPTS) $(LIBNAME).pas
+compile-linux-gnu:
+	dcc $(DCCOPTS) $(LIBNAME).pas
 
 cvsexport: clean
 	mkdir $(MYTMP)
-	cvs -d $(CVSROOT) export -l -r HEAD -d $(MYTMP) .
-	cvs -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
+	cvs -z4 -d $(CVSROOT) export -l -r HEAD -d $(MYTMP) .
+	cvs -z4 -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
 
 tgz:
 	cd $(MYTMP);tar -zcf ../$(ARCHIVE).tgz *;cd ..

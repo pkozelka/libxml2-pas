@@ -1,14 +1,23 @@
+LIBNAME=libxml2
 VERSION=2.4.11
-PACKAGE=libxml2-pas
+PACKAGE=$(LIBNAME)-pas
 ARCHIVE=$(PACKAGE)-$(VERSION)
 TAG=`echo "LIBXML_$(VERSION)" | sed "s/\./_/g"`
 MYTMP=./$(TAG).tmp
 CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/libxml2-pas
 
+all: compile
+
+compile: compile-$(OSTYPE)
+compile-cygwin:
+	dcc32 $(LIBNAME).pas
+compile-linux-gnu:
+	dcc $(LIBNAME).pas
+
 cvsexport: clean
 	mkdir $(MYTMP)
-	cvs -d $(CVSROOT) export -l -r HEAD -d $(MYTMP) .
-	cvs -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
+	cvs -z4 -d $(CVSROOT) export -l -r HEAD -d $(MYTMP) .
+	cvs -z4 -d $(CVSROOT) export -r $(TAG) -d $(MYTMP) .
 
 tgz:
 	cd $(MYTMP);tar -zcf ../$(ARCHIVE).tgz *;cd ..
