@@ -83,7 +83,7 @@ LINKS
 http://sourceforge.net/projects/libxml2-pas			- project's web site
 mailto:libxml2-pas-devel@lists.sourceforge.net			- mailing list
 http://xmlsoft.org/						- the libxml2 libraries web site
-http://www.fh-frankfurt.de/~igor/projects/libxml/index.html	- Windows build of libxml2 by Igor Zlatkovic
+http://www.zlatkovic.com/projects/libxml/index.html		- Windows build of libxml2 by Igor Zlatkovic
 
 
 HOW TO HELP
