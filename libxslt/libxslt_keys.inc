@@ -14,22 +14,15 @@
     ------------------------------------------------------------------------------
 }
 {
-  {
-     key.h: interface for the key matching used in template matches.
+	 key.h: interface for the key matching used in template matches.
     
-     See Copyright for the status of this software.
-    
-     daniel@veillard.com
-    }
+	 See Copyright for the status of this software.
 
-  function xsltAddKey(style:xsltStylesheetPtr; name:PxmlChar; nameURI:PxmlChar; match:PxmlChar; use:PxmlChar; 
-             inst:xmlNodePtr):longint;cdecl;external LIBXSLT_SO;
-
-  function xsltGetKey(ctxt:xsltTransformContextPtr; name:PxmlChar; nameURI:PxmlChar; value:PxmlChar):xmlNodeSetPtr;cdecl;external LIBXSLT_SO;
-
-  procedure xsltInitCtxtKeys(ctxt:xsltTransformContextPtr; doc:xsltDocumentPtr);cdecl;external LIBXSLT_SO;
-
-  procedure xsltFreeKeys(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
-
-  procedure xsltFreeDocumentKeys(doc:xsltDocumentPtr);cdecl;external LIBXSLT_SO;
+	 daniel@veillard.com
+}
+function  xsltAddKey(style:xsltStylesheetPtr; name:PxmlChar; nameURI:PxmlChar; match:PxmlChar; use:PxmlChar; inst:xmlNodePtr):longint;cdecl;external LIBXSLT_SO;
+function  xsltGetKey(ctxt:xsltTransformContextPtr; name:PxmlChar; nameURI:PxmlChar; value:PxmlChar):xmlNodeSetPtr;cdecl;external LIBXSLT_SO;
+procedure xsltInitCtxtKeys(ctxt:xsltTransformContextPtr; doc:xsltDocumentPtr);cdecl;external LIBXSLT_SO;
+procedure xsltFreeKeys(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
+procedure xsltFreeDocumentKeys(doc:xsltDocumentPtr);cdecl;external LIBXSLT_SO;
 

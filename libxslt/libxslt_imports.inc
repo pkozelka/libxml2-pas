@@ -26,18 +26,13 @@
      a macro to import pointers from the stylesheet cascading order
     }
 
-    {
-       Module interfaces
-      }
-
-    procedure xsltParseStylesheetInclude(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
-
-    function xsltNextImport(style:xsltStylesheetPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-
-    function xsltNeedElemSpaceHandling(ctxt:xsltTransformContextPtr):longint;cdecl;external LIBXSLT_SO;
-
-    function xsltFindElemSpaceHandling(ctxt:xsltTransformContextPtr; node:xmlNodePtr):longint;cdecl;external LIBXSLT_SO;
-
-    function xsltFindTemplate(ctxt:xsltTransformContextPtr; name:PxmlChar; nameURI:PxmlChar):xsltTemplatePtr;cdecl;external LIBXSLT_SO;
+{
+	Module interfaces
+}
+procedure xsltParseStylesheetInclude(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
+function  xsltNextImport(style:xsltStylesheetPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function  xsltNeedElemSpaceHandling(ctxt:xsltTransformContextPtr):longint;cdecl;external LIBXSLT_SO;
+function  xsltFindElemSpaceHandling(ctxt:xsltTransformContextPtr; node:xmlNodePtr):longint;cdecl;external LIBXSLT_SO;
+function  xsltFindTemplate(ctxt:xsltTransformContextPtr; name:PxmlChar; nameURI:PxmlChar):xsltTemplatePtr;cdecl;external LIBXSLT_SO;
 
 

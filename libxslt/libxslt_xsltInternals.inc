@@ -547,29 +547,17 @@ in declaration at line 454 *)
     						   xmlChar  name);
       }
 
-    function xsltNewStylesheet:xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-
-    function xsltParseStylesheetFile(filename:PxmlChar):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-
-    procedure xsltFreeStylesheet(sheet:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
-
-    function xsltIsBlank(str:PxmlChar):longint;cdecl;external LIBXSLT_SO;
-
-    procedure xsltFreeStackElemList(elem:xsltStackElemPtr);cdecl;external LIBXSLT_SO;
-
-    function xsltDecimalFormatGetByName(sheet:xsltStylesheetPtr; name:PxmlChar):xsltDecimalFormatPtr;cdecl;external LIBXSLT_SO;
-
-    function xsltParseStylesheetProcess(ret:xsltStylesheetPtr; doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-
-    procedure xsltParseStylesheetOutput(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
-
-    function xsltParseStylesheetDoc(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-
-    function xsltLoadStylesheetPI(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
-
-    procedure xsltNumberFormat(ctxt:xsltTransformContextPtr; data:xsltNumberDataPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
-
-    function xsltFormatNumberConversion(self:xsltDecimalFormatPtr; format:PxmlChar; number:double; result:PPxmlChar):xmlXPathError;cdecl;external LIBXSLT_SO;
-
-    procedure xsltParseTemplateContent(style:xsltStylesheetPtr; templ:xmlNodePtr);cdecl;external LIBXSLT_SO;
+function xsltNewStylesheet:xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function xsltParseStylesheetFile(filename:PxmlChar):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+procedure xsltFreeStylesheet(sheet:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
+function xsltIsBlank(str:PxmlChar):longint;cdecl;external LIBXSLT_SO;
+procedure xsltFreeStackElemList(elem:xsltStackElemPtr);cdecl;external LIBXSLT_SO;
+function xsltDecimalFormatGetByName(sheet:xsltStylesheetPtr; name:PxmlChar):xsltDecimalFormatPtr;cdecl;external LIBXSLT_SO;
+function xsltParseStylesheetProcess(ret:xsltStylesheetPtr; doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+procedure xsltParseStylesheetOutput(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
+function xsltParseStylesheetDoc(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+function xsltLoadStylesheetPI(doc:xmlDocPtr):xsltStylesheetPtr;cdecl;external LIBXSLT_SO;
+procedure xsltNumberFormat(ctxt:xsltTransformContextPtr; data:xsltNumberDataPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
+function xsltFormatNumberConversion(self:xsltDecimalFormatPtr; format:PxmlChar; number:double; result:PPxmlChar):xmlXPathError;cdecl;external LIBXSLT_SO;
+procedure xsltParseTemplateContent(style:xsltStylesheetPtr; templ:xmlNodePtr);cdecl;external LIBXSLT_SO;
 

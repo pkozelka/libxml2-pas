@@ -24,13 +24,9 @@
   {
      Interfaces
     }
-
-   // var
-       //xsltExtMarker : PxmlChar;cvar;external LIBXSLT_SO 'xsltExtMarker';
-
-  function xsltDocumentComp(style:xsltStylesheetPtr; inst:xmlNodePtr; function_:xsltTransformFunction):xsltElemPreCompPtr;cdecl;external LIBXSLT_SO;
-
-  procedure xsltStylePreCompute(style:xsltStylesheetPtr; inst:xmlNodePtr);cdecl;external LIBXSLT_SO;
-
-  procedure xsltFreeStylePreComps(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
+	 // var
+			 //xsltExtMarker : PxmlChar;cvar;external LIBXSLT_SO 'xsltExtMarker';
+function xsltDocumentComp(style:xsltStylesheetPtr; inst:xmlNodePtr; function_:xsltTransformFunction):xsltElemPreCompPtr;cdecl;external LIBXSLT_SO;
+procedure xsltStylePreCompute(style:xsltStylesheetPtr; inst:xmlNodePtr);cdecl;external LIBXSLT_SO;
+procedure xsltFreeStylePreComps(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
 

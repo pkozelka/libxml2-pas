@@ -21,11 +21,7 @@
      daniel@veillard.com
     }
 
-  procedure xsltParseStylesheetAttributeSet(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
-
-  procedure xsltFreeAttributeSetsHashes(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
-
-  procedure xsltApplyAttributeSet(ctxt:xsltTransformContextPtr; node:xmlNodePtr; inst:xmlNodePtr; attributes:PxmlChar);cdecl;external LIBXSLT_SO;
-
-
+procedure xsltParseStylesheetAttributeSet(style:xsltStylesheetPtr; cur:xmlNodePtr);cdecl;external LIBXSLT_SO;
+procedure xsltFreeAttributeSetsHashes(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
+procedure xsltApplyAttributeSet(ctxt:xsltTransformContextPtr; node:xmlNodePtr; inst:xmlNodePtr; attributes:PxmlChar);cdecl;external LIBXSLT_SO;
 

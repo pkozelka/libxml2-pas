@@ -14,22 +14,16 @@
     ------------------------------------------------------------------------------
 }
 {
-     namespaces.h: interface for the XSLT namespace handling
+	 namespaces.h: interface for the XSLT namespace handling
     
-     See Copyright for the status of this software.
-    
-     daniel@veillard.com
-    }
+	 See Copyright for the status of this software.
 
-  procedure xsltNamespaceAlias(style:xsltStylesheetPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
-
-  function xsltGetNamespace(ctxt:xsltTransformContextPtr; cur:xmlNodePtr; ns:xmlNsPtr; out:xmlNodePtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
-
-  function xsltGetSpecialNamespace(ctxt:xsltTransformContextPtr; cur:xmlNodePtr; URI:PxmlChar; prefix:PxmlChar; out:xmlNodePtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
-
-  function xsltCopyNamespace(ctxt:xsltTransformContextPtr; node:xmlNodePtr; cur:xmlNsPtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
-
-  function xsltCopyNamespaceList(ctxt:xsltTransformContextPtr; node:xmlNodePtr; cur:xmlNsPtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
-
-  procedure xsltFreeNamespaceAliasHashes(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
+	 daniel@veillard.com
+}
+procedure xsltNamespaceAlias(style:xsltStylesheetPtr; node:xmlNodePtr);cdecl;external LIBXSLT_SO;
+function xsltGetNamespace(ctxt:xsltTransformContextPtr; cur:xmlNodePtr; ns:xmlNsPtr; out:xmlNodePtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
+function xsltGetSpecialNamespace(ctxt:xsltTransformContextPtr; cur:xmlNodePtr; URI:PxmlChar; prefix:PxmlChar; out:xmlNodePtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
+function xsltCopyNamespace(ctxt:xsltTransformContextPtr; node:xmlNodePtr; cur:xmlNsPtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
+function xsltCopyNamespaceList(ctxt:xsltTransformContextPtr; node:xmlNodePtr; cur:xmlNsPtr):xmlNsPtr;cdecl;external LIBXSLT_SO;
+procedure xsltFreeNamespaceAliasHashes(style:xsltStylesheetPtr);cdecl;external LIBXSLT_SO;
 

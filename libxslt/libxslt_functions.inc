@@ -33,30 +33,23 @@
   (xmlXPathFuncLookupFunc) xsltXPathFunctionLookup, (void //(ctxt->xpathCtxt));
   in declaration at line 26 *)
 
-    function xsltXPathFunctionLookup(ctxt:xmlXPathContextPtr; name:PxmlChar; ns_uri:PxmlChar):xmlXPathFunction;cdecl;external LIBXSLT_SO;
+function xsltXPathFunctionLookup(ctxt:xmlXPathContextPtr; name:PxmlChar; ns_uri:PxmlChar):xmlXPathFunction;cdecl;external LIBXSLT_SO;
 
-    {
-       Interfaces for the functions implementations
-      }
-    procedure xsltDocumentFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+{
+	Interfaces for the functions implementations
+}
+procedure xsltDocumentFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+procedure xsltKeyFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+procedure xsltUnparsedEntityURIFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+procedure xsltFormatNumberFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+procedure xsltGenerateIdFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+procedure xsltSystemPropertyFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+procedure xsltElementAvailableFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
+procedure xsltFunctionAvailableFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
 
-    procedure xsltKeyFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
-
-    procedure xsltUnparsedEntityURIFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
-
-    procedure xsltFormatNumberFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
-
-    procedure xsltGenerateIdFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
-
-    procedure xsltSystemPropertyFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
-
-    procedure xsltElementAvailableFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
-
-    procedure xsltFunctionAvailableFunction(ctxt:xmlXPathParserContextPtr; nargs:longint);cdecl;external LIBXSLT_SO;
-
-    {
-       And the registration
-      }
-    procedure xsltRegisterAllFunctions(ctxt:xmlXPathContextPtr);cdecl;external LIBXSLT_SO;
+{
+	And the registration
+}
+procedure xsltRegisterAllFunctions(ctxt:xmlXPathContextPtr);cdecl;external LIBXSLT_SO;
 
 
