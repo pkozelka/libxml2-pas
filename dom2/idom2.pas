@@ -1069,12 +1069,12 @@ type
     function  get_Item(const aIndex: integer): IDomDocumentBuilderFactory;
 
     property Count: integer read get_Count;
-    property Item: IDomDocumentBuilderFactory read get_Item;
+    property Item[const aIndex: integer]: IDomDocumentBuilderFactory read get_Item;
   end;
 
   (*
    * Exception class for Vendor Registration
-  *)
+   *)
   EDomVendorRegisterException = class(Exception);
 
   (*
@@ -1082,21 +1082,26 @@ type
    * @Param AFactory the factory that need to be registered.
    * @Raise EDomVendorRegisterException if a factory has already registered with
    * the same AVendorID.
-  *)
+   *)
   procedure registerDomVendorFactory(factory : IDomDocumentBuilderFactory);
 
   (*
    * get a DomcumentBuilderFactory based on its Vendor  ID
    * @Param AVendorID the ID that uniquely specifies the DOM implementation
    * @Raise EDomVendorRegisterException if AVendorID does not exist
-  *)
-  function getDocumentBuilderFactory(vendorID : DomString) :
-          IDomDocumentBuilderFactory;
+   *)
+  function getDocumentBuilderFactory(vendorID : DomString) : IDomDocumentBuilderFactory;
 
   (*
    * equivalent to get_DocumentBuilderFactory. for compatibillity with Borland
-  *)
+   *)
   function getDOM(const vendorDesc : string = '') : IDOMImplementation;
+
+  (**
+   * provides access to the list of all registered vendors.
+   * @return  interface enabling to enumerate vendors.
+   *)
+  function getDomVendorList: IDomVendorList;
 
 implementation
 
@@ -1105,15 +1110,17 @@ type
   (*
    * Register for registering different DocumentBuilderFactories. Each
    * DocumentBuilderFactory is identified by a vendorID.
-  *)
-  TDomVendorRegister = class(TObject)
+   *)
+  TDomVendorRegister = class(TInterfacedObject, IDomVendorList)
     private
       (* list of DocumentBuilderFactories *)
       fFactoryList : TInterfaceList;
-
+    protected //IDomVendorList
+      function  get_Count: integer;
+      function  get_Item(const aIndex: integer): IDomDocumentBuilderFactory;
     public
-      constructor create;
-      destructor destroy; override;
+      constructor Create;
+      destructor Destroy; override;
 
       (*
        * add a new DocumentBuilderFactory to the list.
@@ -1137,15 +1144,20 @@ var
   gDomVendorRegister : TDomVendorRegister;
 
 (******************************************************************************)
-constructor TDomVendorRegister.create;
+
+{ TDomVendorRegister }
+
+constructor TDomVendorRegister.Create;
 begin
-  inherited create;
+  inherited Create;
   fFactoryList := TInterfaceList.Create;
+  _AddRef; // one extra lock needed
 end;
 
-destructor TDomVendorRegister.destroy;
+destructor TDomVendorRegister.Destroy;
 begin
-  fFactoryList.free;
+  fFactoryList.Free;
+  inherited Destroy;
 end;
 
 procedure TDomVendorRegister.add(
@@ -1157,28 +1169,32 @@ begin
   fFactoryList.add(domDocumentBuilderFactory);
 end;
 
-function TDomVendorRegister.get_Factory(
-        vendorID : DomString) : IDomDocumentBuilderFactory;
+function TDomVendorRegister.get_Count: integer;
+begin
+  Result := fFactoryList.Count;
+end;
+
+function TDomVendorRegister.get_Factory(vendorID : DomString) : IDomDocumentBuilderFactory;
 var
   i : Integer;
 begin
-  for i := 0 to fFactoryList.Count - 1 do
-  begin
+  for i := 0 to fFactoryList.Count - 1 do begin
+    Result := fFactoryList.items[i] as IDomDocumentBuilderFactory;
     {check the name}
-    if (fFactoryList.items[i] as IDomDocumentBuilderFactory).vendorID
-      =  vendorID then
-    begin
-      result := fFactoryList.items[i] as IDomDocumentBuilderFactory;
-      exit;
-    end;
+    if (Result.vendorID = vendorID) then exit;
   end;
-  result := nil;
+  Result := nil;
+end;
+
+function TDomVendorRegister.get_Item(const aIndex: integer): IDomDocumentBuilderFactory;
+begin
+  Result := fFactoryList[aIndex] as IDomDocumentBuilderFactory;
 end;
 
 (******************************************************************************)
 (*
  * returns the global TDomVendorRegister (create on demand)
-*)
+ *)
 function get_DomVendorRegisterSingleton : TDomVendorRegister;
 begin
   if gDomVendorRegister = nil then
@@ -1186,6 +1202,11 @@ begin
     gDomVendorRegister := TDomVendorRegister.create;
   end;
   result := gDomVendorRegister;
+end;
+
+function getDomVendorList: IDomVendorList;
+begin
+  Result := get_DomVendorRegisterSingleton as IDomVendorList;
 end;
 
 (******************************************************************************)
