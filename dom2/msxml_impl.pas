@@ -531,30 +531,46 @@ begin
 end;
 
 
-
-function TryObjectCreate(const GuidList: array of TGuid): IUnknown;
+(*
+ * Tries to create a DOM object from a list of guids.
+*)
+function tryObjectCreate(const guidList: array of TGuid): IUnknown;
 var
-  I: Integer;
-  Status: HResult;
+  i      : Integer;
+  status : HResult;
 begin
-  for I := Low(GuidList) to High(GuidList) do
+  for i := low(guidList) to high(guidList) do
   begin
-    Status := CoCreateInstance(GuidList[I], nil, CLSCTX_INPROC_SERVER or
+    status := CoCreateInstance(guidList[I], nil, CLSCTX_INPROC_SERVER or
       CLSCTX_LOCAL_SERVER, IDispatch, Result);
-    if Status = S_OK then Break;
-    if Status <> REGDB_E_CLASSNOTREG then
-      OleCheck(Status);
+    if status = S_OK then break;
+    if status <> REGDB_E_CLASSNOTREG then
+      OleCheck(status);
   end;
 end;
 
-function CreateDOMDocument: IXMLDOMDocument;
+function createDOMDocument(freeThreaded : Boolean) : IXMLDOMDocument;
 const
- CLASS_DOMDocument40: TGUID = '{88D969C0-F192-11D4-A65F-0040963251E5}';
+ CLASS_DOMDocument40 : TGUID = '{88D969C0-F192-11D4-A65F-0040963251E5}';
+ CLASS_FreeThreadedDOMDocument40 : TGUID = '{00000000-0000-0000-0000-000000000000}';
+ // XXX TO-DO add correct free threaded 40 GUID !!!!
 begin
-  Result := TryObjectCreate([CLASS_DOMDocument40, CLASS_DOMDocument30, CLASS_DOMDocument26])
-    as IXMLDOMDocument;
-  if not Assigned(Result) then
-    raise EDOMException.Create(etNotFoundErr,'MSDOM not installed!');
+  if not freeThreaded then
+    begin
+      result := tryObjectCreate(
+              [CLASS_DOMDocument40,
+               CLASS_DOMDocument30,
+               CLASS_DOMDocument26]) as IXMLDOMDocument;
+    end
+  else
+    begin
+      result := tryObjectCreate(
+              [CLASS_FreeThreadedDOMDocument40,
+               CLASS_FreeThreadedDOMDocument30,
+               CLASS_FreeThreadedDOMDocument26]) as IXMLDOMDocument;
+    end;
+  if not assigned(result) then
+    raise EDOMException.create(etNotFoundErr,'MSDOM not installed!');
 end;
 
 
@@ -600,17 +616,12 @@ begin
   result:=fDOMImplementation;
 end;
 
-function TMSXMLDocumentBuilder.NewDocument : IDomDocument;
+function TMSXMLDocumentBuilder.newDocument : IDomDocument;
 begin
-  //document:= CreateDOMDocument;
-  //Result := TMSXMLDocument.Create(document);
-  if fFreeThreading then
-    //result := TMSXMLDocument.create(CoDOMFreeThreadedDocument.create)
-  else
-    result := TMSXMLDocument.create(CreateDOMDocument);
+  result := TMSXMLDocument.create(createDOMDocument(fFreeThreading));
 end;
 
-function TMSXMLDocumentBuilder.Parse(const xml : DomString) : IDomDocument;
+function TMSXMLDocumentBuilder.parse(const xml : DomString) : IDomDocument;
 var
   document : IDomDocument;
 begin
@@ -671,9 +682,9 @@ function TMSXMLImplementation.hasFeature(
         const version : DomString) : Boolean;
 begin
   //todo: check version of msdom installed
-  if (uppercase(feature) ='CORE') and (version = '2.0')
-    then result:=true
-    else result:=false;
+  if (uppercase(feature) = 'CORE') and (version = '2.0')
+    then result := true
+    else result := false;
 end;
 
 
@@ -693,15 +704,9 @@ function TMSXMLImplementation.createDocument(
         docType             : IDomDocumentType) : IDomDocument;
 var
   document: IXMLDOMDocument;
-  fFreeThreading: boolean;
 begin
-  //fFreeThreading:=false; //TODO: correct this line
-  //if fFreeThreading then
-    //document := CoDOMFreeThreadedDocument.create
-  //else
-  //  document := CoDOMDocument.create;
-  document:= CreateDOMDocument;
-  Result := TMSXMLDocument.Create(document);
+  document := createDOMDocument(fFreeThreading);
+  result := TMSXMLDocument.create(document);
 end;
 
 
@@ -1552,18 +1557,15 @@ procedure TMSXMLElement.setAttributeNS(
         const namespaceURI  : DomString;
         const qualifiedName : DomString;
         const value         : DomString);
-//begin
-//  (* namespace not supported *)
-//  setAttribute(qualifiedName, value);
-//end;
-
 var
-  AttrNode: IXMLDOMAttribute;
+  attrNode : IXMLDOMAttribute;
 begin
-  AttrNode := fMSElement.ownerDocument.createNode(NODE_ATTRIBUTE, qualifiedName,
-    namespaceURI) as IXMLDOMAttribute;
-  AttrNode.nodeValue := value;
-  fMSElement.setAttributeNode(AttrNode);
+  attrNode := fMSElement.ownerDocument.createNode(
+          NODE_ATTRIBUTE,
+          qualifiedName,
+          namespaceURI) as IXMLDOMAttribute;
+  attrNode.nodeValue := value;
+  fMSElement.setAttributeNode(attrNode);
 end;
 
 
@@ -1572,19 +1574,18 @@ procedure TMSXMLElement.removeAttributeNS(
         const namespaceURI : DomString;
         const localName    : DomString);
 begin
-  (* namespace not supported *)
-  removeAttribute(localName);
+  fMSElement.attributes.removeQualifiedItem(localName, namespaceURI);
 end;
 
 function TMSXMLElement.getAttributeNodeNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomAttr;
-var attr: IXMLDomNode;
+var attr : IXMLDomNode;
 begin
-  attr:=fMSElement.Attributes.getQualifiedItem(localName, namespaceURI);
-  if attr<>nil
-    then Result := createXMLNode(attr) as IDOMAttr
-    else Result := nil;
+  attr := fMSElement.attributes.getQualifiedItem(localName, namespaceURI);
+  if attr <> nil
+    then result := createXMLNode(attr) as IDOMAttr
+    else result := nil;
 end;
 
 function TMSXMLElement.setAttributeNodeNS(const newAttr : IDomAttr) : IDomAttr;
