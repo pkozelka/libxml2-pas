@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.39 2002-01-15 10:28:28 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.40 2002-01-15 11:27:33 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ type
 		function  hasAttributeNS(const namespaceURI, localName: DOMString): Boolean;
 		procedure normalize;
 	public
-		constructor Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
+		constructor Create(AElement: xmlNodePtr);
 		destructor destroy; override;
 	end;
 
@@ -257,7 +257,7 @@ type
 		function get_internalSubset: DOMString;
 	public
 		property GDocumentType: xmlDtdPtr read GetGDocumentType;
-		constructor Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
+		constructor Create(dtd:xmlDtdPtr);
 		destructor Destroy; override;
 	end;
 
@@ -362,8 +362,10 @@ type
 		procedure appendAttr(attr: xmlAttrPtr);
 		procedure appendNode(node: xmlNodePtr);
 		//
+		function  requestDocPtr: xmlDocPtr;
 		function  GetGDoc: xmlDocPtr;
 		procedure SetGDoc(aNewDoc: xmlDocPtr);
+
 		property  GDoc: xmlDocPtr read GetGDoc write SetGDoc;
 	public
 		constructor Create(GDOMImpl:IDOMImplementation; const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType); overload;
@@ -612,7 +614,7 @@ begin
 	usysid := UTF8Encode(systemId);
 	dtd:=xmlCreateIntSubSet(nil, PChar(uqname), PChar(upubid), PChar(usysid)); //todo: doc!
 	if dtd<>nil
-	then Result := TGDOMDocumentType.Create(dtd, nil) as IDOMDocumentType
+	then Result := TGDOMDocumentType.Create(dtd) as IDOMDocumentType
 	else Result := nil;
 end;
 
@@ -1497,7 +1499,7 @@ begin
 	inherited normalize;
 end;
 
-constructor TGDOMElement.Create(AElement: xmlNodePtr;ADocument:IDOMDocument;freenode:boolean=false);
+constructor TGDOMElement.Create(AElement: xmlNodePtr);
 begin
 	inc(elementcount);
 	inherited create(xmlNodePtr(AElement));
@@ -1554,6 +1556,7 @@ begin
 				end;
 			end;
 			FAttrList.Free;
+			FAttrList := nil;
 		end;
 		if FNodeList<>nil then begin
 			for i:=0 to FNodeList.Count-1 do begin
@@ -1565,22 +1568,25 @@ begin
 				end;
 			end;
 			FNodeList.Free;
+			FNodeList := nil;
 		end;
+		xmlFreeDoc(GDoc);
+		FGNode := nil;
 	end;
-	GDoc._private := nil;
-	xmlFreeDoc(GDoc);
-	dec(doccount);
+	Dec(doccount);
 	inherited Destroy;
 end;
 
 // IDOMDocument
-function TGDOMDocument.get_doctype: IDOMDocumentType;
-var dtd: xmlDtdPtr;
+function TGDOMDocument.get_doctype: IDomDocumentType;
+var
+	dtd: xmlDtdPtr;
 begin
-	 dtd:=GDoc.intSubset;
-	 if dtd <> nil
-		 then result:=TGDOMDocumentType.Create(dtd,self)
-		 else result:=nil;
+	Result := nil;
+	if GDoc=nil then exit;
+	dtd := GDoc.intSubset;
+	if dtd = nil then exit;
+	Result := GetDomObject(dtd) as IDomDocumentType;
 end;
 
 function TGDOMDocument.get_domImplementation: IDOMImplementation;
@@ -1602,7 +1608,7 @@ function TGDOMDocument.createElement(const tagName: DOMString): IDomElement;
 var
 	node: xmlNodePtr;
 begin
-	node := xmlNewDocNode(GDoc,nil, PChar(UTF8Encode(tagName)),nil);
+	node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(tagName)),nil);
 	Result := GetDOMObject(node) as IDomElement;
 end;
 
@@ -1610,7 +1616,7 @@ function TGDOMDocument.createDocumentFragment: IDomDocumentFragment;
 var
 	node: xmlNodePtr;
 begin
-	node := xmlNewDocFragment(GDoc);
+	node := xmlNewDocFragment(requestDocPtr);
 	Result := GetDOMObject(node) as IDomDocumentFragment;
 end;
 
@@ -1618,7 +1624,7 @@ function TGDOMDocument.createTextNode(const data: DOMString): IDomText;
 var
 	node: xmlNodePtr;
 begin
-	node := xmlNewDocText(GDoc, PChar(UTF8Encode(data)));
+	node := xmlNewDocText(requestDocPtr, PChar(UTF8Encode(data)));
 	Result := GetDOMObject(node) as IDomText;
 end;
 
@@ -1626,7 +1632,7 @@ function TGDOMDocument.createComment(const data: DOMString): IDomComment;
 var
 	node: xmlNodePtr;
 begin
-	node := xmlNewDocComment(GDoc, PChar(UTF8Encode(data)));
+	node := xmlNewDocComment(requestDocPtr, PChar(UTF8Encode(data)));
 	Result := GetDOMObject(node) as IDomComment;
 end;
 
@@ -1636,7 +1642,7 @@ var
 	node: xmlNodePtr;
 begin
 	s := UTF8Encode(data);
-	node := xmlNewCDataBlock(GDoc, PChar(s), length(s));
+	node := xmlNewCDataBlock(requestDocPtr, PChar(s), length(s));
 	Result := GetDOMObject(node) as IDomCDataSection;
 end;
 
@@ -1645,6 +1651,7 @@ var
 	pi: xmlNodePtr;
 begin
 	pi := xmlNewPI(PChar(UTF8Encode(target)), PChar(UTF8Encode(data)));
+	pi.doc := requestDocPtr;
 	Result := GetDOMObject(pi) as IDomProcessingInstruction;
 end;
 
@@ -1652,7 +1659,7 @@ function TGDOMDocument.createAttribute(const name: DOMString): IDomAttr;
 var
 	attr: xmlAttrPtr;
 begin
-	attr := xmlNewProp(nil, PChar(UTF8Encode(name)), nil);
+	attr := xmlNewDocProp(requestDocPtr, PChar(UTF8Encode(name)), nil);
 	Result := GetDOMObject(attr) as IDomAttr;
 end;
 
@@ -1660,7 +1667,7 @@ function TGDOMDocument.createEntityReference(const name: DOMString): IDomEntityR
 var
 	node: xmlNodePtr;
 begin
-	node := xmlNewReference(GDoc, PChar(UTF8Encode(name)));
+	node := xmlNewReference(requestDocPtr, PChar(UTF8Encode(name)));
 	Result := GetDOMObject(node) as IDomEntityReference;
 end;
 
@@ -1707,7 +1714,7 @@ begin
 		if deep
 		then recurse:=1
 		else recurse:=0;
-		node:=xmlDocCopyNode(GetGNode(importedNode),GDoc,recurse);
+		node:=xmlDocCopyNode(GetGNode(importedNode), requestDocPtr, recurse);
 		Result := GetDOMObject(node) as IDomNode;
 	end;
 end;
@@ -1756,13 +1763,13 @@ begin
 	if (namespaceURI<>'') then begin
 		uprefix := prefix(qualifiedName);
 		ulocal := localName(qualifiedName);
-		ns := xmlNewNs(FGNode {todo: on demand}, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+		node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(qualifiedName)), nil);
+		ns := xmlNewNs(node, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+		xmlSetNs(node, ns);
 	end else begin
-		ns := nil;
 		ulocal := UTF8Encode(qualifiedName);
+		node := xmlNewDocNode(requestDocPtr, nil, PChar(UTF8Encode(qualifiedName)), nil);
 	end;
-	node := xmlNewDocNode(GDoc, ns, PChar(UTF8Encode(qualifiedName)), nil);
-	xmlSetNs(node, ns);
 	Result := GetDOMObject(node) as IDomElement;
 end;
 
@@ -1775,12 +1782,12 @@ begin
 	if (namespaceURI<>'') then begin
 		uprefix := prefix(qualifiedName);
 		ulocal := localName(qualifiedName);
-		ns := xmlNewNs(FGNode {todo: on demand}, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
+		ns := xmlNewNs(FGNode, PChar(UTF8Encode(namespaceURI)), PChar(uprefix));
 	end else begin
 		ns := nil;
 		ulocal := UTF8Encode(qualifiedName);
 	end;
-	attr := xmlNewNsProp(FGNode, ns, PChar(ulocal), nil);
+	attr := xmlNewNsProp(FGNode, ns, PChar(ulocal), nil); //todo:fix
 	Result := GetDOMObject(attr) as IDomAttr;
 	if attr<>nil then begin
 		FAttrList.Add(attr);
@@ -2119,7 +2126,7 @@ begin
 	result:=xmlDtdPtr(GNode);
 end;
 
-constructor TGDOMDocumentType.Create(dtd:xmlDtdPtr;ADocument:IDOMDocument);
+constructor TGDOMDocumentType.Create(dtd:xmlDtdPtr);
 begin
 	//Create root-node as pascal object
 	inherited Create(xmlNodePtr(dtd));
@@ -2341,6 +2348,23 @@ begin
 		aNewDoc._private := self;
 	end;
 	FGNode := xmlNodePtr(aNewDoc);
+end;
+
+(**
+ * On-demand creation of the underlying document.
+ *)
+function TGDOMDocument.requestDocPtr: xmlDocPtr;
+var
+	doc: xmlDocPtr;
+begin
+	Result := GetGDoc;
+	if Result<>nil then exit; //the document is already created so we have to use it
+	// otherwise, we create the document, using all the parameters specified so far
+
+	//todo: distinguish empty doc, parsing, and push-parsing cases (for async)
+	doc := xmlNewDoc(XML_DEFAULT_VERSION);
+
+	SetGDoc(doc);
 end;
 
 initialization
