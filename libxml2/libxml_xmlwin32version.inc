@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlwin32version.h:1.34:
+// CVS-REV:gnome-xml/include/libxml/xmlwin32version.h:1.35:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -30,21 +30,21 @@ const
    *
    * the version string like "1.2.3"
    *)
-  LIBXML_DOTTED_VERSION = '2.4.21';
+  LIBXML_DOTTED_VERSION = '2.4.22';
 
   (**
    * LIBXML_VERSION:
    *
    * the version number: 1.2.3 value is 1002003
    *)
-  LIBXML_VERSION = 20421;
+  LIBXML_VERSION = 20422;
 
   (**
    * LIBXML_VERSION_STRING:
    *
    * the version number string, 1.2.3 value is "1002003"
    *)
-  LIBXML_VERSION_STRING = '20421';
+  LIBXML_VERSION_STRING = '20422';
 
   (**
    * LIBXML_TEST_VERSION:
@@ -53,7 +53,7 @@ const
    * the version the software has been compiled against
    *)
 
-//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20421);
+//TODO: #define LIBXML_TEST_VERSION xmlCheckVersion(20422);
 
 {$IF False}
 

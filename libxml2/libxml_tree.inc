@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/tree.h:1.108:
+// CVS-REV:gnome-xml/include/libxml/tree.h:1.109:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -481,6 +481,7 @@ procedure xmlFreeDoc(cur: xmlDocPtr); cdecl; external LIBXML2_SO;
 function  xmlNewDocProp(doc: xmlDocPtr; name: PxmlChar; value: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
 function  xmlNewProp(node: xmlNodePtr; name: PxmlChar; value: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
 function  xmlNewNsProp(node: xmlNodePtr; ns: xmlNsPtr; name: PxmlChar; value: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
+function  xmlNewNsPropEatName(node: xmlNodePtr; ns: xmlNsPtr; name: PxmlChar; value: PxmlChar): xmlAttrPtr; cdecl; external LIBXML2_SO;
 procedure xmlFreePropList(cur: xmlAttrPtr); cdecl; external LIBXML2_SO;
 procedure xmlFreeProp(cur: xmlAttrPtr); cdecl; external LIBXML2_SO;
 function  xmlCopyProp(target: xmlNodePtr; cur: xmlAttrPtr): xmlAttrPtr; cdecl; external LIBXML2_SO;
@@ -492,8 +493,10 @@ function  xmlCopyDoc(doc: xmlDocPtr; recursive: Longint): xmlDocPtr; cdecl; exte
  * Creating new nodes.
  *)
 function  xmlNewDocNode(doc: xmlDocPtr; ns: xmlNsPtr; name: PxmlChar; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
+function  xmlNewDocNodeEatName(doc: xmlDocPtr; ns: xmlNsPtr; name: PxmlChar; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlNewDocRawNode(doc: xmlDocPtr; ns: xmlNsPtr; name: PxmlChar; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlNewNode(ns: xmlNsPtr; name: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
+function  xmlNewNodeEatName(ns: xmlNsPtr; name: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO; 
 function  xmlNewChild(parent: xmlNodePtr; ns: xmlNsPtr; name: PxmlChar; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlNewTextChild(parent: xmlNodePtr; ns: xmlNsPtr; name: PxmlChar; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;
 function  xmlNewDocText(doc: xmlDocPtr; content: PxmlChar): xmlNodePtr; cdecl; external LIBXML2_SO;

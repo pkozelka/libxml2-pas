@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/imports.h:1.6:
+// CVS-REV:libxslt/libxslt/imports.h:1.7:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -45,8 +45,8 @@
 (*
  * Module interfaces
  *)
-procedure xsltParseStylesheetImport(style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
-procedure xsltParseStylesheetInclude(style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
+function  xsltParseStylesheetImport(style: xsltStylesheetPtr; cur: xmlNodePtr): Longint; cdecl; external LIBXSLT_SO;
+function  xsltParseStylesheetInclude(style: xsltStylesheetPtr; cur: xmlNodePtr): Longint; cdecl; external LIBXSLT_SO;
 function  xsltNextImport(style: xsltStylesheetPtr): xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
 function  xsltNeedElemSpaceHandling(ctxt: xsltTransformContextPtr): Longint; cdecl; external LIBXSLT_SO;
 function  xsltFindElemSpaceHandling(ctxt: xsltTransformContextPtr; node: xmlNodePtr): Longint; cdecl; external LIBXSLT_SO;

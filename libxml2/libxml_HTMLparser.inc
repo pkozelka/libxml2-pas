@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/HTMLparser.h:1.26:
+// CVS-REV:gnome-xml/include/libxml/HTMLparser.h:1.27:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -64,6 +64,7 @@ function  htmlAutoCloseTag(doc: htmlDocPtr; name: PxmlChar; elem: htmlNodePtr): 
 function  htmlParseEntityRef(ctxt: htmlParserCtxtPtr; str: PPxmlChar): htmlEntityDescPtr; cdecl; external LIBXML2_SO;
 function  htmlParseCharRef(ctxt: htmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO;
 procedure htmlParseElement(ctxt: htmlParserCtxtPtr); cdecl; external LIBXML2_SO;
+function  htmlParseDocument(ctxt: htmlParserCtxtPtr): Longint; cdecl; external LIBXML2_SO; 
 function  htmlSAXParseDoc(cur: PxmlChar; encoding: PChar; sax: htmlSAXHandlerPtr; userData: Pointer): htmlDocPtr; cdecl; external LIBXML2_SO;
 function  htmlParseDoc(cur: PxmlChar; encoding: PChar): htmlDocPtr; cdecl; external LIBXML2_SO;
 function  htmlSAXParseFile(filename: PChar; encoding: PChar; sax: htmlSAXHandlerPtr; userData: Pointer): htmlDocPtr; cdecl; external LIBXML2_SO;

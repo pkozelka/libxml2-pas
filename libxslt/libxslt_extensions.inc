@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/extensions.h:1.12:
+// CVS-REV:libxslt/libxslt/extensions.h:1.13:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -121,4 +121,5 @@ function  xsltPreComputeExtModuleElement(style: xsltStylesheetPtr; inst: xmlNode
  * Test module http: //xmlsoft.org/XSLT/
  *)
 procedure xsltRegisterTestModule; cdecl; external LIBXSLT_SO;
+procedure xsltDebugDumpExtensions(output: PLibXml2File); cdecl; external LIBXSLT_SO;
 

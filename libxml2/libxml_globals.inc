@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/globals.h:1.7:
+// CVS-REV:gnome-xml/include/libxml/globals.h:1.8:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -49,6 +49,7 @@ type
     xmlPedanticParserDefaultValue: Longint;
     xmlSaveNoEmptyTags: Longint;
     xmlIndentTreeOutput: Longint;
+    xmlTreeIndentString: PChar;
   end;
 
 procedure xmlInitializeGlobalState(gs: xmlGlobalStatePtr); cdecl; external LIBXML2_SO;
@@ -262,6 +263,16 @@ in define line 238 *)
 in declaration at line 241 *)
 {$ENDIF}
 {$IFDEF LIBXML_THREAD_ENABLED}
+
+(*
+extern const char * *__xmlTreeIndentString(void);
+#ifdef LIBXML_THREAD_ENABLED
+#define xmlTreeIndentString \
+( *(__xmlTreeIndentString()))
+#else
+LIBXML_DLL_IMPORT extern const char * xmlTreeIndentString;
+#endif
+*)
 
 //[pk] function __xmlKeepBlanksDefaultValue:^Longint;cdecl;external LIBXML2_SO;
 (* error

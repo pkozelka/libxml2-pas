@@ -1,4 +1,4 @@
-// CVS-REV:libxslt/libxslt/xsltutils.h:1.28:
+// CVS-REV:libxslt/libxslt/xsltutils.h:1.29:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -119,6 +119,7 @@ function  xsltSaveResultTo(buf: xmlOutputBufferPtr; result: xmlDocPtr; style: xs
 function  xsltSaveResultToFilename(URI: Pchar; result: xmlDocPtr; style: xsltStylesheetPtr; compression: Longint): Longint; cdecl; external LIBXSLT_SO;
 function  xsltSaveResultToFile(var file_: TextFile; result: xmlDocPtr; style: xsltStylesheetPtr): Longint; cdecl; external LIBXSLT_SO;
 function  xsltSaveResultToFd(fd: Longint; result: xmlDocPtr; style: xsltStylesheetPtr): Longint; cdecl; external LIBXSLT_SO;
+function  xsltSaveResultToString(doc_txt_ptr: PPxmlChar; doc_txt_len: PLongint; result: xmlDocPtr; style: xsltStylesheetPtr): Longint; cdecl; external LIBXML2_SO;
 
 (*
  * Profiling.

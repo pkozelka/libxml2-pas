@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xmlIO.h:1.35:
+// CVS-REV:gnome-xml/include/libxml/xmlIO.h:1.36:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -179,4 +179,32 @@ procedure xmlRegisterHTTPPostCallbacks; cdecl; external LIBXML2_SO;
 { [pk] declared in libxml2.pas
 function  xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
 }
+
+(**
+ * Default 'file://' protocol callbacks
+ *)
+function xmlFileMatch(filename: Pchar): Longint; cdecl; external LIBXML2_SO;
+function xmlFileOpen(filename: Pchar): Pointer; cdecl; external LIBXML2_SO;
+function xmlFileRead(context: Pointer; buffer: Pchar; len: Longint): Longint; cdecl; external LIBXML2_SO;
+function xmlFileClose(context: Pointer): Longint; cdecl; external LIBXML2_SO;
+
+(**
+ * Default 'http://' protocol callbacks
+ *)
+{$IFDEF LIBXML_HTTP_ENABLED}
+function xmlIOHTTPMatch(filename: Pchar): Longint; cdecl; external LIBXML2_SO;
+function xmlIOHTTPOpen(filename: Pchar): Pointer; cdecl; external LIBXML2_SO;
+function xmlIOHTTPRead(context: Pointer; buffer: Pchar; len: Longint): Longint; cdecl; external LIBXML2_SO;
+function xmlIOHTTPClose(context: Pointer): Longint; cdecl; external LIBXML2_SO;
+{$ENDIF} // LIBXML_HTTP_ENABLED
+
+(**
+ * Default 'ftp://' protocol callbacks
+ *)
+{$IFDEF LIBXML_FTP_ENABLED }
+function xmlIOFTPMatch(filename: Pchar): Longint; cdecl; external LIBXML2_SO;
+function xmlIOFTPOpen(filename: Pchar): Pointer; cdecl; external LIBXML2_SO;
+function xmlIOFTPRead(context: Pointer; buffer: Pchar; len: Longint): Longint; cdecl; external LIBXML2_SO;
+function xmlIOFTPClose(context: Pointer): Longint; cdecl; external LIBXML2_SO;
+{$ENDIF} // LIBXML_FTP_ENABLED
 

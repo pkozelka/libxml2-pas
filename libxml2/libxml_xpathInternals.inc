@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/xpathInternals.h:1.30:
+// CVS-REV:gnome-xml/include/libxml/xpathInternals.h:1.32:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
@@ -423,6 +423,7 @@ function  xmlXPathNewNodeSet(val: xmlNodePtr): xmlXPathObjectPtr; cdecl; externa
 function  xmlXPathNewValueTree(val: xmlNodePtr): xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
 procedure xmlXPathNodeSetAdd(cur: xmlNodeSetPtr; val: xmlNodePtr); cdecl; external LIBXML2_SO;
 procedure xmlXPathNodeSetAddUnique(cur: xmlNodeSetPtr; val: xmlNodePtr); cdecl; external LIBXML2_SO;
+procedure xmlXPathNodeSetAddNs(cur: xmlNodeSetPtr; node: xmlNodePtr; ns: xmlNsPtr); cdecl; external LIBXML2_SO;
 procedure xmlXPathNodeSetSort(nodeset: xmlNodeSetPtr); cdecl; external LIBXML2_SO;
 procedure xmlXPathRoot(ctxt: xmlXPathParserContextPtr); cdecl; external LIBXML2_SO;
 procedure xmlXPathEvalExpr(ctxt: xmlXPathParserContextPtr); cdecl; external LIBXML2_SO;
@@ -497,4 +498,9 @@ procedure xmlXPathFloorFunction(ctxt: xmlXPathParserContextPtr; nargs: Longint);
 procedure xmlXPathCeilingFunction(ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXML2_SO;
 procedure xmlXPathRoundFunction(ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXML2_SO;
 procedure xmlXPathBooleanFunction(ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXML2_SO;
+
+(**
+ * Really internal functions
+ *)
+procedure xmlXPathNodeSetFreeNs(ns: xmlNsPtr); cdecl; external LIBXML2_SO;
 
