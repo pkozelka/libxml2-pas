@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.105 2002-02-10 16:29:12 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.106 2002-02-10 22:40:32 pkozelka Exp $
 {
     ------------------------------------------------------------------------------
     This unit is an object-oriented wrapper for libxml2.
@@ -25,17 +25,6 @@ unit libxmldom;
     ------------------------------------------------------------------------------
 }
 
-// implemented methods:
-// ====================
-// see tests_libxml2.txt
-
-// Partly supported by libxml2:
-// IDomPersist
-//
-// Not Supported by libxml2:
-// IDomNodeEx, IDomParseError (extended interfaces, not part of dom-spec)
-// Attr.ownerElement
-
 interface
 
 uses
@@ -44,7 +33,9 @@ uses
 {$endif}
   classes,
   idom2,
+  idom_experimental,
   libxml2,
+  libxml_impl_utils,
   sysutils;
 
 const
@@ -473,17 +464,7 @@ type
     destructor Destroy; override;
   end;
 
-var
-  doccount: integer=0;
-  domcount: integer=0;
-  nodecount: integer=0;
-  elementcount: integer=0;
-
 implementation
-
-resourcestring
-  SNodeExpected = 'Node cannot be null';
-  SGDOMNotInstalled = 'GDOME2 is not installed';
 
 const
   IMPLEMENTATION_FEATURES: array [0..9] of DomString = (
@@ -496,51 +477,6 @@ const
   DEFAULT_IMPL_FREE_THREADED = false;
 var
   GDOMImplementation: array[boolean] of IDomImplementation = (nil, nil);
-
-function ErrorString(err:integer):String;
-begin
-  case err of
-    INDEX_SIZE_ERR: Result:='INDEX_SIZE_ERR';
-    DOMSTRING_SIZE_ERR: Result:='DOMSTRING_SIZE_ERR';
-    HIERARCHY_REQUEST_ERR: Result:='HIERARCHY_REQUEST_ERR';
-    WRONG_DOCUMENT_ERR: Result:='WRONG_DOCUMENT_ERR';
-    INVALID_CHARACTER_ERR: Result:='INVALID_CHARACTER_ERR';
-    NO_DATA_ALLOWED_ERR: Result:='NO_DATA_ALLOWED_ERR';
-    NO_MODIFICATION_ALLOWED_ERR: Result:='NO_MODIFICATION_ALLOWED_ERR';
-    NOT_FOUND_ERR: Result:='NOT_FOUND_ERR';
-    NOT_SUPPORTED_ERR: Result:='NOT_SUPPORTED_ERR';
-    INUSE_ATTRIBUTE_ERR: Result:='INUSE_ATTRIBUTE_ERR';
-    INVALID_STATE_ERR: Result:='INVALID_STATE_ERR';
-    SYNTAX_ERR: Result:='SYNTAX_ERR';
-    INVALID_MODIFICATION_ERR: Result:='INVALID_MODIFICATION_ERR';
-    NAMESPACE_ERR: Result:='NAMESPACE_ERR';
-    INVALID_ACCESS_ERR: Result:='INVALID_ACCESS_ERR';
-    20: Result:='SaveXMLToMemory_ERR';
-    21: Result:='NotSupportedByLibxmldom_ERR';
-    22: Result:='SaveXMLToDisk_ERR';
-    100: Result:='LIBXML2_NULL_POINTER_ERR';
-    101: Result:='INVALID_NODE_SET_ERR';
-    102: Result:='PARSE_ERR';
-  else
-    Result:='Unknown error no: '+inttostr(err);
-  end;
-end;
-
-(**
- * Checks if the condition is true, and raises specified exception if not.
- *)
-procedure DomAssert1(aCondition: boolean; aErrorCode:integer; aMsg: WideString; aLocation: String);
-begin
-  if aErrorCode=0 then exit;
-  if aCondition then exit;
-  if aMsg='' then begin
-    aMsg := ErrorString(aErrorCode);
-  end;
-  if (aLocation<>'') then begin
-    aMsg := 'in class '+aLocation+': '+aMsg;
-  end;
-  raise EDomException.Create(aErrorCode, aMsg);
-end;
 
 function GetDomObject(aNode: pointer): IUnknown;
 const
@@ -594,45 +530,8 @@ end;
 
 function GetGNode(const aNode: IDomNode): xmlNodePtr;
 begin
-  DomAssert1(Assigned(aNode), INVALID_ACCESS_ERR, SNodeExpected, 'GetGNode()');
+  DomAssert1(Assigned(aNode), INVALID_ACCESS_ERR, 'Node cannot be null', 'GetGNode()');
   Result := (aNode as ILibXml2Node).LibXml2NodePtr;
-end;
-
-function IsReadOnlyNode(node:xmlNodePtr): boolean;
-begin
-  if node<>nil
-    then  case node.type_ of
-      XML_NOTATION_NODE,XML_ENTITY_NODE,XML_ENTITY_DECL: Result:=true;
-    else
-      Result:=false;
-    end
-  else
-    Result:=false;
-end;
-
-function canAppendNode(priv,newPriv:xmlNodePtr): boolean;
-//var
-//	new_type: integer;
-begin
-//ToDo:
-//Finish the translation from C
-//	if newPriv<>nil
-//		then new_type:=newPriv.type_;
-  Result:=true;
-end;
-
-procedure SplitQName(aQName: String; out aPrefix, aLocalName: String);
-var
-	n: integer;
-begin
-	n := Pos(':', aQName);
-	if (n>0) then begin
-		aPrefix := Copy(aQName, 1, n-1);
-		aLocalName := Copy(aQName, n+1, Length(aQName));
-	end else begin
-		aPrefix := '';
-		aLocalName := aQName;
-	end;
 end;
 
 (**
@@ -677,71 +576,6 @@ begin
   if (idx>0) then begin
     doc.FlyingNodes.Delete(idx);
   end;
-end;
-
-(**
- * [ This function will later be submitted in C to xml@gnome.org
- *   Note that order-preserving implementation will have to be posted.
- *   ]
- * Sets an existing attribute node into an element property list.
- * Returns the previous attribute or NULL.
- *)
-function xmlSetPropNode(elem: xmlNodePtr; attr: xmlAttrPtr): xmlAttrPtr;
-begin
-  if (attr.ns=nil) then begin
-    Result := xmlHasProp(elem, attr.name);
-  end else begin
-    Result := xmlHasNsProp(elem, attr.name, attr.ns.href);
-  end;
-  if (Result<>nil) then begin
-    xmlUnlinkNode(xmlNodePtr(Result));
-  end;
-  xmlAddChild(elem, xmlNodePtr(attr));
-  elem.nsDef := attr.ns; //DIRTY
-end;
-
-function isNameChar(c: Longint): boolean;
-begin
-  Result := true;
-  if xmlIsDigit(c) then exit;
-  if xmlIsBaseChar(c) then exit;
-  case c of
-    Ord('.'),
-    Ord('-'),
-    Ord('_'),
-    Ord(':'): exit;
-  end;
-  if xmlIsIdeographic(c) then exit;
-  if xmlIsCombining(c) then exit;
-  if xmlIsExtender(c) then exit;
-  Result := false;
-end;
-
-function isNCName(aStr: DomString): boolean;
-var
-  i: integer;
-begin
-  Result := false;
-  if (Length(aStr)=0) then exit;
-  if xmlIsDigit(Ord(aStr[1])) then exit;
-  for i:=1 to Length(aStr) do begin
-    if (aStr[i] = ':') then exit;
-    if not isNameChar(Ord(aStr[i])) then exit;
-  end;
-  Result := true;
-end;
-
-function isNamespaceUri(aStr: DomString): boolean;
-var
-  i: integer;
-begin
-  Result := false;
-  if (Length(aStr)=0) then exit;
-  if (not xmlIsLetter(Ord(aStr[1]))) then exit;
-  for i:=2 to Length(aStr) do begin
-    if xmlIsBlank(Ord(aStr[i])) then exit;  //???
-  end;
-  Result := true;
 end;
 
 { TGDomDocumentBuilderFactory }
@@ -957,7 +791,7 @@ begin
       get_ownerDocument._AddRef;
     end;
   end;
-  Inc(nodecount);
+  Inc(GlbNodeCount);
 end;
 
 destructor TGDOMNode.Destroy;
@@ -973,7 +807,7 @@ begin
     FGNode._private := nil;
   end;
   FChildNodes.Free;
-  Dec(nodecount);
+  Dec(GlbNodeCount);
   inherited Destroy;
 end;
 
@@ -1712,12 +1546,12 @@ end;
 constructor TGDOMElement.Create(aLibXml2Node: pointer);
 begin
   inherited Create(aLibXml2Node);
-  Inc(elementcount);
+  Inc(GlbElementCount);
 end;
 
 destructor TGDOMElement.Destroy;
 begin
-  Dec(elementcount);
+  Dec(GlbElementCount);
   inherited Destroy;
 end;
 
@@ -1726,13 +1560,13 @@ end;
 constructor TGDOMDocument.Create(aLibXml2Node: pointer);
 begin
   inherited Create(aLibXml2Node);
-  Inc(doccount);
+  Inc(GlbDocCount);
 end;
 
 destructor TGDOMDocument.Destroy;
 begin
   GDoc := nil;
-  Dec(doccount);
+  Dec(GlbDocCount);
   FFlyingNodes.Free;
   FFlyingNodes := nil;
   inherited Destroy;
