@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.10] hash.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * hash.h: chained hash tables
@@ -26,8 +26,8 @@ type
   (*
    * The hash table
    *)
-	xmlHashTablePtr = ^xmlHashTable;
-	xmlHashTable = record nothing:pointer end;
+  xmlHashTablePtr = ^xmlHashTable;
+  xmlHashTable = record nothing:pointer end;
   (*
    * function types:
    *)
@@ -38,7 +38,7 @@ type
    *
    * Callback to free data from a hash
    *)
-	xmlHashDeallocator = procedure (payload:pointer; name:PxmlChar);cdecl;
+  xmlHashDeallocator = procedure (payload:pointer; name:PxmlChar);cdecl;
   (**
    * xmlHashCopier:
    * @payload:  the data in the hash
@@ -48,7 +48,7 @@ type
    *
    * Returns a copy of the data or NULL in case of error
    *)
-	xmlHashCopier = function (payload:pointer; name:PxmlChar):pointer;cdecl;
+  xmlHashCopier = function (payload:pointer; name:PxmlChar):pointer;cdecl;
   (**
    * xmlHashScanner:
    * @payload:  the data in the hash
@@ -57,7 +57,7 @@ type
    *
    * Callback when scanning data in a hash with the simple scanner
    *)
-	xmlHashScanner = procedure (payload:pointer; data:pointer; name:PxmlChar);cdecl;
+  xmlHashScanner = procedure (payload:pointer; data:pointer; name:PxmlChar);cdecl;
   (**
    * xmlHashScannerFull:
    * @payload:  the data in the hash
@@ -68,7 +68,7 @@ type
    *
    * Callback when scanning data in a hash with the full scanner
    *)
-	xmlHashScannerFull = function (payload:pointer; data:pointer; name,name2,name3:PxmlChar):pointer;cdecl;
+  xmlHashScannerFull = function (payload:pointer; data:pointer; name,name2,name3:PxmlChar):pointer;cdecl;
 
 (*
  * Constructor and destructor

@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.5] DOCBparser.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * DOCBparser.h : interface for a DocBook SGML non-verifying parser
@@ -17,15 +17,15 @@ type
   (*
    * Most of the back-end structures from XML and SGML are shared
    *)
-	docbParserCtxt = xmlParserCtxt;
-	docbParserCtxtPtr = xmlParserCtxtPtr;
-	docbParserNodeInfo = xmlParserNodeInfo;
-	docbSAXHandler = xmlSAXHandler;
-	docbSAXHandlerPtr = xmlSAXHandlerPtr;
-	docbParserInput = xmlParserInput;
-	docbParserInputPtr = xmlParserInputPtr;
-	docbDocPtr = xmlDocPtr;
-	docbNodePtr = xmlNodePtr;
+  docbParserCtxt = xmlParserCtxt;
+  docbParserCtxtPtr = xmlParserCtxtPtr;
+  docbParserNodeInfo = xmlParserNodeInfo;
+  docbSAXHandler = xmlSAXHandler;
+  docbSAXHandlerPtr = xmlSAXHandlerPtr;
+  docbParserInput = xmlParserInput;
+  docbParserInputPtr = xmlParserInputPtr;
+  docbDocPtr = xmlDocPtr;
+  docbNodePtr = xmlNodePtr;
 
 (*
  * There is only few public functions.

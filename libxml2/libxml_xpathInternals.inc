@@ -1,18 +1,18 @@
 // CVS-SIGN: [1.28] xpathInternals.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
-{
-	 xpathInternals.c: internal interfaces for XML Path Language implementation
-										 used to build new modules on top of XPath
-
-   See COPYRIGHT for the status of this software
-  
-   Author: daniel@veillard.com
-	}
+(*
+ * xpathInternals.c: internal interfaces for XML Path Language implementation
+ *                   used to build new modules on top of XPath
+ *
+ * See COPYRIGHT for the status of this software
+ *
+ * Author: daniel@veillard.com
+ *)
 
 (************************************************************************
  *									                                                    *
@@ -340,7 +340,7 @@ function  xmlXPathPopExternal(ctxt:xmlXPathParserContextPtr):pointer; cdecl;exte
    * Returns the XPath object value or NULL if not found
    *)
 type
-	xmlXPathVariableLookupFunc = function  (ctxt:pointer; name:PxmlChar; ns_uri:PxmlChar):xmlXPathObjectPtr;cdecl;
+  xmlXPathVariableLookupFunc = function  (ctxt:pointer; name:PxmlChar; ns_uri:PxmlChar):xmlXPathObjectPtr;cdecl;
 
 procedure xmlXPathRegisterVariableLookup(ctxt:xmlXPathContextPtr; f:xmlXPathVariableLookupFunc; data:pointer);cdecl;external LIBXML2_SO;
 
@@ -359,7 +359,7 @@ type
    *
    * Returns the XPath function or NULL if not found
    *)
-	xmlXPathFuncLookupFunc = function  (ctxt:pointer; name:PxmlChar; ns_uri:PxmlChar):xmlXPathFunction;cdecl;
+  xmlXPathFuncLookupFunc = function  (ctxt:pointer; name:PxmlChar; ns_uri:PxmlChar):xmlXPathFunction;cdecl;
 
 procedure xmlXPathRegisterFuncLookup(ctxt:xmlXPathContextPtr; f:xmlXPathFuncLookupFunc; funcCtxt:pointer);cdecl;external LIBXML2_SO;
 

@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.12] nanohttp.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * nanohttp.c: minimalist HTTP implementation to fetch external subsets.
@@ -25,3 +25,4 @@ function  xmlNanoHTTPAuthHeader(ctx:pointer):Pchar;cdecl;external LIBXML2_SO;
 function  xmlNanoHTTPRead(ctx:pointer; dest:pointer; len:longint):longint;cdecl;external LIBXML2_SO;
 function  xmlNanoHTTPSave(ctxt:pointer; filename:Pchar):longint;cdecl;external LIBXML2_SO;
 procedure xmlNanoHTTPClose(ctx:pointer);cdecl;external LIBXML2_SO;
+

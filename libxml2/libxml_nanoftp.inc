@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.9] nanoftp.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * nanohttp.c: minimalist FTP implementation to fetch external subsets.
@@ -32,8 +32,8 @@ type
    * A callback for the xmlNanoFTPList command
    * Note that only one of year and day:minute are specified
    *)
-	ftpListCallback = procedure (userData: pointer; filename, attrib, owner, group: PChar;
-		size: Longint; links: longint; year: longint; month: byte; day, hour, minute: longint); cdecl;
+  ftpListCallback = procedure (userData: pointer; filename, attrib, owner, group: PChar;
+    size: Longint; links: longint; year: longint; month: byte; day, hour, minute: longint); cdecl;
 
   (**
    * ftpDataCallback:
@@ -43,7 +43,7 @@ type
    *
    * A callback for the xmlNanoFTPGet command
    *)
-	ftpDataCallback = procedure (userData: pointer; data: PChar; len: longint);
+  ftpDataCallback = procedure (userData: pointer; data: PChar; len: longint);
 
 (*
  * Init

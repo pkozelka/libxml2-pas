@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.18] catalog.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (**
  * catalog.h: interfaces of the Catalog handling system
@@ -25,36 +25,36 @@ const
    *
    * The namespace for the XML Catalogs elements
    *)
-	XML_CATALOGS_NAMESPACE = 'urn:oasis:names:tc:entity:xmlns:xml:catalog';
+  XML_CATALOGS_NAMESPACE = 'urn:oasis:names:tc:entity:xmlns:xml:catalog';
   (**
    * XML_CATALOG_PI:
    *
    * the specific XML Catalog Processing Instuction name
    *)
-	XML_CATALOG_PI = 'oasis-xml-catalog';
+  XML_CATALOG_PI = 'oasis-xml-catalog';
 
   (*
    * The API is voluntarily limited to general cataloging
    *)
 type
-	xmlCatalogPrefer = longint;
+  xmlCatalogPrefer = longint;
 const
-	XML_CATA_PREFER_NONE   = 0;
-	XML_CATA_PREFER_PUBLIC = 1;
-	XML_CATA_PREFER_SYSTEM = 2;
+  XML_CATA_PREFER_NONE   = 0;
+  XML_CATA_PREFER_PUBLIC = 1;
+  XML_CATA_PREFER_SYSTEM = 2;
 
 
 type
-	xmlCatalogAllow =  Longint;
+  xmlCatalogAllow =  Longint;
 const
-	XML_CATA_ALLOW_NONE     = 0;
-	XML_CATA_ALLOW_GLOBAL   = 1;
-	XML_CATA_ALLOW_DOCUMENT = 2;
-	XML_CATA_ALLOW_ALL      = 3;
+  XML_CATA_ALLOW_NONE     = 0;
+  XML_CATA_ALLOW_GLOBAL   = 1;
+  XML_CATA_ALLOW_DOCUMENT = 2;
+  XML_CATA_ALLOW_ALL      = 3;
 
 type
-	xmlCatalog = pointer;
-	xmlCatalogPtr = ^xmlCatalog;
+  xmlCatalog = pointer;
+  xmlCatalogPtr = ^xmlCatalog;
 
 (*
  * Operations on a given catalog

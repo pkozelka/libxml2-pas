@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.20] HTMLtree.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * HTMLtree.h : describes the structures found in an tree resulting
@@ -21,14 +21,14 @@ const
    * Macro, a text node in a HTML document is really implemented
    * the same way as a text node in an XML document.
    *)
-	HTML_TEXT_NODE = XML_TEXT_NODE;
+  HTML_TEXT_NODE = XML_TEXT_NODE;
 
   (**
    *
    * Macro, an entity reference in a HTML document is really implemented
    * the same way as an entity reference in an XML document.
    *)
-	HTML_ENTITY_REF_NODE = XML_ENTITY_REF_NODE;
+  HTML_ENTITY_REF_NODE = XML_ENTITY_REF_NODE;
 
   (**
    * HTML_COMMENT_NODE:
@@ -36,7 +36,7 @@ const
    * Macro, a comment in a HTML document is really implemented
    * the same way as a comment in an XML document.
    *)
-	HTML_COMMENT_NODE = XML_COMMENT_NODE;
+  HTML_COMMENT_NODE = XML_COMMENT_NODE;
 
   (**
    * HTML_PRESERVE_NODE:
@@ -44,7 +44,7 @@ const
    * Macro, a preserved node in a HTML document is really implemented
    * the same way as a CDATA section in an XML document.
    *)
-	HTML_PRESERVE_NODE = XML_CDATA_SECTION_NODE;
+  HTML_PRESERVE_NODE = XML_CDATA_SECTION_NODE;
 
   (**
    * HTML_PI_NODE:
@@ -52,7 +52,7 @@ const
    * Macro, a processing instruction in a HTML document is really implemented
    * the same way as a processing instruction in an XML document.
    *)
-	HTML_PI_NODE = XML_PI_NODE;
+  HTML_PI_NODE = XML_PI_NODE;
 
 function  htmlNewDoc(URI:PxmlChar; ExternalID:PxmlChar):htmlDocPtr;cdecl;external LIBXML2_SO;
 function  htmlNewDocNoDtD(URI:PxmlChar; ExternalID:PxmlChar):htmlDocPtr;cdecl;external LIBXML2_SO;

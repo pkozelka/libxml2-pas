@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.21] debugXML.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 
 (*
@@ -30,9 +30,9 @@ procedure xmlLsOneNode(var aOutput: TextFile; node:xmlNodePtr);cdecl;external LI
 function  xmlBoolToText(boolval: longint): PChar; cdecl;external LIBXML2_SO;
 
 (****************************************************************
- *								                                              *
- *	 The XML shell related structures and functions		          *
- *								                                              *
+ *                                                              *
+ *         The XML shell related structures and functions       *
+ *                                                              *
  ****************************************************************)
 
 type
@@ -44,7 +44,7 @@ type
    *
    * Returns a string which will be freed by the Shell
    *)
-	xmlShellReadlineFunc = function (prompt:Pchar):Pchar;cdecl;
+  xmlShellReadlineFunc = function (prompt:Pchar):Pchar;cdecl;
 
   (**
    * xmlShellCtxt:
@@ -52,16 +52,16 @@ type
    * A debugging shell context
    * TODO: add the defined function tables.
    *)
-	xmlShellCtxtPtr = ^xmlShellCtxt;
-	xmlShellCtxt = record
-		filename : Pchar;
-		doc : xmlDocPtr;
-		node : xmlNodePtr;
-		pctxt : xmlXPathContextPtr;
-		loaded : longint;
-		output : ^TextFile;
-		input : xmlShellReadlineFunc;
-	end;
+  xmlShellCtxtPtr = ^xmlShellCtxt;
+  xmlShellCtxt = record
+    filename : Pchar;
+    doc : xmlDocPtr;
+    node : xmlNodePtr;
+    pctxt : xmlXPathContextPtr;
+    loaded : longint;
+    output : ^TextFile;
+    input : xmlShellReadlineFunc;
+  end;
 
   (**
    * xmlShellCmd:
@@ -74,11 +74,11 @@ type
    *
    * Returns an int, negative returns indicating errors
    *)
-	xmlShellCmd = function(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;
+  xmlShellCmd = function(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;
 
 
-procedure xmlShellPrintXPathError	(errorType: longint; arg: PChar); cdecl;external LIBXML2_SO;
-procedure xmlShellPrintNode	(node: xmlNodePtr); cdecl;external LIBXML2_SO;
+procedure xmlShellPrintXPathError(errorType: longint; arg: PChar); cdecl;external LIBXML2_SO;
+procedure xmlShellPrintNode(node: xmlNodePtr); cdecl;external LIBXML2_SO;
 procedure xmlShellPrintXPathResult(list: xmlXPathObjectPtr); cdecl;external LIBXML2_SO;
 function  xmlShellList(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;
 function  xmlShellBase(ctxt: xmlShellCtxtPtr; arg: PChar; node, node2: xmlNodePtr): longint; cdecl;external LIBXML2_SO;

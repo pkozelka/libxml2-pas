@@ -177,7 +177,7 @@ type
     (* Node name stack *)
     name : PxmlChar;                      { Current parsed Node  }
     nameNr : longint;                     { Depth of the parsing stack  }
-    nameMax : longint;                  	{ Max depth of the parsing stack  }
+    nameMax : longint;                    { Max depth of the parsing stack  }
     nameTab : ^PxmlChar;                  { array of nodes  }
     nbChars : longint;                    { number of xmlChar processed  }
     checkIndex : longint;                 { used by progressive parsing lookup  }
@@ -632,14 +632,14 @@ function  xmlPedanticParserDefault(val:longint):longint;cdecl;external LIBXML2_S
 function  xmlLineNumbersDefault(val:longint):longint;cdecl;external LIBXML2_SO;
 
 (*
- *	Recovery mode
+ * Recovery mode
  *)
 function  xmlRecoverDoc(cur:PxmlChar):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlRecoverMemory(buffer:PChar; size:longint):xmlDocPtr;cdecl;external LIBXML2_SO;
 function  xmlRecoverFile(filename:PChar):xmlDocPtr;cdecl;external LIBXML2_SO;
 
 (*
- *	Less common routines and SAX interfaces
+ * Less common routines and SAX interfaces
  *)
 function  xmlParseDocument(ctxt:xmlParserCtxtPtr):longint;cdecl;external LIBXML2_SO;
 function  xmlParseExtParsedEnt(ctxt:xmlParserCtxtPtr):longint;cdecl;external LIBXML2_SO;

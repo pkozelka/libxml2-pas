@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.32] entities.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * entities.h : interface for the XML entities handling
@@ -14,50 +14,50 @@
  *)
 
 type
-	xmlEntityType =  Longint;
+  xmlEntityType =  Longint;
 const
   (*
    * The different valid entity types
    *)
-	XML_INTERNAL_GENERAL_ENTITY = 1;
-	XML_EXTERNAL_GENERAL_PARSED_ENTITY = 2;
-	XML_EXTERNAL_GENERAL_UNPARSED_ENTITY = 3;
-	XML_INTERNAL_PARAMETER_ENTITY = 4;
-	XML_EXTERNAL_PARAMETER_ENTITY = 5;
-	XML_INTERNAL_PREDEFINED_ENTITY = 6;
+  XML_INTERNAL_GENERAL_ENTITY = 1;
+  XML_EXTERNAL_GENERAL_PARSED_ENTITY = 2;
+  XML_EXTERNAL_GENERAL_UNPARSED_ENTITY = 3;
+  XML_INTERNAL_PARAMETER_ENTITY = 4;
+  XML_EXTERNAL_PARAMETER_ENTITY = 5;
+  XML_INTERNAL_PREDEFINED_ENTITY = 6;
 
 type
   (*
    * An unit of storage for an entity, contains the string, the value
    * and the linking data needed for the linking in the hash table.
    *)
-	xmlEntityPtr = ^xmlEntity;
-	xmlEntity = record
-		_private : pointer;             { application data  }
-		type_ : xmlElementType;         { XML_ENTITY_DECL, must be second !  }
-		name : PxmlChar;                { Attribute name  }
-		children : ^xmlNode;            (* First child link *)
-		last : ^xmlNode;                (* Last child link *)
-		parent : ^xmlDtd;               { -> DTD  }
-		next : ^xmlNode;                { next sibling link   }
-		prev : ^xmlNode;                { previous sibling link   }
-		doc : ^xmlDoc;                  { the containing document  }
-		orig : PxmlChar;                { content without ref substitution  }
-		content : PxmlChar;             { content or ndata if unparsed  }
-		length : longint;               { the content length  }
-		etype : xmlEntityType;          { The entity type  }
-		ExternalID : PxmlChar;          { External identifier for PUBLIC  }
-		SystemID : PxmlChar;            { URI for a SYSTEM or PUBLIC Entity  }
-		nexte : xmlEntityPtr;           { unused  }
-		URI : PxmlChar;                 { the full URI as computed  }
-	end;
+  xmlEntityPtr = ^xmlEntity;
+  xmlEntity = record
+    _private : pointer;             { application data  }
+    type_ : xmlElementType;         { XML_ENTITY_DECL, must be second !  }
+    name : PxmlChar;                { Attribute name  }
+    children : ^xmlNode;            (* First child link *)
+    last : ^xmlNode;                (* Last child link *)
+    parent : ^xmlDtd;               { -> DTD  }
+    next : ^xmlNode;                { next sibling link   }
+    prev : ^xmlNode;                { previous sibling link   }
+    doc : ^xmlDoc;                  { the containing document  }
+    orig : PxmlChar;                { content without ref substitution  }
+    content : PxmlChar;             { content or ndata if unparsed  }
+    length : longint;               { the content length  }
+    etype : xmlEntityType;          { The entity type  }
+    ExternalID : PxmlChar;          { External identifier for PUBLIC  }
+    SystemID : PxmlChar;            { URI for a SYSTEM or PUBLIC Entity  }
+    nexte : xmlEntityPtr;           { unused  }
+    URI : PxmlChar;                 { the full URI as computed  }
+  end;
 
   (*
    * All entities are stored in an hash table
    * there is 2 separate hash tables for global and parameter entities
    *)
-	xmlEntitiesTable = xmlHashTable;
-	xmlEntitiesTablePtr = ^xmlEntitiesTable;
+  xmlEntitiesTable = xmlHashTable;
+  xmlEntitiesTablePtr = ^xmlEntitiesTable;
 
 (*
  * External functions :

@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.2] threads.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (**
  * threads.c: set of generic threading related routines 
@@ -16,8 +16,8 @@
  * xmlMutex are a simple mutual exception locks
  *)
 type
-	xmlMutex = pointer;
-	xmlMutexPtr = ^xmlMutex;
+  xmlMutex = pointer;
+  xmlMutexPtr = ^xmlMutex;
 
 function  xmlNewMutex:xmlMutexPtr;cdecl;external LIBXML2_SO;
 procedure xmlMutexLock(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
@@ -28,8 +28,8 @@ procedure xmlFreeMutex(tok:xmlMutexPtr);cdecl;external LIBXML2_SO;
  * xmlRMutex are reentrant mutual exception locks
  *)
 type
-	xmlRMutex = pointer;
-	xmlRMutexPtr = ^xmlRMutex;
+  xmlRMutex = pointer;
+  xmlRMutexPtr = ^xmlRMutex;
 
 function  xmlNewRMutex:xmlRMutexPtr;cdecl;external LIBXML2_SO;
 procedure xmlRMutexLock(tok:xmlRMutexPtr);cdecl;external LIBXML2_SO;

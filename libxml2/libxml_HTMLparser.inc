@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.25] HTMLparser.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * HTMLparser.h : interface for an HTML 4.0 non-verifying parser
@@ -17,41 +17,41 @@ type
   (*
    * Most of the back-end structures from XML and HTML are shared
    *)
-	htmlParserCtxt = xmlParserCtxt;
-	htmlParserCtxtPtr = xmlParserCtxtPtr;
-	htmlParserNodeInfo = xmlParserNodeInfo;
-	htmlSAXHandler = xmlSAXHandler;
-	htmlSAXHandlerPtr = xmlSAXHandlerPtr;
-	htmlParserInput = xmlParserInput;
-	htmlParserInputPtr = xmlParserInputPtr;
-	htmlDocPtr = xmlDocPtr;
-	htmlNodePtr = xmlNodePtr;
+  htmlParserCtxt = xmlParserCtxt;
+  htmlParserCtxtPtr = xmlParserCtxtPtr;
+  htmlParserNodeInfo = xmlParserNodeInfo;
+  htmlSAXHandler = xmlSAXHandler;
+  htmlSAXHandlerPtr = xmlSAXHandlerPtr;
+  htmlParserInput = xmlParserInput;
+  htmlParserInputPtr = xmlParserInputPtr;
+  htmlDocPtr = xmlDocPtr;
+  htmlNodePtr = xmlNodePtr;
 
   (*
    * Internal description of an HTML element
    *)
-	htmlElemDescPtr = ^htmlElemDesc;
-	htmlElemDesc = record
-		name : Pchar;                   { The tag name  }
-		startTag : char;                { Whether the start tag can be implied  }
-		endTag : char;                  { Whether the end tag can be implied  }
-		saveEndTag : char;              { Whether the end tag should be saved  }
-		empty : char;                   { Is this an empty element ?  }
-		depr : char;                    { Is this a deprecated element ?  }
-		dtd : char;                     { 1: only in Loose DTD, 2: only Frameset one  }
-		isinline : char;                { is this a block 0 or inline 1 element  }
-		desc : Pchar;                   { the description  }
-	end;
+  htmlElemDescPtr = ^htmlElemDesc;
+  htmlElemDesc = record
+    name : Pchar;                   { The tag name  }
+    startTag : char;                { Whether the start tag can be implied  }
+    endTag : char;                  { Whether the end tag can be implied  }
+    saveEndTag : char;              { Whether the end tag should be saved  }
+    empty : char;                   { Is this an empty element ?  }
+    depr : char;                    { Is this a deprecated element ?  }
+    dtd : char;                     { 1: only in Loose DTD, 2: only Frameset one  }
+    isinline : char;                { is this a block 0 or inline 1 element  }
+    desc : Pchar;                   { the description  }
+  end;
 
   (*
    * Internal description of an HTML entity
    *)
-	htmlEntityDescPtr = ^htmlEntityDesc;
-	htmlEntityDesc = record
-		value : dword;                  { the UNICODE value for the character  }
-		name : Pchar;                   { The entity name  }
-		desc : Pchar;                   { the description  }
-	end;
+  htmlEntityDescPtr = ^htmlEntityDesc;
+  htmlEntityDesc = record
+    value : dword;                  { the UNICODE value for the character  }
+    name : Pchar;                   { The entity name  }
+    desc : Pchar;                   { the description  }
+  end;
 
 (*
  * There is only few public functions.

@@ -326,13 +326,13 @@ type
     prev : xmlNodePtr;              { previous sibling link   }
     doc : xmlDocPtr;                { the containing document  }
                                     { End of common part  }
-    notations : pointer;          	{ Hash table for notations if any  }
-    elements : pointer;           	{ Hash table for elements if any  }
-    attributes : pointer;         	{ Hash table for attributes if any  }
-    entities : pointer;           	{ Hash table for entities if any  }
-    ExternalID : PxmlChar;        	{ External identifier for PUBLIC DTD  }
-    SystemID : PxmlChar;          	{ URI for a SYSTEM or PUBLIC DTD  }
-    pentities : pointer;          	{ Hash table for param entities if any  }
+    notations : pointer;            { Hash table for notations if any  }
+    elements : pointer;             { Hash table for elements if any  }
+    attributes : pointer;           { Hash table for attributes if any  }
+    entities : pointer;             { Hash table for entities if any  }
+    ExternalID : PxmlChar;          { External identifier for PUBLIC DTD  }
+    SystemID : PxmlChar;            { URI for a SYSTEM or PUBLIC DTD  }
+    pentities : pointer;            { Hash table for param entities if any  }
   end;
 
   (**
@@ -361,7 +361,7 @@ type
    *)
   xmlIDPtr = ^xmlID;
   xmlID = record
-    next : xmlIDPtr;              	{ next ID  }
+    next : xmlIDPtr;                { next ID  }
     value : PxmlChar;               { The ID name  }
     attr : xmlAttrPtr;              { The attribut holding it  }
   end;
@@ -430,7 +430,7 @@ type
   xmlDoc = record
     _private : pointer;             { application data }
     type_ : xmlElementType;         { XML_DOCUMENT_NODE, must be second !  }
-    name : Pchar;                 	{ name/filename/URI of the document  }
+    name : Pchar;                   { name/filename/URI of the document  }
     children : xmlNodePtr;          { the document tree  }
     last : xmlNodePtr;              { last child link  }
     parent : xmlNodePtr;            { child->parent link  }
@@ -439,7 +439,7 @@ type
     doc : xmlDocPtr;                { autoreference to itself  }
     { End of common part  }
     compression : longint;          { level of zlib compression  }
-    standalone : longint;         	{ standalone document (no external refs)  }
+    standalone : longint;           { standalone document (no external refs)  }
     intSubset : xmlDtdPtr;          { the document internal subset  }
     extSubset : xmlDtdPtr;          { the document external subset  }
     oldNs : xmlNsPtr;               { Global namespace, the old way  }

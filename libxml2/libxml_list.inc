@@ -1,9 +1,9 @@
 // CVS-SIGN: [1.5] list.h
 {
-	------------------------------------------------------------------------------
-	Translated into pascal with help of h2pas utility from the FreePascal project.
-	Petr Kozelka <pkozelka@email.cz>
-	------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------
+  Translated into pascal with help of h2pas utility from the FreePascal project.
+  Petr Kozelka <pkozelka@email.cz>
+  ------------------------------------------------------------------------------
 }
 (*
  * list.h: lists interfaces
@@ -23,18 +23,18 @@
  *)
 
 type
-	xmlLink = pointer;
-	xmlLinkPtr = ^xmlLink;
+  xmlLink = pointer;
+  xmlLinkPtr = ^xmlLink;
 
-	xmlList = pointer;
-	xmlListPtr = ^xmlList;
+  xmlList = pointer;
+  xmlListPtr = ^xmlList;
   (**
    * xmlListDeallocator:
    * @lk:  the data to deallocate
    *
    * Callback function used to free data from a list
    *)
-	xmlListDeallocator = procedure (lk: xmlLinkPtr);
+  xmlListDeallocator = procedure (lk: xmlLinkPtr);
   (**
    * xmlListDataCompare:
    * @data0: the first data
@@ -44,7 +44,7 @@ type
    *
    * Returns 0 is equality, -1 or 1 otherwise depending on the ordering
    *)
-	xmlListDataCompare = function (data0,data1: pointer): integer;
+  xmlListDataCompare = function (data0,data1: pointer): integer;
   (**
    * xmlListWalker:
    * @data: the data found in the list
@@ -54,7 +54,7 @@ type
    *
    * Returns 0 to stop walking the list, 1 otherwise
    *)
-	xmlListWalker = function (data, user: pointer): integer;
+  xmlListWalker = function (data, user: pointer): integer;
 
 (* Creation/Deletion *)
 function  xmlListCreate(deallocator:xmlListDeallocator; compare:xmlListDataCompare):xmlListPtr;cdecl;external LIBXML2_SO;

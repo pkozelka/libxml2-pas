@@ -37,9 +37,9 @@ type
   end;
 
 (*
- *	This function is in tree.h:
- *	xmlChar *  xmlNodeGetBase	(xmlDocPtr doc,
- *																 xmlNodePtr cur);
+ * This function is in tree.h:
+ * xmlChar *  xmlNodeGetBase (xmlDocPtr doc,
+ *                            xmlNodePtr cur);
  *)
 
 function  xmlCreateURI:xmlURIPtr;cdecl;external LIBXML2_SO;
