@@ -1,4 +1,4 @@
-s/\([[:alnum:]]*\)[[:space:]]*:[[:space:]]*/\1: /
+s/\([[:alnum:]]*\)[[:space:]]*:[[:space:]]*\([[:alnum:]]\)/\1: \2/
 s/longint/Longint/gi
 s/\(\* Const before type ignored \*\)//g
 s/{ C++ end of extern C conditionnal removed }//g
@@ -22,4 +22,4 @@ s/{\$if /{\$IF /gi
 s/{\$ifend/{\$IFEND/gi
 s:/\*:(\*:g
 s:\*/:\*):g
-s/[[:space:]]$//
+s/[[:space:]]*$//
