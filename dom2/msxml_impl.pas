@@ -1222,6 +1222,7 @@ end;
  *)
 constructor TMSXMLNamedNodeMap.create(msDomNamedNodeMap : IXMLDOMNamedNodeMap);
 begin
+  inherited create; //by FE
   fMSDomNamedNodeMap := msDomNamedNodeMap;
 end;
 
@@ -1452,19 +1453,35 @@ end;
 function TMSXMLElement.getAttributeNS(
         const namespaceURI : DomString;
         const localName    : DomString) : DomString;
+var
+  Attr : IDOMAttr;
 begin
-  (* namespace not supported *)
-  result := getAttribute(localName);
+  Attr := getAttributeNodeNS(namespaceURI, localName);
+  if Assigned(Attr) then
+    Result := Attr.NodeValue
+  else
+    Result := '';
 end;
 
 procedure TMSXMLElement.setAttributeNS(
         const namespaceURI  : DomString;
         const qualifiedName : DomString;
         const value         : DomString);
+//begin
+//  (* namespace not supported *)
+//  setAttribute(qualifiedName, value);
+//end;
+
+var
+  AttrNode: IXMLDOMAttribute;
 begin
-  (* namespace not supported *)
-  setAttribute(qualifiedName, value);
+  AttrNode := fMSElement.ownerDocument.createNode(NODE_ATTRIBUTE, qualifiedName,
+    namespaceURI) as IXMLDOMAttribute;
+  AttrNode.nodeValue := value;
+  fMSElement.setAttributeNode(AttrNode);
 end;
+
+
 
 procedure TMSXMLElement.removeAttributeNS(
         const namespaceURI : DomString;
@@ -1477,14 +1494,16 @@ end;
 function TMSXMLElement.getAttributeNodeNS(
         const namespaceURI : DomString;
         const localName    : DomString) : IDomAttr;
+var attr: IXMLDomNode;
 begin
-  (* namespace not supported *)
-  result := getAttributeNode(localName);
+  attr:=fMSElement.Attributes.getQualifiedItem(localName, namespaceURI);
+  if attr<>nil
+    then Result := createXMLNode(attr) as IDOMAttr
+    else Result := nil;
 end;
 
 function TMSXMLElement.setAttributeNodeNS(const newAttr : IDomAttr) : IDomAttr;
 begin
-  (* namespace not supported *)
   setAttributeNode(newAttr);
 end;
 
