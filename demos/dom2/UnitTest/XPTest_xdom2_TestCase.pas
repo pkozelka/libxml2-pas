@@ -32,6 +32,7 @@ type TTestDOM2Methods = class(TTestCase)
     procedure jkTestDocument;
     procedure jkTestElement;
     procedure jkNamedNodemap;
+    procedure append_100_attributes_with_different_namespaces;
   end;
 
 type TTestDomExceptions = class(TTestCase)
@@ -72,6 +73,7 @@ type TTestMemoryLeaks = class(TTestCase)
     procedure CreateDocumentFragment10000Times;
     procedure CreateTextNode10000Times;
     procedure AppendElement10000Times;
+
   end;
 
 
@@ -357,8 +359,31 @@ begin
   doc.documentElement.setAttributeNodeNS(attr);
   temp:=(doc as IDOMPersist).xml;
   temp:=getCont(temp);
-  //OutLog(temp);
   check(temp='<test xmlns:ct="http://ns.4ct.de" ct:name1="hund"/>','failed')
+end;
+
+procedure TTestDOM2Methods.append_100_attributes_with_different_namespaces;
+var
+  attr: IDOMAttr;
+  i: integer;
+  attrval,temp: string;
+begin
+  // create attributes
+  for i := 0 to 2 do begin
+    attr := doc.createAttributeNS('http://test'+IntToStr(i)+'.invalid','test'+IntToStr(i)+':attr');
+    attr.value := IntToStr(i);
+    doc.documentElement.setAttributeNodeNS(attr);
+    attr := nil;
+  end;
+  temp:=(doc as IDOMPersist).xml;
+  temp:=getCont(temp);
+  //OutLog(temp);
+  Check(temp='<test xmlns:test0="http://test0.invalid" test0:attr="0" xmlns:test1="http://test1.invalid" test1:attr="1" xmlns:test2="http://test2.invalid" test2:attr="2"/>','Test failed!');
+  // check attributes
+  for i := 0 to 2 do begin
+    attrval := doc.documentElement.getAttributeNS('http://test'+IntToStr(i)+'.invalid','attr');
+    check(attrval = IntToStr(i),'expected '+IntToStr(i)+' but found '+attrval);
+  end;
 end;
 
 function TTestDOM2Methods.getCont(xml:string):string;
