@@ -15,13 +15,14 @@
  *)
 
 
-(*
- * XML Schemas defines multiple type of types.
- *)
 type
+  (*
+   * XML Schemas defines multiple type of types.
+   *)
+{$IFDEF HAS_CENUM}
+  // this variant is good for stronger typing
   xmlSchemaTypeType = (
-    DUMMY__XML_SCHEMA_TYPE_0, // =0 // this is for D5 compatibility
-    XML_SCHEMA_TYPE_BASIC,// = 1,
+    XML_SCHEMA_TYPE_BASIC = 1,
     XML_SCHEMA_TYPE_ANY,
     XML_SCHEMA_TYPE_FACET,
     XML_SCHEMA_TYPE_SIMPLE,
@@ -54,9 +55,48 @@ type
     XML_SCHEMA_FACET_MAXLENGTH,
     XML_SCHEMA_FACET_MINLENGTH
   );
+{$ELSE}
+  // this is for D5
+  xmlSchemaTypeType =  Longint;
+const
+  XML_SCHEMA_TYPE_BASIC           = 1;
+  XML_SCHEMA_TYPE_ANY             = 2;
+  XML_SCHEMA_TYPE_FACET           = 3;
+  XML_SCHEMA_TYPE_SIMPLE          = 4;
+  XML_SCHEMA_TYPE_COMPLEX         = 5;
+  XML_SCHEMA_TYPE_SEQUENCE        = 6;
+  XML_SCHEMA_TYPE_CHOICE          = 7;
+  XML_SCHEMA_TYPE_ALL             = 8;
+  XML_SCHEMA_TYPE_SIMPLE_CONTENT  = 9;
+  XML_SCHEMA_TYPE_COMPLEX_CONTENT = 10;
+  XML_SCHEMA_TYPE_UR              = 11;
+  XML_SCHEMA_TYPE_RESTRICTION     = 12;
+  XML_SCHEMA_TYPE_EXTENSION       = 13;
+  XML_SCHEMA_TYPE_ELEMENT         = 14;
+  XML_SCHEMA_TYPE_ATTRIBUTE       = 15;
+  XML_SCHEMA_TYPE_ATTRIBUTEGROUP  = 16;
+  XML_SCHEMA_TYPE_GROUP           = 17;
+  XML_SCHEMA_TYPE_NOTATION        = 18;
+  XML_SCHEMA_TYPE_LIST            = 19;
+  XML_SCHEMA_TYPE_UNION           = 20;
 
+  XML_SCHEMA_FACET_MININCLUSIVE   = 1000;
+  XML_SCHEMA_FACET_MINEXCLUSIVE   = 1001;
+  XML_SCHEMA_FACET_MAXINCLUSIVE   = 1002;
+  XML_SCHEMA_FACET_MAXEXCLUSIVE   = 1003;
+  XML_SCHEMA_FACET_TOTALDIGITS    = 1004;
+  XML_SCHEMA_FACET_FRACTIONDIGITS = 1005;
+  XML_SCHEMA_FACET_PATTERN        = 1006;
+  XML_SCHEMA_FACET_ENUMERATION    = 1007;
+  XML_SCHEMA_FACET_WHITESPACE     = 1008;
+  XML_SCHEMA_FACET_LENGTH         = 1009;
+  XML_SCHEMA_FACET_MAXLENGTH      = 1010;
+  XML_SCHEMA_FACET_MINLENGTH      = 1011;
+{$ENDIF}
+
+type
   xmlSchemaContentType = (
-    XML_SCHEMA_CONTENT_UNKNOWN = 0,
+    XML_SCHEMA_CONTENT_UNKNOWN, // = 0,
     XML_SCHEMA_CONTENT_EMPTY,
     XML_SCHEMA_CONTENT_ELEMENTS,
     XML_SCHEMA_CONTENT_MIXED,
@@ -67,11 +107,12 @@ type
   );
 
 {[pk] I moved many constants here, because of internal references in pointer forward declarations }
-(*
- * An attribute definition.
- *)
 
 const
+
+  (*
+   * An attribute definition.
+   *)
   XML_SCHEMAS_ANYATTR_SKIP = 1;
   XML_SCHEMAS_ANYATTR_LAX = 2;
   XML_SCHEMAS_ANYATTR_STRICT = 3;
@@ -80,13 +121,13 @@ const
   XML_SCHEMAS_TYPE_MIXED = 1;//1 << 0
 
 const
-  XML_SCHEMAS_ELEM_NILLABLE	= 1; //1 << 0
-  XML_SCHEMAS_ELEM_GLOBAL		= 2; //1 << 1
-  XML_SCHEMAS_ELEM_DEFAULT	= 4; //1 << 2
-  XML_SCHEMAS_ELEM_FIXED		= 8; //1 << 3
-  XML_SCHEMAS_ELEM_ABSTRACT	=16; //1 << 4
-  XML_SCHEMAS_ELEM_TOPLEVEL	=32; //1 << 5
-  XML_SCHEMAS_ELEM_REF		  =64; //1 << 6
+  XML_SCHEMAS_ELEM_NILLABLE = 1; //1 << 0
+  XML_SCHEMAS_ELEM_GLOBAL   = 2; //1 << 1
+  XML_SCHEMAS_ELEM_DEFAULT  = 4; //1 << 2
+  XML_SCHEMAS_ELEM_FIXED    = 8; //1 << 3
+  XML_SCHEMAS_ELEM_ABSTRACT =16; //1 << 4
+  XML_SCHEMAS_ELEM_TOPLEVEL =32; //1 << 5
+  XML_SCHEMAS_ELEM_REF      =64; //1 << 6
 
 const
   XML_SCHEMAS_FACET_UNKNOWN  = 0;
