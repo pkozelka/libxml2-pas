@@ -1,8 +1,8 @@
 [API]
 Name=libxml2-pas
-Version=@VERSION@
+Version=@LIBXML_VERSION@
 Date=@DATE@
-Originated=libxml2-@VERSION@
+Originated=libxml2-@LIBXML_VERSION@
 URL=http://libxml2-pas.sourceforge.net
 Description=The XML C library for Gnome
 
@@ -46,7 +46,9 @@ Linux=YES
 Kylix=YES
 
 [Requirements]
-Req1=libxml2.dll version @VERSION@
+Req1=libxml2.dll version @LIBXML_VERSION@
+Req2=libxslt.dll
+Req3=libexslt.dll
 Req4=iconv.dll
 
 [Captain]
