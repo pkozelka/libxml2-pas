@@ -722,7 +722,7 @@ begin
                CLASS_FreeThreadedDOMDocument26]) as IXMLDOMDocument;
     end;
   if not assigned(result) then
-    raise EDOMException.create(etNotFoundErr,'MSDOM not installed!');
+    raise EDOMException.create(NOT_FOUND_ERR,'MSDOM not installed!');
 end;
 
 
@@ -909,7 +909,7 @@ function TMSXMLImplementation.createDocumentType(
 begin
   (* CreateDocumentType is not supported *)
   raise EDomException.create(
-          etNotSupportedErr, 'CreateDocumentType is not supported');
+          NOT_SUPPORTED_ERR, 'CreateDocumentType is not supported');
 end;
 
 function TMSXMLImplementation.createDocument(
@@ -1136,7 +1136,7 @@ function TMSXMLDocument.getElementById(
         const elementId : DomString) : IDomElement;
 begin
   raise EDomException.create(
-          etNotSupportedErr, 'GetElementById is not supported');
+          NOT_SUPPORTED_ERR, 'GetElementById is not supported');
 end;
 
 
@@ -1156,7 +1156,7 @@ begin
   if not result then
 	begin
 	  raise EDomException.createFmt(
-		        etParseErr,
+		        PARSE_ERR,
             'Reason: %s, Url: %s, Line: %d, LinePos: %d',
             [fMSDomDocument.parseError.reason,
             fMSDomDocument.parseError.url,
@@ -1174,7 +1174,7 @@ begin
   if not result then
   begin
     raise EDomException.createFmt(
-            etParseErr,
+            PARSE_ERR,
             'Reason: %s, Line: %d, LinePos: %d',
             [fMSDomDocument.parseError.reason,
             fMSDomDocument.parseError.line,
@@ -1188,7 +1188,7 @@ begin
   if not result then
   begin
     raise EDomException.createFmt(
-            etParseErr,
+            PARSE_ERR,
             'Reason: %s, Line: %d, LinePos: %d',
             [fMSDomDocument.parseError.reason,
             fMSDomDocument.parseError.line,
@@ -1407,7 +1407,7 @@ end;
 procedure TMSXMLNode.set_Prefix(const prefix : DomString);
 begin
   (* SetPrefix is not supported *)
-  raise EDomException.create(etNotSupportedErr, 'SetPrefix is not supported');
+  raise EDomException.create(NOT_SUPPORTED_ERR, 'SetPrefix is not supported');
 end;
 
 function TMSXMLNode.get_Prefix : DomString;
@@ -1669,20 +1669,20 @@ end;
 function TMSXMLDocumentType.get_PublicId : DomString;
 begin
   (* GetPublicId is not supported *)
-  raise EDomException.create(etNotSupportedErr, 'GetPublicId is not supported');
+  raise EDomException.create(NOT_SUPPORTED_ERR, 'GetPublicId is not supported');
 end;
 
 function TMSXMLDocumentType.get_SystemId : DomString;
 begin
   (* GetSystemId is not supported *)
-  raise EDomException.create(etNotSupportedErr, 'GetSystemId is not supported');
+  raise EDomException.create(NOT_SUPPORTED_ERR, 'GetSystemId is not supported');
 end;
 
 function TMSXMLDocumentType.get_InternalSubset : DomString;
 begin
   (* GetInternalSubset is not supported *)
   raise EDomException.create(
-          etNotSupportedErr, 'GetInternalSubset is not supported');
+          NOT_SUPPORTED_ERR, 'GetInternalSubset is not supported');
 end;
 
 
@@ -1897,7 +1897,7 @@ function TMSXMLAttr.get_OwnerElement : IDomElement;
 begin
   (* not supported *)
   raise EDomException.create(
-          etNotSupportedErr, 'GetOwnerElement is not supported');
+          NOT_SUPPORTED_ERR, 'GetOwnerElement is not supported');
 end;
 
 
@@ -2021,7 +2021,7 @@ begin
        * IXMLDOMCharacterData instead of IDomText
       *)
       raise EDomException.create(
-              etNotSupportedErr, 'SplitText is not supported');
+              NOT_SUPPORTED_ERR, 'SplitText is not supported');
     end;
   end;
 end;

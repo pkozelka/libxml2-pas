@@ -43,15 +43,6 @@ uses
   classes;
 
 const
-// remove the following line, if you want to work with  enums for nodeTypes
-{$DEFINE NodeTypeInteger}
-
-  (*
-   * The official DOM specs works with Integer values for Exceptions.
-   * These Integer values are provided for supporting DOM implementations
-   * that work with Integer values. Conversion routines are provided to convert
-   * from TExceptionType <-> Integer
-  *)
 
   (*
    * If index or size is negative, or greater than the allowed value
@@ -136,6 +127,22 @@ const
   INVALID_ACCESS_ERR = 15;
 
 
+  (* NON standard Exception codes *)
+
+  (*
+   * The DOM specs state:
+   *    Note: Other numeric codes are reserved for W3C for possible future use.
+   * which is problematic if new (non standard) exception codes should be added.
+   * We therfore choose to have our own exception codes >= 1000 in the hope it
+   * will not break future DOM specs. To minimize any inconveniance in the
+   * future you should make sure not to rely on the numeric constant value but
+   * always use the constant name declaration so the numeric value can be
+   * changed without breaking existing code.
+  *)
+
+  PARSE_ERR = 1000;
+
+
   (*
    * The official DOM specs works with Integer values for Node Types.
    * These Integer values are provided for supporting DOM implementations
@@ -207,66 +214,19 @@ type
   DomString    = WideString;
   DomTimeStamp = Int64;
 
-  (*
-   * Although strict DOM specs works with constants for node types, enums are
-   * used. For explanation of the Node Types see comments above.
-   *
-   * See functions: domNodeTypeToOrd and domOrdToNodeType for conversion to and
-   * from constants to the enum nodetype
-  *)
-  TNodeType = (ntUndefined,
-               ntElementNode,
-               ntAttributeNode,
-               ntTextNode,
-               ntCDataSectionNode,
-               ntEntityReferenceNode,
-               ntEntityNode,
-               ntProcessingInstructionNode,
-               ntCommenNode,
-               ntDocumentNode,
-               ntDocumentTypeNode,
-               ntDocumentFragmentNode,
-               ntNotationNode);
-
-  (* added for compatibillity with borland xml *)
-  {$IFDEF NodeTypeInteger}
-    DomNodeType = Integer;
-  {$ELSE}
-    DomNodeType = TNodeType;
-  {$ENDIF}
-
-  (*
-   * Although strict DOM specs works with constants for Exception types, enums
-   * are used. For explanation of Exception Types see comments above
-  *)
-  TExceptionType = (etUndefined,
-                    etIndexSizeErr,
-                    etDomStringSizeErr,
-                    etHierarchyRequestErr,
-                    etWrongDocumentErr,
-                    etInvalidCharacterErr,
-                    etNoDataAllowedErr,
-                    etNoModificationAllowedErr,
-                    etNotFoundErr,
-                    etNotSupportedErr,
-                    etInuseAttributeErr,
-                    etInvalidStateErr,
-                    etSyntaxErr,
-                    etInvalidModificationErr,
-                    etNamespaceErr,
-                    etInvalidAccessErr,
-                    etParseErr);
+  DomNodeType  = Integer;
+  DomExceptionType = Integer;
 
   EDomException = class(Exception)
     private
-      fCode : TExceptionType;
+      fCode : DomExceptionType;
     public
-      constructor create(code : TExceptionType; const msg : DomString); overload;
+      constructor create(code : DomExceptionType; const msg : DomString); overload;
       constructor createFmt(
-              code       : TExceptionType;
+              code       : DomExceptionType;
               const msg  : string;
               const args : array of const); overload;
-      property code : TExceptionType read fCode;
+      property code : DomExceptionType read fCode;
   end;
 
   type TAsyncEventHandler = procedure(
@@ -1070,38 +1030,6 @@ type
   EDomVendorRegisterException = class(Exception);
 
   (*
-   * Conversion from TNodeType to the official DOM specs Integer values.
-   * Results in RunError is ANodeType is not an official DOM spec Node Type
-   * NOTE: Should only be used for supporting DOM implementation that works with
-   * integer values for Node Types.
-  *)
-  function domNodeTypeToOrd(nodeType : TNodeType) : Integer;
-
-  (*
-   * Conversion from the official DOM specs Integer values to TNodeType.
-   * Results in RunError if AOrd is not an official DOM spec Node Type
-   * NOTE: Should only be used for supporting DOM implementation that works with
-   * integer values for Node Types.
-  *)
-  function domOrdToNodeType(domOrd : Integer) : TNodeType;
-
-  (*
-   * Conversion from TExceptionType to the official DOM specs Integer values.
-   * Results in RunError is AEType is not an official DOM spec Exception Type
-   * NOTE: Should only be used for supporting DOM implementation that works with
-   * integer values for Exception Types.
-  *)
-  function domETypeToOrd(eType : TExceptionType) : Integer;
-
-  (*
-   * Conversion from the official DOM specs Integer values to TExceptionType.
-   * Results in RunError if AOrd is not an official DOM spec Exception Type
-   * NOTE: Should only be used for supporting DOM implementation that works with
-   * integer values for Exception Types.
-  *)
-  function domOrdToEType(domOrd : Integer) : TExceptionType;
-
-  (*
    * used for registering a DomcumentBuilderFactory
    * @Param AFactory the factory that need to be registered.
    * @Raise EDomVendorRegisterException if a factory has already registered with
@@ -1240,107 +1168,17 @@ begin
       newDocumentBuilder.DOMImplementation;
 end;
 
-function domNodeTypeToOrd(nodeType : TNodeType) : Integer;
-begin
-  result := 0;
-  case nodeType of
-    ntElementNode               : result := ELEMENT_NODE;
-    ntAttributeNode             : result := ATTRIBUTE_NODE;
-    ntTextNode                  : result := TEXT_NODE;
-    ntCDataSectionNode          : result := CDATA_SECTION_NODE;
-    ntEntityReferenceNode       : result := ENTITY_REFERENCE_NODE;
-    ntEntityNode                : result := ENTITY_NODE;
-    ntProcessingInstructionNode : result := PROCESSING_INSTRUCTION_NODE;
-    ntCommenNode                : result := COMMENT_NODE;
-    ntDocumentNode              : result := DOCUMENT_NODE;
-    ntDocumentTypeNode          : result := DOCUMENT_TYPE_NODE;
-    ntDocumentFragmentNode      : result := DOCUMENT_FRAGMENT_NODE;
-    ntNotationNode              : result := NOTATION_NODE;
-  else
-    runError;
-  end;
-end;
-
-function domOrdToNodeType(domOrd : Integer) : TNodeType;
-begin
-  result := ntUndefined;
-  case domOrd of
-    ELEMENT_NODE                : result := ntElementNode;
-    ATTRIBUTE_NODE              : result := ntAttributeNode;
-    TEXT_NODE                   : result := ntTextNode;
-    CDATA_SECTION_NODE          : result := ntCDataSectionNode;
-    ENTITY_REFERENCE_NODE       : result := ntEntityReferenceNode;
-    ENTITY_NODE                 : result := ntEntityNode;
-    PROCESSING_INSTRUCTION_NODE : result := ntProcessingInstructionNode;
-    COMMENT_NODE                : result := ntCommenNode;
-    DOCUMENT_NODE               : result := ntDocumentNode;
-    DOCUMENT_TYPE_NODE          : result := ntDocumentTypeNode;
-    DOCUMENT_FRAGMENT_NODE      : result := ntDocumentFragmentNode;
-    NOTATION_NODE               : result := ntNotationNode;
-  else
-    runError;
-  end;
-end;
-
-
-function domETypeToOrd(eType : TExceptionType) : Integer;
-begin
-  result := 0;
-  case eType of
-    etIndexSizeErr              : result := INDEX_SIZE_ERR;
-    etDomStringSizeErr          : result := DOMSTRING_SIZE_ERR;
-    etHierarchyRequestErr       : result := HIERARCHY_REQUEST_ERR;
-    etWrongDocumentErr          : result := WRONG_DOCUMENT_ERR;
-    etInvalidCharacterErr       : result := INVALID_CHARACTER_ERR;
-    etNoDataAllowedErr          : result := NO_DATA_ALLOWED_ERR;
-    etNoModificationAllowedErr  : result := NO_MODIFICATION_ALLOWED_ERR;
-    etNotFoundErr               : result := NOT_FOUND_ERR;
-    etNotSupportedErr           : result := NOT_SUPPORTED_ERR;
-    etInuseAttributeErr         : result := INUSE_ATTRIBUTE_ERR;
-    etInvalidStateErr           : result := INVALID_STATE_ERR;
-    etSyntaxErr                 : result := SYNTAX_ERR;
-    etInvalidModificationErr    : result := INVALID_MODIFICATION_ERR;
-    etNamespaceErr              : result := NAMESPACE_ERR;
-    etInvalidAccessErr          : result := INVALID_ACCESS_ERR;
-  else
-    runError;
-  end;
-end;
-
-function domOrdToEType(domOrd : Integer) : TExceptionType;
-begin
-  result := etUndefined;
-  case domOrd of
-    INDEX_SIZE_ERR              : result := etIndexSizeErr;
-    DOMSTRING_SIZE_ERR          : result := etDomStringSizeErr;
-    HIERARCHY_REQUEST_ERR       : result := etHierarchyRequestErr;
-    WRONG_DOCUMENT_ERR          : result := etWrongDocumentErr;
-    INVALID_CHARACTER_ERR       : result := etInvalidCharacterErr;
-    NO_DATA_ALLOWED_ERR         : result := etNoDataAllowedErr;
-    NO_MODIFICATION_ALLOWED_ERR : result := etNoModificationAllowedErr;
-    NOT_FOUND_ERR               : result := etNotFoundErr;
-    NOT_SUPPORTED_ERR           : result := etNotFoundErr;
-    INUSE_ATTRIBUTE_ERR         : result := etInuseAttributeErr;
-    INVALID_STATE_ERR           : result := etInvalidStateErr;
-    SYNTAX_ERR                  : result := etSyntaxErr;
-    INVALID_MODIFICATION_ERR    : result := etInvalidModificationErr;
-    NAMESPACE_ERR               : result := etNamespaceErr;
-    INVALID_ACCESS_ERR          : result := etInvalidAccessErr;
-  else
-    runError;
-  end;
-end;
 
 (******************************************************************************)
 
-constructor EDomException.create(code : TExceptionType; const msg : DomString);
+constructor EDomException.create(code : DomExceptionType; const msg : DomString);
 begin
   inherited create(msg);
   fCode := code;
 end;
 
 constructor EDomException.createFmt(
-        code       : TExceptionType;
+        code       : DomExceptionType;
         const msg  : string;
         const args : array of const);
 begin
