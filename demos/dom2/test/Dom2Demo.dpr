@@ -3,12 +3,9 @@ program Dom2Demo;
 uses
   Forms,
   Unit1 in 'Unit1.pas' {Form1},
-  conapp in 'conapp.pas',
-  MicroTime in 'MicroTime.pas',
   jkDomTest in 'jkDomTest.pas',
-  msxml_impl in 'L:\open\dom2\msxml_impl.pas',
-  libxmldom in 'L:\open\dom2\libxmldom.pas',
-  Dom2 in 'L:\open\dom2\Dom2.pas';
+  libxmldom in '..\..\..\Open_xdom\libxmldom.pas',
+  ComObj in 'D:\Programme\Borland\Delphi6\Source\Rtl\Common\ComObj.pas';
 
 {$R *.res}
 

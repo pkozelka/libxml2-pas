@@ -23,7 +23,12 @@ interface
 
   // walk through the tree
   // result: passed time
-  function TestDom2(name,vendor:string):double;
+  // ignore: ignore whitespace;
+  //   this value is true as default for msxml,
+  //   false for libxml2
+  //   the result is not exactly defined, if set to true, because it is not
+  //   defined in any specification, what whitespace is and what not
+  function TestDom2(name,vendor:string;ignore:boolean):double;
 
 
 implementation
@@ -32,7 +37,7 @@ uses MicroTime, conapp, sysutils, Dialogs, xdom2, libxml2,libxmldom,jkDomTest;
 
 function TestDom1b(name,vendor:string):double;
 var
-  dom: IDomImplementation;
+  //dom: IDomImplementation;
   filename: string;
   doc: IDomDocument;
   FDomPersist: IDomPersist;
@@ -45,15 +50,14 @@ begin
 
   FDomPersist:=doc as IDomPersist;
   ok:=FDomPersist.load(filename);
-  if ok
-    then begin
-      outLog('Parsed file ok!');
-      result:=EndTime;
-      outLog('Elapsed time: '+format('%8.1f',[result*1000])+' ms');
-    end
-    else begin
-      outLog('Parse error!');
-    end;
+  if ok then begin
+    outLog('Parsed file ok!');
+    result:=EndTime;
+    outLog('Elapsed time: '+format('%8.1f',[result*1000])+' ms');
+  end else begin
+    result := -1;
+    outLog('Parse error!');
+  end;
   // Erster Test
   outLog('doccount='+inttostr(doccount));
   root:=doc.documentElement;
@@ -96,20 +100,21 @@ begin
   result:=node;
 end;
 
-function TestDom2b(name,vendor:string):double;
+function TestDom2b(name,vendor:string;ignore: boolean):double;
 // a simple tree-walker
 var node: IDomNode;
     filename: string;
     doc: IDomDocument;
-    dom: IDomImplementation;
+    //dom: IDomImplementation;
     FDomPersist: IDomPersist;
     ok: boolean;
     i: integer;
 begin
+  result:=0;
   filename:='..\data\'+name;
   StartTimer;
   doc:=GetEmptyDoc(vendor);
-  (doc as IDomParseOptions).preserveWhiteSpace:=true;
+  (doc as IDomParseOptions).preserveWhiteSpace:=not(ignore);
   FDomPersist:=doc as IDomPersist;
   ok:=FDomPersist.load(filename);
   if ok then
@@ -137,9 +142,9 @@ begin
   doc:=nil;
 end;
 
-function TestDom2(name,vendor:string):double;
+function TestDom2(name,vendor:string;ignore:boolean):double;
 begin
-  result:=TestDom2b(name,vendor);
+  result:=TestDom2b(name,vendor,ignore);
   //The following code can help to check the
   //reference counting, if there are memory leaks//outLog('doccount='+inttostr(doccount));
   //outLog('nodecount='+inttostr(nodecount));

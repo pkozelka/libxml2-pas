@@ -25,20 +25,21 @@ type
     RbLIBXML: TRadioButton;
     Button12: TButton;
     Button1: TButton;
-    Test1: TCheckBox;
-    Label2: TLabel;
-    Test2: TCheckBox;
-    Test3: TCheckBox;
-    Test4: TCheckBox;
-    Test5: TCheckBox;
-    Test6: TCheckBox;
-    Test7: TCheckBox;
-    Test8: TCheckBox;
-    Test9: TCheckBox;
     dom2: TCheckBox;
     TestDocument5000: TButton;
     Button3: TButton;
     Button5: TButton;
+    Ignore: TCheckBox;
+    GroupBox1: TGroupBox;
+    Test9: TCheckBox;
+    Test8: TCheckBox;
+    Test7: TCheckBox;
+    Test6: TCheckBox;
+    Test5: TCheckBox;
+    Test4: TCheckBox;
+    Test3: TCheckBox;
+    Test2: TCheckBox;
+    Test1: TCheckBox;
     Button8: TButton;
     Button10: TButton;
     procedure Button2Click(Sender: TObject);
@@ -103,7 +104,7 @@ begin
 end;
 
 procedure TForm1.Native100Click(Sender: TObject);
-var i: integer;
+//var i: integer;
 begin
   OutLog('Disabled!');
   //for i:=1 to 100 do
@@ -116,8 +117,8 @@ var
 begin
   Memo1.lines.Clear;
   if not EnableOutput.Checked then OutDebugLog('Start!');
-  TestDom2(Combobox1.Text,GetVendorStr);
-  time:=TestDom2(Combobox1.Text,GetVendorStr);
+  TestDom2(Combobox1.Text,GetVendorStr,Ignore.checked);
+  time:=TestDom2(Combobox1.Text,GetVendorStr,ignore.Checked);
    if not EnableOutput.Checked
      then outDebugLog('Everage time: '+format('%8.1f',[time*1000])+' ms');
 end;
@@ -214,7 +215,7 @@ begin
   time:=0;
   OutDebugLog('Start!');
   for i:=1 to 100 do
-    time:=time+TestDom2(Combobox1.Text,GetVendorStr);
+    time:=time+TestDom2(Combobox1.Text,GetVendorStr,ignore.Checked);
   outDebugLog('Everage time: '+format('%8.1f',[time*1000/100])+' ms');
 end;
 

@@ -563,20 +563,22 @@ end;
 
 procedure TestDomImpl(filename,vendorstr:string);
 var
-  document: IDOMDocument;
+  document,temp: IDOMDocument;
   documentType: IDOMDocumentType;
 begin
   document := getDoc(filename,vendorstr);
   if document=nil then exit;
   try
-    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','test');
+    documenttype := document.domImplementation.createDocumentType('eva:special','','test');
+    temp:=documenttype.ownerDocument;
+    //documenttype:=nil;
     test('domImplementation.createDocument (NS)',(document.domImplementation.createDocument('http://xmlns.4commerce.de/eva','eva:test',documenttype) <> nil));
     documenttype := nil;
   except
     outLog('__domImplementation.createDocument (NS) doesn''t work!');
   end;
   try
-    documenttype := document.domImplementation.createDocumentType('http://xmlns.4commerce.de/eva','','');
+    documenttype := document.domImplementation.createDocumentType('eva:special','','');
     test('domImplementation.createDocumentType',(documenttype <> nil));
     documenttype := nil;
   except
@@ -770,9 +772,9 @@ var
   element: IDOMElement;
   node: IDOMNode;
   attlist: IDOMNamedNodeMap;
-  documentElement: IDOMNode;
+  //documentElement: IDOMNode;
   stringlist: TStringList;
-  temp: string;
+  //temp: string;
   dom2: boolean;
 begin
   // init
@@ -880,7 +882,7 @@ begin
   if (TestSet and 2) = 2
     then if dom2
       then testCount:=testCount+22
-      else testCount:=testCount+18;
+      else testCount:=testCount+16;
   if (TestSet and 4) = 4
     then if dom2
       then testCount:=testCount+13+16
@@ -890,7 +892,7 @@ begin
       then testCount:=testCount+25+6
       else testCount:=testCount+25;
   if (TestSet and 16) = 16
-    then testCount:=testCount+14;
+    then testCount:=testCount+5;
   if (TestSet and 32) = 32
     then testCount:=testCount+3;
   if (TestSet and 64) = 64
