@@ -48,6 +48,9 @@ uses
   {$else}
     MSXML_TLB,
   {$endif}
+  {$ifdef VER140} //delphi6
+    variants,
+  {$endif}
   windows,
   ComObj,
   Dom2;
@@ -82,7 +85,6 @@ implementation
 uses
   SysUtils,
   Classes,
-  Variants,
   ActiveX;            
 
 type
@@ -1252,8 +1254,7 @@ end;
 
 procedure TMSXMLNode.normalize;
 begin
-  (* not supported *)
-  raise EDomException.create(etNotSupportedErr, 'Normalize is not supported');
+  (fMSDomNode as IXMLDomElement).normalize;
 end;
 
 function TMSXMLNode.isSupported(

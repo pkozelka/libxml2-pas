@@ -38,7 +38,15 @@ unit libxmldom;
 // Attr.ownerElement
 
 interface
-uses classes,dom2,libxml2,conapp,sysutils;
+uses
+  {$ifdef VER130} //Delphi 5
+    unicode,
+  {$endif}
+  classes,
+  dom2,
+  libxml2,
+  conapp,
+  sysutils;
 
 const
 
@@ -810,13 +818,17 @@ end;
 
 function TGDOMNode.replaceChild(const newChild, oldChild: IDOMNode): IDOMNode; 
 var
-  node: xmlNodePtr;
+  old, cur, node: xmlNodePtr;
 begin
-  {node:=gdome_n_replaceChild(FGNode,GetGNode(newChild),GetGNode(oldChild),@exc);
-  CheckError(exc);
-  if node<>nil
-    then result:=MakeNode(node,FOwnerDocument) as IDOMNode
-    else result:=nil;}
+  old := GetGNode(oldChild);
+  cur := GetGNode(newChild);
+  //todo: raise exception otherwise
+  if (old<>nil) and (cur<>nil)
+    then begin
+      node:=xmlReplaceNode(old, cur);
+      result:=MakeNode(node,FOwnerDocument) as IDOMNode
+    end
+    else result:=nil;
 end;
 
 function TGDOMNode.removeChild(const childNode: IDOMNode): IDOMNode; 
@@ -863,20 +875,37 @@ begin
 end;
 
 procedure TGDOMNode.normalize;
+var
+  node,next,new_next: xmlNodePtr;
+  nodeType: integer;
 begin
-  //gdome_n_normalize(FGNode,@exc);
-  //CheckError(exc);
+  node:=FGNode.children;
+  next:=nil;
+  while node<>nil do begin
+    nodeType:=node.type_;
+    if nodeType=TEXT_NODE then begin
+      next:=node.next;
+      while next<>nil do begin
+        if next.type_<>TEXT_NODE then break;
+        xmlTextConcat(node,next.content,length(next.content));
+        new_next:=next.next;
+        xmlUnlinkNode(next);
+        xmlFreeNode(next); //carefull!!
+        next:=new_next;
+      end;
+    end else if nodeType=ELEMENT_NODE then begin
+      //todo
+    end;
+    node:=next;
+  end;
 end;
 
 function TGDOMNode.isSupported(const feature, version: DOMString): WordBool;
 begin
-  {feature1:=TGdomString.create(feature);
-  version1:=TGdomString.create(version);
-  result:=gdome_n_issupported(FGNode,feature1.GetPString,version1.GetPString,@exc)<>0;
-  CheckError(exc);
-  feature1.free;
-  version1.free;}
-  result:=false;
+  if (((upperCase(feature)='CORE') and (version='2.0')) or
+     (upperCase(feature)='XML')  and (version='2.0'))
+    then result:=true
+    else result:=false;
 end;
 
 constructor TGDOMNode.Create(ANode: xmlNodePtr;ADocument:IDOMDocument;parentnode:boolean=false);
@@ -1468,8 +1497,7 @@ end;
 
 procedure TGDOMElement.normalize;
 begin
-  //gdome_el_normalize(GElement,@exc);
-  //CheckError(exc);
+  inherited normalize;
 end;
 
 constructor TGDOMElement.Create(AElement: xmlElementPtr;ADocument:IDOMDocument);
@@ -1506,15 +1534,6 @@ begin
   name2:=TGdomString.create(qualifiedName);
   FPGdomeDoc.children:=xmlNewDocNode(FPGdomeDoc,nil,name2.CString,nil);
   name2.Free;
-  {name1:=TGdomString.create(namespaceURI);
- 
-  //#ToDo2 add doctype to the following function-call
-  if length(namespaceURI)=0
-    then FPGdomeDoc:=gdome_di_createDocument(FPGDOMImpl,nil,name2.GetPString,nil,@exc)
-    else FPGdomeDoc:=gdome_di_createDocument(FPGDOMImpl,name1.GetPString,name2.GetPString,nil,@exc);
-  CheckError(exc);
-  name1.Free;
-  name2.Free;}
   //Get root-node
   root:= xmlNodePtr(FPGdomeDoc);
   //Create root-node as pascal object
@@ -1546,12 +1565,12 @@ begin
      else result:=nil;
 end;
 
-function TGDOMDocument.get_domImplementation: IDOMImplementation; 
+function TGDOMDocument.get_domImplementation: IDOMImplementation;
 begin
   result:=FGDOMImpl;
 end;
 
-function TGDOMDocument.get_documentElement: IDOMElement; 
+function TGDOMDocument.get_documentElement: IDOMElement;
 var root1:xmlElementPtr;
     exc: GdomeException;
     FGRoot: TGDOMElement;
@@ -1610,17 +1629,15 @@ end;
 
 function TGDOMDocument.createComment(const data: DOMString): IDOMComment; 
 var
-  exc:GdomeException;
   data1: TGdomString;
-  //AComment: PGdomeComment;
+  node: xmlNodePtr;
 begin
-  {data1:=TGdomString.create(data);
-  AComment:=gdome_doc_createComment(FPGdomeDoc,data1.GetPString,@exc);
-  CheckError(exc);
+  data1:=TGdomString.create(data);
+  node := xmlNewDocComment(FPGdomeDoc, data1.CString);
   data1.free;
-  if AComment<>nil
-    then result:=TGDOMComment.Create(PGdomeCharacterData(AComment),self)
-    else result:=nil;}
+  if node<>nil
+    then result:=TGDOMComment.Create(PGdomeCharacterData(node),self)
+    else result:=nil;
 end;
 
 function TGDOMDocument.createCDATASection(const data: DOMString): IDOMCDATASection;
@@ -1685,19 +1702,9 @@ begin
     else result:=nil;}
 end;
 
-function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList; 
-var
-  //ANodeList: xmlNodePtrList;
-  name1: TGdomString;
+function TGDOMDocument.getElementsByTagName(const tagName: DOMString): IDOMNodeList;
 begin
-  {name1:=TGdomString.create(tagName);
-  ANodeList:=gdome_doc_getElementsByTagName(FPGdomeDoc,name1.GetPString, @exc);
-  CheckError(exc);
-  name1.Free;
-  if ANodeList<>nil
-    then result:=TGDOMNodeList.Create(ANodeList,self)
-    else result:=nil;}
-  result:=nil;
+  result:=selectNodes(tagName);
 end;
 
 function TGDOMDocument.importNode(importedNode: IDOMNode; deep: WordBool): IDOMNode; 
