@@ -116,8 +116,8 @@ procedure xmlDumpNotationTable(buf: xmlBufferPtr; table: xmlNotationTablePtr); c
 function  xmlNewElementContent(name: PxmlChar; aType: xmlElementContentType): xmlElementContentPtr; cdecl; external LIBXML2_SO;
 function  xmlCopyElementContent(content: xmlElementContentPtr): xmlElementContentPtr; cdecl; external LIBXML2_SO;
 procedure xmlFreeElementContent(cur: xmlElementContentPtr); cdecl; external LIBXML2_SO;
-procedure xmlSnprintfElementContent(buf: PChar; size: Integer; content: xmlElementContentPtr; glob: Longint); cdecl; external LIBXML2_SO; {$IFDEF VER140} deprecated; {$ENDIF}
-procedure xmlSprintfElementContent(buf: PChar; content: xmlElementContentPtr; glob: Longint); cdecl; external LIBXML2_SO; {$IFDEF VER140} deprecated; {$ENDIF}
+procedure xmlSnprintfElementContent(buf: PChar; size: Integer; content: xmlElementContentPtr; glob: Longint); cdecl; external LIBXML2_SO; {$IFDEF HAS_DEPR} deprecated; {$ENDIF}
+procedure xmlSprintfElementContent(buf: PChar; content: xmlElementContentPtr; glob: Longint); cdecl; external LIBXML2_SO; {$IFDEF HAS_DEPR} deprecated; {$ENDIF}
 
 (* Element *)
 function  xmlAddElementDecl(ctxt: xmlValidCtxtPtr; dtd: xmlDtdPtr; name: PxmlChar; aType: xmlElementTypeVal; content: xmlElementContentPtr): xmlElementPtr; cdecl; external LIBXML2_SO;

@@ -33,13 +33,7 @@ const
   LIBXML2_SO = 'libxml2.so';
 {$ENDIF}
 
-{$IFDEF VER130}
-{$ALIGN ON}
-{$ELSE}
-{$ALIGN 4}
-{$ENDIF}
-{$MINENUMSIZE 4}
-{$ASSERTIONS OFF}
+{$I pasconfig.inc}
 
 type
   DWORD = Cardinal;

@@ -103,8 +103,8 @@ function  xsltExtModuleTopLevelLookup(name: PxmlChar; URI: PxmlChar): xsltTopLev
 function  xsltUnregisterExtModuleTopLevel(name: PxmlChar; URI: PxmlChar): Longint; cdecl; external LIBXSLT_SO;
 
 (* These 2 functions are deprecated for use within modules *)
-function  xsltRegisterExtFunction(ctxt: xsltTransformContextPtr; name: PxmlChar; URI: PxmlChar; function_: xmlXPathFunction): Longint; cdecl; external LIBXSLT_SO; {$IFDEF VER140} deprecated; {$ENDIF}
-function  xsltRegisterExtElement(ctxt: xsltTransformContextPtr; name: PxmlChar; URI: PxmlChar; function_: xsltTransformFunction): Longint; cdecl; external LIBXSLT_SO; {$IFDEF VER140} deprecated; {$ENDIF}
+function  xsltRegisterExtFunction(ctxt: xsltTransformContextPtr; name: PxmlChar; URI: PxmlChar; function_: xmlXPathFunction): Longint; cdecl; external LIBXSLT_SO; {$IFDEF HAS_DEPR} deprecated; {$ENDIF}
+function  xsltRegisterExtElement(ctxt: xsltTransformContextPtr; name: PxmlChar; URI: PxmlChar; function_: xsltTransformFunction): Longint; cdecl; external LIBXSLT_SO; {$IFDEF HAS_DEPR} deprecated; {$ENDIF}
 
 (*
  * Extension Prefix handling API.

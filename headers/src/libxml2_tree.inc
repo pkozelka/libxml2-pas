@@ -473,7 +473,7 @@ function  xmlCreateIntSubset(doc: xmlDocPtr; name: PxmlChar; ExternalID: PxmlCha
 function  xmlNewDtd(doc: xmlDocPtr; name: PxmlChar; ExternalID: PxmlChar; SystemID: PxmlChar): xmlDtdPtr; cdecl; external LIBXML2_SO;
 function  xmlGetIntSubset(doc: xmlDocPtr): xmlDtdPtr; cdecl; external LIBXML2_SO;
 procedure xmlFreeDtd(cur: xmlDtdPtr); cdecl; external LIBXML2_SO;
-function  xmlNewGlobalNs(doc: xmlDocPtr; href: PxmlChar; prefix: PxmlChar): xmlNsPtr; cdecl; external LIBXML2_SO; {$IFDEF VER140} deprecated; {$ENDIF}
+function  xmlNewGlobalNs(doc: xmlDocPtr; href: PxmlChar; prefix: PxmlChar): xmlNsPtr; cdecl; external LIBXML2_SO; {$IFDEF HAS_DEPR} deprecated; {$ENDIF}
 function  xmlNewNs(node: xmlNodePtr; href: PxmlChar; prefix: PxmlChar): xmlNsPtr; cdecl; external LIBXML2_SO;
 procedure xmlFreeNs(cur: xmlNsPtr); cdecl; external LIBXML2_SO;
 procedure xmlFreeNsList(cur: xmlNsPtr); cdecl; external LIBXML2_SO;

@@ -107,6 +107,6 @@ procedure xmlCatalogSetDefaults(allow: xmlCatalogAllow); cdecl; external LIBXML2
 function  xmlCatalogGetDefaults: xmlCatalogAllow; cdecl; external LIBXML2_SO;
 
 (* DEPRECATED interfaces *)
-function  xmlCatalogGetSystem(sysID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO; {$IFDEF VER140} deprecated; {$ENDIF}
-function  xmlCatalogGetPublic(pubID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO; {$IFDEF VER140} deprecated; {$ENDIF}
+function  xmlCatalogGetSystem(sysID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO; {$IFDEF HAS_DEPR} deprecated; {$ENDIF}
+function  xmlCatalogGetPublic(pubID: PxmlChar): PxmlChar; cdecl; external LIBXML2_SO; {$IFDEF HAS_DEPR} deprecated; {$ENDIF}
 

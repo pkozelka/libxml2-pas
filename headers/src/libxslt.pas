@@ -23,8 +23,7 @@ const
 
 {$WEAKPACKAGEUNIT}
 
-{$MINENUMSIZE 4}
-{$ASSERTIONS OFF}
+{$I pasconfig.inc}
 
 type
   xsltRuntimeExtraPtr = Pointer;
