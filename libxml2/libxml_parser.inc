@@ -1,4 +1,4 @@
-{ [1.71] libxml2-2.4.12
+{ [1.71] parser.h
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>

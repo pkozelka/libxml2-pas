@@ -1,4 +1,4 @@
-{ [1.4] libxml2-1.4.12
+{ [1.4] xinclude.h
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>

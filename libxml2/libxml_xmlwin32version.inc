@@ -1,4 +1,9 @@
-{$PACKRECORDS C}
+{ [1.21] xmlwin32version.h
+	------------------------------------------------------------------------------
+	Translated into pascal with help of h2pas utility from the FreePascal project.
+	Petr Kozelka <pkozelka@email.cz>
+	------------------------------------------------------------------------------
+}
 
 {
    xmlwin32version.h : compile-time version informations for the XML parser

@@ -1,4 +1,4 @@
-{ [1.23] libxml2-2.4.12
+{ [1.23] encoding.h
 	------------------------------------------------------------------------------
 	Translated into pascal with help of h2pas utility from the FreePascal project.
 	Petr Kozelka <pkozelka@email.cz>

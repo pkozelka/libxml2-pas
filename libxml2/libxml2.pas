@@ -82,6 +82,8 @@ function xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxt
 
 implementation
 
+// functions from globals.b
+
 procedure xmlFree(str: PxmlChar);
 begin
 	FreeMem(PChar(str));
