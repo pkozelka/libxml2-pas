@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.58 2002-01-16 21:15:09 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.59 2002-01-16 21:29:02 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -365,6 +365,7 @@ type
 		property  DomImplementation: IDomImplementation read get_domImplementation write FGDOMImpl; // internal mean to 'setup' implementation
 		property  FlyingNodes: TList read GetFlyingNodes;
 	public
+		constructor Create(aLibXml2Node: pointer); override;
 		destructor Destroy; override;
 	end;
 
@@ -982,20 +983,14 @@ begin
 		if (FGNode.parent=nil) then begin
 			RegisterFlyingNode(FGNode);
 		end;
-		if (doc = nil) then begin
-		end;
-	end else begin
-		// this is a document node
-		Inc(doccount);
-		_AddRef; //todo: replace with better solution
 		// if this is not the document itself, pretend having a reference to the owner document.
 		// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
-		//		get_ownerDocument._AddRef;
+//		get_ownerDocument._AddRef;
 	end;
 	Inc(nodecount);
 end;
 
-destructor TGDOMNode.destroy;
+destructor TGDOMNode.Destroy;
 begin
 	// if this is not the document itself, release the pretended reference to the owner document:
 	// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
@@ -1583,6 +1578,12 @@ end;
 
 { TGDOMDocument }
 
+constructor TGDOMDocument.Create(aLibXml2Node: pointer);
+begin
+	inherited Create(aLibXml2Node);
+	Inc(doccount);
+end;
+
 destructor TGDOMDocument.Destroy;
 begin
 	GDoc := nil;
@@ -1592,7 +1593,6 @@ begin
 	inherited Destroy;
 end;
 
-// IDOMDocument
 function TGDOMDocument.get_doctype: IDomDocumentType;
 var
 	dtd: xmlDtdPtr;
@@ -1825,7 +1825,6 @@ begin
 	end;
 end;
 
-// IDOMParseOptions
 function TGDOMDocument.get_async: Boolean;
 begin
 	result:=FAsync;
@@ -1866,7 +1865,6 @@ begin
 	Fvalidate:=true;
 end;
 
-// IDOMPersist
 function TGDOMDocument.get_xml: DOMString;
 var
 	CString,encoding:pchar;
