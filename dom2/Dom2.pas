@@ -1228,7 +1228,8 @@ var
 begin
   factory := get_DomVendorRegisterSingleton.get_Factory(vendorID);
   if factory = nil then
-    Raise EDomVendorRegisterException.create('Vendor ID not present');
+    Raise EDomVendorRegisterException.createFmt(
+            'Vendor ID: %s not present', [vendorID]);
 
   result := factory;
 end;
