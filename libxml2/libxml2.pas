@@ -93,6 +93,9 @@ procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePt
 // xmlIO.h
 function  xmlNoNetExternalEntityLoader(URL: PChar; ID: PChar; ctxt: xmlParserCtxtPtr): xmlParserInputPtr; cdecl;external LIBXML2_SO;
 
+//
+procedure xmlFree(str: PxmlChar);
+
 type
   (**
   * This interface is intended for libxml2 wrappers. It provides a way
@@ -106,8 +109,6 @@ implementation
 
 uses
   SysUtils;
-
-// functions from libxml_globals.pas
 
 procedure xmlFree(str: PxmlChar);
 begin
