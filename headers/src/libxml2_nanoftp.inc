@@ -1,4 +1,4 @@
-// CVS-REV:gnome-xml/include/libxml/nanoftp.h:1.11:
+// CVS-REV:gnome-xml/include/libxml/nanoftp.h:1.12:
 {
   ------------------------------------------------------------------------------
   Translated into pascal with help of h2pas utility from the FreePascal project.
