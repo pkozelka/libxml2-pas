@@ -5,3 +5,5 @@ dist:
 upload:
 	./mkrelease upload
 
+checkapi:
+	sh utils/checkapi.sh $(GNOMECVSROOT) src/*.inc
