@@ -1,4 +1,4 @@
-unit libxmldom; //$Id: libxmldom.pas,v 1.50 2002-01-16 17:45:49 pkozelka Exp $
+unit libxmldom; //$Id: libxmldom.pas,v 1.51 2002-01-16 19:12:41 pkozelka Exp $
 
 {
 	 ------------------------------------------------------------------------------
@@ -60,10 +60,10 @@ type
 
 { TGDOMImplementation }
 
-	TGDOMImplementation = class(TGDOMInterface, IDOMImplementation)
+	TGDOMImplementation = class(TGDOMInterface,
+		IDomImplementation)
 	private
-		protected
-		 { IDOMImplementation }
+	protected //IDomImplementation
 		function hasFeature(const feature, version: DOMString): Boolean;
 		function createDocumentType(const qualifiedName, publicId, systemId: DOMString): IDOMDocumentType;
 		function createDocument(const namespaceURI, qualifiedName: DOMString; doctype: IDOMDocumentType): IDOMDocument;
@@ -958,9 +958,14 @@ begin
 end;
 
 constructor TGDOMNode.Create(aNode: xmlNodePtr);
+var
+	doc: IDomDocument;
 begin
 	inherited Create;
-	DomAssert(Assigned(aNode), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
+	self.QueryInterface(IDomDocument, doc);
+	if (doc<>nil) then begin
+		DomAssert(Assigned(aNode), INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap null node');
+	end;
 	DomAssert(aNode.doc<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.Create: Cannot wrap node not attached to any document');
 	FGNode := aNode;
 	inc(nodecount);
@@ -968,10 +973,20 @@ begin
 	if (aNode.parent=nil) then begin
 		RegisterFlyingNode(aNode);
 	end;
+	// if this is not the document itself, pretend having a reference to the owner document.
+	// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+	if (doc = nil) then begin
+//		get_ownerDocument._AddRef;
+	end;
 end;
 
 destructor TGDOMNode.destroy;
 begin
+	// if this is not the document itself, release the pretended reference to the owner document:
+	// This ensures that the document lives exactly as long as any wrapper node (created by this doc) exists
+	if (get_nodeType<>DOCUMENT_NODE) then begin
+//		get_ownerDocument._Release;
+	end;
 	Dec(nodecount);
 	inherited Destroy;
 end;
@@ -1564,7 +1579,7 @@ constructor TGDOMDocument.create(GDOMImpl:IDOMImplementation; const namespaceURI
 begin
 //	DomAssert(doctype<>nil, NOT_SUPPORTED_ERR, 'TGDOMDocument.create with doctype not implemented yet');
 	//Create doc-node as pascal object
-//	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
+	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
 	FGDOMImpl:=GDOMImpl;
 	FFlyingNodes := TList.Create;
 	Inc(doccount);
@@ -1578,7 +1593,7 @@ end;
 constructor TGDOMDocument.Create(GDOMImpl: IDOMImplementation);
 begin
 	//Create root-node as pascal object
-//	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
+	inherited Create(xmlNodePtr(xmlNewDoc(XML_DEFAULT_VERSION)));
 	FGDOMImpl := GDOMImpl;
 	FFlyingNodes := TList.Create;
 	Inc(doccount);
