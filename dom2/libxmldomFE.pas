@@ -12,6 +12,9 @@ unit libxmldom;
    Martijn Brinkers
    Petr Kozelka
 
+   The IsXML... routines are written by Dieter Köhler,
+   http://www.philo.de/xml/
+
      Copyright:
      4commerce technologies AG
      Kamerbalken 10-14
@@ -2557,15 +2560,13 @@ end;
 { TGDOMDocumentType }
 
 function TGDOMDocumentType.get_entities: IDOMNamedNodeMap;
-//var entities: PGdomeNamedNodeMap;
-//    exc: GdomeException;
+var
+  entities: xmlNodePtr;
 begin
-  checkError(NOT_SUPPORTED_ERR);
-  {entities:=gdome_dt_entities(GDocumentType,@exc);
-  CheckError(exc);
+  entities:=xmlNodePtr(GDocumentType);
   if entities<>nil
     then result:=TGDOMNamedNodeMap.Create(entities,FOwnerDocument) as IDOMNamedNodeMap
-    else result:=nil;}
+    else result:=nil;
 end;
 
 function TGDOMDocumentType.get_internalSubset: DOMString;
