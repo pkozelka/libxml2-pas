@@ -1,5 +1,5 @@
 unit libxmldom;
-//$Id: libxmldom.pas,v 1.83 2002-01-27 22:15:53 pkozelka Exp $
+//$Id: libxmldom.pas,v 1.84 2002-01-27 22:25:59 pkozelka Exp $
 
 {
    ------------------------------------------------------------------------------
@@ -1055,15 +1055,15 @@ var
   child: xmlNodePtr;
 const
   CHILD_TYPES = [
-    Element_Node,
-    Text_Node,
-    CDATA_Section_Node,
-    Entity_Reference_Node,
-    Processing_Instruction_Node,
-    Comment_Node,
-    Document_Type_Node,
-    Document_Fragment_Node,
-    Notation_Node
+    ELEMENT_NODE,
+    TEXT_NODE,
+    CDATA_SECTION_NODE,
+    ENTITY_REFERENCE_NODE,
+    PROCESSING_INSTRUCTION_NODE,
+    COMMENT_NODE,
+    DOCUMENT_TYPE_NODE,
+    DOCUMENT_FRAGMENT_NODE,
+    NOTATION_NODE
   ];
 begin
   DomAssert(newChild<>nil, INVALID_ACCESS_ERR, 'TGDOMNode.insertBefore: cannot append null');
@@ -1224,11 +1224,13 @@ begin
   DomAssert(aOwnerNode<>nil, HIERARCHY_REQUEST_ERR, 'Child list must have a parent');
   FOwnerNode := aOwnerNode;
   FOwnerNode.FChildNodes := self;
+  FOwnerNode._AddRef; //as long as the list exists, its owner must exist too
 end;
 
 destructor TGDOMChildNodeList.Destroy;
 begin
   FOwnerNode.FChildNodes := nil;
+  FOwnerNode._Release;
   FOwnerNode := nil;
   inherited Destroy;
 end;
@@ -1322,11 +1324,13 @@ begin
   DomAssert(aOwnerElement<>nil, HIERARCHY_REQUEST_ERR, 'Attribute list must have an owner element');
   FOwnerElement := aOwnerElement;
   FOwnerElement.FAttributes := self;
+  FOwnerElement._AddRef; //as long as the map exists, its owner must exist too
 end;
 
 destructor TGDOMAttributes.Destroy;
 begin
   FOwnerElement.FAttributes := nil;
+  FOwnerElement._Release;
   FOwnerElement := nil;
   inherited destroy;
 end;
