@@ -1,30 +1,50 @@
-Delphi-Headers for libxml2 - Version 0.23
-=========================================
-
-New in version 0.23:
-
-- Tested with delphi5
-- access to vars of type xmlNodeSetPtr works now
-
-New in version 0.21:
-
-- XPATH evaluation works correctly for numbers and strings, too
-
-New in version 0.20:
-
-- complete example projekt in demos/libxml2/demo1
-
+Delphi-Headers for libxml2
+==========================
 Libxml2 is a low-level library for the work with xml-documents.
+libxml2-pas is translation of the header files into Pascal language.
 
-See:
-http://xmlsoft.org/
+AUTHORS
+-------
+Petr Kozelka <pkozelka@email.cz>	-  original header translations
+Uwe Fechner <ufechner@4commerce.de>	-  testing, demo application(s)
 
 
-Tested with delphi6, windows 2000, libxml binaries version 2.4.12 from:
-http://www.fh-frankfurt.de/~igor/projects/libxml/
+VERSION COMPLIANCE
+------------------
+This set of units was successfully tested with libxml2 version 2.4.11. However, 
+translations of some API functions might be missing.
 
-Tested with delphi5
 
-Original header translations from:
+WHAT YOU FIND IN THIS PACKAGE
+-----------------------------
+libxml2/		- pascal translations of the libxml2 headers
+demos/libxml2/		- demo applications
+demos/libxml2/demo1/	- demo application for xpath testing (by Uwe Fechner)
 
-Petr Kozelka <pkozelka@email.cz>
+
+USAGE
+-----
+Note that you should *NEVER* need to include any of the *.inc files in the translation directory.
+To use functions implemented in libxml2, you just put "libxml2" into your _uses_ list:
+
+program MyPrg;
+uses libxml2;
+begin
+  ... your code here ...
+end.
+
+The following dlls are necessary and must be placed in this directory or in a 
+directory listed in the PATH environment variable:
+
+iconv.dll
+libxml2.dll
+
+
+
+LINKS
+-----
+http://sourceforge.net/projects/libxml2-pas			- project's web site
+mailto:libxml2-pas-devel@lists.sourceforge.net			- mailing list
+http://xmlsoft.org/						- the libxml2 libraries web site
+http://www.fh-frankfurt.de/~igor/projects/libxml/index.html	- Windows build of libxml2 by Igor Zlatkovic
+

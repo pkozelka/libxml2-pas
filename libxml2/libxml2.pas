@@ -8,6 +8,7 @@ unit libxml2;
 	See also:
 		http://www.xmlsoft.org  - the libxml2 homepage
 		http://kozelka.hyperlink.cz  - my homepage
+
 }
 
 interface
@@ -33,6 +34,7 @@ type
 	PLongInt = ^LongInt;
 	PByte = ^byte;
 	PPChar = ^PChar;
+	size_t = longint;
 
 {$I libxml_xmlmemory.inc}
 {$I libxml_tree.inc}
@@ -60,6 +62,7 @@ type
 {$I libxml_nanohttp.inc}
 {$I libxml_uri.inc}
 
+// xmlFree overloaded functions
 procedure xmlFree(str: PxmlChar); overload;
 procedure xmlFree(cur: xmlNodePtr);cdecl;external LIBXML2_SO name 'xmlFreeNode'; overload;
 procedure xmlFree(cur: xmlDocPtr);cdecl;external LIBXML2_SO name 'xmlFreeDoc'; overload;
@@ -67,6 +70,13 @@ procedure xmlFree(cur: xmlDtdPtr);cdecl;external LIBXML2_SO name 'xmlFreeDtd'; o
 procedure xmlFree(uri: xmlURIPtr);cdecl;external LIBXML2_SO name 'xmlFreeURI'; overload;
 procedure xmlFree(cur: xmlAttrPtr);cdecl;external LIBXML2_SO name 'xmlFreeProp'; overload;
 procedure xmlFree(cur: xmlNsPtr);cdecl;external LIBXML2_SO name 'xmlFreeNs'; overload;
+
+// functions that reference symbols defined later - by header file:
+
+// tree.h
+function  xmlSaveFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar):longint;cdecl;external LIBXML2_SO;
+function  xmlSaveFormatFileTo(buf:xmlOutputBufferPtr; cur:xmlDocPtr; encoding:Pchar; format:longint):longint;cdecl;external LIBXML2_SO;
+procedure xmlNodeDumpOutput(buf:xmlOutputBufferPtr; doc:xmlDocPtr; cur:xmlNodePtr; level:longint; format:longint; encoding:Pchar);cdecl;external LIBXML2_SO;
 
 implementation
 
@@ -78,4 +88,7 @@ begin
 end;
 
 end.
+
+
+
 
