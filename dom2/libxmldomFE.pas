@@ -1482,6 +1482,7 @@ begin
     FGNamedNodeMap := ANamedNodeMap;
   end else begin
     FGDTD := xmlDtdPtr(ANamedNodeMap);
+    FGDTD2:=dtd2;
     FGNamedNodeMap := nil;
   end;
   inherited Create;
@@ -1596,14 +1597,14 @@ end;
 
 procedure TGDOMElement.removeAttribute(const Name: DOMString);
 var
-  oldattr: xmlAttrPtr;
   name1: TGdomString;
+  ok: integer;
 begin
   name1 := TGdomString.Create(Name);
-  oldattr := xmlHasProp(xmlNodePtr(GElement), name1.CString);
+  ok:=xmlUnsetProp(GElement,name1.CString);
+  if ok <> 0 then checkerror(103);
   name1.Free;
   //todo: make it work with xmlns attributes
-  if oldattr <> nil then xmlRemoveProp(oldattr);
 end;
 
 function TGDOMElement.getAttributeNode(const Name: DOMString): IDomAttr;
@@ -1942,8 +1943,9 @@ var
   name1: TGdomString;
 begin
   name1 := TGdomString.Create(Name);
-  if xmlHasProp(xmlNodePtr(GElement), name1.CString) <> nil then Result := True
-  else Result := False;
+  if xmlHasProp(GElement, name1.CString) <> nil
+    then Result := True
+    else Result := False;
   name1.Free;
 end;
 
