@@ -308,7 +308,7 @@ function  xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: integer): xmlNodePtr; { 
  *
  * Returns %TRUE if @ns is an empty node-set
  *)
-function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): boolean;
+function  xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): boolean;
 
 procedure xmlXPathFreeObject(obj:xmlXPathObjectPtr);cdecl;external LIBXML2_SO;
 function  xmlXPathNodeSetCreate(val:xmlNodePtr):xmlNodeSetPtr;cdecl;external LIBXML2_SO;
