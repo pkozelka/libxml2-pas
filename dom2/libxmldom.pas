@@ -771,7 +771,13 @@ end;
 
 function TGDOMNode.get_ownerDocument: IDOMDocument; 
 begin
-  result:=FOwnerDocument;
+  if FGNode.type_<>Document_Node
+    then result:=FOwnerDocument
+    else begin
+      if FOwnerDocument=nil
+        then result:=self as IDOMDocument
+        else result:=FOwnerDocument;
+    end;
 end;
 
 function TGDOMNode.get_namespaceURI: DOMString; 
@@ -889,7 +895,8 @@ const
 var
   node: xmlNodePtr;
 begin
-  if newChild=nil then CheckError(Not_Supported_Err);
+  node:=GetGNode(newChild);
+  if node=nil then CheckError(Not_Supported_Err);
   if self.IsReadOnly
     then CheckError(NO_MODIFICATION_ALLOWED_ERR);
   if not (newChild.NodeType in FAllowedChildTypes)
@@ -897,8 +904,10 @@ begin
   if FGNode.type_=Document_Node then
     if (newChild.nodeType = Element_Node) and (xmlDocGetRootElement(xmlDocPtr(FGNode))<>nil)
       then CheckError(HIERARCHY_REQUEST_ERR);
-  if self.get_ownerDocument<>newChild.ownerDocument
+  if node.doc<>FGNode.doc
     then CheckError(WRONG_DOCUMENT_ERR);
+  //if self.get_ownerDocument<>newChild.ownerDocument
+  //  then CheckError(WRONG_DOCUMENT_ERR);
   if self.isAncestorOrSelf(GetGNode(newChild))
     then CheckError(HIERARCHY_REQUEST_ERR);
   if IsReadOnlyNode((GetGNode(newChild)).parent)
@@ -1615,14 +1624,12 @@ begin
   //Get root-node
   root:= xmlNodePtr(FPGdomeDoc);
   //Create root-node as pascal object
-  inherited create(root,self);
+  inherited create(root,nil);
   //self._Release;
   inc(doccount);
 end;
 
 destructor TGDOMDocument.destroy;
-var
-  exc: GdomeException;
 begin
   if doccount>0 then begin
     if FPGdomeDoc<>nil
@@ -2647,7 +2654,7 @@ begin
   //Get root-node
   root:= xmlNodePtr(FPGdomeDoc);
   //Create root-node as pascal object
-  inherited create(root,self);
+  inherited create(root,nil);
   //self._Release;
   inc(doccount);
 end;
