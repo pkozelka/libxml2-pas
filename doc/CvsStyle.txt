@@ -1,0 +1,27 @@
+Following are rules defining how to work with CVS
+Petr Kozelka (C) 2002
+
+1. General
+	- the repository content should always be independent of any concrete working environment
+1.1. checkout
+	- it is always assumed that the whole repository including all modules is checked out ("cvs co .")
+2. Directory structure
+	TODO (as agreed earlier, I will fill this later)
+3. Files under revision control
+3.1. What should never be uploaded
+	- long binary files (archives, executables, photos, other binary data)
+	- configuration plaintext files which contain absolute directory references
+		- for Delphi/Kylix, it means: .DOF, .CFG, .DSK, .KOFF, ...
+	- third party source code. Instead, there should be a script to download and move the files wherever 
+	  appropriate.
+3.2. What is acceptable
+	- small icons/bitmaps, that do not change frequently
+	- configuration files mentioned above, if the name is extended with ".in" and content 
+	  carefully checked against absolute directory references. In this case, it is recommended
+	  to provide a script (or preferrably a Makefile target) that renames and performs anything 
+	  necessary with the ".in" file. This should be mentioned in the README.txt file
+3.3. What should primarily be in CVS
+	- any Pascal sources (.pas, .inc, .dpr)
+	- Delphi and Kylix forms saved as TEXT (.dfm, .kfm)
+	- README.txt (in each directory) and other documentation files (HOWTOs etc.)
+	- Makefile's 

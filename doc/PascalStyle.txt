@@ -1,0 +1,45 @@
+Following are rules for syntax of Pascal files.
+Petr Kozelka (C) 2002
+
+1. Indentation
+1.1. always use 2 spaces
+1.2. no TABs should be in the .pas, .dpr or .inc source file
+
+2. Identifiers 
+2.1. New identifiers
+	- when declaring an identifier, always make its prefixing/sufixing coherent 
+	  throughout the whole project, or at least the unit
+
+2.2. Referrencing identifiers
+	- when referrencing an existing identifier, use exactly the namecase with which it was declared
+
+3. Programming constructs
+3.1. "if"
+	- do never use comparison with boolean constants, like:
+	if (myFlag=true)	// WRONG! 
+	then doSomething
+	else doSomethingElse
+
+	Just use the boolean value (or negated value)
+
+3.2. "end"
+	- always align "end" with the first character of the construct being ended. 
+	Example 1:
+		if (myTest) then begin
+		  // ...
+		end else begin
+		  // ...
+		end;
+	Example 2:
+		for i:=1 to 5 do begin
+		  // ...
+		end;
+
+4. Special comments
+4.1. //TODO <+some text>
+	- marks a feature that should be implemented, but the developper didn't have 
+	  time yet, or is waiting for something
+4.2. //BUG <+some text>
+	- marks a place that was discoverred buggy, but is tempoarily necessary. Should be fixed asap.
+	- alternatively, one developper can mark this way a place where he found a bug, 
+	  to make it easier to the one who will work on it
