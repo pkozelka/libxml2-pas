@@ -231,7 +231,7 @@ type
     procedure setAttribute(const name, value: DOMString);
     procedure removeAttribute(const name: DOMString);
 		function getAttributeNode(const name: DOMString): IDOMAttr;
-    function setAttributeNode(const newAttr: IDOMAttr): IDOMAttr;
+		function setAttributeNode(const newAttr: IDOMAttr): IDOMAttr;
     function removeAttributeNode(const oldAttr: IDOMAttr):IDOMAttr;
     function getElementsByTagName(const name: DOMString): IDOMNodeList;
     function getAttributeNS(const namespaceURI, localName: DOMString): DOMString;
@@ -289,7 +289,7 @@ type
   end;
 
 	{ TMSDOMNotation }
-  PGdomeNotation=xmlNotationPtr;
+	PGdomeNotation=xmlNotationPtr;
 
   TGDOMNotation = class(TGDOMNode, IDOMNotation)
   private
@@ -347,7 +347,7 @@ type
 
   TGDOMDocument = class(TGDOMNode, IDOMDocument, IDOMParseOptions, IDOMPersist, IDOMInternal)
 	private
-    FGDOMImpl: IDOMImplementation;
+		FGDOMImpl: IDOMImplementation;
     FPGdomeDoc: xmlDocPtr;
     FAsync: boolean;              //for compatibility, not really supported
     FpreserveWhiteSpace: boolean; //difficult to support
@@ -376,7 +376,7 @@ type
 		function createAttributeNS(const namespaceURI, qualifiedName: DOMString): IDOMAttr;
 		function getElementsByTagNameNS(const namespaceURI, localName: DOMString): IDOMNodeList;
 		function getElementById(const elementId: DOMString): IDOMElement;
-    // IDOMParseOptions
+		// IDOMParseOptions
     function get_async: Boolean;
     function get_preserveWhiteSpace: Boolean;
     function get_resolveExternals: Boolean;
@@ -397,7 +397,7 @@ type
       EventHandler: TAsyncEventHandler);
     // IDOMInternal
     procedure removeAttr(attr: xmlAttrPtr);
-    procedure appendAttr(attr: xmlAttrPtr);
+		procedure appendAttr(attr: xmlAttrPtr);
     procedure appendNode(node: xmlNodePtr);
   public
     constructor Create(
@@ -405,14 +405,14 @@ type
       const namespaceURI, qualifiedName: DOMString;
       doctype: IDOMDocumentType); overload;
 		constructor Create(GDOMImpl:IDOMImplementation); overload;
-    constructor Create(GDOMImpl:IDOMImplementation; aUrl: DomString); overload;
+		constructor Create(GDOMImpl:IDOMImplementation; aUrl: DomString); overload;
 		destructor destroy; override;
   end;
 
   { TMSDOMDocumentFragment }
 
   TGDOMDocumentFragment = class(TGDOMNode, IDOMDocumentFragment)
-  end;
+	end;
 
   TGDOMDocumentBuilderFactory = class(TInterfacedObject, IDomDocumentBuilderFactory)
   private
@@ -425,14 +425,14 @@ type
     function Get_VendorID : DomString;
   end;
 
-  TGDOMDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
-  private
-    FFreeThreading : Boolean;
-  public
-    constructor Create(AFreeThreading : Boolean);
-    destructor Destroy; override;
-    function  Get_DomImplementation : IDomImplementation;
-    function  Get_IsNamespaceAware : Boolean;
+	TGDOMDocumentBuilder = class(TInterfacedObject, IDomDocumentBuilder)
+	private
+		FFreeThreading : Boolean;
+	public
+		constructor Create(AFreeThreading : Boolean);
+		destructor Destroy; override;
+		function  Get_DomImplementation : IDomImplementation;
+		function  Get_IsNamespaceAware : Boolean;
 		function  Get_IsValidating : Boolean;
 		function  Get_HasAsyncSupport : Boolean;
 		function  Get_HasAbsoluteURLSupport : Boolean;
@@ -441,29 +441,22 @@ type
 		function  load(const url : DomString) : IDomDocument;
 	end;
 
-implementation
-
 var
+	//[pk] following should be in implementation, or nowhere at all:
 	LIBXML_DOM: IDomDocumentBuilderFactory;
 	doccount: integer=0;
 	domcount: integer=0;
 	nodecount: integer=0;
 	elementcount: integer=0;
 
-function GetGNode(const Node: IDOMNode): xmlNodePtr;
-
-procedure CheckError(err:integer);
-
-function IsReadOnlyNode(node:xmlNodePtr): boolean;
-
-function ErrorString(err:integer):string;
+implementation
 
 type
 	GDomeException = Integer;
 
 resourcestring
-  SNodeExpected = 'Node cannot be null';
-  SGDOMNotInstalled = 'GDOME2 is not installed';
+	SNodeExpected = 'Node cannot be null';
+	SGDOMNotInstalled = 'GDOME2 is not installed';
 
 function MakeNode(aNode: xmlNodePtr;aDocument:IDOMDocument): IDOMNode;
 const
@@ -492,50 +485,103 @@ begin
 	Result := obj;
 end;
 
+function GetGNode(const Node: IDOMNode): xmlNodePtr;
+begin
+  if not Assigned(Node) then
+    raise EDOMException.Create(SNodeExpected);
+  Result := (Node as IXMLDOMNodeRef).GetGDOMNode;
+end;
+
+function ErrorString(err:integer):string;
+begin
+  case err of
+    INDEX_SIZE_ERR: result:='INDEX_SIZE_ERR';
+    DOMSTRING_SIZE_ERR: result:='DOMSTRING_SIZE_ERR';
+    HIERARCHY_REQUEST_ERR: result:='HIERARCHY_REQUEST_ERR';
+    WRONG_DOCUMENT_ERR: result:='WRONG_DOCUMENT_ERR';
+    INVALID_CHARACTER_ERR: result:='INVALID_CHARACTER_ERR';
+    NO_DATA_ALLOWED_ERR: result:='NO_DATA_ALLOWED_ERR';
+    NO_MODIFICATION_ALLOWED_ERR: result:='NO_MODIFICATION_ALLOWED_ERR';
+    NOT_FOUND_ERR: result:='NOT_FOUND_ERR';
+    NOT_SUPPORTED_ERR: result:='NOT_SUPPORTED_ERR';
+    INUSE_ATTRIBUTE_ERR: result:='INUSE_ATTRIBUTE_ERR';
+    INVALID_STATE_ERR: result:='INVALID_STATE_ERR';
+    SYNTAX_ERR: result:='SYNTAX_ERR';
+		INVALID_MODIFICATION_ERR: result:='INVALID_MODIFICATION_ERR';
+		NAMESPACE_ERR: result:='NAMESPACE_ERR';
+		INVALID_ACCESS_ERR: result:='INVALID_ACCESS_ERR';
+		20: result:='SaveXMLToMemory_ERR';
+		21: result:='NotSupportedByLibxmldom_ERR';
+		22: result:='SaveXMLToDisk_ERR';
+		100: result:='LIBXML2_NULL_POINTER_ERR';
+		101: result:='INVALID_NODE_SET_ERR';
+		102: result:='PARSE_ERR';
+	else
+		result:='Unknown error no: '+inttostr(err);
+	end;
+end;
+
+procedure CheckError(err:integer);
+begin
+	if err <>0
+		then raise EDOMException.Create(ErrorString(err));
+end;
+
+function IsReadOnlyNode(node:xmlNodePtr): boolean;
+begin
+	if node<>nil
+		then  case node.type_ of
+			XML_NOTATION_NODE,XML_ENTITY_NODE,XML_ENTITY_DECL: result:=true;
+		else
+			result:=false;
+		end
+	else
+		result:=false;
+end;
+
+function canAppendNode(priv,newPriv:xmlNodePtr): boolean;
+//var
+//	new_type: integer;
+begin
+//ToDo:
+//Finish the translation from C
+//	if newPriv<>nil
+//		then new_type:=newPriv.type_;
+	result:=true;
+end;
+
 function prefix(qualifiedName:string):string;
 begin
-  result := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
+	result := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
 end;
 
 function localName(qualifiedName:string):string;
 var prefix: string;
 begin
   prefix := Copy(qualifiedName,1,Pos(':',qualifiedName)-1);
-  if length(prefix)>0
+	if length(prefix)>0
     then result:=(Copy(qualifiedName,Pos(':',qualifiedName)+1,
       length(qualifiedName)-length(prefix)-1))
-    else result:=qualifiedName;
+		else result:=qualifiedName;
 end;
 
 function libxmlStringToString(libstring:pchar):String;
-  var s: string;
-  begin
-    if libstring<>nil
-      then begin
-        s := libstring;
-        result:= s;
-      end
-      else result:='';
-  end;
-
-(*
-function TGDOMImplementationFactory.DOMImplementation: IDOMImplementation;
+var s: string;
 begin
-  Result := TGDOMImplementation.Create;
+	if libstring<>nil
+		then begin
+			s := libstring;
+			result:= s;
+		end
+		else result:='';
 end;
-
-function TGDOMImplementationFactory.Description: String;
-begin
-  Result := SLIBXML;
-end;
-*)
 
 (*
  *  TXDomDocumentBuilder
 *)
 constructor TGDOMDocumentBuilder.Create(AFreeThreading : Boolean);
 begin
-  inherited Create;
+	inherited Create;
   FFreeThreading := AFreeThreading;
 end;
 
@@ -1489,7 +1535,7 @@ var
   attr,xmlnewAttr,oldattr: xmlAttrPtr;
   temp: string;
   node: xmlNodePtr;
-  namespace: pchar;
+	namespace: pchar;
   slocalname: string;
 begin
   if newAttr<>nil then begin
@@ -1518,7 +1564,7 @@ begin
       then begin
         temp:=oldattr.name;
         result:=TGDomAttr.Create(oldattr,FOwnerDocument) as IDOMAttr;
-        (FOwnerDocument as IDOMInternal).appendAttr(oldattr);
+				(FOwnerDocument as IDOMInternal).appendAttr(oldattr);
       end
       else begin
         result:=nil;
@@ -1605,7 +1651,7 @@ begin
             then xmlFreeProp(AAttr)
             else begin
               AAttr.ns:=nil;
-              //xmlFreeProp(AAttr);
+							//xmlFreeProp(AAttr);
             end;
 
     end;
@@ -1777,9 +1823,9 @@ begin
     if deep
       then recurse:=1
       else recurse:=0;
-    node:=xmlDocCopyNode(GetGNode(importedNode),FPGdomeDoc,recurse);
-    if node <> nil
-      then result:=MakeNode(node,self)
+		node:=xmlDocCopyNode(GetGNode(importedNode),FPGdomeDoc,recurse);
+		if node <> nil
+			then result:=MakeNode(node,self)
       else result:=nil;
   end;
 end;
@@ -1806,14 +1852,14 @@ gdome_xml_doc_importNode (GdomeDocument *self, GdomeNode *importedNode, GdomeBoo
   case XML_ELEMENT_NODE:
   case XML_ENTITY_REF_NODE:
   case XML_PI_NODE:
-  case XML_TEXT_NODE:
+	case XML_TEXT_NODE:
   case XML_CDATA_SECTION_NODE:
   case XML_COMMENT_NODE:
 		ret = xmlDocCopyNode (priv_node->n, priv->n, deep);
     break;
   default:
 		*exc = GDOME_NOT_SUPPORTED_ERR;
-  }
+	}
 
 	return gdome_xml_n_mkref (ret);
 }
@@ -1864,14 +1910,14 @@ function TGDOMDocument.getElementsByTagNameNS(const namespaceURI,
   localName: DOMString): IDOMNodeList;
 var docElement:IDOMElement;
 begin
-  docElement:=self.get_documentElement;
+	docElement:=self.get_documentElement;
   result:=docElement.getElementsByTagNameNS(namespaceURI,localName);
 end;
 
 function TGDOMDocument.getElementById(const elementId: DOMString): IDOMElement;
 //var
   //AElement: xmlElementPtr;
-  //name1: string;
+	//name1: string;
 begin
   checkError(NOT_SUPPORTED_ERR);
   {name1:=TGdomString.create(elementID);
@@ -1958,7 +2004,7 @@ begin
         inherited create(root,nil);
         result:=true
       end
-    else result:=false;
+		else result:=false;
 end;
 
 function TGDOMDocument.loadFromStream(const stream: TStream): WordBool;
@@ -2007,71 +2053,6 @@ procedure TGDOMDocument.set_OnAsyncLoad(const Sender: TObject;
   EventHandler: TAsyncEventHandler);
 begin
   checkError(NOT_SUPPORTED_ERR);
-end;
-
-function GetGNode(const Node: IDOMNode): xmlNodePtr;
-begin
-  if not Assigned(Node) then
-    raise EDOMException.Create(SNodeExpected);
-  Result := (Node as IXMLDOMNodeRef).GetGDOMNode;
-end;
-
-function ErrorString(err:integer):string;
-begin
-  case err of
-    INDEX_SIZE_ERR: result:='INDEX_SIZE_ERR';
-    DOMSTRING_SIZE_ERR: result:='DOMSTRING_SIZE_ERR';
-    HIERARCHY_REQUEST_ERR: result:='HIERARCHY_REQUEST_ERR';
-    WRONG_DOCUMENT_ERR: result:='WRONG_DOCUMENT_ERR';
-    INVALID_CHARACTER_ERR: result:='INVALID_CHARACTER_ERR';
-    NO_DATA_ALLOWED_ERR: result:='NO_DATA_ALLOWED_ERR';
-    NO_MODIFICATION_ALLOWED_ERR: result:='NO_MODIFICATION_ALLOWED_ERR';
-    NOT_FOUND_ERR: result:='NOT_FOUND_ERR';
-    NOT_SUPPORTED_ERR: result:='NOT_SUPPORTED_ERR';
-    INUSE_ATTRIBUTE_ERR: result:='INUSE_ATTRIBUTE_ERR';
-    INVALID_STATE_ERR: result:='INVALID_STATE_ERR';
-    SYNTAX_ERR: result:='SYNTAX_ERR';
-    INVALID_MODIFICATION_ERR: result:='INVALID_MODIFICATION_ERR';
-    NAMESPACE_ERR: result:='NAMESPACE_ERR';
-    INVALID_ACCESS_ERR: result:='INVALID_ACCESS_ERR';
-    20: result:='SaveXMLToMemory_ERR';
-    21: result:='NotSupportedByLibxmldom_ERR';
-    22: result:='SaveXMLToDisk_ERR';
-    100: result:='LIBXML2_NULL_POINTER_ERR';
-    101: result:='INVALID_NODE_SET_ERR';
-    102: result:='PARSE_ERR';
-  else
-    result:='Unknown error no: '+inttostr(err);
-  end;
-end;
-
-procedure CheckError(err:integer);
-begin
-  if err <>0
-    then raise EDOMException.Create(ErrorString(err));
-end;
-
-function IsReadOnlyNode(node:xmlNodePtr): boolean;
-begin
-  if node<>nil
-    then  case node.type_ of
-      XML_NOTATION_NODE,XML_ENTITY_NODE,XML_ENTITY_DECL: result:=true;
-    else
-      result:=false;
-    end
-  else
-    result:=false;
-end;
-
-function canAppendNode(priv,newPriv:xmlNodePtr): boolean;
-//var
-//	new_type: integer;
-begin
-//ToDo:
-//Finish the translation from C
-//	if newPriv<>nil
-//		then new_type:=newPriv.type_;
-	result:=true;
 end;
 
 { TGDOMCharacterData }
