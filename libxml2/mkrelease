@@ -40,7 +40,7 @@ createArchive()
 	echo "Preparing archive $ARCHIVEFILE ..."
 	rm -f $ARCHIVEFILE
 	cd $MYTMP
-	cat libxml2/INFO.txt.template | sed "s:@VERSION@:$VERSION:g" | sed "s:@DATE@:`date | cut -d\  -f 2,3,6`:g" >INFO.txt
+	cat libxml2/INFO.txt.template | sed "s:@VERSION@:$VERSION:g" | sed "s:@DATE@:`date +'%d %b %Y'`:g" >INFO.txt
 	rm libxml2/INFO.txt.template
 	$PACKCMD
 	cd ..
