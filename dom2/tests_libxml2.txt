@@ -1,0 +1,115 @@
+priority:
+1 = high
+2 = medium
+3 = low
+
+class                       method                 importance    ok     remark                                                 
+                                                                                                                                   
+-                           GetDom                 1             X                                                              
+attr                        name                   1             X                                                                
+attr                        specified              3                                                                             
+attr                        value                  1             X      test again, please                                                                 
+characterData               appendData             3                                                                             
+characterData               deleteData             3                                                                             
+characterData               Data                   2             X                                                                
+characterData               Length                 2                                                                             
+characterData               insertData             3                                                                             
+characterData               replaceData            3                                                                             
+document                    createAttribute        1             X                                                                
+document                    createAttributeNS      1             X                                                                
+document                    createElement          1             X                                                                
+document                    createElementNS        1             X                                                                
+document                    createCDATASection     2                                                                             
+document                    createComment          2                                                                             
+document                    createDocumentFragment 3                                                                             
+document                    createEntityReference  3                                                                             
+document                    createProcessingInstr. 3                                                                             
+document                    createTextNode         1             X                                                                
+document                    documentElement        1             X                                                                
+document                    getElementByID         2                    jk: not able to test now                              
+document                    getElementsByTagName   2                                                                             
+document                    getElementsByTagNameNS 2                                                                             
+document                    importNode             2                   
+document                    domImplementation      2                                                                             
+document                    docType                2                      
+document/IDOMPersist        load                   1             X                                                                
+document/IDOMPersist        save                   1             X                                                                
+document/IDOMPersist        loadXML                1             X      
+document/IDOMPersist        xml                    1             X                                                                
+document/IDOMParseOptions   validate               ?                    fe: failure not reported        
+documentType                entities               ?                                                           
+documentType                internalSubset         3                   
+documentType                name                   3                   
+documentType                notations              3                   
+documentType                publicId               2                                                                             
+documentType                systemId               2                                                                             
+domImplementation           createDocument         1             X      
+domImplementation           createDocumentType     2                   
+domImplementation           hasFeature             3                                            
+element                     getAttribute           1             X                                                                     
+element                     getAttributeNS         1             X                                                                
+element                     getAttributeNode       1             X                                                               
+element                     getAttributeNodeNS     1             X                                                               
+element                     getElementsByTagName   2                                                                             
+element                     getElementsByTagNameNS 2                                                                             
+element                     hasAttribute           1             X                                                                
+element                     hasAttributeNS         1             X                                                                
+element                     normalize              2                                                                             
+element                     removeAttribute        2                                                                             
+element                     removeAttributeNS      2                                                                             
+element                     removeAttributeNode    2                                                                             
+element                     setAttribute           1             X
+element                     setAttributeNS         1             X                                                    
+element                     setAttributeNode       1             X                                                               
+element                     setAttributeNodeNS     1             X                                                               
+element                     tagName                3                                                                            
+entity                      notationName           3                   
+entity                      publicID               3                   
+entity                      systemID               3                   
+namedNodeMap                getNamedItem           3             X                                                                
+namedNodeMap                getNamedItemNS         3                                                                             
+namedNodeMap                item                   3                                                                             
+namedNodeMap                length                 3             X                                                                
+namedNodeMap                removeNamedItem        3                                                                             
+namedNodeMap                removeNamedItemNS      3                                                                             
+namedNodeMap                setNamedItem           3             X                                                                
+namedNodeMap                setNamedItemNS         3                                                                             
+node                        OwnerDocument          2             X                                                                
+node                        appendChild            1             X                                                                
+node                        attributes             1             X                                                                
+node                        childNodes             1             X                                                                
+node                        cloneNode              1             X                                                                
+node                        firstChild             1             X                                                                
+node                        hasChildNodes          1             X                                                                
+node                        insertBefore           1             X                                                                
+node                        lastChild              1             X                                                                
+node                        localname              2             X                                                               
+node                        namespaceURI           1             X                                                                
+node                        nextSibling            1             X                                                                
+node                        nodeName               1             X                                                                
+node                        nodeType               2             X                                                                
+node                        nodeValue              1             X                                                                
+node                        normalize              2                                                                             
+node                        parentNode             1             X                                                                
+node                        prefix                 1             X                                                                
+node                        previousSibling        1             X                                                                
+node                        removeChild            1             X                                                                
+node                        replaceChild           2                                                                             
+node                        supports               3       
+node/IDOMNodeSelect         selectNode             1             X
+node/IDOMNodeSelect         selectNodes            1             ?   Implemented, not tested                                                         
+nodelist                    item                   1             X                                                                
+nodelist                    length                 1             X                                                                
+notation                    publicId               3                   
+notation                    systemId               3                   
+processingInstruction       data                   3                                                                             
+processingInstruction       target                 3                                                                             
+
+Summary: 
+
+99 tests at all    = 100,0 %
+
+43 high priority methods
+all done (one not tested)
+
+50 methods done totally       
