@@ -126,7 +126,8 @@ type
   xsltTransformFunction = procedure(ctxt: xsltTransformContextPtr; node, inst: xmlNodePtr; comp: xsltElemPreCompPtr); cdecl;
 
   xsltStyleType = (
-    XSLT_FUNC_COPY = 1,
+    DUMMY__XSLT_FUNC_0, // this is for D5 compatibility
+    XSLT_FUNC_COPY, // = 1,
     XSLT_FUNC_SORT,
     XSLT_FUNC_TEXT,
     XSLT_FUNC_ELEMENT,
@@ -326,13 +327,13 @@ type
    * The in-memory structure corresponding to an XSLT Transformation.
    *)
   xsltOutputType = (
-    XSLT_OUTPUT_XML = 0,
+    XSLT_OUTPUT_XML, // = 0,
     XSLT_OUTPUT_HTML,
     XSLT_OUTPUT_TEXT
   );
 
   xsltTransformState = (
-    XSLT_STATE_OK = 0,
+    XSLT_STATE_OK, // = 0,
     XSLT_STATE_ERROR,
     XSLT_STATE_STOPPED
   );

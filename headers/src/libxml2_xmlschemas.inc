@@ -15,8 +15,8 @@
  *)
 type
   xmlSchemaValidError = (
-    XML_SCHEMAS_ERR_OK              = 0,
-    XML_SCHEMAS_ERR_NOROOT          = 1,
+    XML_SCHEMAS_ERR_OK,              // = 0,
+    XML_SCHEMAS_ERR_NOROOT,          // = 1,
     XML_SCHEMAS_ERR_UNDECLAREDELEM,
     XML_SCHEMAS_ERR_NOTTOPLEVEL,
     XML_SCHEMAS_ERR_MISSING,

@@ -1,7 +1,6 @@
 package libxml2_pas;
 
 {$R *.res}
-{$ALIGN 8}
 {$ASSERTIONS OFF}
 {$BOOLEVAL OFF}
 {$DEBUGINFO OFF}
@@ -31,5 +30,8 @@ contains
   libxml2 in 'libxml2.pas',
   libxml2_experimental in 'libxml2_experimental.pas',
   libxslt in 'libxslt.pas';
+
+end.
+libxslt in 'libxslt.pas';
 
 end.

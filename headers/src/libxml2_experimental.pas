@@ -1,5 +1,5 @@
 unit libxml2_experimental;
-//$Id: libxml2_experimental.pas,v 1.1 2002-06-26 19:52:49 pkozelka Exp $
+//$Id: libxml2_experimental.pas,v 1.2 2002-08-03 20:56:46 pkozelka Exp $
 (**
  * Title:        libxml2 experimental unit
  * Description:  Contains experimental code for support or development of libxml2
@@ -28,6 +28,16 @@ uses
 
 var
   myErrH: TMessageHandler;
+
+{$IFDEF VER130}
+
+function UTF8Decode(aText: String): WideString;
+begin
+  Result := aText; //DIRTY
+end;
+
+{$ENDIF}
+
 
 // error output redirected to OutputDebugString
 
@@ -69,4 +79,3 @@ initialization
   xmlSetGenericErrorFunc(nil, @myGenericErrorFunc);
 
 end.
-
