@@ -63,6 +63,7 @@ type
 {$I libxml2_list.inc}
 {$I libxml2_xmlautomata.inc}
 {$I libxml2_valid.inc}
+{$I libxml2_dict.inc}
 {$I libxml2_parser.inc}
 {$I libxml2_SAX.inc}
 {$I libxml2_xpath.inc}
@@ -86,12 +87,11 @@ type
 
 {$I libxml2_xmlunicode.inc}
 {$I libxml2_schemasInternals.inc}
-{$I libxml2_xmlschemastypes.inc}
 {$I libxml2_xmlschemas.inc}
+{$I libxml2_xmlschemastypes.inc}
 {$I libxml2_relaxng.inc}
 {$I libxml2_xmlreader.inc}
 
-{TODO: $I  libxslt_dict.inc}
 
 // functions existing only in some compilers
 
