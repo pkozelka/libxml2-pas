@@ -103,6 +103,13 @@ function compressDist()
 	fi
 }
 
+function compile()
+{
+	cd $DIST/src
+	dcc -H -Q -N. -E. libxml2_pas.dpk
+	zip -qr $HEADERS_DIR/libxml2-pas-$LIBXML_VER-D6.zip *.dcp *.bpl
+}
+
 # check that LIBXML2_PAS env. var. is correct
 if [ ! -d "$LIBXML2_PAS" ]; then
 	echo "ERROR - variable LIBXML2_PAS must point to the root of libxml2-pas working copy" >/dev/stderr
@@ -150,5 +157,10 @@ dist)
 	;;
 upload)
 	echo "NOT IMPLEMENTED YET"
+	;;
+bin)
+	checkSrcVersions
+	copySourceFilesToDist
+	compile
 	;;
 esac
