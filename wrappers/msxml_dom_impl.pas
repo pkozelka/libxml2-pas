@@ -285,6 +285,19 @@ type
 		destructor Destroy; override;
 	end;
 
+	TNodeArray = class(TXMLDOMNodeCollection,
+		IXMLDOMNodeList)
+	private
+		FItems: array of pointer;
+	protected //IXMLDOMNodeList
+		function  Get_item(index: Integer): IXMLDOMNode; safecall;
+		function  Get_length: Integer; safecall;
+	private
+		constructor Create(aItems: xmlNodeSetPtr);
+	public
+		destructor Destroy; override;
+	end;
+
 function GetDOMObject(const aNode: pointer): IUnknown;
 
 implementation
@@ -385,13 +398,13 @@ constructor TXMLDOMNode.Create(aLibXmlObj: pointer);
 begin
 	FNode.ptr := aLibXmlObj;
 	if (aLibXmlObj<>nil) then begin
-		pointer(FNode.node._private) := self; // establish weak reference
+		pointer(FNode.node._private) := self;
 	end;
 end;
 
 destructor TXMLDOMNode.Destroy;
 begin
-	pointer(FNode.node._private) := nil;  // remove weak reference
+	pointer(FNode.node._private) := nil;
 	inherited;
 end;
 
@@ -607,8 +620,22 @@ begin
 end;
 
 function TXMLDOMNode.selectNodes(const queryString: WideString): IXMLDOMNodeList;
+var
+	s: string;
+	ctxt: xmlXPathContextPtr;
+	rv: xmlXPathObjectPtr;
 begin
-	ENotImpl('selectNodes');
+	ctxt := xmlXPathNewContext(FNode.node.doc);
+	s := queryString;
+	rv := xmlXPathEval(PChar(s), ctxt);
+	Result := nil;
+	if (rv=nil) then exit;
+	if (rv.type_ = XPATH_NODESET) then begin
+		if (rv.nodesetval.nodeNr > 0) then begin
+			Result := TNodeArray.Create(rv.nodesetval);
+		end;
+	end;
+	xmlXPathFreeObject(rv);
 end;
 
 function TXMLDOMNode.selectSingleNode(const queryString: WideString): IXMLDOMNode;
@@ -800,6 +827,29 @@ end;
 function TAttrNodeMap.setNamedItem(const newItem: IXMLDOMNode): IXMLDOMNode;
 begin
 	Result := FParent.setAttributeNode(newItem as IXMLDOMAttribute);
+end;
+
+{ TNodeArray }
+
+constructor TNodeArray.Create(aItems: xmlNodeSetPtr);
+begin
+	SetLength(FItems, aItems^.nodeNr);
+	Move(aItems.nodeTab^, Addr(FItems[0])^, aItems^.nodeNr * sizeof (pointer));
+end;
+
+destructor TNodeArray.Destroy;
+begin
+	inherited;
+end;
+
+function TNodeArray.Get_item(index: Integer): IXMLDOMNode;
+begin
+	Result :=  GetDOMObject(FItems[index]) as IXMLDOMNode;
+end;
+
+function TNodeArray.Get_length: Integer;
+begin
+	Result := Length(FItems);
 end;
 
 { TXMLDOMElement }
@@ -1120,7 +1170,7 @@ end;
 
 procedure TXMLDOMDocument.Set_documentElement(const DOMElement: IXMLDOMElement);
 begin
-	ENotImpl('TXMLDOMDocument.Set_documentElement');
+	xmlDocSetRootElement(FNode.doc, GetNodePtr(DOMElement));
 end;
 
 procedure TXMLDOMDocument.Set_ondataavailable(Param1: OleVariant);
