@@ -55,6 +55,23 @@ type
       procedure createEntityReferenceTest;
       (* converted from: documentCreateEntityReferenceKnown.js *)
       procedure createEntityReferenceKnownTest;
+      (* converted from: documentCreateProcessingInstruction.js *)
+      procedure createProcessingInstructionTargetXMLTest;
+      procedure createProcessingInstructionTest;
+      (* converted from: documentCreateTextNode.js *)
+      procedure createTextNodeTest;
+      (* converted from: documentGetDocType.js *)
+      procedure getDocTypeTest;
+      (* converted from: documentGetDocTypeNoDTD.js *)
+      procedure getDocTypeNoDTDTest;
+      (* converted from: documentGetDocumentElementHTML.js *)
+      procedure getDocumentElementHTMLTest;
+      (* converted from: documentGetElementByIdXMLNS.js *)
+      procedure getElementByIdXMLNSTest;
+      (* converted from: documentGetElementByIdXMLNSNull.js *)
+      procedure getElementByIdXMLNSNullTest;
+      (* converted from: documentGetElementsByTagNameAllXMLNS.js *)
+      procedure getElementsByTagNameAllXMLNSTest;
 
   end;
 
@@ -487,6 +504,201 @@ begin
   check(entityRef.childNodes.item[0].nodeValue = ENTITY_VALUE,
           'entity nodeValue <> SomeEntity');
 end;
+
+
+
+(* creates a createProcessingInstructionTest and checks its properties *)
+procedure TDomDocumentFundamentalTests.createProcessingInstructionTargetXMLTest;
+const
+  TARGET = 'XML';
+  DATA   = 'new PI node';
+var
+  document : IDomDocument;
+  pi       : IDomProcessingInstruction;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  pi := document.createProcessingInstruction(TARGET, DATA);
+  check(pi.nodeType = PROCESSING_INSTRUCTION_NODE,
+          'nodeType <> PROCESSING_INSTRUCTION_NODE');
+  check(pi.target = TARGET, 'target <> XML');
+  check(pi.data = DATA, 'data <> ''new PI node''');
+end;
+
+(* creates a createProcessingInstructionTest and checks its properties *)
+procedure TDomDocumentFundamentalTests.createProcessingInstructionTest;
+const
+  TARGET = 'SomeTarget';
+  DATA   = 'new PI node';
+var
+  document : IDomDocument;
+  pi       : IDomProcessingInstruction;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  pi := document.createProcessingInstruction(TARGET, DATA);
+  check(pi.nodeType = PROCESSING_INSTRUCTION_NODE,
+          'nodeType <> PROCESSING_INSTRUCTION_NODE');
+  check(pi.target = TARGET, 'target <> someTarget');
+  check(pi.data = DATA, 'data <> ''new PI node''');
+end;
+
+
+
+(* creates a text node and checks its properties *)
+procedure TDomDocumentFundamentalTests.createTextNodeTest;
+const
+  NODE_TEXT = 'Some Text';
+var
+  document : IDomDocument;
+  textNode : IDomText;
+begin
+  document := fDomImplementation.createDocument('', '', nil);
+  textNode := document.createTextNode(NODE_TEXT);
+  check(textNode.nodeType = TEXT_NODE, 'nodeType <> TEXT_NODE');
+  check(textNode.nodeName = '#text', 'nodeName <> #text');
+  check(textNode.nodeValue = NODE_TEXT, 'nodeValue <> "Some Text"');
+end;
+
+
+(* checks the name of the docType *)
+procedure TDomDocumentFundamentalTests.getDocTypeTest;
+const
+  XML_VALID_DOC =
+         '<?xml version=''1.0''?>' +
+         '  <!DOCTYPE address [' +
+         '  <!ELEMENT address (#PCDATA)>' +
+         '  <!ENTITY ent1 "SomeEntity">' +
+         '  ]>' +
+         '  <address>some text</address>';
+var
+  document : IDomDocument;
+  docType  : IDomDocumentType;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  docType := document.docType;
+  check(docType.name = 'address', 'docType.name <> ''address''');
+end;
+
+
+(* checks the name of the docType if no DTD is specified *)
+procedure TDomDocumentFundamentalTests.getDocTypeNoDTDTest;
+const
+  XML_VALID_DOC =
+         '<?xml version=''1.0''?>' +
+         '  <address>some text</address>';
+var
+  document : IDomDocument;
+  docType  : IDomDocumentType;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  docType := document.docType;
+  check(docType = nil, 'docType <> nil');
+end;
+
+
+(* Tests if documentElement is HTML *)
+procedure TDomDocumentFundamentalTests.getDocumentElementHTMLTest;
+const
+  HTML_VALID_DOC =
+         '<HTML>' +
+         '<HEAD>' +
+         '<TITLE>Some Title</TITLE>' +
+         '</HEAD>' +
+         '<BODY>' +
+         'Some Body' +
+         '</BODY>' +
+         '</HTML>';
+var
+  document   : IDomDocument;
+  docElement : IDomElement;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(HTML_VALID_DOC);
+  docElement := document.documentElement;
+  check(docElement.nodeName = 'HTML', 'docElement.nodeName <> HTML');
+end;
+
+(* checks if getElementById retrieves the correct element *)
+procedure TDomDocumentFundamentalTests.getElementByIdXMLNSTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <!DOCTYPE someNS:address [' +
+     '  <!ELEMENT someNS:address (#PCDATA)>' +
+     '  <!ATTLIST someNS:address xmlns:someNS CDATA #IMPLIED>' +
+     '  <!ATTLIST someNS:address someNS:someID ID #IMPLIED>' +
+     '  ]>' +
+     '  <someNS:address xmlns:someNS="http:/localhost" someNS:someID="NAME">' +
+     '  some text' +
+     '  </someNS:address>';
+var
+  document : IDomDocument;
+  element  : IDomElement;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  element := document.getElementById('NAME');
+  check(element <> nil, 'getElementById(''NAME'') = nil');
+  check(element.nodeName = 'someNS:address',
+          'element.nodeName <> ''someNs:address''');
+end;
+
+(* checks if getElementById returns nil if ID does not exist *)
+procedure TDomDocumentFundamentalTests.getElementByIdXMLNSNullTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <!DOCTYPE someNS:address [' +
+     '  <!ELEMENT someNS:address (#PCDATA)>' +
+     '  <!ATTLIST someNS:address xmlns:someNS CDATA #IMPLIED>' +
+     '  <!ATTLIST someNS:address someNS:someID ID #IMPLIED>' +
+     '  ]>' +
+     '  <someNS:address xmlns:someNS="http:/localhost" someNS:someID="NAME">' +
+     '  some text' +
+     '  </someNS:address>';
+var
+  document : IDomDocument;
+  element  : IDomElement;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  element := document.getElementById('nonexisting');
+  check(element = nil, 'getElementById(''nonexisting'') <> nil');
+end;
+
+
+
+(* checks if getElementsByTagNameNS('*', '*') returns all elements *)
+procedure TDomDocumentFundamentalTests.getElementsByTagNameAllXMLNSTest;
+const
+  XML_VALID_DOC =
+     '<?xml version=''1.0''?>' +
+     '  <!DOCTYPE someNS:address [' +
+     '  <!ELEMENT someNS:address (someNS:street, someNS:info*)>' +
+     '  <!ELEMENT someNS:street (#PCDATA)>' +
+     '  <!ELEMENT someNS:info (#PCDATA)>' +
+     '  <!ATTLIST someNS:address xmlns:someNS CDATA #IMPLIED>' +
+     '  <!ATTLIST someNS:address someNS:someID ID #IMPLIED>' +
+     '  ]>' +
+     '  <someNS:address xmlns:someNS="http:/localhost" someNS:someID="NAME">' +
+     '    <someNS:street>the street</someNS:street>' +
+     '    <someNS:info>1</someNS:info>' +
+     '    <someNS:info>2</someNS:info>' +
+     '    <someNS:info>3</someNS:info>' +
+     '    <someNS:info>4</someNS:info>' +
+     '  </someNS:address>';
+var
+  document : IDomDocument;
+  nodeList : IDomNodeList;
+begin
+  document := DomSetup.getCurrentDomSetup.getDocumentBuilder.
+          parse(XML_VALID_DOC);
+  nodeList := document.getElementsByTagNameNS('*', '*');
+  check(nodeList.length = 6, 'nodeList.length <> 6');
+end;
+
+
 
 (******************************************************************************)
 (******************************************************************************)
