@@ -155,33 +155,30 @@ begin
   while ((p^<>#0) and (p^<>'<')) do Inc(p);
 end;
 
+//[pk] DEPRECATED, TEMPORARY:
 procedure InitExportedVar;
 {$ifdef WIN32}
 begin
-  xmlDoValidityCheckingDefaultValue :=
-    GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
-  Assert(xmlDoValidityCheckingDefaultValue <> nil);
-  xmlSubstituteEntitiesDefaultValue :=
-    GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
-  Assert(xmlSubstituteEntitiesDefaultValue <> nil);
+  xmlDoValidityCheckingDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
+  Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
+  xmlSubstituteEntitiesDefaultValue_PTR := GetProcAddress(GetModuleHandle(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
+  Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);
 end;
 {$else}
 begin
   // to do:
   // not yet tested
   // I suppose, that I don't use dlopen correctly
-  xmlDoValidityCheckingDefaultValue :=
-    dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
-  Assert(xmlDoValidityCheckingDefaultValue <> nil);
-  xmlSubstituteEntitiesDefaultValue :=
-    dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
-  Assert(xmlSubstituteEntitiesDefaultValue <> nil);
+  xmlDoValidityCheckingDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlDoValidityCheckingDefaultValue');
+  Assert(xmlDoValidityCheckingDefaultValue_PTR <> nil);
+  xmlSubstituteEntitiesDefaultValue_PTR := dlsym(dlopen(PChar(LIBXML2_SO)), 'xmlSubstituteEntitiesDefaultValue');
+  Assert(xmlSubstituteEntitiesDefaultValue_PTR <> nil);
 end;
 {$endif}
-Initialization
 
+initialization
   InitExportedVar;
-
+//end of deprecated part
 end.
 
 
