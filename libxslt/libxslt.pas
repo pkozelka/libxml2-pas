@@ -14,9 +14,11 @@ uses libxml2;
 const
 {$IFDEF WIN32}
   LIBXSLT_SO = 'libxslt.dll';
+  LIBEXSLT_SO = 'libexslt.dll';
 {$ENDIF}
 {$IFDEF LINUX}
   LIBXSLT_SO = 'libxslt.so';
+  LIBEXSLT_SO = 'libexslt.so';
 {$ENDIF}
 
 {$WEAKPACKAGEUNIT}
@@ -46,7 +48,8 @@ const
 
 {TODO: $I  libxslt_xsltconfig.inc}
 
-{TODO: libexslt !!!}
+{$I libexslt_exslt.inc}
+{$I libexslt_exsltconfig.inc}
 
 implementation
 
