@@ -15,7 +15,9 @@ s/:\([[:alnum:]]\)/: \1/g
 s/ _type:/ aType:/g
 s/ PFILE/ PLibXml2File/g
 s/var [[:space:]]*\([[:alnum:]]*\):[[:space:]]*TextFile/\1: PLibXml2File/g
+s/{\$define /{\$DEFINE /gi
 s/{\$ifdef /{\$IFDEF /gi
+s/{\$ifndef /{\$IFNDEF /gi
 s/{\$else/{\$ELSE/gi
 s/{\$endif/{\$ENDIF/gi
 s/{\$if /{\$IF /gi
