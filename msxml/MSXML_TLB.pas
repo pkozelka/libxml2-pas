@@ -1,10 +1,14 @@
-unit MSXML2_TLB;
+unit MSXML_TLB;
 
 {$TYPEDADDRESS OFF} // Unit must be compiled without type-checked pointers.
 interface
 
 uses
-	ActiveX, Classes;
+{$ifdef VER140}
+	Variants,
+{$endif}
+	ActiveX,
+	Classes;
 
 // *********************************************************************//
 // GUIDS declared in the TypeLibrary. Following prefixes are used:        
@@ -175,36 +179,10 @@ type
 	IMXWriter = interface;
 	IMXAttributes = interface;
 	IMXReaderControl = interface;
-	IMXSchemaDeclHandler = interface;
-	ISchemaItem = interface;
-	ISchemaParticle = interface;
-	ISchemaElement = interface;
-	ISchema = interface;
-	ISchemaItemCollection = interface;
-	ISchemaStringCollection = interface;
-	ISchemaType = interface;
-	ISchemaComplexType = interface;
-	ISchemaAny = interface;
-	ISchemaModelGroup = interface;
-	IXMLDOMSchemaCollection2 = interface;
-	ISchemaAttribute = interface;
-	ISchemaAttributeGroup = interface;
-	ISchemaIdentityConstraint = interface;
-	ISchemaNotation = interface;
-	IXMLElementCollection = interface;
-	IXMLDocument = interface;
-	IXMLElement = interface;
-	IXMLDocument2 = interface;
-	IXMLElement2 = interface;
-	IXMLAttribute = interface;
-	IXMLError = interface;
-	IXMLDOMSelection = interface;
-	IDSOControl = interface;
 	IXMLHTTPRequest = interface;
 	IServerXMLHTTPRequest = interface;
 	IServerXMLHTTPRequest2 = interface;
 	IMXNamespacePrefixes = interface;
-	IMXNamespaceManager = interface;
 
 // *********************************************************************//
 // Declaration of structures, unions and aliases.
@@ -1000,21 +978,26 @@ type
 		property _newEnum: IUnknown read Get__newEnum;
 	end;
 
-// *********************************************************************//
-// Interface: IMXNamespaceManager
-// Flags:     (4112) Hidden Dispatchable
-// GUID:      {C90352F6-643C-4FBC-BB23-E996EB2D51FD}
-// *********************************************************************//
-	IMXNamespaceManager = interface(IVBMXNamespaceManager)
-		['{C90352F6-643C-4FBC-BB23-E996EB2D51FD}']
-		function  _getDeclaredPrefix(nIndex: Integer; var pwchPrefix: Word; var pcchPrefix: SYSINT): HResult; stdcall;
-		function  _getPrefix(var pwszNamespaceURI: Word; nIndex: Integer; var pwchPrefix: Word; 
-												 var pcchPrefix: SYSINT): HResult; stdcall;
-		function  _getURI(var pwchPrefix: Word; const pContextNode: IXMLDOMNode; var pwchUri: Word; 
-											var pcchUri: SYSINT): HResult; stdcall;
+	CoDOMDocument = class
+	public
+		class function Create: IXMLDOMNode;
 	end;
 
 implementation
+
+uses
+	libxml2,
+	domimpl;
+
+{ CoDOMDocument }
+
+class function CoDOMDocument.Create: IXMLDOMNode;
+var
+	doc: xmlDocPtr;
+begin
+	doc := xmlNewDoc(XML_DEFAULT_VERSION);
+	GetNodeObject(xmlNodePtr(doc), Result);
+end;
 
 end.
 
