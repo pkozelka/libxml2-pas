@@ -780,7 +780,7 @@ var
   attlist: IDOMNamedNodeMap;
   //documentElement: IDOMNode;
   stringlist: TStringList;
-  //temp: string;
+  temp: string;
   dom2: boolean;
 begin
   // init
@@ -846,10 +846,14 @@ begin
     document := getEmptyDoc(vendorstr);
     (document as IDOMParseOptions).validate := False;
     //(document as IDomPersist).loadxml('<?xml version="1.0" encoding="iso-8859-1"?><aaa />');
-    (document as IDomPersist).loadxml('<?xml version="1.0" ?><aaa />');
+    (document as IDomPersist).loadxml('<?xml version="1.0"?><aaa>12345678901234567890</aaa>');
     IF document.documentElement<>nil
       then test('IDOMPersist.loadxml',(document.documentElement.nodeName = 'aaa'))
       else outLog('__ERROR__ IDOMPersist.loadxml => failed');
+    temp:=(document as IDomPersist).xml;
+    temp:=StringReplace(temp,#$d#$a,'',[rfReplaceAll]);
+    temp:=StringReplace(temp,#10,'',[rfReplaceAll]);
+    test('IDOMPersist.xml',(temp='<?xml version="1.0"?><aaa>12345678901234567890</aaa>'));
     document := nil;
   end;
 
@@ -911,7 +915,7 @@ begin
       then testCount:=testCount+5
       else testCount:=testCount+3;
   if (TestSet and 256) = 256
-    then testCount:=testCount+1;
+    then testCount:=testCount+2;
 
   outLog('Number of tests total:    '+inttostr(TestCount));
 end;
