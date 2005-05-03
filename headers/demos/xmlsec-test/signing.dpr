@@ -142,7 +142,7 @@ begin
     end;
 
     { Check loaded library version }
-    if(xmlSecCheckVersionExt(1, 2, 6, xmlSecCheckVersionABICompatible) <> 1) then
+    if(xmlSecCheckVersionExt(1, 2, 8, xmlSecCheckVersionABICompatible) <> 1) then
     begin
       Writeln(ErrOutput, 'Error: loaded xmlsec library version is not compatible.');
       Exit;
