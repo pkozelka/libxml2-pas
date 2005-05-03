@@ -2,6 +2,7 @@ Delphi-Headers for libxml2
 ==========================
 libxml2 is a low-level library for the work with xml-documents.
 libxslt is a low-level library implementing the XSL Transformations standard
+libxmlsec is a low-level library implementing XML security standards
 libxml2-pas is translation of their header files into Pascal language.
 
 Contents:
@@ -30,18 +31,23 @@ Mikhail Soukhanov <m.soukhanov@geosys.ru>
 
 VERSION COMPLIANCE
 ------------------
-libxml2: 2.6.17
-libxslt: 1.1.12
-libexslt: 0.8.10
+libxml2: 2.6.19
+libxslt: 1.1.14
+libexslt: 0.8.12
+libxmlsec: 1.2.8
 
 WHAT YOU FIND IN THIS PACKAGE
 -----------------------------
-libxml2.pas, libxslt.pas, libexslt.pas 	- pascal bindings generated from API descriptions
+libxml2.pas, 
+libxslt.pas, 
+libexslt.pas,
+libxmlsec.pas			 	- pascal bindings generated from API descriptions
 style/DelphiAPI.xsl			- XSLT transformation used to generate the Pascal code
-src/					- older pascal translations generated from the libxml2 headers
+src/					- older pascal translations generated from the libxml2 headers (obsolete)
 demos/libxml2-test/			- demo applications
 demos/demo1/				- demo application for xpath testing (by Uwe Fechner)
 demos/simplexslt/			- demo application for XSLT testing
+demos/xmlsec-test/			- demo application for xmlsec testing (by Eric Zurcher)
 
 
 USAGE
@@ -70,7 +76,7 @@ KNOWN PROBLEMS
 - extending the xslt-processor with own functions doesn't work yet
 - only a rather small part of the API has been tested
 
-GENERATING THE PASCAL BINDINGS
+GENERATING THE PASCAL BINDINGS (if you want to do it yourself)
 ------------------------------
 DelphiAPI.xsl is an XSLT stylesheet for transforming the interface to libxml2, 
 as described in libxml2-api.xml, into Delphi bindings. The same stylesheet may
@@ -116,16 +122,6 @@ and friends), the exported variable is a pointer to a function. These
 are handled by proxy functions which are implemented by using GetProcAddress 
 during module initialization to obtain the address of the pointer to the 
 function.
-
-I have not yet been able to work out a way to handle function types 
-definitions that define a function type having a variable number of
-parameters. This includes errorSAXFunc, fatalErrorSAXFunc, warningSAXFunc,
-xmlGenericErrorFunc, xmlRelaxNGValidityErrorFunc, 
-xmlRelaxNGValidityWarningFunc, xmlSchemaValidityErrorFunc,
-xmlSchemaValidityWarningFunc, xmlValidityErrorFunc, and 
-xmlValidityWarningFunc. Any ideas for correct handling of these function
-types would be welcome.
-
 
 LINKS
 -----

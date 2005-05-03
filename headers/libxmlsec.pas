@@ -1,4 +1,5 @@
 {This file generated automatically from xmlsec-api.xml}
+{For libxmlsec version: 1.2.8}
 Unit libxmlsec;
 
 interface
@@ -1099,6 +1100,7 @@ type
   function xmlSecReplaceNodeBuffer (node: xmlNodePtr; const buffer: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
   function xmlSecShutdown () : Longint; cdecl; external XMLSEC_SO;
   function xmlSecSimpleKeysStoreAdoptKey (store: xmlSecKeyStorePtr; key: xmlSecKeyPtr) : Longint; cdecl; external XMLSEC_SO;
+  function xmlSecSimpleKeysStoreGetKeys (store: xmlSecKeyStorePtr) : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
   function xmlSecSimpleKeysStoreGetKlass () : xmlSecKeyStoreId; cdecl; external XMLSEC_SO;
   function xmlSecSimpleKeysStoreLoad (store: xmlSecKeyStorePtr; const uri: PChar; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
   function xmlSecSimpleKeysStoreSave (store: xmlSecKeyStorePtr; const filename: PChar; type_: xmlSecKeyDataType) : Longint; cdecl; external XMLSEC_SO;
@@ -1159,6 +1161,11 @@ type
   function xmlSecTmplTransformAddXPath2 (transformNode: xmlNodePtr; const type_: PChar; const expression: PChar; const nsList: PPChar) : Longint; cdecl; external XMLSEC_SO;
   function xmlSecTmplTransformAddXPointer (transformNode: xmlNodePtr; const expression: PChar; const nsList: PPChar) : Longint; cdecl; external XMLSEC_SO;
   function xmlSecTmplTransformAddXsltStylesheet (transformNode: xmlNodePtr; const xslt: PChar) : Longint; cdecl; external XMLSEC_SO;
+  function xmlSecTmplX509DataAddCRL (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
+  function xmlSecTmplX509DataAddCertificate (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
+  function xmlSecTmplX509DataAddIssuerSerial (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
+  function xmlSecTmplX509DataAddSKI (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
+  function xmlSecTmplX509DataAddSubjectName (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
   function xmlSecTransformAes128CbcGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
   function xmlSecTransformAes192CbcGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
   function xmlSecTransformAes256CbcGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;

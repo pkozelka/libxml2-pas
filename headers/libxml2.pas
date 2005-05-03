@@ -19,7 +19,10 @@ const
   XML_DETECT_IDS = 2;
   XML_COMPLETE_ATTRS = 4;
   XML_SKIP_IDS = 8;
+
 type
+
+
       PFILE = Pointer;
       iconv_t = Cardinal;
       size_t = Cardinal;
@@ -781,6 +784,8 @@ type
           XML_SCHEMAV_CVC_AU = 1874,
           XML_SCHEMAV_CVC_TYPE_1 = 1875,
           XML_SCHEMAV_CVC_TYPE_2 = 1876,
+          XML_SCHEMAV_CVC_IDC = 1877,
+          XML_SCHEMAV_CVC_WILDCARD = 1878,
           XML_XPTR_UNKNOWN_SCHEME = 1900,
           XML_XPTR_CHILDSEQ_START = 1901,
           XML_XPTR_EVAL_FAILED = 1902,
@@ -789,9 +794,12 @@ type
           XML_C14N_REQUIRES_UTF8 = 1951,
           XML_C14N_CREATE_STACK = 1952,
           XML_C14N_INVALID_NODE = 1953,
+          XML_C14N_UNKNOW_NODE = 1954,
+          XML_C14N_RELATIVE_NAMESPACE = 1955,
           XML_FTP_PASV_ANSWER = 2000,
           XML_FTP_EPSV_ANSWER = 2001,
           XML_FTP_ACCNT = 2002,
+          XML_FTP_URL_SYNTAX = 2003,
           XML_HTTP_URL_SYNTAX = 2020,
           XML_HTTP_USE_IP = 2021,
           XML_HTTP_UNKNOWN_HOST = 2022,
@@ -1078,6 +1086,10 @@ type
           XML_SCHEMA_TYPE_LIST = 19,
           XML_SCHEMA_TYPE_UNION = 20,
           XML_SCHEMA_TYPE_ANY_ATTRIBUTE = 21,
+          XML_SCHEMA_TYPE_IDC_UNIQUE = 22,
+          XML_SCHEMA_TYPE_IDC_KEY = 23,
+          XML_SCHEMA_TYPE_IDC_KEYREF = 24,
+          XML_SCHEMA_TYPE_PARTICLE = 25,
           XML_SCHEMA_FACET_MININCLUSIVE = 1000,
           XML_SCHEMA_FACET_MINEXCLUSIVE = 1001,
           XML_SCHEMA_FACET_MAXINCLUSIVE = 1002,
@@ -1089,7 +1101,8 @@ type
           XML_SCHEMA_FACET_WHITESPACE = 1008,
           XML_SCHEMA_FACET_LENGTH = 1009,
           XML_SCHEMA_FACET_MAXLENGTH = 1010,
-          XML_SCHEMA_FACET_MINLENGTH = 1011);
+          XML_SCHEMA_FACET_MINLENGTH = 1011,
+          XML_SCHEMA_EXTRA_QNAMEREF = 2000);
 
       xmlSchemaValType = (
           XML_SCHEMAS_UNKNOWN = 0,
@@ -1170,6 +1183,12 @@ type
 
       xmlSchemaValidOption = (
           XML_SCHEMA_VAL_VC_I_CREATE = 1);
+
+      xmlSchemaWhitespaceValueType = (
+          XML_SCHEMA_WHITESPACE_UNKNOWN = 0,
+          XML_SCHEMA_WHITESPACE_PRESERVE = 1,
+          XML_SCHEMA_WHITESPACE_REPLACE = 2,
+          XML_SCHEMA_WHITESPACE_COLLAPSE = 3);
 
       xmlTextReaderMode = (
           XML_TEXTREADER_MODE_INITIAL = 0,
@@ -1293,6 +1312,7 @@ type
        xmlSchemaWildcardNsPtr = ^xmlSchemaWildcardNs;
        xmlSchemaWildcardPtr = ^xmlSchemaWildcard;
        xmlShellCtxtPtr = ^xmlShellCtxt;
+       xmlStreamCtxtPtr = ^xmlStreamCtxt;
        xmlTextReaderLocatorPtr = Pointer;
        xmlTextReaderPtr = ^xmlTextReader;
        xmlTextWriterPtr = ^xmlTextWriter;
@@ -2085,6 +2105,8 @@ actually an xmlCharEncoding}
           includes : Pointer; { the includes, this is opaque for now}
           preserve : Longint; { whether to free the document}
           counter : Longint; { used to give ononymous components unique names}
+          idcDef : xmlHashTablePtr; {}
+          volatiles : Pointer; { Misc. helper items (e.g. reference items)}
       end;
 
       xmlSchemaAnnot = record
@@ -2162,6 +2184,7 @@ actually an xmlCharEncoding}
           contentType : xmlSchemaContentType; {}
           refPrefix : PChar; {}
           defVal : xmlSchemaValPtr; {}
+          idcs : Pointer; {}
       end;
 
       xmlSchemaFacet = record
@@ -2263,6 +2286,9 @@ actually an xmlCharEncoding}
           loaded : Longint; {}
           output : PFILE; {}
           input : xmlShellReadlineFunc; {}
+      end;
+
+      xmlStreamCtxt = record
       end;
 
       xmlTextReader = record
@@ -2751,6 +2777,7 @@ actually an xmlCharEncoding}
   function xmlCopyChar (len: Longint; out_: PChar; val: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlCopyCharMultiByte (out_: PChar; val: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlCopyDoc (doc: xmlDocPtr; recursive: Longint) : xmlDocPtr; cdecl; external LIBXML2_SO;
+  function xmlCopyDocElementContent (doc: xmlDocPtr; cur: xmlElementContentPtr) : xmlElementContentPtr; cdecl; external LIBXML2_SO;
   function xmlCopyDtd (dtd: xmlDtdPtr) : xmlDtdPtr; cdecl; external LIBXML2_SO;
   function xmlCopyElementContent (cur: xmlElementContentPtr) : xmlElementContentPtr; cdecl; external LIBXML2_SO;
   function xmlCopyElementTable (table: xmlElementTablePtr) : xmlElementTablePtr; cdecl; external LIBXML2_SO;
@@ -2802,6 +2829,7 @@ actually an xmlCharEncoding}
   function xmlDelEncodingAlias (const alias: PChar) : Longint; cdecl; external LIBXML2_SO;
   function xmlDeregisterNodeDefault (func: xmlDeregisterNodeFunc) : xmlDeregisterNodeFunc; cdecl; external LIBXML2_SO;
   function xmlDetectCharEncoding (const in_: PByte; len: Longint) : xmlCharEncoding; cdecl; external LIBXML2_SO;
+  procedure xmlDictCleanup (); cdecl; external LIBXML2_SO;
   function xmlDictCreate () : xmlDictPtr; cdecl; external LIBXML2_SO;
   function xmlDictCreateSub (sub: xmlDictPtr) : xmlDictPtr; cdecl; external LIBXML2_SO;
   function xmlDictExists (dict: xmlDictPtr; const name: PChar; len: Longint) : PChar; cdecl; external LIBXML2_SO;
@@ -2843,6 +2871,7 @@ actually an xmlCharEncoding}
   procedure xmlFreeAutomata (am: xmlAutomataPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeCatalog (catal: xmlCatalogPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeDoc (cur: xmlDocPtr); cdecl; external LIBXML2_SO;
+  procedure xmlFreeDocElementContent (doc: xmlDocPtr; cur: xmlElementContentPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeDtd (cur: xmlDtdPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeElementContent (cur: xmlElementContentPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeElementTable (table: xmlElementTablePtr); cdecl; external LIBXML2_SO;
@@ -2864,6 +2893,7 @@ actually an xmlCharEncoding}
   procedure xmlFreePropList (cur: xmlAttrPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeRMutex (tok: xmlRMutexPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeRefTable (table: xmlRefTablePtr); cdecl; external LIBXML2_SO;
+  procedure xmlFreeStreamCtxt (stream: xmlStreamCtxtPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeTextReader (reader: xmlTextReaderPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeTextWriter (writer: xmlTextWriterPtr); cdecl; external LIBXML2_SO;
   procedure xmlFreeURI (uri: xmlURIPtr); cdecl; external LIBXML2_SO;
@@ -2910,6 +2940,7 @@ actually an xmlCharEncoding}
   function xmlHashAddEntry3 (table: xmlHashTablePtr; const name: PChar; const name2: PChar; const name3: PChar; userdata: Pointer) : Longint; cdecl; external LIBXML2_SO;
   function xmlHashCopy (table: xmlHashTablePtr; f: xmlHashCopier) : xmlHashTablePtr; cdecl; external LIBXML2_SO;
   function xmlHashCreate (size: Longint) : xmlHashTablePtr; cdecl; external LIBXML2_SO;
+  function xmlHashCreateDict (size: Longint; dict: xmlDictPtr) : xmlHashTablePtr; cdecl; external LIBXML2_SO;
   procedure xmlHashFree (table: xmlHashTablePtr; f: xmlHashDeallocator); cdecl; external LIBXML2_SO;
   function xmlHashLookup (table: xmlHashTablePtr; const name: PChar) : Pointer; cdecl; external LIBXML2_SO;
   function xmlHashLookup2 (table: xmlHashTablePtr; const name: PChar; const name2: PChar) : Pointer; cdecl; external LIBXML2_SO;
@@ -3070,6 +3101,7 @@ actually an xmlCharEncoding}
   function xmlNewComment (const content: PChar) : xmlNodePtr; cdecl; external LIBXML2_SO;
   function xmlNewDoc (const version: PChar) : xmlDocPtr; cdecl; external LIBXML2_SO;
   function xmlNewDocComment (doc: xmlDocPtr; const content: PChar) : xmlNodePtr; cdecl; external LIBXML2_SO;
+  function xmlNewDocElementContent (doc: xmlDocPtr; const name: PChar; type_: xmlElementContentType) : xmlElementContentPtr; cdecl; external LIBXML2_SO;
   function xmlNewDocFragment (doc: xmlDocPtr) : xmlNodePtr; cdecl; external LIBXML2_SO;
   function xmlNewDocNode (doc: xmlDocPtr; ns: xmlNsPtr; const name: PChar; const content: PChar) : xmlNodePtr; cdecl; external LIBXML2_SO;
   function xmlNewDocNodeEatName (doc: xmlDocPtr; ns: xmlNsPtr; name: PChar; const content: PChar) : xmlNodePtr; cdecl; external LIBXML2_SO;
@@ -3158,7 +3190,7 @@ actually an xmlCharEncoding}
   function xmlParseCtxtExternalEntity (ctx: xmlParserCtxtPtr; const URL: PChar; const ID: PChar; lst: xmlNodePtrPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlParseDTD (const ExternalID: PChar; const SystemID: PChar) : xmlDtdPtr; cdecl; external LIBXML2_SO;
   function xmlParseDefaultDecl (ctxt: xmlParserCtxtPtr; value: PPChar) : Longint; cdecl; external LIBXML2_SO;
-  function xmlParseDoc (cur: PChar) : xmlDocPtr; cdecl; external LIBXML2_SO;
+  function xmlParseDoc (const cur: PChar) : xmlDocPtr; cdecl; external LIBXML2_SO;
   procedure xmlParseDocTypeDecl (ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
   function xmlParseDocument (ctxt: xmlParserCtxtPtr) : Longint; cdecl; external LIBXML2_SO;
   procedure xmlParseElement (ctxt: xmlParserCtxtPtr); cdecl; external LIBXML2_SO;
@@ -3229,7 +3261,11 @@ actually an xmlCharEncoding}
   procedure xmlParserValidityError (ctx: Pointer; const msg: PChar); cdecl; varargs; external LIBXML2_SO;
   procedure xmlParserValidityWarning (ctx: Pointer; const msg: PChar); cdecl; varargs; external LIBXML2_SO;
   procedure xmlParserWarning (ctx: Pointer; const msg: PChar); cdecl; varargs; external LIBXML2_SO;
+  function xmlPatternFromRoot (comp: xmlPatternPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlPatternGetStreamCtxt (comp: xmlPatternPtr) : xmlStreamCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlPatternMatch (comp: xmlPatternPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlPatternMaxDepth (comp: xmlPatternPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlPatternStreamable (comp: xmlPatternPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlPatterncompile (const pattern: PChar; dict: xmlDictPtr; flags: Longint; const namespaces: PPChar) : xmlPatternPtr; cdecl; external LIBXML2_SO;
   function xmlPedanticParserDefault (val: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlPopInput (ctxt: xmlParserCtxtPtr) : xmlChar; cdecl; external LIBXML2_SO;
@@ -3341,7 +3377,7 @@ actually an xmlCharEncoding}
   procedure xmlSAX2UnparsedEntityDecl (ctx: Pointer; const name: PChar; const publicId: PChar; const systemId: PChar; const notationName: PChar); cdecl; external LIBXML2_SO;
   function xmlSAXDefaultVersion (version: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlSAXParseDTD (sax: xmlSAXHandlerPtr; const ExternalID: PChar; const SystemID: PChar) : xmlDtdPtr; cdecl; external LIBXML2_SO;
-  function xmlSAXParseDoc (sax: xmlSAXHandlerPtr; cur: PChar; recovery: Longint) : xmlDocPtr; cdecl; external LIBXML2_SO;
+  function xmlSAXParseDoc (sax: xmlSAXHandlerPtr; const cur: PChar; recovery: Longint) : xmlDocPtr; cdecl; external LIBXML2_SO;
   function xmlSAXParseEntity (sax: xmlSAXHandlerPtr; const filename: PChar) : xmlDocPtr; cdecl; external LIBXML2_SO;
   function xmlSAXParseFile (sax: xmlSAXHandlerPtr; const filename: PChar; recovery: Longint) : xmlDocPtr; cdecl; external LIBXML2_SO;
   function xmlSAXParseFileWithData (sax: xmlSAXHandlerPtr; const filename: PChar; recovery: Longint; data: Pointer) : xmlDocPtr; cdecl; external LIBXML2_SO;
@@ -3371,6 +3407,8 @@ actually an xmlCharEncoding}
   procedure xmlSchemaCleanupTypes (); cdecl; external LIBXML2_SO;
   function xmlSchemaCollapseString (const value: PChar) : PChar; cdecl; external LIBXML2_SO;
   function xmlSchemaCompareValues (x: xmlSchemaValPtr; y: xmlSchemaValPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlSchemaCompareValuesWhtsp (x: xmlSchemaValPtr; xws: xmlSchemaWhitespaceValueType; y: xmlSchemaValPtr; yws: xmlSchemaWhitespaceValueType) : Longint; cdecl; external LIBXML2_SO;
+  function xmlSchemaCopyValue (val: xmlSchemaValPtr) : xmlSchemaValPtr; cdecl; external LIBXML2_SO;
   procedure xmlSchemaDump (output: PFILE; schema: xmlSchemaPtr); cdecl; external LIBXML2_SO;
   procedure xmlSchemaFree (schema: xmlSchemaPtr); cdecl; external LIBXML2_SO;
   procedure xmlSchemaFreeFacet (facet: xmlSchemaFacetPtr); cdecl; external LIBXML2_SO;
@@ -3381,16 +3419,20 @@ actually an xmlCharEncoding}
   procedure xmlSchemaFreeWildcard (wildcard: xmlSchemaWildcardPtr); cdecl; external LIBXML2_SO;
   function xmlSchemaGetBuiltInListSimpleTypeItemType (type_: xmlSchemaTypePtr) : xmlSchemaTypePtr; cdecl; external LIBXML2_SO;
   function xmlSchemaGetBuiltInType (type_: xmlSchemaValType) : xmlSchemaTypePtr; cdecl; external LIBXML2_SO;
+  function xmlSchemaGetCanonValue (val: xmlSchemaValPtr; const retValue: PPChar) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaGetFacetValueAsULong (facet: xmlSchemaFacetPtr) : Cardinal; cdecl; external LIBXML2_SO;
   function xmlSchemaGetParserErrors (ctxt: xmlSchemaParserCtxtPtr; err: xmlSchemaValidityErrorFuncPtr; warn: xmlSchemaValidityWarningFuncPtr; ctx: PPointer) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaGetPredefinedType (const name: PChar; const ns: PChar) : xmlSchemaTypePtr; cdecl; external LIBXML2_SO;
+  function xmlSchemaGetValType (val: xmlSchemaValPtr) : xmlSchemaValType; cdecl; external LIBXML2_SO;
   function xmlSchemaGetValidErrors (ctxt: xmlSchemaValidCtxtPtr; err: xmlSchemaValidityErrorFuncPtr; warn: xmlSchemaValidityWarningFuncPtr; ctx: PPointer) : Longint; cdecl; external LIBXML2_SO;
   procedure xmlSchemaInitTypes (); cdecl; external LIBXML2_SO;
   function xmlSchemaIsBuiltInTypeFacet (type_: xmlSchemaTypePtr; facetType: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaNewDocParserCtxt (doc: xmlDocPtr) : xmlSchemaParserCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlSchemaNewFacet () : xmlSchemaFacetPtr; cdecl; external LIBXML2_SO;
   function xmlSchemaNewMemParserCtxt (const buffer: PChar; size: Longint) : xmlSchemaParserCtxtPtr; cdecl; external LIBXML2_SO;
+  function xmlSchemaNewNOTATIONValue (const name: PChar; const ns: PChar) : xmlSchemaValPtr; cdecl; external LIBXML2_SO;
   function xmlSchemaNewParserCtxt (const URL: PChar) : xmlSchemaParserCtxtPtr; cdecl; external LIBXML2_SO;
+  function xmlSchemaNewStringValue (type_: xmlSchemaValType; const value: PChar) : xmlSchemaValPtr; cdecl; external LIBXML2_SO;
   function xmlSchemaNewValidCtxt (schema: xmlSchemaPtr) : xmlSchemaValidCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlSchemaParse (ctxt: xmlSchemaParserCtxtPtr) : xmlSchemaPtr; cdecl; external LIBXML2_SO;
   procedure xmlSchemaSetParserErrors (ctxt: xmlSchemaParserCtxtPtr; err: xmlSchemaValidityErrorFunc; warn: xmlSchemaValidityWarningFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
@@ -3401,7 +3443,9 @@ actually an xmlCharEncoding}
   function xmlSchemaValidCtxtGetOptions (ctxt: xmlSchemaValidCtxtPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateDoc (ctxt: xmlSchemaValidCtxtPtr; doc: xmlDocPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateFacet (base: xmlSchemaTypePtr; facet: xmlSchemaFacetPtr; const value: PChar; val: xmlSchemaValPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlSchemaValidateFacetWhtsp (facet: xmlSchemaFacetPtr; fws: xmlSchemaWhitespaceValueType; valType: xmlSchemaValType; const value: PChar; val: xmlSchemaValPtr; ws: xmlSchemaWhitespaceValueType) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateLengthFacet (type_: xmlSchemaTypePtr; facet: xmlSchemaFacetPtr; const value: PChar; val: xmlSchemaValPtr; length: PCardinal) : Longint; cdecl; external LIBXML2_SO;
+  function xmlSchemaValidateLengthFacetWhtsp (facet: xmlSchemaFacetPtr; valType: xmlSchemaValType; const value: PChar; val: xmlSchemaValPtr; length: PCardinal; ws: xmlSchemaWhitespaceValueType) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateListSimpleTypeFacet (facet: xmlSchemaFacetPtr; const value: PChar; actualLen: Cardinal; expectedLen: PCardinal) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateOneElement (ctxt: xmlSchemaValidCtxtPtr; elem: xmlNodePtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidatePredefinedType (type_: xmlSchemaTypePtr; const value: PChar; val: xmlSchemaValPtrPtr) : Longint; cdecl; external LIBXML2_SO;
@@ -3454,6 +3498,9 @@ actually an xmlCharEncoding}
   function xmlStrchr (const str: PChar; val: xmlChar) : PChar; cdecl; external LIBXML2_SO;
   function xmlStrcmp (const str1: PChar; const str2: PChar) : Longint; cdecl; external LIBXML2_SO;
   function xmlStrdup (const cur: PChar) : PChar; cdecl; external LIBXML2_SO;
+  function xmlStreamPop (stream: xmlStreamCtxtPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlStreamPush (stream: xmlStreamCtxtPtr; const name: PChar; const ns: PChar) : Longint; cdecl; external LIBXML2_SO;
+  function xmlStreamPushAttr (stream: xmlStreamCtxtPtr; const name: PChar; const ns: PChar) : Longint; cdecl; external LIBXML2_SO;
   function xmlStringCurrentChar (ctxt: xmlParserCtxtPtr; const cur: PChar; len: PInteger) : Longint; cdecl; external LIBXML2_SO;
   function xmlStringDecodeEntities (ctxt: xmlParserCtxtPtr; const str: PChar; what: Longint; end_: xmlChar; end2: xmlChar; end3: xmlChar) : PChar; cdecl; external LIBXML2_SO;
   function xmlStringGetNodeList (doc: xmlDocPtr; const value: PChar) : xmlNodePtr; cdecl; external LIBXML2_SO;
@@ -3475,6 +3522,7 @@ actually an xmlCharEncoding}
   function xmlTextMerge (first: xmlNodePtr; second: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXML2_SO;
   function xmlTextReaderAttributeCount (reader: xmlTextReaderPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlTextReaderBaseUri (reader: xmlTextReaderPtr) : PChar; cdecl; external LIBXML2_SO;
+  function xmlTextReaderByteConsumed (reader: xmlTextReaderPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlTextReaderClose (reader: xmlTextReaderPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlTextReaderConstBaseUri (reader: xmlTextReaderPtr) : PChar; cdecl; external LIBXML2_SO;
   function xmlTextReaderConstEncoding (reader: xmlTextReaderPtr) : PChar; cdecl; external LIBXML2_SO;
@@ -4154,7 +4202,7 @@ initialization
   // get to these addresses (and also those of other data values exported from
   // the DLL) by using GetProcAddress.
   libHandle := LoadLibrary(LIBXML2_SO);
-  if libHandle <> 0 then
+  if libHandle <> 0 then 
   begin
     pxmlFree := xmlFreeFuncPtr(GetProcAddress(libHandle, 'xmlFree'));
     __xmlIsBaseCharGroup := xmlChRangeGroupPtr(GetProcAddress(libHandle, 'xmlIsBaseCharGroup'));

@@ -1,4 +1,5 @@
 {This file generated automatically from libxslt-api.xml}
+{For libxslt version: 1.1.14}
 Unit libxslt;
 
 interface
@@ -220,7 +221,6 @@ type
       xsltRuntimeExtra = record
           info : Pointer; { pointer to the extra data}
           deallocate : xmlFreeFunc; { pointer to the deallocation routine}
-          val : Pointer; { data not needing deallocation}
       end;
 
       xsltSecurityPrefs = record
@@ -342,7 +342,11 @@ informations are stored}
 *}
           defaultAlias : PChar; {* bypass pre-processing (already done) (used in imports)
 *}
-          nopreproc : Longint; {}
+          nopreproc : Longint; {* all document text strings were internalized
+*}
+          internalized : Longint; {* Literal Result Element as Stylesheet c.f. section 2.3
+*}
+          literal_result : Longint; {}
       end;
 
       xsltTemplate = record
@@ -420,7 +424,12 @@ informations are stored}
           traceCode : PCardinal; { pointer to the variable holding the mask}
           parserOptions : Longint; {* dictionnary: shared between stylesheet, context and documents.
 *}
-          dict : xmlDictPtr; {}
+          dict : xmlDictPtr; {* temporary storage for doc ptr, currently only used for
+* global var evaluation
+*}
+          tmpDoc : xmlDocPtr; {* all document text strings are internalized
+*}
+          internalized : Longint; {}
       end;
 
 
@@ -640,9 +649,9 @@ informations are stored}
   function xsltXPathFunctionLookup (ctxt: xmlXPathContextPtr; const name: PChar; const ns_uri: PChar) : xmlXPathFunction; cdecl; external LIBXSLT_SO;
   function xsltXPathGetTransformContext (ctxt: xmlXPathParserContextPtr) : xsltTransformContextPtr; cdecl; external LIBXSLT_SO;
   function xsltXPathVariableLookup (ctxt: Pointer; const name: PChar; const ns_uri: PChar) : xmlXPathObjectPtr; cdecl; external LIBXSLT_SO;
-var  
+var
   __xslDebugStatus: PInteger;
-var  
+var
   __xsltDocDefaultLoader: xsltDocLoaderFuncPtr;
   function xsltEngineVersion(): PChar; cdecl;
   function xsltExtMarker(): PChar; cdecl;
@@ -719,7 +728,7 @@ initialization
   // get to these addresses (and also those of other data values exported from
   // the DLL) by using GetProcAddress.
   libHandle := LoadLibrary(LIBXSLT_SO);
-  if libHandle <> 0 then
+  if libHandle <> 0 then 
   begin
     __xslDebugStatus := PInteger(GetProcAddress(libHandle, 'xslDebugStatus'));
     __xsltDocDefaultLoader := xsltDocLoaderFuncPtr(GetProcAddress(libHandle, 'xsltDocDefaultLoader'));
@@ -732,6 +741,7 @@ initialization
     pxsltLibxmlVersion := PInteger(GetProcAddress(libHandle, 'xsltLibxmlVersion'));
     pxsltLibxsltVersion := PInteger(GetProcAddress(libHandle, 'xsltLibxsltVersion'));
     __xsltMaxDepth := PInteger(GetProcAddress(libHandle, 'xsltMaxDepth'));
+
     FreeLibrary(libHandle);
   end;
 
