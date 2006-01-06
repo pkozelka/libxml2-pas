@@ -109,7 +109,17 @@ const
 <xsl:text> = '</xsl:text>
 <xsl:value-of select="$unit"/><xsl:text>.so';
 {$ENDIF}
+</xsl:text>
 
+<xsl:if test="$unit='libxml2'">
+  <xsl:text>
+  XML_DETECT_IDS = 2;
+  XML_COMPLETE_ATTRS = 4;
+  XML_SKIP_IDS = 8;
+  </xsl:text>
+</xsl:if>
+
+<xsl:text>
 type
 
 </xsl:text>
@@ -120,7 +130,9 @@ type
       iconv_t = Cardinal;
       size_t = Cardinal;
       va_list = Pointer;
-      xmlCharPtr = ^xmlChar;
+      xmlCharPtr = PAnsiChar;
+      pxmlChar = PAnsiChar; // For backwards compatibility
+      xmlCharPtrPtr = ^xmlCharPtr;
       xmlNodePtrPtr = ^xmlNodePtr;
       xmlDocPtrPtr = ^xmlDocPtr;
       xmlNSPtrPtr = ^xmlNSPtr;
@@ -135,6 +147,7 @@ type
       xmlXPathObjectPtrPtr = ^xmlXPathObjectPtr;
       xmlParserInputPtrPtr = ^xmlParserInputPtr;
       xmlBufferAllocationSchemePtr = ^xmlBufferAllocationScheme;
+      xmlSAXHandlerPtrPtr = ^xmlSAXHandlerPtr;
 
     </xsl:text>
   </xsl:when>
@@ -142,6 +155,17 @@ type
     <xsl:text>
       xsltTemplatePtrPtr = ^xsltTemplatePtr;
       xsltStackElemPtrPtr = ^xsltStackElemPtr;
+
+    </xsl:text>
+  </xsl:when>
+  <xsl:when test="$unit='libxmlsec'">
+    <xsl:text>
+      time_t = LongInt;
+      xmlSecSize = Cardinal;
+      xmlSecSizePtr = ^xmlSecSize;
+      xmlSecByte = Byte;
+      xmlSecBytePtr = ^xmlSecByte;
+      xmlSecBytePtrPtr = ^xmlSecBytePtr;
 
     </xsl:text>
   </xsl:when>
@@ -176,6 +200,16 @@ type
   <xsl:apply-templates select="api/symbols/typedef[@type!='enum']" mode="NonPtrTypes"/>
   <xsl:apply-templates select="api/symbols/function"/>
   <xsl:apply-templates select="api/symbols/variable" mode="VariablesPassOne"/>
+
+<xsl:if test="$unit='libxml2'">
+  <xsl:text>
+// macros from xpath.h
+  function xmlXPathNodeSetGetLength(ns: xmlNodeSetPtr): Integer;
+  function xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: Integer): xmlNodePtr;
+  function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): Boolean;
+  </xsl:text>
+</xsl:if>
+
   <xsl:text>
 
 implementation
@@ -188,6 +222,8 @@ uses
 var
   libHandle: THandle;
 
+// Utility function to make sure procedure entry points are not null
+
 procedure CheckForNil(ptr: Pointer; name:string);
 begin
   if not Assigned(ptr) then
@@ -197,6 +233,42 @@ begin
 end;
 
 </xsl:text>
+
+<xsl:if test="$unit='libxml2'">
+  <xsl:text>
+// macros from xpath.h
+
+function xmlXPathNodeSetGetLength(ns: xmlNodeSetPtr): Integer;
+begin
+  if Assigned(ns) then
+    Result := ns.nodeNr
+  else
+    Result := 0
+end;
+
+function xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: Integer): xmlNodePtr;
+var
+  p: xmlNodePtrPtr;
+begin
+  if (ns = nil) or (index &lt; 0) or (index &gt;= ns.nodeNr) then
+    Result := nil
+  else
+  begin
+    p := ns.nodeTab;
+    Inc(p, index);
+    Result := p^;
+  end;
+end;
+
+function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): Boolean;
+begin
+  Result := ((ns = nil) or (ns.nodeNr = 0) or (ns.nodeTab = nil));
+end;
+
+</xsl:text>
+</xsl:if>
+
+
   <xsl:apply-templates select="api/symbols/variable" mode="VariablesPassTwo"/>
   <xsl:text>
 
@@ -492,7 +564,12 @@ begin
       <xsl:text>');
   Result := p</xsl:text>
       <xsl:value-of select="@name"/>
-      <xsl:text>^;
+      <!-- Nasty hack for libxmlsec - problem is actually in handling of
+      character array declarations by apibuild.py -->
+      <xsl:if test="not(starts-with(@type,'const xmlCharxmlSec'))">
+        <xsl:text>^</xsl:text>
+      </xsl:if>
+      <xsl:text>;
 end;
 
 </xsl:text>  
@@ -658,7 +735,8 @@ end;
                 ($text='end') or
                 ($text='set') or
                 ($text='function') or
-                ($text='file')">
+                ($text='file') or
+                ($text='mod')">
     <xsl:text>_</xsl:text>
   </xsl:if>
 </xsl:template>
@@ -687,6 +765,11 @@ end;
 <xsl:template name="FixupNonconstVarType">
   <xsl:param name="text"/>
   <xsl:choose>
+    <!-- Nasty hack for libxmlsec - problem is actually in handling of
+     character array declarations by apibuild.py -->
+    <xsl:when test="($unit='libxmlsec') and starts-with($text, 'xmlCharxmlSec')">
+      <xsl:text>xmlCharPtr</xsl:text>
+    </xsl:when>
     <xsl:when test="contains($text, '(*')">
       <xsl:text>Pointer</xsl:text>
     </xsl:when>
@@ -751,13 +834,13 @@ end;
       <xsl:text>PPChar</xsl:text>
     </xsl:when>
     <xsl:when test="$text='xmlChar *'">
-      <xsl:text>PChar</xsl:text>
+      <xsl:text>xmlCharPtr</xsl:text>
     </xsl:when>
     <xsl:when test="$text='xmlChar **'">
-      <xsl:text>PPChar</xsl:text>
+      <xsl:text>xmlCharPtrPtr</xsl:text>
     </xsl:when>
     <xsl:when test="$text='xmlChar * *'">
-      <xsl:text>PPChar</xsl:text>
+      <xsl:text>xmlCharPtrPtr</xsl:text>
     </xsl:when>
     <xsl:when test="$text='FILE *'">
       <xsl:text>PFILE</xsl:text>

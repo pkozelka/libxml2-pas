@@ -16,7 +16,7 @@ const
   LIBEXSLT_SO = 'libexslt.so';
 {$ENDIF}
 
-// type
+//type
 
 
   procedure exsltCommonRegister (); cdecl; external LIBEXSLT_SO;
@@ -43,6 +43,8 @@ uses
 
 var
   libHandle: THandle;
+
+// Utility function to make sure procedure entry points are not null
 
 procedure CheckForNil(ptr: Pointer; name:string);
 begin

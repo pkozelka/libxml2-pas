@@ -1,5 +1,5 @@
-{This file generated automatically from xmlsec-api.xml}
-{For libxmlsec version: 1.2.8}
+{This file generated (mostly) automatically from libxmlsec-api.xml}
+{For libxmlsec version: 1.2.9}
 Unit libxmlsec;
 
 interface
@@ -11,9 +11,9 @@ uses libxml2, libxslt;
 
 const
 {$IFDEF WIN32}
-   XMLSEC_SO = 'libxmlsec.dll';
+  LIBXMLSEC_SO = 'libxmlsec.dll';
 {$ELSE}
-   XMLSEC_SO = 'libxmlsec.so';
+  LIBXMLSEC_SO = 'libxmlsec.so';
 {$ENDIF}
 
 type
@@ -143,281 +143,48 @@ type
        xmlSecPtr = Pointer;
        xmlSecPtrPtr = ^xmlSecPtr;
 
-      xmlSecKeyDataUsage = Cardinal;
-
-      xmlSecKeyPtr = Pointer;
-      xmlSecKeyDataList = Pointer;
-      xmlSecKeyDataListPtr = Pointer;
-      xmlSecKeyDataPtr = Pointer;
-      xmlSecKeyDataStorePtr = Pointer;
-      xmlSecKeyInfoCtxPtr = Pointer;
-      xmlSecKeyStorePtr = Pointer;
-
-      xmlSecKeyDataType = Cardinal;
-      xmlSecKeyDataId = ^_xmlSecKeyDataKlass;
-
-      xmlSecKeyDataBinReadMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
-        xmlSecKeyDataBinReadMethodPtr = ^xmlSecKeyDataBinReadMethod;
-
-      xmlSecKeyDataBinWriteMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; buf: xmlSecBytePtrPtr; bufSize: xmlSecSizePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
-        xmlSecKeyDataBinWriteMethodPtr = ^xmlSecKeyDataBinWriteMethod;
-
-      xmlSecKeyDataDebugDumpMethod = procedure  (data: xmlSecKeyDataPtr; output: PFILE); cdecl;
-        xmlSecKeyDataDebugDumpMethodPtr = ^xmlSecKeyDataDebugDumpMethod;
-
-      xmlSecKeyDataDuplicateMethod = function  (dst: xmlSecKeyDataPtr; src: xmlSecKeyDataPtr) : Longint; cdecl;
-        xmlSecKeyDataDuplicateMethodPtr = ^xmlSecKeyDataDuplicateMethod;
-
-      xmlSecKeyDataFinalizeMethod = procedure  (data: xmlSecKeyDataPtr); cdecl;
-        xmlSecKeyDataFinalizeMethodPtr = ^xmlSecKeyDataFinalizeMethod;
-
-      xmlSecKeyDataGenerateMethod = function  (data: xmlSecKeyDataPtr; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : Longint; cdecl;
-        xmlSecKeyDataGenerateMethodPtr = ^xmlSecKeyDataGenerateMethod;
-
-      xmlSecKeyDataGetIdentifierMethod = function  (data: xmlSecKeyDataPtr) : PChar; cdecl;
-        xmlSecKeyDataGetIdentifierMethodPtr = ^xmlSecKeyDataGetIdentifierMethod;
-
-      xmlSecKeyDataGetSizeMethod = function  (data: xmlSecKeyDataPtr) : xmlSecSize; cdecl;
-        xmlSecKeyDataGetSizeMethodPtr = ^xmlSecKeyDataGetSizeMethod;
-
-      xmlSecKeyDataGetTypeMethod = function  (data: xmlSecKeyDataPtr) : xmlSecKeyDataType; cdecl;
-        xmlSecKeyDataGetTypeMethodPtr = ^xmlSecKeyDataGetTypeMethod;
-
-      xmlSecKeyDataInitMethod = function  (data: xmlSecKeyDataPtr) : Longint; cdecl;
-        xmlSecKeyDataInitMethodPtr = ^xmlSecKeyDataInitMethod;
-
-      xmlSecKeyDataStoreFinalizeMethod = procedure  (store: xmlSecKeyDataStorePtr); cdecl;
-        xmlSecKeyDataStoreFinalizeMethodPtr = ^xmlSecKeyDataStoreFinalizeMethod;
-
-      xmlSecKeyDataStoreInitializeMethod = function  (store: xmlSecKeyDataStorePtr) : Longint; cdecl;
-        xmlSecKeyDataStoreInitializeMethodPtr = ^xmlSecKeyDataStoreInitializeMethod;
-
-      xmlSecKeyDataXmlReadMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
-        xmlSecKeyDataXmlReadMethodPtr = ^xmlSecKeyDataXmlReadMethod;
-
-      xmlSecKeyDataXmlWriteMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
-        xmlSecKeyDataXmlWriteMethodPtr = ^xmlSecKeyDataXmlWriteMethod;
-
-      xmlSecKeyStoreFinalizeMethod = procedure  (store: xmlSecKeyStorePtr); cdecl;
-        xmlSecKeyStoreFinalizeMethodPtr = ^xmlSecKeyStoreFinalizeMethod;
-
-      xmlSecKeyStoreFindKeyMethod = function  (store: xmlSecKeyStorePtr; const name: PChar; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl;
-        xmlSecKeyStoreFindKeyMethodPtr = ^xmlSecKeyStoreFindKeyMethod;
-
-      xmlSecKeyStoreInitializeMethod = function  (store: xmlSecKeyStorePtr) : Longint; cdecl;
-        xmlSecKeyStoreInitializeMethodPtr = ^xmlSecKeyStoreInitializeMethod;
-
-      _xmlSecKeyDataKlass = record
-        klassSize : xmlSecSize;
-        objSize : xmlSecSize;
-        name : xmlCharPtr;
-        usage : xmlSecKeyDataUsage;
-        href : xmlCharPtr;
-        dataNodeName : xmlCharPtr;
-        dataNodeNs : xmlCharPtr;
-        initialize : xmlSecKeyDataInitMethod;
-        duplicate : xmlSecKeyDataDuplicateMethod;
-        finalize : xmlSecKeyDataFinalizeMethod;
-        generate : xmlSecKeyDataGenerateMethod;
-        getType : xmlSecKeyDataGetTypeMethod;
-        getSize : xmlSecKeyDataGetSizeMethod;
-        getIdentifier : xmlSecKeyDataGetIdentifierMethod;
-        xmlRead : xmlSecKeyDataXmlReadMethod;
-        xmlWrite : xmlSecKeyDataXmlWriteMethod;
-        binRead : xmlSecKeyDataBinReadMethod;
-        binWrite : xmlSecKeyDataBinWriteMethod;
-        debugDump : xmlSecKeyDataDebugDumpMethod;
-        debugXmlDump : xmlSecKeyDataDebugDumpMethod;
-        reserved0 : Pointer;
-        reserved1 : Pointer;
-      end;
-
-      xmlSecKeyDataKlass = _xmlSecKeyDataKlass;
-
-      _xmlSecKeyDataStoreKlass = record
-        klassSize : xmlSecSize;
-        objSize : xmlSecSize;
-        name : xmlCharPtr;
-        initialize : xmlSecKeyDataStoreInitializeMethod;
-        finalize : xmlSecKeyDataStoreFinalizeMethod;
-        reserved0 : Pointer;
-        reserved1 : Pointer;
-      end;
-
-      xmlSecKeyDataStoreId = ^_xmlSecKeyDataStoreKlass;
-      xmlSecKeyDataStoreKlass = _xmlSecKeyDataStoreKlass;
-
-      _xmlSecKeyStoreKlass = record
-        klassSize : xmlSecSize;
-        objSize : xmlSecSize;
-        name : xmlCharPtr;
-        initialize : xmlSecKeyStoreInitializeMethod;
-        finalize : xmlSecKeyStoreFinalizeMethod;
-        findKey : xmlSecKeyStoreFindKeyMethod;
-        reserved0 : Pointer;
-        reserved1 : Pointer;
-      end;
-
-      xmlSecKeyStoreId = ^_xmlSecKeyStoreKlass;
-      xmlSecKeyStoreKlass = _xmlSecKeyStoreKlass;
-
-      _xmlSecKeyKlass = record  // Never actually defined in the headers!
-      end;
-
-      xmlSecKeyId = ^_xmlSecKeyKlass;
-      xmlSecKeyKlass = _xmlSecKeyKlass;
-
-      xmlSecBuffer = record
-          data : xmlSecBytePtr; {}
-          size : xmlSecSize; {}
-          maxSize : xmlSecSize; {}
-          allocMode : xmlSecAllocMode; {}
-      end;
-
+      // Manually gathering all the definitions of pointers
+      // to records here helps reduce problems with ordering of
+      // declarations.
+      xmlSecBase64CtxPtr = ^xmlSecBase64Ctx;
       xmlSecBufferPtr = ^xmlSecBuffer;
-      xmlSecBn = xmlSecBuffer;
+      xmlSecCryptoDLFunctionsPtr = ^xmlSecCryptoDLFunctions;
+      xmlSecDSigCtxPtr = ^xmlSecDSigCtx;
+      xmlSecDSigReferenceCtxPtr = ^xmlSecDSigReferenceCtx;
+      xmlSecEncCtxPtr = ^xmlSecEncCtx;
+      xmlSecKeyDataListPtr = ^xmlSecKeyDataList;
+      xmlSecKeyDataPtr = ^xmlSecKeyData;
+      xmlSecKeyDataStorePtr = ^xmlSecKeyDataStore;
+      xmlSecKeyInfoCtxPtr = ^xmlSecKeyInfoCtx;
+      xmlSecKeyPtr = ^xmlSecKey;
+      xmlSecKeyReqPtr = ^xmlSecKeyReq;
+      xmlSecKeyStorePtr = ^xmlSecKeyStore;
+      xmlSecKeyUseWithPtr = ^xmlSecKeyUseWith;
+      xmlSecKeysMngrPtr = ^xmlSecKeysMngr;
+      xmlSecNodeSetPtr = ^xmlSecNodeSet;
+      xmlSecNodeSetPtrPtr = ^xmlSecNodeSetPtr;
+      xmlSecPtrListPtr = ^xmlSecPtrList;
+      xmlSecQName2BitMaskInfoPtr = ^xmlSecQName2BitMaskInfo;
+      xmlSecQName2IntegerInfoPtr = ^xmlSecQName2IntegerInfo;
+      xmlSecTransformCtxPtr = ^xmlSecTransformCtx;
+      xmlSecTransformPtr = ^xmlSecTransform;
+      xmlSecBitMask = Cardinal;
+      xmlSecBitMaskPtr = ^xmlSecBitmask;
+      xmlSecXkmsServerCtxPtr = ^xmlSecXkmsServerCtx;
       xmlSecBnPtr = ^xmlSecBuffer;
-
-      xmlSecPtrDebugDumpItemMethod = procedure  (ptr: xmlSecPtr; output: PFILE); cdecl;
-        xmlSecPtrDebugDumpItemMethodPtr = ^xmlSecPtrDebugDumpItemMethod;
-
-      xmlSecPtrDestroyItemMethod = procedure  (ptr: xmlSecPtr); cdecl;
-        xmlSecPtrDestroyItemMethodPtr = ^xmlSecPtrDestroyItemMethod;
-
-      xmlSecPtrDuplicateItemMethod = function  (ptr: xmlSecPtr) : xmlSecPtr; cdecl;
-        xmlSecPtrDuplicateItemMethodPtr = ^xmlSecPtrDuplicateItemMethod;
-
-      _xmlSecPtrListKlass = record
-        name : xmlCharPtr;
-        duplicateItem : xmlSecPtrDuplicateItemMethod;
-        destroyItem : xmlSecPtrDestroyItemMethod;
-        debugDumpItem : xmlSecPtrDebugDumpItemMethod;
-        debugXmlDumpItem : xmlSecPtrDebugDumpItemMethod;
-      end;
-
+      xmlSecKeyDataId = ^_xmlSecKeyDataKlass;
+      xmlSecKeyDataStoreId = ^_xmlSecKeyDataStoreKlass;
+      xmlSecKeyDataType = Cardinal;
+      xmlSecKeyDataUsage = Cardinal;
+      xmlSecKeyId = ^_xmlSecKeyKlass;
+      xmlSecKeyStoreId = ^_xmlSecKeyStoreKlass;
+      xmlSecKeyUsage = Cardinal;
       xmlSecPtrListId = ^_xmlSecPtrListKlass;
-      xmlSecPtrListKlass = _xmlSecPtrListKlass;
-
-      _xmlSecPtrList = record
-        id : xmlSecPtrListId;
-        data : xmlSecPtrPtr;
-        use : xmlSecSize;
-        max : xmlSecSize;
-        allocMode : xmlSecAllocMode;
-      end;
-
+      xmlSecTransformId = ^_xmlSecTransformKlass;
+      xmlSecTransformUriType = Cardinal;
       xmlSecTransformUsage = Cardinal;
-
       xmlSecTransformDataType = xmlSecByte;
 
-      xmlSecTransformPtr = ^xmlSecTransform;
-
-      xmlSecTransformCtxPtr = ^xmlSecTransformCtx;
-
-      xmlSecNodeSetPtr = ^xmlSecNodeSet;
-
-      xmlSecNodeSetPtrPtr = ^xmlSecNodeSetPtr;
-
-      xmlSecKeyReqPtr = ^xmlSecKeyReq;
-
-      xmlSecTransformExecuteMethod = function  (transform: xmlSecTransformPtr; last: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformExecuteMethodPtr = ^xmlSecTransformExecuteMethod;
-
-      xmlSecTransformFinalizeMethod = procedure  (transform: xmlSecTransformPtr); cdecl;
-        xmlSecTransformFinalizeMethodPtr = ^xmlSecTransformFinalizeMethod;
-
-      xmlSecTransformGetDataTypeMethod = function  (transform: xmlSecTransformPtr; mode: xmlSecTransformMode; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformDataType; cdecl;
-        xmlSecTransformGetDataTypeMethodPtr = ^xmlSecTransformGetDataTypeMethod;
-
-      xmlSecTransformInitializeMethod = function  (transform: xmlSecTransformPtr) : Longint; cdecl;
-        xmlSecTransformInitializeMethodPtr = ^xmlSecTransformInitializeMethod;
-
-      xmlSecTransformNodeReadMethod = function  (transform: xmlSecTransformPtr; node: xmlNodePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformNodeReadMethodPtr = ^xmlSecTransformNodeReadMethod;
-
-      xmlSecTransformNodeWriteMethod = function  (transform: xmlSecTransformPtr; node: xmlNodePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformNodeWriteMethodPtr = ^xmlSecTransformNodeWriteMethod;
-
-      xmlSecTransformPopBinMethod = function  (transform: xmlSecTransformPtr; data: xmlSecBytePtr; maxDataSize: xmlSecSize; dataSize: xmlSecSizePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformPopBinMethodPtr = ^xmlSecTransformPopBinMethod;
-
-      xmlSecTransformPopXmlMethod = function  (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtrPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformPopXmlMethodPtr = ^xmlSecTransformPopXmlMethod;
-
-      xmlSecTransformPushBinMethod = function  (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; final: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformPushBinMethodPtr = ^xmlSecTransformPushBinMethod;
-
-      xmlSecTransformPushXmlMethod = function  (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformPushXmlMethodPtr = ^xmlSecTransformPushXmlMethod;
-
-      xmlSecTransformSetKeyMethod = function  (transform: xmlSecTransformPtr; key: xmlSecKeyPtr) : Longint; cdecl;
-        xmlSecTransformSetKeyMethodPtr = ^xmlSecTransformSetKeyMethod;
-
-      xmlSecTransformSetKeyRequirementsMethod = function  (transform: xmlSecTransformPtr; keyReq: xmlSecKeyReqPtr) : Longint; cdecl;
-        xmlSecTransformSetKeyRequirementsMethodPtr = ^xmlSecTransformSetKeyRequirementsMethod;
-
-      xmlSecTransformVerifyMethod = function  (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
-        xmlSecTransformVerifyMethodPtr = ^xmlSecTransformVerifyMethod;
-
-      _xmlSecTransformKlass = record
-        klassSize : xmlSecSize;
-        objSize : xmlSecSize;
-        name : xmlCharPtr;
-        href : xmlCharptr;
-        usage : xmlSecTransformUsage;
-        initialize : xmlSecTransformInitializeMethod;
-        finalize : xmlSecTransformFinalizeMethod;
-        readNode : xmlSecTransformNodeReadMethod;
-        writeNode : xmlSecTransformNodeWriteMethod;
-        setKeyReq : xmlSecTransformSetKeyRequirementsMethod;
-        setKey : xmlSecTransformSetKeyMethod;
-        verify : xmlSecTransformVerifyMethod;
-        getDataType : xmlSecTransformGetDataTypeMethod;
-        pushBin : xmlSecTransformPushBinMethod;
-        popBin : xmlSecTransformPopBinMethod;
-        pushXml : xmlSecTransformPushXmlMethod;
-        popXml : xmlSecTransformPopXmlMethod;
-        execute : xmlSecTransformExecuteMethod;
-        reserved0 : Pointer;
-        reverved1 : Pointer;
-      end;
-
-      xmlSecBitMask = Cardinal;
-      xmlSecBitMaskPtr = ^xmlSecBitMask;
-      xmlSecKeyUsage = Cardinal;
-      xmlSecTransformId = ^_xmlSecTransformKlass;
-      xmlSecTransformKlass = _xmlSecTransformKlass;
-      xmlSecTransformUriType = Cardinal;
-
-      xmlSecKeyStore = record
-          id : xmlSecKeyStoreId; { for the future}
-          reserved0 : Pointer; {}
-          reserved1 : Pointer; {}
-      end;
-
-      xmlSecPtrList = record
-          id : xmlSecPtrListId; {}
-          data : xmlSecPtrPtr; {}
-          use : xmlSecSize; {}
-          max : xmlSecSize; {}
-          allocMode : xmlSecAllocMode; {}
-      end;
-
-      xmlSecPtrListPtr = ^xmlSecPtrList;
-
-      xmlSecGetKeyCallback = function  (keyInfoNode: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl;
-        xmlSecGetKeyCallbackPtr = ^xmlSecGetKeyCallback;
-
-      xmlSecKeysMngr = record
-          keysStore : xmlSecKeyStorePtr; {}
-          storesList : xmlSecPtrList; {}
-          getKey : xmlSecGetKeyCallback; {}
-      end;
-
-      xmlSecKeysMngrPtr = ^xmlSecKeysMngr;
-
-       xmlSecQName2BitMaskInfoPtr = ^xmlSecQName2BitMaskInfo;
-       xmlSecQName2IntegerInfoPtr = ^xmlSecQName2IntegerInfo;
       xmlSecCryptoAppDefaultKeysMngrAdoptKeyMethod = function  (mngr: xmlSecKeysMngrPtr; key: xmlSecKeyPtr) : Longint; cdecl;
         xmlSecCryptoAppDefaultKeysMngrAdoptKeyMethodPtr = ^xmlSecCryptoAppDefaultKeysMngrAdoptKeyMethod;
 
@@ -481,16 +248,123 @@ type
       xmlSecErrorsCallback = procedure  (const file_: PChar; line: Longint; const func: PChar; const errorObject: PChar; const errorSubject: PChar; reason: Longint; const msg: PChar); cdecl;
         xmlSecErrorsCallbackPtr = ^xmlSecErrorsCallback;
 
+      xmlSecGetKeyCallback = function  (keyInfoNode: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl;
+        xmlSecGetKeyCallbackPtr = ^xmlSecGetKeyCallback;
+
+      xmlSecKeyDataBinReadMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
+        xmlSecKeyDataBinReadMethodPtr = ^xmlSecKeyDataBinReadMethod;
+
+      xmlSecKeyDataBinWriteMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; buf: xmlSecBytePtrPtr; bufSize: xmlSecSizePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
+        xmlSecKeyDataBinWriteMethodPtr = ^xmlSecKeyDataBinWriteMethod;
+
+      xmlSecKeyDataDebugDumpMethod = procedure  (data: xmlSecKeyDataPtr; output: PFILE); cdecl;
+        xmlSecKeyDataDebugDumpMethodPtr = ^xmlSecKeyDataDebugDumpMethod;
+
+      xmlSecKeyDataDuplicateMethod = function  (dst: xmlSecKeyDataPtr; src: xmlSecKeyDataPtr) : Longint; cdecl;
+        xmlSecKeyDataDuplicateMethodPtr = ^xmlSecKeyDataDuplicateMethod;
+
+      xmlSecKeyDataFinalizeMethod = procedure  (data: xmlSecKeyDataPtr); cdecl;
+        xmlSecKeyDataFinalizeMethodPtr = ^xmlSecKeyDataFinalizeMethod;
+
+      xmlSecKeyDataGenerateMethod = function  (data: xmlSecKeyDataPtr; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : Longint; cdecl;
+        xmlSecKeyDataGenerateMethodPtr = ^xmlSecKeyDataGenerateMethod;
+
+      xmlSecKeyDataGetIdentifierMethod = function  (data: xmlSecKeyDataPtr) : xmlCharPtr; cdecl;
+        xmlSecKeyDataGetIdentifierMethodPtr = ^xmlSecKeyDataGetIdentifierMethod;
+
+      xmlSecKeyDataGetSizeMethod = function  (data: xmlSecKeyDataPtr) : xmlSecSize; cdecl;
+        xmlSecKeyDataGetSizeMethodPtr = ^xmlSecKeyDataGetSizeMethod;
+
+      xmlSecKeyDataGetTypeMethod = function  (data: xmlSecKeyDataPtr) : xmlSecKeyDataType; cdecl;
+        xmlSecKeyDataGetTypeMethodPtr = ^xmlSecKeyDataGetTypeMethod;
+
+      xmlSecKeyDataInitMethod = function  (data: xmlSecKeyDataPtr) : Longint; cdecl;
+        xmlSecKeyDataInitMethodPtr = ^xmlSecKeyDataInitMethod;
+
+      xmlSecKeyDataStoreFinalizeMethod = procedure  (store: xmlSecKeyDataStorePtr); cdecl;
+        xmlSecKeyDataStoreFinalizeMethodPtr = ^xmlSecKeyDataStoreFinalizeMethod;
+
+      xmlSecKeyDataStoreInitializeMethod = function  (store: xmlSecKeyDataStorePtr) : Longint; cdecl;
+        xmlSecKeyDataStoreInitializeMethodPtr = ^xmlSecKeyDataStoreInitializeMethod;
+
+      xmlSecKeyDataXmlReadMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
+        xmlSecKeyDataXmlReadMethodPtr = ^xmlSecKeyDataXmlReadMethod;
+
+      xmlSecKeyDataXmlWriteMethod = function  (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl;
+        xmlSecKeyDataXmlWriteMethodPtr = ^xmlSecKeyDataXmlWriteMethod;
+
+      xmlSecKeyStoreFinalizeMethod = procedure  (store: xmlSecKeyStorePtr); cdecl;
+        xmlSecKeyStoreFinalizeMethodPtr = ^xmlSecKeyStoreFinalizeMethod;
+
+      xmlSecKeyStoreFindKeyMethod = function  (store: xmlSecKeyStorePtr; const name: xmlCharPtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl;
+        xmlSecKeyStoreFindKeyMethodPtr = ^xmlSecKeyStoreFindKeyMethod;
+
+      xmlSecKeyStoreInitializeMethod = function  (store: xmlSecKeyStorePtr) : Longint; cdecl;
+        xmlSecKeyStoreInitializeMethodPtr = ^xmlSecKeyStoreInitializeMethod;
+
       xmlSecNodeSetWalkCallback = function  (nset: xmlSecNodeSetPtr; cur: xmlNodePtr; parent: xmlNodePtr; data: Pointer) : Longint; cdecl;
         xmlSecNodeSetWalkCallbackPtr = ^xmlSecNodeSetWalkCallback;
+
+      xmlSecPtrDebugDumpItemMethod = procedure  (ptr: xmlSecPtr; output: PFILE); cdecl;
+        xmlSecPtrDebugDumpItemMethodPtr = ^xmlSecPtrDebugDumpItemMethod;
+
+      xmlSecPtrDestroyItemMethod = procedure  (ptr: xmlSecPtr); cdecl;
+        xmlSecPtrDestroyItemMethodPtr = ^xmlSecPtrDestroyItemMethod;
+
+      xmlSecPtrDuplicateItemMethod = function  (ptr: xmlSecPtr) : xmlSecPtr; cdecl;
+        xmlSecPtrDuplicateItemMethodPtr = ^xmlSecPtrDuplicateItemMethod;
 
       xmlSecTransformCtxPreExecuteCallback = function  (transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
         xmlSecTransformCtxPreExecuteCallbackPtr = ^xmlSecTransformCtxPreExecuteCallback;
 
+      xmlSecTransformExecuteMethod = function  (transform: xmlSecTransformPtr; last: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformExecuteMethodPtr = ^xmlSecTransformExecuteMethod;
+
+      xmlSecTransformFinalizeMethod = procedure  (transform: xmlSecTransformPtr); cdecl;
+        xmlSecTransformFinalizeMethodPtr = ^xmlSecTransformFinalizeMethod;
+
+      xmlSecTransformGetDataTypeMethod = function  (transform: xmlSecTransformPtr; mode: xmlSecTransformMode; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformDataType; cdecl;
+        xmlSecTransformGetDataTypeMethodPtr = ^xmlSecTransformGetDataTypeMethod;
+
+      xmlSecTransformInitializeMethod = function  (transform: xmlSecTransformPtr) : Longint; cdecl;
+        xmlSecTransformInitializeMethodPtr = ^xmlSecTransformInitializeMethod;
+
+      xmlSecTransformNodeReadMethod = function  (transform: xmlSecTransformPtr; node: xmlNodePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformNodeReadMethodPtr = ^xmlSecTransformNodeReadMethod;
+
+      xmlSecTransformNodeWriteMethod = function  (transform: xmlSecTransformPtr; node: xmlNodePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformNodeWriteMethodPtr = ^xmlSecTransformNodeWriteMethod;
+
+      xmlSecTransformPopBinMethod = function  (transform: xmlSecTransformPtr; data: xmlSecBytePtr; maxDataSize: xmlSecSize; dataSize: xmlSecSizePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformPopBinMethodPtr = ^xmlSecTransformPopBinMethod;
+
+      xmlSecTransformPopXmlMethod = function  (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtrPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformPopXmlMethodPtr = ^xmlSecTransformPopXmlMethod;
+
+      xmlSecTransformPushBinMethod = function  (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; final: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformPushBinMethodPtr = ^xmlSecTransformPushBinMethod;
+
+      xmlSecTransformPushXmlMethod = function  (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformPushXmlMethodPtr = ^xmlSecTransformPushXmlMethod;
+
+      xmlSecTransformSetKeyMethod = function  (transform: xmlSecTransformPtr; key: xmlSecKeyPtr) : Longint; cdecl;
+        xmlSecTransformSetKeyMethodPtr = ^xmlSecTransformSetKeyMethod;
+
+      xmlSecTransformSetKeyRequirementsMethod = function  (transform: xmlSecTransformPtr; keyReq: xmlSecKeyReqPtr) : Longint; cdecl;
+        xmlSecTransformSetKeyRequirementsMethodPtr = ^xmlSecTransformSetKeyRequirementsMethod;
+
+      xmlSecTransformVerifyMethod = function  (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl;
+        xmlSecTransformVerifyMethodPtr = ^xmlSecTransformVerifyMethod;
+
       xmlSecBase64Ctx = record
       end;
 
-      xmlSecBase64CtxPtr = ^xmlSecBase64Ctx;
+      xmlSecBuffer = record
+          data : xmlSecBytePtr; {}
+          size : xmlSecSize; {}
+          maxSize : xmlSecSize; {}
+          allocMode : xmlSecAllocMode; {}
+      end;
 
       xmlSecCryptoDLFunctions = record
           cryptoInit : xmlSecCryptoInitMethod; {}
@@ -519,14 +393,29 @@ type
           transformDes3CbcGetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformKWDes3GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformDsaSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
-          transformHmacSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
-          transformHmacRipemd160GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformHmacMd5GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformHmacRipemd160GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformHmacSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformHmacSha224GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformHmacSha256GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformHmacSha384GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformHmacSha512GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformMd5GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformRipemd160GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformRsaMd5GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformRsaRipemd160GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformRsaSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformRsaSha224GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformRsaSha256GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformRsaSha384GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformRsaSha512GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformRsaPkcs1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformRsaOaepGetKlass : xmlSecCryptoTransformGetKlassMethod; {}
-          transformSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {*
+          transformSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformSha224GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformSha256GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformSha384GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformSha512GetKlass : xmlSecCryptoTransformGetKlassMethod; {*
 * High level routines form xmlsec command line utility
 *}
           cryptoAppInit : xmlSecCryptoAppInitMethod; {}
@@ -546,18 +435,12 @@ type
           cryptoAppDefaultPwdCallback : Pointer; {}
       end;
 
-      xmlSecCryptoDLFunctionsPtr = ^xmlSecCryptoDLFunctions;
-
-      xmlSecEncCtxPtr = ^xmlSecEncCtx;
-
-      xmlSecKeyReq = record
-          keyId : xmlSecKeyDataId; {}
-          keyType : xmlSecKeyDataType; {}
-          keyUsage : xmlSecKeyUsage; {}
-          keyBitsSize : xmlSecSize; {}
-          keyUseWithList : xmlSecPtrList; {}
-          reserved1 : Pointer; {}
-          reserved2 : Pointer; {}
+      xmlSecPtrList = record
+          id : xmlSecPtrListId; {}
+          data : xmlSecPtrPtr; {}
+          use : xmlSecSize; {}
+          max : xmlSecSize; {}
+          allocMode : xmlSecAllocMode; {}
       end;
 
       xmlSecTransformCtx = record
@@ -569,12 +452,22 @@ type
           preExecCallback : xmlSecTransformCtxPreExecuteCallback; { results}
           result : xmlSecBufferPtr; {}
           status : xmlSecTransformStatus; {}
-          uri : PChar; {}
-          xptrExpr : PChar; {}
+          uri : xmlCharPtr; {}
+          xptrExpr : xmlCharPtr; {}
           first : xmlSecTransformPtr; {}
           last : xmlSecTransformPtr; { for the future}
           reserved0 : Pointer; {}
           reserved1 : Pointer; {}
+      end;
+
+      xmlSecKeyReq = record
+          keyId : xmlSecKeyDataId; {}
+          keyType : xmlSecKeyDataType; {}
+          keyUsage : xmlSecKeyUsage; {}
+          keyBitsSize : xmlSecSize; {}
+          keyUseWithList : xmlSecPtrList; {}
+          reserved1 : Pointer; {}
+          eserved2 : Pointer; {}
       end;
 
       xmlSecKeyInfoCtx = record
@@ -620,14 +513,12 @@ type
           c14nMethod : xmlSecTransformPtr; {}
           preSignMemBufMethod : xmlSecTransformPtr; {}
           signValueNode : xmlNodePtr; {}
-          id : PChar; {}
+          id : xmlCharPtr; {}
           signedInfoReferences : xmlSecPtrList; {}
           manifestReferences : xmlSecPtrList; { reserved for future}
           reserved0 : Pointer; {}
           reserved1 : Pointer; {}
       end;
-
-      xmlSecDSigCtxPtr = ^xmlSecDSigCtx;
 
       xmlSecDSigReferenceCtx = record
           userData : Pointer; {}
@@ -638,14 +529,12 @@ type
           result : xmlSecBufferPtr; {}
           status : xmlSecDSigStatus; {}
           preDigestMemBufMethod : xmlSecTransformPtr; {}
-          id : PChar; {}
-          uri : PChar; {}
-          type_ : PChar; { reserved for future}
+          id : xmlCharPtr; {}
+          uri : xmlCharPtr; {}
+          type_ : xmlCharPtr; { reserved for future}
           reserved0 : Pointer; {}
           reserved1 : Pointer; {}
       end;
-
-      xmlSecDSigReferenceCtxPtr = ^xmlSecDSigReferenceCtx;
 
       xmlSecEncCtx = record
           userData : Pointer; {}
@@ -662,12 +551,12 @@ type
           resultBase64Encoded : Longint; {}
           resultReplaced : Longint; {}
           encMethod : xmlSecTransformPtr; { attributes from EncryptedData or EncryptedKey}
-          id : PChar; {}
-          type_ : PChar; {}
-          mimeType : PChar; {}
-          encoding : PChar; {}
-          recipient : PChar; {}
-          carriedKeyName : PChar; { these are internal data, nobody should change that except us}
+          id : xmlCharPtr; {}
+          type_ : xmlCharPtr; {}
+          mimeType : xmlCharPtr; {}
+          encoding : xmlCharPtr; {}
+          recipient : xmlCharPtr; {}
+          carriedKeyName : xmlCharPtr; { these are internal data, nobody should change that except us}
           encDataNode : xmlNodePtr; {}
           encMethodNode : xmlNodePtr; {}
           keyInfoNode : xmlNodePtr; {}
@@ -677,7 +566,7 @@ type
       end;
 
       xmlSecKey = record
-          name : PChar; {}
+          name : xmlCharPtr; {}
           value : xmlSecKeyDataPtr; {}
           dataList : xmlSecPtrListPtr; {}
           usage : xmlSecKeyUsage; {}
@@ -691,20 +580,33 @@ type
           reserved1 : Pointer; {}
       end;
 
+      xmlSecKeyDataList = record
+      end;
+
       xmlSecKeyDataStore = record
           id : xmlSecKeyDataStoreId; { for the future}
           reserved0 : Pointer; {}
           reserved1 : Pointer; {}
       end;
 
+      xmlSecKeyStore = record
+          id : xmlSecKeyStoreId; { for the future}
+          reserved0 : Pointer; {}
+          reserved1 : Pointer; {}
+      end;
+
       xmlSecKeyUseWith = record
-          application : PChar; {}
-          identifier : PChar; {}
+          application : xmlCharPtr; {}
+          identifier : xmlCharPtr; {}
           reserved1 : Pointer; {}
           reserved2 : Pointer; {}
       end;
 
-      xmlSecKeyUseWithPtr = ^xmlSecKeyUseWith;
+      xmlSecKeysMngr = record
+          keysStore : xmlSecKeyStorePtr; {}
+          storesList : xmlSecPtrList; {}
+          getKey : xmlSecGetKeyCallback; {}
+      end;
 
       xmlSecNodeSet = record
           nodes : xmlNodeSetPtr; {}
@@ -718,14 +620,14 @@ type
       end;
 
       xmlSecQName2BitMaskInfo = record
-          qnameHref : PChar; {}
-          qnameLocalPart : PChar; {}
+          qnameHref : xmlCharPtr; {}
+          qnameLocalPart : xmlCharPtr; {}
           mask : xmlSecBitMask; {}
       end;
 
       xmlSecQName2IntegerInfo = record
-          qnameHref : PChar; {}
-          qnameLocalPart : PChar; {}
+          qnameHref : xmlCharPtr; {}
+          qnameLocalPart : xmlCharPtr; {}
           intValue : Longint; {}
       end;
 
@@ -744,19 +646,13 @@ type
           reserved1 : Pointer; {}
       end;
 
-
       xmlSecXkmsRespondWithId = record
       end;
 
       xmlSecXkmsRespondWithKlass = record
       end;
 
-      xmlSecXkmsServerCtxPtr = ^xmlSecXkmsServerCtx;
-
       xmlSecXkmsServerRequestId = record
-      end;
-
-      xmlSecXkmsServerRequestKlass = record
       end;
 
       xmlSecXkmsServerCtx = record
@@ -767,19 +663,19 @@ type
           keyInfoWriteCtx : xmlSecKeyInfoCtx; {}
           enabledRespondWithIds : xmlSecPtrList; {}
           enabledServerRequestIds : xmlSecPtrList; {}
-          expectedService : PChar; {}
-          idPrefix : PChar; {}
+          expectedService : xmlCharPtr; {}
+          idPrefix : xmlCharPtr; {}
           idLen : xmlSecSize; { these data are returned}
           keys : xmlSecPtrList; {}
           resultMajor : xmlSecXkmsResultMajor; {}
           resultMinor : xmlSecXkmsResultMinor; {}
           requestId : xmlSecXkmsServerRequestId; {}
-          id : PChar; {}
-          service : PChar; {}
-          nonce : PChar; {}
-          originalRequestId : PChar; {}
-          pendingNotificationMechanism : PChar; {}
-          pendingNotificationIdentifier : PChar; {}
+          id : xmlCharPtr; {}
+          service : xmlCharPtr; {}
+          nonce : xmlCharPtr; {}
+          originalRequestId : xmlCharPtr; {}
+          pendingNotificationMechanism : xmlCharPtr; {}
+          pendingNotificationIdentifier : xmlCharPtr; {}
           responseLimit : Longint; {}
           responseMechanismMask : xmlSecBitMask; {}
           compoundRequestContexts : xmlSecPtrListPtr; { these are internal data, nobody should change that except us}
@@ -792,537 +688,654 @@ type
           reserved1 : Pointer; {}
       end;
 
-  function xmlSecAddChild (parent: xmlNodePtr; const name: PChar; const ns: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecAddChildNode (parent: xmlNodePtr; child: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecAddIDs (doc: xmlDocPtr; cur: xmlNodePtr; const ids: PPChar); cdecl; external XMLSEC_SO;
-  function xmlSecAddNextSibling (node: xmlNodePtr; const name: PChar; const ns: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecAddPrevSibling (node: xmlNodePtr; const name: PChar; const ns: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecBase64CtxCreate (encode: Longint; columns: Longint) : xmlSecBase64CtxPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecBase64CtxDestroy (ctx: xmlSecBase64CtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecBase64CtxFinal (ctx: xmlSecBase64CtxPtr; out_: xmlSecBytePtr; outSize: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecBase64CtxFinalize (ctx: xmlSecBase64CtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecBase64CtxInitialize (ctx: xmlSecBase64CtxPtr; encode: Longint; columns: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBase64CtxUpdate (ctx: xmlSecBase64CtxPtr; const in_: xmlSecBytePtr; inSize: xmlSecSize; out_: xmlSecBytePtr; outSize: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBase64Decode (const str: PChar; buf: xmlSecBytePtr; len: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBase64Encode (const buf: xmlSecBytePtr; len: xmlSecSize; columns: Longint) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecBnAdd (bn: xmlSecBnPtr; delta: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnBlobSetNodeValue (const data: xmlSecBytePtr; dataSize: xmlSecSize; cur: xmlNodePtr; format: xmlSecBnFormat; reverse: Longint; addLineBreaks: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnCompare (bn: xmlSecBnPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnCompareReverse (bn: xmlSecBnPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnCreate (size: xmlSecSize) : xmlSecBnPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecBnDestroy (bn: xmlSecBnPtr); cdecl; external XMLSEC_SO;
-  function xmlSecBnDiv (bn: xmlSecBnPtr; divider: Longint; mod_: PInteger) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecBnFinalize (bn: xmlSecBnPtr); cdecl; external XMLSEC_SO;
-  function xmlSecBnFromDecString (bn: xmlSecBnPtr; const str: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnFromHexString (bn: xmlSecBnPtr; const str: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnFromString (bn: xmlSecBnPtr; const str: PChar; base: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnGetData (bn: xmlSecBnPtr) : xmlSecBytePtr; cdecl; external XMLSEC_SO;
-  function xmlSecBnGetNodeValue (bn: xmlSecBnPtr; cur: xmlNodePtr; format: xmlSecBnFormat; reverse: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnGetSize (bn: xmlSecBnPtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecBnInitialize (bn: xmlSecBnPtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnMul (bn: xmlSecBnPtr; multiplier: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnReverse (bn: xmlSecBnPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnSetData (bn: xmlSecBnPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnSetNodeValue (bn: xmlSecBnPtr; cur: xmlNodePtr; format: xmlSecBnFormat; reverse: Longint; addLineBreaks: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBnToDecString (bn: xmlSecBnPtr) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecBnToHexString (bn: xmlSecBnPtr) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecBnToString (bn: xmlSecBnPtr; base: xmlSecSize) : PChar; cdecl; external XMLSEC_SO;
-  procedure xmlSecBnZero (bn: xmlSecBnPtr); cdecl; external XMLSEC_SO;
-  function xmlSecBufferAppend (buf: xmlSecBufferPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferBase64NodeContentRead (buf: xmlSecBufferPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferBase64NodeContentWrite (buf: xmlSecBufferPtr; node: xmlNodePtr; columns: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferCreate (size: xmlSecSize) : xmlSecBufferPtr; cdecl; external XMLSEC_SO;
-  function xmlSecBufferCreateOutputBuffer (buf: xmlSecBufferPtr) : xmlOutputBufferPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecBufferDestroy (buf: xmlSecBufferPtr); cdecl; external XMLSEC_SO;
-  procedure xmlSecBufferEmpty (buf: xmlSecBufferPtr); cdecl; external XMLSEC_SO;
-  procedure xmlSecBufferFinalize (buf: xmlSecBufferPtr); cdecl; external XMLSEC_SO;
-  function xmlSecBufferGetData (buf: xmlSecBufferPtr) : xmlSecBytePtr; cdecl; external XMLSEC_SO;
-  function xmlSecBufferGetMaxSize (buf: xmlSecBufferPtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecBufferGetSize (buf: xmlSecBufferPtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecBufferInitialize (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferPrepend (buf: xmlSecBufferPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferReadFile (buf: xmlSecBufferPtr; const filename: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferRemoveHead (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferRemoveTail (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferSetData (buf: xmlSecBufferPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecBufferSetDefaultAllocMode (defAllocMode: xmlSecAllocMode; defInitialSize: xmlSecSize); cdecl; external XMLSEC_SO;
-  function xmlSecBufferSetMaxSize (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecBufferSetSize (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCheckNodeName (const cur: xmlNodePtr; const name: PChar; const ns: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCheckVersionExt (major: Longint; minor: Longint; subminor: Longint; mode: xmlSecCheckVersionMode) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCreateTree (const rootNodeName: PChar; const rootNodeNs: PChar) : xmlDocPtr; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppDefaultKeysMngrAdoptKey (mngr: xmlSecKeysMngrPtr; key: xmlSecKeyPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppDefaultKeysMngrInit (mngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppDefaultKeysMngrLoad (mngr: xmlSecKeysMngrPtr; const uri: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppDefaultKeysMngrSave (mngr: xmlSecKeysMngrPtr; const filename: PChar; type_: xmlSecKeyDataType) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppGetDefaultPwdCallback () : Pointer; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppInit (const config: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppKeyCertLoad (key: xmlSecKeyPtr; const filename: PChar; format: xmlSecKeyDataFormat) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppKeyCertLoadMemory (key: xmlSecKeyPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; format: xmlSecKeyDataFormat) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppKeyLoad (const filename: PChar; format: xmlSecKeyDataFormat; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppKeyLoadMemory (const data: xmlSecBytePtr; dataSize: xmlSecSize; format: xmlSecKeyDataFormat; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppKeysMngrCertLoad (mngr: xmlSecKeysMngrPtr; const filename: PChar; format: xmlSecKeyDataFormat; type_: xmlSecKeyDataType) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppKeysMngrCertLoadMemory (mngr: xmlSecKeysMngrPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; format: xmlSecKeyDataFormat; type_: xmlSecKeyDataType) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppPkcs12Load (const filename: PChar; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppPkcs12LoadMemory (const data: xmlSecBytePtr; dataSize: xmlSecSize; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoAppShutdown () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLFunctionsRegisterKeyDataAndTransforms (functions: xmlSecCryptoDLFunctionsPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLGetFunctions () : xmlSecCryptoDLFunctionsPtr; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLGetLibraryFunctions (const crypto: PChar) : xmlSecCryptoDLFunctionsPtr; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLLoadLibrary (const crypto: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLSetFunctions (functions: xmlSecCryptoDLFunctionsPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLShutdown () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoDLUnloadLibrary (const crypto: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoKeysMngrInit (mngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecCryptoShutdown () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecDSigCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecDSigCtxPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigCtxDebugDump (dsigCtx: xmlSecDSigCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigCtxDebugXmlDump (dsigCtx: xmlSecDSigCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigCtxDestroy (dsigCtx: xmlSecDSigCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecDSigCtxEnableReferenceTransform (dsigCtx: xmlSecDSigCtxPtr; transformId: xmlSecTransformId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecDSigCtxEnableSignatureTransform (dsigCtx: xmlSecDSigCtxPtr; transformId: xmlSecTransformId) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigCtxFinalize (dsigCtx: xmlSecDSigCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecDSigCtxGetPreSignBuffer (dsigCtx: xmlSecDSigCtxPtr) : xmlSecBufferPtr; cdecl; external XMLSEC_SO;
-  function xmlSecDSigCtxInitialize (dsigCtx: xmlSecDSigCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecDSigCtxSign (dsigCtx: xmlSecDSigCtxPtr; tmpl: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecDSigCtxVerify (dsigCtx: xmlSecDSigCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecDSigReferenceCtxCreate (dsigCtx: xmlSecDSigCtxPtr; origin: xmlSecDSigReferenceOrigin) : xmlSecDSigReferenceCtxPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigReferenceCtxDebugDump (dsigRefCtx: xmlSecDSigReferenceCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigReferenceCtxDebugXmlDump (dsigRefCtx: xmlSecDSigReferenceCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigReferenceCtxDestroy (dsigRefCtx: xmlSecDSigReferenceCtxPtr); cdecl; external XMLSEC_SO;
-  procedure xmlSecDSigReferenceCtxFinalize (dsigRefCtx: xmlSecDSigReferenceCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecDSigReferenceCtxGetPreDigestBuffer (dsigRefCtx: xmlSecDSigReferenceCtxPtr) : xmlSecBufferPtr; cdecl; external XMLSEC_SO;
-  function xmlSecDSigReferenceCtxInitialize (dsigRefCtx: xmlSecDSigReferenceCtxPtr; dsigCtx: xmlSecDSigCtxPtr; origin: xmlSecDSigReferenceOrigin) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecDSigReferenceCtxListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecDSigReferenceCtxProcessNode (dsigRefCtx: xmlSecDSigReferenceCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxBinaryEncrypt (encCtx: xmlSecEncCtxPtr; tmpl: xmlNodePtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxCopyUserPref (dst: xmlSecEncCtxPtr; src: xmlSecEncCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecEncCtxPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecEncCtxDebugDump (encCtx: xmlSecEncCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecEncCtxDebugXmlDump (encCtx: xmlSecEncCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxDecrypt (encCtx: xmlSecEncCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxDecryptToBuffer (encCtx: xmlSecEncCtxPtr; node: xmlNodePtr) : xmlSecBufferPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecEncCtxDestroy (encCtx: xmlSecEncCtxPtr); cdecl; external XMLSEC_SO;
-  procedure xmlSecEncCtxFinalize (encCtx: xmlSecEncCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxInitialize (encCtx: xmlSecEncCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecEncCtxReset (encCtx: xmlSecEncCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxUriEncrypt (encCtx: xmlSecEncCtxPtr; tmpl: xmlNodePtr; const uri: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecEncCtxXmlEncrypt (encCtx: xmlSecEncCtxPtr; tmpl: xmlNodePtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecError (const file_: PChar; line: Longint; const func: PChar; const errorObject: PChar; const errorSubject: PChar; reason: Longint; const msg: PChar); cdecl; varargs; external XMLSEC_SO;
-  procedure xmlSecErrorsDefaultCallback (const file_: PChar; line: Longint; const func: PChar; const errorObject: PChar; const errorSubject: PChar; reason: Longint; const msg: PChar); cdecl; external XMLSEC_SO;
-  procedure xmlSecErrorsDefaultCallbackEnableOutput (enabled: Longint); cdecl; external XMLSEC_SO;
-  function xmlSecErrorsGetCode (pos: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecErrorsGetMsg (pos: xmlSecSize) : PChar; cdecl; external XMLSEC_SO;
-  procedure xmlSecErrorsInit (); cdecl; external XMLSEC_SO;
-  procedure xmlSecErrorsSetCallback (callback: xmlSecErrorsCallback); cdecl; external XMLSEC_SO;
-  procedure xmlSecErrorsShutdown (); cdecl; external XMLSEC_SO;
-  function xmlSecFindChild (const parent: xmlNodePtr; const name: PChar; const ns: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecFindNode (const parent: xmlNodePtr; const name: PChar; const ns: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecFindParent (const cur: xmlNodePtr; const name: PChar; const ns: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecGenerateAndAddID (node: xmlNodePtr; const attrName: PChar; const prefix: PChar; len: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecGenerateID (const prefix: PChar; len: xmlSecSize) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecGetNextElementNode (cur: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecGetNodeNsHref (const cur: xmlNodePtr) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecGetQName (node: xmlNodePtr; const href: PChar; const local: PChar) : PChar; cdecl; external XMLSEC_SO;
-  procedure xmlSecIOCleanupCallbacks (); cdecl; external XMLSEC_SO;
-  function xmlSecIOInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecIORegisterCallbacks (matchFunc: xmlInputMatchCallback; openFunc: xmlInputOpenCallback; readFunc: xmlInputReadCallback; closeFunc: xmlInputCloseCallback) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecIORegisterDefaultCallbacks () : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecIOShutdown (); cdecl; external XMLSEC_SO;
-  function xmlSecInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecIsEmptyNode (node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecIsEmptyString (const str: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyAdoptData (key: xmlSecKeyPtr; data: xmlSecKeyDataPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyCopy (keyDst: xmlSecKeyPtr; keySrc: xmlSecKeyPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyCreate () : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataAesGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; buf: xmlSecBytePtrPtr; bufSize: xmlSecSizePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueBinRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueBinWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; buf: xmlSecBytePtrPtr; bufSize: xmlSecSizePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataBinaryValueDebugDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataBinaryValueDebugXmlDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueDuplicate (dst: xmlSecKeyDataPtr; src: xmlSecKeyDataPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataBinaryValueFinalize (data: xmlSecKeyDataPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueGetBuffer (data: xmlSecKeyDataPtr) : xmlSecBufferPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueGetSize (data: xmlSecKeyDataPtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueInitialize (data: xmlSecKeyDataPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueSetBuffer (data: xmlSecKeyDataPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueXmlRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataBinaryValueXmlWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataCreate (id: xmlSecKeyDataId) : xmlSecKeyDataPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataDebugDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataDebugXmlDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataDesGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataDestroy (data: xmlSecKeyDataPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataDsaGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataDuplicate (data: xmlSecKeyDataPtr) : xmlSecKeyDataPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataEncryptedKeyGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataGenerate (data: xmlSecKeyDataPtr; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataGetIdentifier (data: xmlSecKeyDataPtr) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataGetSize (data: xmlSecKeyDataPtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataGetType (data: xmlSecKeyDataPtr) : xmlSecKeyDataType; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataHmacGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataIdListDebugDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataIdListDebugXmlDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdListFind (list: xmlSecPtrListPtr; dataId: xmlSecKeyDataId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdListFindByHref (list: xmlSecPtrListPtr; const href: PChar; usage: xmlSecKeyDataUsage) : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdListFindByName (list: xmlSecPtrListPtr; const name: PChar; usage: xmlSecKeyDataUsage) : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdListFindByNode (list: xmlSecPtrListPtr; const nodeName: PChar; const nodeNs: PChar; usage: xmlSecKeyDataUsage) : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdsGet () : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdsInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdsRegister (id: xmlSecKeyDataId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataIdsRegisterDefault () : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataIdsShutdown (); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataNameGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataRawX509CertGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataRetrievalMethodGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataRsaGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataStoreCreate (id: xmlSecKeyDataStoreId) : xmlSecKeyDataStorePtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDataStoreDestroy (store: xmlSecKeyDataStorePtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataStorePtrListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataValueGetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataX509GetKlass () : xmlSecKeyDataId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataXmlRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyDataXmlWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDebugDump (key: xmlSecKeyPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDebugXmlDump (key: xmlSecKeyPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyDestroy (key: xmlSecKeyPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyDuplicate (key: xmlSecKeyPtr) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyEmpty (key: xmlSecKeyPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyEnsureData (key: xmlSecKeyPtr; dataId: xmlSecKeyDataId) : xmlSecKeyDataPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyGenerate (dataId: xmlSecKeyDataId; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyGenerateByName (const name: PChar; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyGetData (key: xmlSecKeyPtr; dataId: xmlSecKeyDataId) : xmlSecKeyDataPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyGetName (key: xmlSecKeyPtr) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecKeyGetType (key: xmlSecKeyPtr) : xmlSecKeyDataType; cdecl; external XMLSEC_SO;
-  function xmlSecKeyGetValue (key: xmlSecKeyPtr) : xmlSecKeyDataPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyInfoCtxCopyUserPref (dst: xmlSecKeyInfoCtxPtr; src: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyInfoCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecKeyInfoCtxPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyInfoCtxCreateEncCtx (keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyInfoCtxDebugDump (keyInfoCtx: xmlSecKeyInfoCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyInfoCtxDebugXmlDump (keyInfoCtx: xmlSecKeyInfoCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyInfoCtxDestroy (keyInfoCtx: xmlSecKeyInfoCtxPtr); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyInfoCtxFinalize (keyInfoCtx: xmlSecKeyInfoCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyInfoCtxInitialize (keyInfoCtx: xmlSecKeyInfoCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyInfoCtxReset (keyInfoCtx: xmlSecKeyInfoCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyInfoNodeRead (keyInfoNode: xmlNodePtr; key: xmlSecKeyPtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyInfoNodeWrite (keyInfoNode: xmlNodePtr; key: xmlSecKeyPtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyMatch (key: xmlSecKeyPtr; const name: PChar; keyReq: xmlSecKeyReqPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyPtrListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecKeyReadBinaryFile (dataId: xmlSecKeyDataId; const filename: PChar) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyReadBuffer (dataId: xmlSecKeyDataId; buffer: xmlSecBufferPtr) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyReadMemory (dataId: xmlSecKeyDataId; const data: xmlSecBytePtr; dataSize: xmlSecSize) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyReqCopy (dst: xmlSecKeyReqPtr; src: xmlSecKeyReqPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyReqDebugDump (keyReq: xmlSecKeyReqPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyReqDebugXmlDump (keyReq: xmlSecKeyReqPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyReqFinalize (keyReq: xmlSecKeyReqPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyReqInitialize (keyReq: xmlSecKeyReqPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyReqMatchKey (keyReq: xmlSecKeyReqPtr; key: xmlSecKeyPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyReqMatchKeyValue (keyReq: xmlSecKeyReqPtr; value: xmlSecKeyDataPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyReqReset (keyReq: xmlSecKeyReqPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeySetName (key: xmlSecKeyPtr; const name: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeySetValue (key: xmlSecKeyPtr; value: xmlSecKeyDataPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyStoreCreate (id: xmlSecKeyStoreId) : xmlSecKeyStorePtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyStoreDestroy (store: xmlSecKeyStorePtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyStoreFindKey (store: xmlSecKeyStorePtr; const name: PChar; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeyUseWithCopy (dst: xmlSecKeyUseWithPtr; src: xmlSecKeyUseWithPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyUseWithCreate (const application: PChar; const identifier: PChar) : xmlSecKeyUseWithPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyUseWithDebugDump (keyUseWith: xmlSecKeyUseWithPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyUseWithDebugXmlDump (keyUseWith: xmlSecKeyUseWithPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyUseWithDestroy (keyUseWith: xmlSecKeyUseWithPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyUseWithDuplicate (keyUseWith: xmlSecKeyUseWithPtr) : xmlSecKeyUseWithPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyUseWithFinalize (keyUseWith: xmlSecKeyUseWithPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyUseWithInitialize (keyUseWith: xmlSecKeyUseWithPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeyUseWithPtrListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeyUseWithReset (keyUseWith: xmlSecKeyUseWithPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeyUseWithSet (keyUseWith: xmlSecKeyUseWithPtr; const application: PChar; const identifier: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeysMngrAdoptDataStore (mngr: xmlSecKeysMngrPtr; store: xmlSecKeyDataStorePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeysMngrAdoptKeysStore (mngr: xmlSecKeysMngrPtr; store: xmlSecKeyStorePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecKeysMngrCreate () : xmlSecKeysMngrPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecKeysMngrDestroy (mngr: xmlSecKeysMngrPtr); cdecl; external XMLSEC_SO;
-  function xmlSecKeysMngrFindKey (mngr: xmlSecKeysMngrPtr; const name: PChar; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeysMngrGetDataStore (mngr: xmlSecKeysMngrPtr; id: xmlSecKeyDataStoreId) : xmlSecKeyDataStorePtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeysMngrGetKey (keyInfoNode: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl; external XMLSEC_SO;
-  function xmlSecKeysMngrGetKeysStore (mngr: xmlSecKeysMngrPtr) : xmlSecKeyStorePtr; cdecl; external XMLSEC_SO;
-  function xmlSecNodeSetAdd (nset: xmlSecNodeSetPtr; newNSet: xmlSecNodeSetPtr; op: xmlSecNodeSetOp) : xmlSecNodeSetPtr; cdecl; external XMLSEC_SO;
-  function xmlSecNodeSetAddList (nset: xmlSecNodeSetPtr; newNSet: xmlSecNodeSetPtr; op: xmlSecNodeSetOp) : xmlSecNodeSetPtr; cdecl; external XMLSEC_SO;
-  function xmlSecNodeSetContains (nset: xmlSecNodeSetPtr; node: xmlNodePtr; parent: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecNodeSetCreate (doc: xmlDocPtr; nodes: xmlNodeSetPtr; type_: xmlSecNodeSetType) : xmlSecNodeSetPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecNodeSetDebugDump (nset: xmlSecNodeSetPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecNodeSetDestroy (nset: xmlSecNodeSetPtr); cdecl; external XMLSEC_SO;
-  procedure xmlSecNodeSetDocDestroy (nset: xmlSecNodeSetPtr); cdecl; external XMLSEC_SO;
-  function xmlSecNodeSetDumpTextNodes (nset: xmlSecNodeSetPtr; out_: xmlOutputBufferPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecNodeSetGetChildren (doc: xmlDocPtr; const parent: xmlNodePtr; withComments: Longint; invert: Longint) : xmlSecNodeSetPtr; cdecl; external XMLSEC_SO;
-  function xmlSecNodeSetWalk (nset: xmlSecNodeSetPtr; walkFunc: xmlSecNodeSetWalkCallback; data: Pointer) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecParseFile (const filename: PChar) : xmlDocPtr; cdecl; external XMLSEC_SO;
-  function xmlSecParseMemory (const buffer: xmlSecBytePtr; size: xmlSecSize; recovery: Longint) : xmlDocPtr; cdecl; external XMLSEC_SO;
-  function xmlSecParseMemoryExt (const prefix: xmlSecBytePtr; prefixSize: xmlSecSize; const buffer: xmlSecBytePtr; bufferSize: xmlSecSize; const postfix: xmlSecBytePtr; postfixSize: xmlSecSize) : xmlDocPtr; cdecl; external XMLSEC_SO;
-  function xmlSecPtrListAdd (list: xmlSecPtrListPtr; item: xmlSecPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecPtrListCopy (dst: xmlSecPtrListPtr; src: xmlSecPtrListPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecPtrListCreate (id: xmlSecPtrListId) : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecPtrListDebugDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecPtrListDebugXmlDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecPtrListDestroy (list: xmlSecPtrListPtr); cdecl; external XMLSEC_SO;
-  function xmlSecPtrListDuplicate (list: xmlSecPtrListPtr) : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecPtrListEmpty (list: xmlSecPtrListPtr); cdecl; external XMLSEC_SO;
-  procedure xmlSecPtrListFinalize (list: xmlSecPtrListPtr); cdecl; external XMLSEC_SO;
-  function xmlSecPtrListGetItem (list: xmlSecPtrListPtr; pos: xmlSecSize) : xmlSecPtr; cdecl; external XMLSEC_SO;
-  function xmlSecPtrListGetSize (list: xmlSecPtrListPtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecPtrListInitialize (list: xmlSecPtrListPtr; id: xmlSecPtrListId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecPtrListRemove (list: xmlSecPtrListPtr; pos: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecPtrListSet (list: xmlSecPtrListPtr; item: xmlSecPtr; pos: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecPtrListSetDefaultAllocMode (defAllocMode: xmlSecAllocMode; defInitialSize: xmlSecSize); cdecl; external XMLSEC_SO;
-  procedure xmlSecQName2BitMaskDebugDump (info: xmlSecQName2BitMaskInfoPtr; mask: xmlSecBitMask; const name: PChar; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecQName2BitMaskDebugXmlDump (info: xmlSecQName2BitMaskInfoPtr; mask: xmlSecBitMask; const name: PChar; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecQName2BitMaskGetBitMask (info: xmlSecQName2BitMaskInfoPtr; const qnameLocalPart: PChar; const qnameHref: PChar; mask: xmlSecBitMaskPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2BitMaskGetBitMaskFromString (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtr; const qname: PChar; mask: xmlSecBitMaskPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2BitMaskGetInfo (info: xmlSecQName2BitMaskInfoPtr; mask: xmlSecBitMask) : xmlSecQName2BitMaskInfoPtr; cdecl; external XMLSEC_SO;
-  function xmlSecQName2BitMaskGetStringFromBitMask (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtr; mask: xmlSecBitMask) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecQName2BitMaskNodesRead (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtrPtr; const nodeName: PChar; const nodeNs: PChar; stopOnUnknown: Longint; mask: xmlSecBitMaskPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2BitMaskNodesWrite (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtr; const nodeName: PChar; const nodeNs: PChar; mask: xmlSecBitMask) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerAttributeRead (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const attrName: PChar; intValue: PInteger) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerAttributeWrite (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const attrName: PChar; intValue: Longint) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecQName2IntegerDebugDump (info: xmlSecQName2IntegerInfoPtr; intValue: Longint; const name: PChar; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecQName2IntegerDebugXmlDump (info: xmlSecQName2IntegerInfoPtr; intValue: Longint; const name: PChar; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerGetInfo (info: xmlSecQName2IntegerInfoPtr; intValue: Longint) : xmlSecQName2IntegerInfoPtr; cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerGetInteger (info: xmlSecQName2IntegerInfoPtr; const qnameHref: PChar; const qnameLocalPart: PChar; intValue: PInteger) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerGetIntegerFromString (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const qname: PChar; intValue: PInteger) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerGetStringFromInteger (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; intValue: Longint) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerNodeRead (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; intValue: PInteger) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecQName2IntegerNodeWrite (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const nodeName: PChar; const nodeNs: PChar; intValue: Longint) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecReplaceContent (node: xmlNodePtr; newNode: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecReplaceNode (node: xmlNodePtr; newNode: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecReplaceNodeBuffer (node: xmlNodePtr; const buffer: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecShutdown () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecSimpleKeysStoreAdoptKey (store: xmlSecKeyStorePtr; key: xmlSecKeyPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecSimpleKeysStoreGetKeys (store: xmlSecKeyStorePtr) : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
-  function xmlSecSimpleKeysStoreGetKlass () : xmlSecKeyStoreId; cdecl; external XMLSEC_SO;
-  function xmlSecSimpleKeysStoreLoad (store: xmlSecKeyStorePtr; const uri: PChar; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecSimpleKeysStoreSave (store: xmlSecKeyStorePtr; const filename: PChar; type_: xmlSecKeyDataType) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11AddBodyEntry (envNode: xmlNodePtr; entryNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11AddFaultEntry (envNode: xmlNodePtr; const faultCodeHref: PChar; const faultCodeLocalPart: PChar; const faultString: PChar; const faultActor: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11CheckEnvelope (envNode: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11CreateEnvelope (doc: xmlDocPtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11EnsureHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11GetBody (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11GetBodyEntriesNumber (envNode: xmlNodePtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11GetBodyEntry (envNode: xmlNodePtr; pos: xmlSecSize) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11GetFaultEntry (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap11GetHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12AddBodyEntry (envNode: xmlNodePtr; entryNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12AddFaultDetailEntry (faultNode: xmlNodePtr; detailEntryNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12AddFaultEntry (envNode: xmlNodePtr; faultCode: xmlSecSoap12FaultCode; const faultReasonText: PChar; const faultReasonLang: PChar; const faultNodeURI: PChar; const faultRole: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12AddFaultReasonText (faultNode: xmlNodePtr; const faultReasonText: PChar; const faultReasonLang: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12AddFaultSubcode (faultNode: xmlNodePtr; const subCodeHref: PChar; const subCodeName: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12CheckEnvelope (envNode: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12CreateEnvelope (doc: xmlDocPtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12EnsureHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12GetBody (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12GetBodyEntriesNumber (envNode: xmlNodePtr) : xmlSecSize; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12GetBodyEntry (envNode: xmlNodePtr; pos: xmlSecSize) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12GetFaultEntry (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecSoap12GetHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecStringListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecTmplCipherReferenceAddTransform (cipherReferenceNode: xmlNodePtr; transformId: xmlSecTransformId) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplEncDataAddEncProperty (encNode: xmlNodePtr; const id: PChar; const target: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplEncDataCreate (doc: xmlDocPtr; encMethodId: xmlSecTransformId; const id: PChar; const type_: PChar; const mimeType: PChar; const encoding: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplEncDataEnsureCipherReference (encNode: xmlNodePtr; const uri: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplEncDataEnsureCipherValue (encNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplEncDataEnsureEncProperties (encNode: xmlNodePtr; const id: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplEncDataEnsureKeyInfo (encNode: xmlNodePtr; const id: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplEncDataGetEncMethodNode (encNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplKeyInfoAddEncryptedKey (keyInfoNode: xmlNodePtr; encMethodId: xmlSecTransformId; const id: PChar; const type_: PChar; const recipient: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplKeyInfoAddKeyName (keyInfoNode: xmlNodePtr; const name: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplKeyInfoAddKeyValue (keyInfoNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplKeyInfoAddRetrievalMethod (keyInfoNode: xmlNodePtr; const uri: PChar; const type_: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplKeyInfoAddX509Data (keyInfoNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplManifestAddReference (manifestNode: xmlNodePtr; digestMethodId: xmlSecTransformId; const id: PChar; const uri: PChar; const type_: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplObjectAddManifest (objectNode: xmlNodePtr; const id: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplObjectAddSignProperties (objectNode: xmlNodePtr; const id: PChar; const target: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplReferenceAddTransform (referenceNode: xmlNodePtr; transformId: xmlSecTransformId) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplReferenceListAddDataReference (encNode: xmlNodePtr; const uri: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplReferenceListAddKeyReference (encNode: xmlNodePtr; const uri: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplRetrievalMethodAddTransform (retrMethodNode: xmlNodePtr; transformId: xmlSecTransformId) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplSignatureAddObject (signNode: xmlNodePtr; const id: PChar; const mimeType: PChar; const encoding: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplSignatureAddReference (signNode: xmlNodePtr; digestMethodId: xmlSecTransformId; const id: PChar; const uri: PChar; const type_: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplSignatureCreate (doc: xmlDocPtr; c14nMethodId: xmlSecTransformId; signMethodId: xmlSecTransformId; const id: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplSignatureEnsureKeyInfo (signNode: xmlNodePtr; const id: PChar) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplSignatureGetC14NMethodNode (signNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplSignatureGetSignMethodNode (signNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplTransformAddC14NInclNamespaces (transformNode: xmlNodePtr; const prefixList: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTmplTransformAddHmacOutputLength (transformNode: xmlNodePtr; bitsLen: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTmplTransformAddRsaOaepParam (transformNode: xmlNodePtr; const buf: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTmplTransformAddXPath (transformNode: xmlNodePtr; const expression: PChar; const nsList: PPChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTmplTransformAddXPath2 (transformNode: xmlNodePtr; const type_: PChar; const expression: PChar; const nsList: PPChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTmplTransformAddXPointer (transformNode: xmlNodePtr; const expression: PChar; const nsList: PPChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTmplTransformAddXsltStylesheet (transformNode: xmlNodePtr; const xslt: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTmplX509DataAddCRL (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplX509DataAddCertificate (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplX509DataAddIssuerSerial (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplX509DataAddSKI (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTmplX509DataAddSubjectName (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformAes128CbcGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformAes192CbcGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformAes256CbcGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformBase64GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformBase64SetLineSize (transform: xmlSecTransformPtr; lineSize: xmlSecSize); cdecl; external XMLSEC_SO;
-  function xmlSecTransformConnect (left: xmlSecTransformPtr; right: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCreate (id: xmlSecTransformId) : xmlSecTransformPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCreateInputBuffer (transform: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : xmlParserInputBufferPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCreateOutputBuffer (transform: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : xmlOutputBufferPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxAppend (ctx: xmlSecTransformCtxPtr; transform: xmlSecTransformPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxBinaryExecute (ctx: xmlSecTransformCtxPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxCopyUserPref (dst: xmlSecTransformCtxPtr; src: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxCreate () : xmlSecTransformCtxPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxCreateAndAppend (ctx: xmlSecTransformCtxPtr; id: xmlSecTransformId) : xmlSecTransformPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxCreateAndPrepend (ctx: xmlSecTransformCtxPtr; id: xmlSecTransformId) : xmlSecTransformPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformCtxDebugDump (ctx: xmlSecTransformCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformCtxDebugXmlDump (ctx: xmlSecTransformCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformCtxDestroy (ctx: xmlSecTransformCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxExecute (ctx: xmlSecTransformCtxPtr; doc: xmlDocPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformCtxFinalize (ctx: xmlSecTransformCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxInitialize (ctx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxNodeRead (ctx: xmlSecTransformCtxPtr; node: xmlNodePtr; usage: xmlSecTransformUsage) : xmlSecTransformPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxNodesListRead (ctx: xmlSecTransformCtxPtr; node: xmlNodePtr; usage: xmlSecTransformUsage) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxPrepare (ctx: xmlSecTransformCtxPtr; inputDataType: xmlSecTransformDataType) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxPrepend (ctx: xmlSecTransformCtxPtr; transform: xmlSecTransformPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformCtxReset (ctx: xmlSecTransformCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxSetUri (ctx: xmlSecTransformCtxPtr; const uri: PChar; hereNode: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxUriExecute (ctx: xmlSecTransformCtxPtr; const uri: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformCtxXmlExecute (ctx: xmlSecTransformCtxPtr; nodes: xmlSecNodeSetPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformDebugDump (transform: xmlSecTransformPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformDebugXmlDump (transform: xmlSecTransformPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecTransformDefaultGetDataType (transform: xmlSecTransformPtr; mode: xmlSecTransformMode; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformDataType; cdecl; external XMLSEC_SO;
-  function xmlSecTransformDefaultPopBin (transform: xmlSecTransformPtr; data: xmlSecBytePtr; maxDataSize: xmlSecSize; dataSize: xmlSecSizePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformDefaultPopXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtrPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformDefaultPushBin (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; final: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformDefaultPushXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformDes3CbcGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformDestroy (transform: xmlSecTransformPtr); cdecl; external XMLSEC_SO;
-  function xmlSecTransformDsaSha1GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformEnvelopedGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformExclC14NGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformExclC14NWithCommentsGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformExecute (transform: xmlSecTransformPtr; last: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformGetDataType (transform: xmlSecTransformPtr; mode: xmlSecTransformMode; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformDataType; cdecl; external XMLSEC_SO;
-  function xmlSecTransformHmacMd5GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformHmacRipemd160GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformHmacSha1GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformIdListDebugDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformIdListDebugXmlDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdListFind (list: xmlSecPtrListPtr; transformId: xmlSecTransformId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdListFindByHref (list: xmlSecPtrListPtr; const href: PChar; usage: xmlSecTransformUsage) : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdListFindByName (list: xmlSecPtrListPtr; const name: PChar; usage: xmlSecTransformUsage) : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdsGet () : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdsInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdsRegister (id: xmlSecTransformId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformIdsRegisterDefault () : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformIdsShutdown (); cdecl; external XMLSEC_SO;
-  function xmlSecTransformInclC14NGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformInclC14NWithCommentsGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformInputURIGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformInputURIOpen (transform: xmlSecTransformPtr; const uri: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformKWAes128GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformKWAes192GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformKWAes256GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformKWDes3GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformMemBufGetBuffer (transform: xmlSecTransformPtr) : xmlSecBufferPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformMemBufGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformNodeRead (node: xmlNodePtr; usage: xmlSecTransformUsage; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformPtr; cdecl; external XMLSEC_SO;
-  function xmlSecTransformPopBin (transform: xmlSecTransformPtr; data: xmlSecBytePtr; maxDataSize: xmlSecSize; dataSize: xmlSecSizePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformPopXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtrPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformPump (left: xmlSecTransformPtr; right: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformPushBin (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; final: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformPushXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecTransformRemove (transform: xmlSecTransformPtr); cdecl; external XMLSEC_SO;
-  function xmlSecTransformRemoveXmlTagsC14NGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformRipemd160GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformRsaOaepGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformRsaPkcs1GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformRsaSha1GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformSetKey (transform: xmlSecTransformPtr; key: xmlSecKeyPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformSetKeyReq (transform: xmlSecTransformPtr; keyReq: xmlSecKeyReqPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformSha1GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformUriTypeCheck (type_: xmlSecTransformUriType; const uri: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformVerify (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformVerifyNodeContent (transform: xmlSecTransformPtr; node: xmlNodePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformVisa3DHackGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformVisa3DHackSetID (transform: xmlSecTransformPtr; const id: PChar) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformXPath2GetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformXPathGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformXPointerGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformXPointerSetExpr (transform: xmlSecTransformPtr; const expr: PChar; nodeSetType: xmlSecNodeSetType; hereNode: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecTransformXmlParserGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecTransformXsltGetKlass () : xmlSecTransformId; cdecl; external XMLSEC_SO;
-  function xmlSecX509DataGetNodeContent (node: xmlNodePtr; deleteChildren: Longint; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecX509StoreGetKlass () : xmlSecKeyDataStoreId; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsRespondWithDebugDump (id: xmlSecXkmsRespondWithId; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsRespondWithDebugXmlDump (id: xmlSecXkmsRespondWithId; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithDefaultNodeRead (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithDefaultNodeWrite (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdListFind (list: xmlSecPtrListPtr; id: xmlSecXkmsRespondWithId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdListFindByNodeValue (list: xmlSecPtrListPtr; node: xmlNodePtr) : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdListWrite (list: xmlSecPtrListPtr; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdsGet () : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdsInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdsRegister (id: xmlSecXkmsRespondWithId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithIdsRegisterDefault () : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsRespondWithIdsShutdown (); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithKeyNameGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithKeyValueGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithNodeRead (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithNodeWrite (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithPGPGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithPrivateKeyGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithRetrievalMethodGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithSPKIGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithX509CRLGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithX509CertGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsRespondWithX509ChainGetKlass () : xmlSecXkmsRespondWithId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxCopyUserPref (dst: xmlSecXkmsServerCtxPtr; src: xmlSecXkmsServerCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecXkmsServerCtxPtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerCtxDebugDump (ctx: xmlSecXkmsServerCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerCtxDebugXmlDump (ctx: xmlSecXkmsServerCtxPtr; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerCtxDestroy (ctx: xmlSecXkmsServerCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxFatalErrorResponseCreate (ctx: xmlSecXkmsServerCtxPtr; format: xmlSecXkmsServerFormat; doc: xmlDocPtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerCtxFinalize (ctx: xmlSecXkmsServerCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxInitialize (ctx: xmlSecXkmsServerCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxProcess (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr; format: xmlSecXkmsServerFormat; doc: xmlDocPtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxPtrListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxRequestRead (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxRequestUnwrap (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr; format: xmlSecXkmsServerFormat) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerCtxReset (ctx: xmlSecXkmsServerCtxPtr); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxResponseWrap (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr; format: xmlSecXkmsServerFormat; doc: xmlDocPtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerCtxResponseWrite (ctx: xmlSecXkmsServerCtxPtr; doc: xmlDocPtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerCtxSetResult (ctx: xmlSecXkmsServerCtxPtr; resultMajor: xmlSecXkmsResultMajor; resultMinor: xmlSecXkmsResultMinor); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerFormatFromString (const str: PChar) : xmlSecXkmsServerFormat; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerFormatToString (format: xmlSecXkmsServerFormat) : PChar; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestCompoundGetKlass () : xmlSecXkmsServerRequestId; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerRequestDebugDump (id: xmlSecXkmsServerRequestId; output: PFILE); cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerRequestDebugXmlDump (id: xmlSecXkmsServerRequestId; output: PFILE); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestExecute (id: xmlSecXkmsServerRequestId; ctx: xmlSecXkmsServerCtxPtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdListFind (list: xmlSecPtrListPtr; id: xmlSecXkmsServerRequestId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdListFindByName (list: xmlSecPtrListPtr; const name: PChar) : xmlSecXkmsServerRequestId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdListFindByNode (list: xmlSecPtrListPtr; node: xmlNodePtr) : xmlSecXkmsServerRequestId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdListGetKlass () : xmlSecPtrListId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdsGet () : xmlSecPtrListPtr; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdsInit () : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdsRegister (id: xmlSecXkmsServerRequestId) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestIdsRegisterDefault () : Longint; cdecl; external XMLSEC_SO;
-  procedure xmlSecXkmsServerRequestIdsShutdown (); cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestLocateGetKlass () : xmlSecXkmsServerRequestId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestNodeRead (id: xmlSecXkmsServerRequestId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestNodeWrite (id: xmlSecXkmsServerRequestId; ctx: xmlSecXkmsServerCtxPtr; doc: xmlDocPtr; node: xmlNodePtr) : xmlNodePtr; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestResultGetKlass () : xmlSecXkmsServerRequestId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestStatusGetKlass () : xmlSecXkmsServerRequestId; cdecl; external XMLSEC_SO;
-  function xmlSecXkmsServerRequestValidateGetKlass () : xmlSecXkmsServerRequestId; cdecl; external XMLSEC_SO;
+      xmlSecXkmsServerRequestKlass = record
+      end;
+
+      // The various _mxl...Klass records are not handled properly
+      // by the python script. I've inserted these manually
+
+      _xmlSecKeyKlass = record  // Never actually defined in the headers!
+      end;
+
+      _xmlSecKeyDataKlass = record
+        klassSize : xmlSecSize;
+        objSize : xmlSecSize;
+        name : xmlCharPtr;
+        usage : xmlSecKeyDataUsage;
+        href : xmlCharPtr;
+        dataNodeName : xmlCharPtr;
+        dataNodeNs : xmlCharPtr;
+        initialize : xmlSecKeyDataInitMethod;
+        duplicate : xmlSecKeyDataDuplicateMethod;
+        finalize : xmlSecKeyDataFinalizeMethod;
+        generate : xmlSecKeyDataGenerateMethod;
+        getType : xmlSecKeyDataGetTypeMethod;
+        getSize : xmlSecKeyDataGetSizeMethod;
+        getIdentifier : xmlSecKeyDataGetIdentifierMethod;
+        xmlRead : xmlSecKeyDataXmlReadMethod;
+        xmlWrite : xmlSecKeyDataXmlWriteMethod;
+        binRead : xmlSecKeyDataBinReadMethod;
+        binWrite : xmlSecKeyDataBinWriteMethod;
+        debugDump : xmlSecKeyDataDebugDumpMethod;
+        debugXmlDump : xmlSecKeyDataDebugDumpMethod;
+        reserved0 : Pointer;
+        reserved1 : Pointer;
+      end;
+
+      _xmlSecKeyDataStoreKlass = record
+        klassSize : xmlSecSize;
+        objSize : xmlSecSize;
+        name : xmlCharPtr;
+        initialize : xmlSecKeyDataStoreInitializeMethod;
+        finalize : xmlSecKeyDataStoreFinalizeMethod;
+        reserved0 : Pointer;
+        reserved1 : Pointer;
+      end;
+
+      _xmlSecKeyStoreKlass = record
+        klassSize : xmlSecSize;
+        objSize : xmlSecSize;
+        name : xmlCharPtr;
+        initialize : xmlSecKeyStoreInitializeMethod;
+        finalize : xmlSecKeyStoreFinalizeMethod;
+        findKey : xmlSecKeyStoreFindKeyMethod;
+        reserved0 : Pointer;
+        reserved1 : Pointer;
+      end;
+
+      _xmlSecPtrListKlass = record
+        name : xmlCharPtr;
+        duplicateItem : xmlSecPtrDuplicateItemMethod;
+        destroyItem : xmlSecPtrDestroyItemMethod;
+        debugDumpItem : xmlSecPtrDebugDumpItemMethod;
+        debugXmlDumpItem : xmlSecPtrDebugDumpItemMethod;
+      end;
+
+      _xmlSecPtrList = record
+        id : xmlSecPtrListId;
+        data : xmlSecPtrPtr;
+        use : xmlSecSize;
+        max : xmlSecSize;
+        allocMode : xmlSecAllocMode;
+      end;
+
+      _xmlSecTransformKlass = record
+        klassSize : xmlSecSize;
+        objSize : xmlSecSize;
+        name : xmlCharPtr;
+        href : xmlCharptr;
+        usage : xmlSecTransformUsage;
+        initialize : xmlSecTransformInitializeMethod;
+        finalize : xmlSecTransformFinalizeMethod;
+        readNode : xmlSecTransformNodeReadMethod;
+        writeNode : xmlSecTransformNodeWriteMethod;
+        setKeyReq : xmlSecTransformSetKeyRequirementsMethod;
+        setKey : xmlSecTransformSetKeyMethod;
+        verify : xmlSecTransformVerifyMethod;
+        getDataType : xmlSecTransformGetDataTypeMethod;
+        pushBin : xmlSecTransformPushBinMethod;
+        popBin : xmlSecTransformPopBinMethod;
+        pushXml : xmlSecTransformPushXmlMethod;
+        popXml : xmlSecTransformPopXmlMethod;
+        execute : xmlSecTransformExecuteMethod;
+        reserved0 : Pointer;
+        reverved1 : Pointer;
+      end;
+
+      xmlSecBn = xmlSecBuffer;
+      xmlSecKeyKlass = _xmlSecKeyKlass;
+      xmlSecKeyDataKlass = _xmlSecKeyDataKlass;
+      xmlSecKeyStoreKlass = _xmlSecKeyStoreKlass;
+      xmlSecKeyDataStoreKlass = _xmlSecKeyDataStoreKlass;
+      xmlSecPtrListKlass = _xmlSecPtrListKlass;
+      xmlSecTransformKlass = _xmlSecTransformKlass;
+
+  function xmlSecAddChild (parent: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecAddChildNode (parent: xmlNodePtr; child: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecAddIDs (doc: xmlDocPtr; cur: xmlNodePtr; const ids: xmlCharPtrPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecAddNextSibling (node: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecAddPrevSibling (node: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBase64CtxCreate (encode: Longint; columns: Longint) : xmlSecBase64CtxPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBase64CtxDestroy (ctx: xmlSecBase64CtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecBase64CtxFinal (ctx: xmlSecBase64CtxPtr; out_: xmlSecBytePtr; outSize: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBase64CtxFinalize (ctx: xmlSecBase64CtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecBase64CtxInitialize (ctx: xmlSecBase64CtxPtr; encode: Longint; columns: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBase64CtxUpdate (ctx: xmlSecBase64CtxPtr; const in_: xmlSecBytePtr; inSize: xmlSecSize; out_: xmlSecBytePtr; outSize: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBase64Decode (const str: xmlCharPtr; buf: xmlSecBytePtr; len: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBase64Encode (const buf: xmlSecBytePtr; len: xmlSecSize; columns: Longint) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnAdd (bn: xmlSecBnPtr; delta: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnBlobSetNodeValue (const data: xmlSecBytePtr; dataSize: xmlSecSize; cur: xmlNodePtr; format: xmlSecBnFormat; reverse: Longint; addLineBreaks: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnCompare (bn: xmlSecBnPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnCompareReverse (bn: xmlSecBnPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnCreate (size: xmlSecSize) : xmlSecBnPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBnDestroy (bn: xmlSecBnPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnDiv (bn: xmlSecBnPtr; divider: Longint; mod_: PInteger) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBnFinalize (bn: xmlSecBnPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnFromDecString (bn: xmlSecBnPtr; const str: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnFromHexString (bn: xmlSecBnPtr; const str: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnFromString (bn: xmlSecBnPtr; const str: xmlCharPtr; base: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnGetData (bn: xmlSecBnPtr) : xmlSecBytePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnGetNodeValue (bn: xmlSecBnPtr; cur: xmlNodePtr; format: xmlSecBnFormat; reverse: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnGetSize (bn: xmlSecBnPtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnInitialize (bn: xmlSecBnPtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnMul (bn: xmlSecBnPtr; multiplier: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnReverse (bn: xmlSecBnPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnSetData (bn: xmlSecBnPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnSetNodeValue (bn: xmlSecBnPtr; cur: xmlNodePtr; format: xmlSecBnFormat; reverse: Longint; addLineBreaks: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnToDecString (bn: xmlSecBnPtr) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnToHexString (bn: xmlSecBnPtr) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBnToString (bn: xmlSecBnPtr; base: xmlSecSize) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBnZero (bn: xmlSecBnPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferAppend (buf: xmlSecBufferPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferBase64NodeContentRead (buf: xmlSecBufferPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferBase64NodeContentWrite (buf: xmlSecBufferPtr; node: xmlNodePtr; columns: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferCreate (size: xmlSecSize) : xmlSecBufferPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferCreateOutputBuffer (buf: xmlSecBufferPtr) : xmlOutputBufferPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBufferDestroy (buf: xmlSecBufferPtr); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBufferEmpty (buf: xmlSecBufferPtr); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBufferFinalize (buf: xmlSecBufferPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferGetData (buf: xmlSecBufferPtr) : xmlSecBytePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferGetMaxSize (buf: xmlSecBufferPtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferGetSize (buf: xmlSecBufferPtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferInitialize (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferPrepend (buf: xmlSecBufferPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferReadFile (buf: xmlSecBufferPtr; const filename: PChar) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferRemoveHead (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferRemoveTail (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferSetData (buf: xmlSecBufferPtr; const data: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecBufferSetDefaultAllocMode (defAllocMode: xmlSecAllocMode; defInitialSize: xmlSecSize); cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferSetMaxSize (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecBufferSetSize (buf: xmlSecBufferPtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCheckNodeName (const cur: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCheckVersionExt (major: Longint; minor: Longint; subminor: Longint; mode: xmlSecCheckVersionMode) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCreateTree (const rootNodeName: xmlCharPtr; const rootNodeNs: xmlCharPtr) : xmlDocPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppDefaultKeysMngrAdoptKey (mngr: xmlSecKeysMngrPtr; key: xmlSecKeyPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppDefaultKeysMngrInit (mngr: xmlSecKeysMngrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppDefaultKeysMngrLoad (mngr: xmlSecKeysMngrPtr; const uri: PChar) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppDefaultKeysMngrSave (mngr: xmlSecKeysMngrPtr; const filename: PChar; type_: xmlSecKeyDataType) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppGetDefaultPwdCallback () : Pointer; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppInit (const config: PChar) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppKeyCertLoad (key: xmlSecKeyPtr; const filename: PChar; format: xmlSecKeyDataFormat) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppKeyCertLoadMemory (key: xmlSecKeyPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; format: xmlSecKeyDataFormat) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppKeyLoad (const filename: PChar; format: xmlSecKeyDataFormat; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppKeyLoadMemory (const data: xmlSecBytePtr; dataSize: xmlSecSize; format: xmlSecKeyDataFormat; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppKeysMngrCertLoad (mngr: xmlSecKeysMngrPtr; const filename: PChar; format: xmlSecKeyDataFormat; type_: xmlSecKeyDataType) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppKeysMngrCertLoadMemory (mngr: xmlSecKeysMngrPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; format: xmlSecKeyDataFormat; type_: xmlSecKeyDataType) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppPkcs12Load (const filename: PChar; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppPkcs12LoadMemory (const data: xmlSecBytePtr; dataSize: xmlSecSize; const pwd: PChar; pwdCallback: Pointer; pwdCallbackCtx: Pointer) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoAppShutdown () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLFunctionsRegisterKeyDataAndTransforms (functions: xmlSecCryptoDLFunctionsPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLGetFunctions () : xmlSecCryptoDLFunctionsPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLGetLibraryFunctions (const crypto: xmlCharPtr) : xmlSecCryptoDLFunctionsPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLLoadLibrary (const crypto: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLSetFunctions (functions: xmlSecCryptoDLFunctionsPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLShutdown () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoDLUnloadLibrary (const crypto: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoKeysMngrInit (mngr: xmlSecKeysMngrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecCryptoShutdown () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecDSigCtxPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigCtxDebugDump (dsigCtx: xmlSecDSigCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigCtxDebugXmlDump (dsigCtx: xmlSecDSigCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigCtxDestroy (dsigCtx: xmlSecDSigCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigCtxEnableReferenceTransform (dsigCtx: xmlSecDSigCtxPtr; transformId: xmlSecTransformId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigCtxEnableSignatureTransform (dsigCtx: xmlSecDSigCtxPtr; transformId: xmlSecTransformId) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigCtxFinalize (dsigCtx: xmlSecDSigCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigCtxGetPreSignBuffer (dsigCtx: xmlSecDSigCtxPtr) : xmlSecBufferPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigCtxInitialize (dsigCtx: xmlSecDSigCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigCtxSign (dsigCtx: xmlSecDSigCtxPtr; tmpl: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigCtxVerify (dsigCtx: xmlSecDSigCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigReferenceCtxCreate (dsigCtx: xmlSecDSigCtxPtr; origin: xmlSecDSigReferenceOrigin) : xmlSecDSigReferenceCtxPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigReferenceCtxDebugDump (dsigRefCtx: xmlSecDSigReferenceCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigReferenceCtxDebugXmlDump (dsigRefCtx: xmlSecDSigReferenceCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigReferenceCtxDestroy (dsigRefCtx: xmlSecDSigReferenceCtxPtr); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecDSigReferenceCtxFinalize (dsigRefCtx: xmlSecDSigReferenceCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigReferenceCtxGetPreDigestBuffer (dsigRefCtx: xmlSecDSigReferenceCtxPtr) : xmlSecBufferPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigReferenceCtxInitialize (dsigRefCtx: xmlSecDSigReferenceCtxPtr; dsigCtx: xmlSecDSigCtxPtr; origin: xmlSecDSigReferenceOrigin) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigReferenceCtxListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecDSigReferenceCtxProcessNode (dsigRefCtx: xmlSecDSigReferenceCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxBinaryEncrypt (encCtx: xmlSecEncCtxPtr; tmpl: xmlNodePtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxCopyUserPref (dst: xmlSecEncCtxPtr; src: xmlSecEncCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecEncCtxPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecEncCtxDebugDump (encCtx: xmlSecEncCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecEncCtxDebugXmlDump (encCtx: xmlSecEncCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxDecrypt (encCtx: xmlSecEncCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxDecryptToBuffer (encCtx: xmlSecEncCtxPtr; node: xmlNodePtr) : xmlSecBufferPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecEncCtxDestroy (encCtx: xmlSecEncCtxPtr); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecEncCtxFinalize (encCtx: xmlSecEncCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxInitialize (encCtx: xmlSecEncCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecEncCtxReset (encCtx: xmlSecEncCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxUriEncrypt (encCtx: xmlSecEncCtxPtr; tmpl: xmlNodePtr; const uri: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecEncCtxXmlEncrypt (encCtx: xmlSecEncCtxPtr; tmpl: xmlNodePtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecError (const file_: PChar; line: Longint; const func: PChar; const errorObject: PChar; const errorSubject: PChar; reason: Longint; const msg: PChar); cdecl; varargs; external LIBXMLSEC_SO;
+  procedure xmlSecErrorsDefaultCallback (const file_: PChar; line: Longint; const func: PChar; const errorObject: PChar; const errorSubject: PChar; reason: Longint; const msg: PChar); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecErrorsDefaultCallbackEnableOutput (enabled: Longint); cdecl; external LIBXMLSEC_SO;
+  function xmlSecErrorsGetCode (pos: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecErrorsGetMsg (pos: xmlSecSize) : PChar; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecErrorsInit (); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecErrorsSetCallback (callback: xmlSecErrorsCallback); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecErrorsShutdown (); cdecl; external LIBXMLSEC_SO;
+  function xmlSecFindChild (const parent: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecFindNode (const parent: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecFindParent (const cur: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecGenerateAndAddID (node: xmlNodePtr; const attrName: xmlCharPtr; const prefix: xmlCharPtr; len: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecGenerateID (const prefix: xmlCharPtr; len: xmlSecSize) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecGetNextElementNode (cur: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecGetNodeNsHref (const cur: xmlNodePtr) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecGetQName (node: xmlNodePtr; const href: xmlCharPtr; const local: xmlCharPtr) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecIOCleanupCallbacks (); cdecl; external LIBXMLSEC_SO;
+  function xmlSecIOInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecIORegisterCallbacks (matchFunc: xmlInputMatchCallback; openFunc: xmlInputOpenCallback; readFunc: xmlInputReadCallback; closeFunc: xmlInputCloseCallback) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecIORegisterDefaultCallbacks () : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecIOShutdown (); cdecl; external LIBXMLSEC_SO;
+  function xmlSecInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecIsEmptyNode (node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecIsEmptyString (const str: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyAdoptData (key: xmlSecKeyPtr; data: xmlSecKeyDataPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyCopy (keyDst: xmlSecKeyPtr; keySrc: xmlSecKeyPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyCreate () : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataAesGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; buf: xmlSecBytePtrPtr; bufSize: xmlSecSizePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueBinRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueBinWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; buf: xmlSecBytePtrPtr; bufSize: xmlSecSizePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataBinaryValueDebugDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataBinaryValueDebugXmlDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueDuplicate (dst: xmlSecKeyDataPtr; src: xmlSecKeyDataPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataBinaryValueFinalize (data: xmlSecKeyDataPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueGetBuffer (data: xmlSecKeyDataPtr) : xmlSecBufferPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueGetSize (data: xmlSecKeyDataPtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueInitialize (data: xmlSecKeyDataPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueSetBuffer (data: xmlSecKeyDataPtr; const buf: xmlSecBytePtr; bufSize: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueXmlRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataBinaryValueXmlWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataCreate (id: xmlSecKeyDataId) : xmlSecKeyDataPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataDebugDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataDebugXmlDump (data: xmlSecKeyDataPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataDesGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataDestroy (data: xmlSecKeyDataPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataDsaGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataDuplicate (data: xmlSecKeyDataPtr) : xmlSecKeyDataPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataEncryptedKeyGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataGenerate (data: xmlSecKeyDataPtr; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataGetIdentifier (data: xmlSecKeyDataPtr) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataGetSize (data: xmlSecKeyDataPtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataGetType (data: xmlSecKeyDataPtr) : xmlSecKeyDataType; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataHmacGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataIdListDebugDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataIdListDebugXmlDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdListFind (list: xmlSecPtrListPtr; dataId: xmlSecKeyDataId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdListFindByHref (list: xmlSecPtrListPtr; const href: xmlCharPtr; usage: xmlSecKeyDataUsage) : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdListFindByName (list: xmlSecPtrListPtr; const name: xmlCharPtr; usage: xmlSecKeyDataUsage) : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdListFindByNode (list: xmlSecPtrListPtr; const nodeName: xmlCharPtr; const nodeNs: xmlCharPtr; usage: xmlSecKeyDataUsage) : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdsGet () : xmlSecPtrListPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdsInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdsRegister (id: xmlSecKeyDataId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataIdsRegisterDefault () : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataIdsShutdown (); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataNameGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataRawX509CertGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataRetrievalMethodGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataRsaGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataStoreCreate (id: xmlSecKeyDataStoreId) : xmlSecKeyDataStorePtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDataStoreDestroy (store: xmlSecKeyDataStorePtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataStorePtrListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataValueGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataX509GetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataXmlRead (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataXmlWrite (id: xmlSecKeyDataId; key: xmlSecKeyPtr; node: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDebugDump (key: xmlSecKeyPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDebugXmlDump (key: xmlSecKeyPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyDestroy (key: xmlSecKeyPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDuplicate (key: xmlSecKeyPtr) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyEmpty (key: xmlSecKeyPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyEnsureData (key: xmlSecKeyPtr; dataId: xmlSecKeyDataId) : xmlSecKeyDataPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyGenerate (dataId: xmlSecKeyDataId; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyGenerateByName (const name: xmlCharPtr; sizeBits: xmlSecSize; type_: xmlSecKeyDataType) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyGetData (key: xmlSecKeyPtr; dataId: xmlSecKeyDataId) : xmlSecKeyDataPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyGetName (key: xmlSecKeyPtr) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyGetType (key: xmlSecKeyPtr) : xmlSecKeyDataType; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyGetValue (key: xmlSecKeyPtr) : xmlSecKeyDataPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyInfoCtxCopyUserPref (dst: xmlSecKeyInfoCtxPtr; src: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyInfoCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecKeyInfoCtxPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyInfoCtxCreateEncCtx (keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyInfoCtxDebugDump (keyInfoCtx: xmlSecKeyInfoCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyInfoCtxDebugXmlDump (keyInfoCtx: xmlSecKeyInfoCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyInfoCtxDestroy (keyInfoCtx: xmlSecKeyInfoCtxPtr); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyInfoCtxFinalize (keyInfoCtx: xmlSecKeyInfoCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyInfoCtxInitialize (keyInfoCtx: xmlSecKeyInfoCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyInfoCtxReset (keyInfoCtx: xmlSecKeyInfoCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyInfoNodeRead (keyInfoNode: xmlNodePtr; key: xmlSecKeyPtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyInfoNodeWrite (keyInfoNode: xmlNodePtr; key: xmlSecKeyPtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyMatch (key: xmlSecKeyPtr; const name: xmlCharPtr; keyReq: xmlSecKeyReqPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyPtrListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyReadBinaryFile (dataId: xmlSecKeyDataId; const filename: PChar) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyReadBuffer (dataId: xmlSecKeyDataId; buffer: xmlSecBufferPtr) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyReadMemory (dataId: xmlSecKeyDataId; const data: xmlSecBytePtr; dataSize: xmlSecSize) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyReqCopy (dst: xmlSecKeyReqPtr; src: xmlSecKeyReqPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyReqDebugDump (keyReq: xmlSecKeyReqPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyReqDebugXmlDump (keyReq: xmlSecKeyReqPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyReqFinalize (keyReq: xmlSecKeyReqPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyReqInitialize (keyReq: xmlSecKeyReqPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyReqMatchKey (keyReq: xmlSecKeyReqPtr; key: xmlSecKeyPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyReqMatchKeyValue (keyReq: xmlSecKeyReqPtr; value: xmlSecKeyDataPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyReqReset (keyReq: xmlSecKeyReqPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeySetName (key: xmlSecKeyPtr; const name: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeySetValue (key: xmlSecKeyPtr; value: xmlSecKeyDataPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyStoreCreate (id: xmlSecKeyStoreId) : xmlSecKeyStorePtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyStoreDestroy (store: xmlSecKeyStorePtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyStoreFindKey (store: xmlSecKeyStorePtr; const name: xmlCharPtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyUseWithCopy (dst: xmlSecKeyUseWithPtr; src: xmlSecKeyUseWithPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyUseWithCreate (const application: xmlCharPtr; const identifier: xmlCharPtr) : xmlSecKeyUseWithPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyUseWithDebugDump (keyUseWith: xmlSecKeyUseWithPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyUseWithDebugXmlDump (keyUseWith: xmlSecKeyUseWithPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyUseWithDestroy (keyUseWith: xmlSecKeyUseWithPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyUseWithDuplicate (keyUseWith: xmlSecKeyUseWithPtr) : xmlSecKeyUseWithPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyUseWithFinalize (keyUseWith: xmlSecKeyUseWithPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyUseWithInitialize (keyUseWith: xmlSecKeyUseWithPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyUseWithPtrListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeyUseWithReset (keyUseWith: xmlSecKeyUseWithPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyUseWithSet (keyUseWith: xmlSecKeyUseWithPtr; const application: xmlCharPtr; const identifier: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeysMngrAdoptDataStore (mngr: xmlSecKeysMngrPtr; store: xmlSecKeyDataStorePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeysMngrAdoptKeysStore (mngr: xmlSecKeysMngrPtr; store: xmlSecKeyStorePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeysMngrCreate () : xmlSecKeysMngrPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecKeysMngrDestroy (mngr: xmlSecKeysMngrPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeysMngrFindKey (mngr: xmlSecKeysMngrPtr; const name: xmlCharPtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeysMngrGetDataStore (mngr: xmlSecKeysMngrPtr; id: xmlSecKeyDataStoreId) : xmlSecKeyDataStorePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeysMngrGetKey (keyInfoNode: xmlNodePtr; keyInfoCtx: xmlSecKeyInfoCtxPtr) : xmlSecKeyPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeysMngrGetKeysStore (mngr: xmlSecKeysMngrPtr) : xmlSecKeyStorePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecNodeSetAdd (nset: xmlSecNodeSetPtr; newNSet: xmlSecNodeSetPtr; op: xmlSecNodeSetOp) : xmlSecNodeSetPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecNodeSetAddList (nset: xmlSecNodeSetPtr; newNSet: xmlSecNodeSetPtr; op: xmlSecNodeSetOp) : xmlSecNodeSetPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecNodeSetContains (nset: xmlSecNodeSetPtr; node: xmlNodePtr; parent: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecNodeSetCreate (doc: xmlDocPtr; nodes: xmlNodeSetPtr; type_: xmlSecNodeSetType) : xmlSecNodeSetPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecNodeSetDebugDump (nset: xmlSecNodeSetPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecNodeSetDestroy (nset: xmlSecNodeSetPtr); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecNodeSetDocDestroy (nset: xmlSecNodeSetPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecNodeSetDumpTextNodes (nset: xmlSecNodeSetPtr; out_: xmlOutputBufferPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecNodeSetGetChildren (doc: xmlDocPtr; const parent: xmlNodePtr; withComments: Longint; invert: Longint) : xmlSecNodeSetPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecNodeSetWalk (nset: xmlSecNodeSetPtr; walkFunc: xmlSecNodeSetWalkCallback; data: Pointer) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecParseFile (const filename: PChar) : xmlDocPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecParseMemory (const buffer: xmlSecBytePtr; size: xmlSecSize; recovery: Longint) : xmlDocPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecParseMemoryExt (const prefix: xmlSecBytePtr; prefixSize: xmlSecSize; const buffer: xmlSecBytePtr; bufferSize: xmlSecSize; const postfix: xmlSecBytePtr; postfixSize: xmlSecSize) : xmlDocPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListAdd (list: xmlSecPtrListPtr; item: xmlSecPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListCopy (dst: xmlSecPtrListPtr; src: xmlSecPtrListPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListCreate (id: xmlSecPtrListId) : xmlSecPtrListPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecPtrListDebugDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecPtrListDebugXmlDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecPtrListDestroy (list: xmlSecPtrListPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListDuplicate (list: xmlSecPtrListPtr) : xmlSecPtrListPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecPtrListEmpty (list: xmlSecPtrListPtr); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecPtrListFinalize (list: xmlSecPtrListPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListGetItem (list: xmlSecPtrListPtr; pos: xmlSecSize) : xmlSecPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListGetSize (list: xmlSecPtrListPtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListInitialize (list: xmlSecPtrListPtr; id: xmlSecPtrListId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListRemove (list: xmlSecPtrListPtr; pos: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecPtrListSet (list: xmlSecPtrListPtr; item: xmlSecPtr; pos: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecPtrListSetDefaultAllocMode (defAllocMode: xmlSecAllocMode; defInitialSize: xmlSecSize); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecQName2BitMaskDebugDump (info: xmlSecQName2BitMaskInfoPtr; mask: xmlSecBitMask; const name: xmlCharPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecQName2BitMaskDebugXmlDump (info: xmlSecQName2BitMaskInfoPtr; mask: xmlSecBitMask; const name: xmlCharPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2BitMaskGetBitMask (info: xmlSecQName2BitMaskInfoPtr; const qnameLocalPart: xmlCharPtr; const qnameHref: xmlCharPtr; mask: xmlSecBitMaskPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2BitMaskGetBitMaskFromString (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtr; const qname: xmlCharPtr; mask: xmlSecBitMaskPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2BitMaskGetInfo (info: xmlSecQName2BitMaskInfoPtr; mask: xmlSecBitMask) : xmlSecQName2BitMaskInfoPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2BitMaskGetStringFromBitMask (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtr; mask: xmlSecBitMask) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2BitMaskNodesRead (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtrPtr; const nodeName: xmlCharPtr; const nodeNs: xmlCharPtr; stopOnUnknown: Longint; mask: xmlSecBitMaskPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2BitMaskNodesWrite (info: xmlSecQName2BitMaskInfoPtr; node: xmlNodePtr; const nodeName: xmlCharPtr; const nodeNs: xmlCharPtr; mask: xmlSecBitMask) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerAttributeRead (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const attrName: xmlCharPtr; intValue: PInteger) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerAttributeWrite (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const attrName: xmlCharPtr; intValue: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecQName2IntegerDebugDump (info: xmlSecQName2IntegerInfoPtr; intValue: Longint; const name: xmlCharPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecQName2IntegerDebugXmlDump (info: xmlSecQName2IntegerInfoPtr; intValue: Longint; const name: xmlCharPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerGetInfo (info: xmlSecQName2IntegerInfoPtr; intValue: Longint) : xmlSecQName2IntegerInfoPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerGetInteger (info: xmlSecQName2IntegerInfoPtr; const qnameHref: xmlCharPtr; const qnameLocalPart: xmlCharPtr; intValue: PInteger) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerGetIntegerFromString (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const qname: xmlCharPtr; intValue: PInteger) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerGetStringFromInteger (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; intValue: Longint) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerNodeRead (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; intValue: PInteger) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecQName2IntegerNodeWrite (info: xmlSecQName2IntegerInfoPtr; node: xmlNodePtr; const nodeName: xmlCharPtr; const nodeNs: xmlCharPtr; intValue: Longint) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecReplaceContent (node: xmlNodePtr; newNode: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecReplaceNode (node: xmlNodePtr; newNode: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecReplaceNodeBuffer (node: xmlNodePtr; const buffer: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecShutdown () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSimpleKeysStoreAdoptKey (store: xmlSecKeyStorePtr; key: xmlSecKeyPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSimpleKeysStoreGetKeys (store: xmlSecKeyStorePtr) : xmlSecPtrListPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSimpleKeysStoreGetKlass () : xmlSecKeyStoreId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSimpleKeysStoreLoad (store: xmlSecKeyStorePtr; const uri: PChar; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSimpleKeysStoreSave (store: xmlSecKeyStorePtr; const filename: PChar; type_: xmlSecKeyDataType) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11AddBodyEntry (envNode: xmlNodePtr; entryNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11AddFaultEntry (envNode: xmlNodePtr; const faultCodeHref: xmlCharPtr; const faultCodeLocalPart: xmlCharPtr; const faultString: xmlCharPtr; const faultActor: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11CheckEnvelope (envNode: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11CreateEnvelope (doc: xmlDocPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11EnsureHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11GetBody (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11GetBodyEntriesNumber (envNode: xmlNodePtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11GetBodyEntry (envNode: xmlNodePtr; pos: xmlSecSize) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11GetFaultEntry (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap11GetHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12AddBodyEntry (envNode: xmlNodePtr; entryNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12AddFaultDetailEntry (faultNode: xmlNodePtr; detailEntryNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12AddFaultEntry (envNode: xmlNodePtr; faultCode: xmlSecSoap12FaultCode; const faultReasonText: xmlCharPtr; const faultReasonLang: xmlCharPtr; const faultNodeURI: xmlCharPtr; const faultRole: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12AddFaultReasonText (faultNode: xmlNodePtr; const faultReasonText: xmlCharPtr; const faultReasonLang: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12AddFaultSubcode (faultNode: xmlNodePtr; const subCodeHref: xmlCharPtr; const subCodeName: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12CheckEnvelope (envNode: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12CreateEnvelope (doc: xmlDocPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12EnsureHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12GetBody (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12GetBodyEntriesNumber (envNode: xmlNodePtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12GetBodyEntry (envNode: xmlNodePtr; pos: xmlSecSize) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12GetFaultEntry (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecSoap12GetHeader (envNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecStringListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplCipherReferenceAddTransform (cipherReferenceNode: xmlNodePtr; transformId: xmlSecTransformId) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplEncDataAddEncProperty (encNode: xmlNodePtr; const id: xmlCharPtr; const target: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplEncDataCreate (doc: xmlDocPtr; encMethodId: xmlSecTransformId; const id: xmlCharPtr; const type_: xmlCharPtr; const mimeType: xmlCharPtr; const encoding: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplEncDataEnsureCipherReference (encNode: xmlNodePtr; const uri: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplEncDataEnsureCipherValue (encNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplEncDataEnsureEncProperties (encNode: xmlNodePtr; const id: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplEncDataEnsureKeyInfo (encNode: xmlNodePtr; const id: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplEncDataGetEncMethodNode (encNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplKeyInfoAddEncryptedKey (keyInfoNode: xmlNodePtr; encMethodId: xmlSecTransformId; const id: xmlCharPtr; const type_: xmlCharPtr; const recipient: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplKeyInfoAddKeyName (keyInfoNode: xmlNodePtr; const name: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplKeyInfoAddKeyValue (keyInfoNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplKeyInfoAddRetrievalMethod (keyInfoNode: xmlNodePtr; const uri: xmlCharPtr; const type_: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplKeyInfoAddX509Data (keyInfoNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplManifestAddReference (manifestNode: xmlNodePtr; digestMethodId: xmlSecTransformId; const id: xmlCharPtr; const uri: xmlCharPtr; const type_: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplObjectAddManifest (objectNode: xmlNodePtr; const id: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplObjectAddSignProperties (objectNode: xmlNodePtr; const id: xmlCharPtr; const target: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplReferenceAddTransform (referenceNode: xmlNodePtr; transformId: xmlSecTransformId) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplReferenceListAddDataReference (encNode: xmlNodePtr; const uri: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplReferenceListAddKeyReference (encNode: xmlNodePtr; const uri: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplRetrievalMethodAddTransform (retrMethodNode: xmlNodePtr; transformId: xmlSecTransformId) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplSignatureAddObject (signNode: xmlNodePtr; const id: xmlCharPtr; const mimeType: xmlCharPtr; const encoding: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplSignatureAddReference (signNode: xmlNodePtr; digestMethodId: xmlSecTransformId; const id: xmlCharPtr; const uri: xmlCharPtr; const type_: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplSignatureCreate (doc: xmlDocPtr; c14nMethodId: xmlSecTransformId; signMethodId: xmlSecTransformId; const id: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplSignatureEnsureKeyInfo (signNode: xmlNodePtr; const id: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplSignatureGetC14NMethodNode (signNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplSignatureGetSignMethodNode (signNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplTransformAddC14NInclNamespaces (transformNode: xmlNodePtr; const prefixList: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplTransformAddHmacOutputLength (transformNode: xmlNodePtr; bitsLen: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplTransformAddRsaOaepParam (transformNode: xmlNodePtr; const buf: xmlSecBytePtr; size: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplTransformAddXPath (transformNode: xmlNodePtr; const expression: xmlCharPtr; const nsList: xmlCharPtrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplTransformAddXPath2 (transformNode: xmlNodePtr; const type_: xmlCharPtr; const expression: xmlCharPtr; const nsList: xmlCharPtrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplTransformAddXPointer (transformNode: xmlNodePtr; const expression: xmlCharPtr; const nsList: xmlCharPtrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplTransformAddXsltStylesheet (transformNode: xmlNodePtr; const xslt: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplX509DataAddCRL (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplX509DataAddCertificate (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplX509DataAddIssuerSerial (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplX509DataAddSKI (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplX509DataAddSubjectName (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformAes128CbcGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformAes192CbcGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformAes256CbcGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformBase64GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformBase64SetLineSize (transform: xmlSecTransformPtr; lineSize: xmlSecSize); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformConnect (left: xmlSecTransformPtr; right: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCreate (id: xmlSecTransformId) : xmlSecTransformPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCreateInputBuffer (transform: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : xmlParserInputBufferPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCreateOutputBuffer (transform: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : xmlOutputBufferPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxAppend (ctx: xmlSecTransformCtxPtr; transform: xmlSecTransformPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxBinaryExecute (ctx: xmlSecTransformCtxPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxCopyUserPref (dst: xmlSecTransformCtxPtr; src: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxCreate () : xmlSecTransformCtxPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxCreateAndAppend (ctx: xmlSecTransformCtxPtr; id: xmlSecTransformId) : xmlSecTransformPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxCreateAndPrepend (ctx: xmlSecTransformCtxPtr; id: xmlSecTransformId) : xmlSecTransformPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformCtxDebugDump (ctx: xmlSecTransformCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformCtxDebugXmlDump (ctx: xmlSecTransformCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformCtxDestroy (ctx: xmlSecTransformCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxExecute (ctx: xmlSecTransformCtxPtr; doc: xmlDocPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformCtxFinalize (ctx: xmlSecTransformCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxInitialize (ctx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxNodeRead (ctx: xmlSecTransformCtxPtr; node: xmlNodePtr; usage: xmlSecTransformUsage) : xmlSecTransformPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxNodesListRead (ctx: xmlSecTransformCtxPtr; node: xmlNodePtr; usage: xmlSecTransformUsage) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxPrepare (ctx: xmlSecTransformCtxPtr; inputDataType: xmlSecTransformDataType) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxPrepend (ctx: xmlSecTransformCtxPtr; transform: xmlSecTransformPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformCtxReset (ctx: xmlSecTransformCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxSetUri (ctx: xmlSecTransformCtxPtr; const uri: xmlCharPtr; hereNode: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxUriExecute (ctx: xmlSecTransformCtxPtr; const uri: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformCtxXmlExecute (ctx: xmlSecTransformCtxPtr; nodes: xmlSecNodeSetPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformDebugDump (transform: xmlSecTransformPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformDebugXmlDump (transform: xmlSecTransformPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformDefaultGetDataType (transform: xmlSecTransformPtr; mode: xmlSecTransformMode; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformDataType; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformDefaultPopBin (transform: xmlSecTransformPtr; data: xmlSecBytePtr; maxDataSize: xmlSecSize; dataSize: xmlSecSizePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformDefaultPopXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtrPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformDefaultPushBin (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; final: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformDefaultPushXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformDes3CbcGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformDestroy (transform: xmlSecTransformPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformDsaSha1GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformEnvelopedGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformExclC14NGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformExclC14NWithCommentsGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformExecute (transform: xmlSecTransformPtr; last: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformGetDataType (transform: xmlSecTransformPtr; mode: xmlSecTransformMode; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformDataType; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformHmacMd5GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformHmacRipemd160GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformHmacSha1GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformHmacSha224GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformHmacSha256GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformHmacSha384GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformHmacSha512GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformIdListDebugDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformIdListDebugXmlDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdListFind (list: xmlSecPtrListPtr; transformId: xmlSecTransformId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdListFindByHref (list: xmlSecPtrListPtr; const href: xmlCharPtr; usage: xmlSecTransformUsage) : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdListFindByName (list: xmlSecPtrListPtr; const name: xmlCharPtr; usage: xmlSecTransformUsage) : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdsGet () : xmlSecPtrListPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdsInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdsRegister (id: xmlSecTransformId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformIdsRegisterDefault () : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformIdsShutdown (); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformInclC14NGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformInclC14NWithCommentsGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformInputURIGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformInputURIOpen (transform: xmlSecTransformPtr; const uri: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformKWAes128GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformKWAes192GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformKWAes256GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformKWDes3GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformMd5GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformMemBufGetBuffer (transform: xmlSecTransformPtr) : xmlSecBufferPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformMemBufGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformNodeRead (node: xmlNodePtr; usage: xmlSecTransformUsage; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformPopBin (transform: xmlSecTransformPtr; data: xmlSecBytePtr; maxDataSize: xmlSecSize; dataSize: xmlSecSizePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformPopXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtrPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformPump (left: xmlSecTransformPtr; right: xmlSecTransformPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformPushBin (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; final: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformPushXml (transform: xmlSecTransformPtr; nodes: xmlSecNodeSetPtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecTransformRemove (transform: xmlSecTransformPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRemoveXmlTagsC14NGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRipemd160GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaMd5GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaOaepGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaPkcs1GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaRipemd160GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaSha1GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaSha224GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaSha256GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaSha384GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformRsaSha512GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformSetKey (transform: xmlSecTransformPtr; key: xmlSecKeyPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformSetKeyReq (transform: xmlSecTransformPtr; keyReq: xmlSecKeyReqPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformSha1GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformSha224GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformSha256GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformSha384GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformSha512GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformUriTypeCheck (type_: xmlSecTransformUriType; const uri: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformVerify (transform: xmlSecTransformPtr; const data: xmlSecBytePtr; dataSize: xmlSecSize; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformVerifyNodeContent (transform: xmlSecTransformPtr; node: xmlNodePtr; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformVisa3DHackGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformVisa3DHackSetID (transform: xmlSecTransformPtr; const id: xmlCharPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformXPath2GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformXPathGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformXPointerGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformXPointerSetExpr (transform: xmlSecTransformPtr; const expr: xmlCharPtr; nodeSetType: xmlSecNodeSetType; hereNode: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformXmlParserGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformXsltGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecX509DataGetNodeContent (node: xmlNodePtr; deleteChildren: Longint; keyInfoCtx: xmlSecKeyInfoCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecX509StoreGetKlass () : xmlSecKeyDataStoreId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsRespondWithDebugDump (id: xmlSecXkmsRespondWithId; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsRespondWithDebugXmlDump (id: xmlSecXkmsRespondWithId; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithDefaultNodeRead (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithDefaultNodeWrite (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdListFind (list: xmlSecPtrListPtr; id: xmlSecXkmsRespondWithId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdListFindByNodeValue (list: xmlSecPtrListPtr; node: xmlNodePtr) : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdListWrite (list: xmlSecPtrListPtr; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdsGet () : xmlSecPtrListPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdsInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdsRegister (id: xmlSecXkmsRespondWithId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithIdsRegisterDefault () : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsRespondWithIdsShutdown (); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithKeyNameGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithKeyValueGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithNodeRead (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithNodeWrite (id: xmlSecXkmsRespondWithId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithPGPGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithPrivateKeyGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithRetrievalMethodGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithSPKIGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithX509CRLGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithX509CertGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsRespondWithX509ChainGetKlass () : xmlSecXkmsRespondWithId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxCopyUserPref (dst: xmlSecXkmsServerCtxPtr; src: xmlSecXkmsServerCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxCreate (keysMngr: xmlSecKeysMngrPtr) : xmlSecXkmsServerCtxPtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerCtxDebugDump (ctx: xmlSecXkmsServerCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerCtxDebugXmlDump (ctx: xmlSecXkmsServerCtxPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerCtxDestroy (ctx: xmlSecXkmsServerCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxFatalErrorResponseCreate (ctx: xmlSecXkmsServerCtxPtr; format: xmlSecXkmsServerFormat; doc: xmlDocPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerCtxFinalize (ctx: xmlSecXkmsServerCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxInitialize (ctx: xmlSecXkmsServerCtxPtr; keysMngr: xmlSecKeysMngrPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxProcess (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr; format: xmlSecXkmsServerFormat; doc: xmlDocPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxPtrListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxRequestRead (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxRequestUnwrap (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr; format: xmlSecXkmsServerFormat) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerCtxReset (ctx: xmlSecXkmsServerCtxPtr); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxResponseWrap (ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr; format: xmlSecXkmsServerFormat; doc: xmlDocPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerCtxResponseWrite (ctx: xmlSecXkmsServerCtxPtr; doc: xmlDocPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerCtxSetResult (ctx: xmlSecXkmsServerCtxPtr; resultMajor: xmlSecXkmsResultMajor; resultMinor: xmlSecXkmsResultMinor); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerFormatFromString (const str: xmlCharPtr) : xmlSecXkmsServerFormat; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerFormatToString (format: xmlSecXkmsServerFormat) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestCompoundGetKlass () : xmlSecXkmsServerRequestId; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerRequestDebugDump (id: xmlSecXkmsServerRequestId; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerRequestDebugXmlDump (id: xmlSecXkmsServerRequestId; output: PFILE); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestExecute (id: xmlSecXkmsServerRequestId; ctx: xmlSecXkmsServerCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdListFind (list: xmlSecPtrListPtr; id: xmlSecXkmsServerRequestId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdListFindByName (list: xmlSecPtrListPtr; const name: xmlCharPtr) : xmlSecXkmsServerRequestId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdListFindByNode (list: xmlSecPtrListPtr; node: xmlNodePtr) : xmlSecXkmsServerRequestId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdListGetKlass () : xmlSecPtrListId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdsGet () : xmlSecPtrListPtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdsInit () : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdsRegister (id: xmlSecXkmsServerRequestId) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestIdsRegisterDefault () : Longint; cdecl; external LIBXMLSEC_SO;
+  procedure xmlSecXkmsServerRequestIdsShutdown (); cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestLocateGetKlass () : xmlSecXkmsServerRequestId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestNodeRead (id: xmlSecXkmsServerRequestId; ctx: xmlSecXkmsServerCtxPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestNodeWrite (id: xmlSecXkmsServerRequestId; ctx: xmlSecXkmsServerCtxPtr; doc: xmlDocPtr; node: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestResultGetKlass () : xmlSecXkmsServerRequestId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestStatusGetKlass () : xmlSecXkmsServerRequestId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecXkmsServerRequestValidateGetKlass () : xmlSecXkmsServerRequestId; cdecl; external LIBXMLSEC_SO;
   function xmlSecAttrAlgorithm(): xmlCharPtr; cdecl;
   function xmlSecAttrApplication(): xmlCharPtr; cdecl;
   function xmlSecAttrEncoding(): xmlCharPtr; cdecl;
@@ -1368,19 +1381,34 @@ type
   function xmlSecHrefHmacMd5(): xmlCharPtr; cdecl;
   function xmlSecHrefHmacRipemd160(): xmlCharPtr; cdecl;
   function xmlSecHrefHmacSha1(): xmlCharPtr; cdecl;
+  function xmlSecHrefHmacSha224(): xmlCharPtr; cdecl;
+  function xmlSecHrefHmacSha256(): xmlCharPtr; cdecl;
+  function xmlSecHrefHmacSha384(): xmlCharPtr; cdecl;
+  function xmlSecHrefHmacSha512(): xmlCharPtr; cdecl;
   function xmlSecHrefKWAes128(): xmlCharPtr; cdecl;
   function xmlSecHrefKWAes192(): xmlCharPtr; cdecl;
   function xmlSecHrefKWAes256(): xmlCharPtr; cdecl;
   function xmlSecHrefKWDes3(): xmlCharPtr; cdecl;
+  function xmlSecHrefMd5(): xmlCharPtr; cdecl;
   function xmlSecHrefPGPData(): xmlCharPtr; cdecl;
   function xmlSecHrefRSAKeyValue(): xmlCharPtr; cdecl;
   function xmlSecHrefRawX509Cert(): xmlCharPtr; cdecl;
   function xmlSecHrefRipemd160(): xmlCharPtr; cdecl;
+  function xmlSecHrefRsaMd5(): xmlCharPtr; cdecl;
   function xmlSecHrefRsaOaep(): xmlCharPtr; cdecl;
   function xmlSecHrefRsaPkcs1(): xmlCharPtr; cdecl;
+  function xmlSecHrefRsaRipemd160(): xmlCharPtr; cdecl;
   function xmlSecHrefRsaSha1(): xmlCharPtr; cdecl;
+  function xmlSecHrefRsaSha224(): xmlCharPtr; cdecl;
+  function xmlSecHrefRsaSha256(): xmlCharPtr; cdecl;
+  function xmlSecHrefRsaSha384(): xmlCharPtr; cdecl;
+  function xmlSecHrefRsaSha512(): xmlCharPtr; cdecl;
   function xmlSecHrefSPKIData(): xmlCharPtr; cdecl;
   function xmlSecHrefSha1(): xmlCharPtr; cdecl;
+  function xmlSecHrefSha224(): xmlCharPtr; cdecl;
+  function xmlSecHrefSha256(): xmlCharPtr; cdecl;
+  function xmlSecHrefSha384(): xmlCharPtr; cdecl;
+  function xmlSecHrefSha512(): xmlCharPtr; cdecl;
   function xmlSecHrefX509Data(): xmlCharPtr; cdecl;
   function xmlSecHrefXslt(): xmlCharPtr; cdecl;
   function xmlSecKeyBindingReasonIssuerTrust(): xmlCharPtr; cdecl;
@@ -1412,23 +1440,38 @@ type
   function xmlSecNameHmacMd5(): xmlCharPtr; cdecl;
   function xmlSecNameHmacRipemd160(): xmlCharPtr; cdecl;
   function xmlSecNameHmacSha1(): xmlCharPtr; cdecl;
+  function xmlSecNameHmacSha224(): xmlCharPtr; cdecl;
+  function xmlSecNameHmacSha256(): xmlCharPtr; cdecl;
+  function xmlSecNameHmacSha384(): xmlCharPtr; cdecl;
+  function xmlSecNameHmacSha512(): xmlCharPtr; cdecl;
   function xmlSecNameKWAes128(): xmlCharPtr; cdecl;
   function xmlSecNameKWAes192(): xmlCharPtr; cdecl;
   function xmlSecNameKWAes256(): xmlCharPtr; cdecl;
   function xmlSecNameKWDes3(): xmlCharPtr; cdecl;
   function xmlSecNameKeyName(): xmlCharPtr; cdecl;
   function xmlSecNameKeyValue(): xmlCharPtr; cdecl;
+  function xmlSecNameMd5(): xmlCharPtr; cdecl;
   function xmlSecNameMemBuf(): xmlCharPtr; cdecl;
   function xmlSecNamePGPData(): xmlCharPtr; cdecl;
   function xmlSecNameRSAKeyValue(): xmlCharPtr; cdecl;
   function xmlSecNameRawX509Cert(): xmlCharPtr; cdecl;
   function xmlSecNameRetrievalMethod(): xmlCharPtr; cdecl;
   function xmlSecNameRipemd160(): xmlCharPtr; cdecl;
+  function xmlSecNameRsaMd5(): xmlCharPtr; cdecl;
   function xmlSecNameRsaOaep(): xmlCharPtr; cdecl;
   function xmlSecNameRsaPkcs1(): xmlCharPtr; cdecl;
+  function xmlSecNameRsaRipemd160(): xmlCharPtr; cdecl;
   function xmlSecNameRsaSha1(): xmlCharPtr; cdecl;
+  function xmlSecNameRsaSha224(): xmlCharPtr; cdecl;
+  function xmlSecNameRsaSha256(): xmlCharPtr; cdecl;
+  function xmlSecNameRsaSha384(): xmlCharPtr; cdecl;
+  function xmlSecNameRsaSha512(): xmlCharPtr; cdecl;
   function xmlSecNameSPKIData(): xmlCharPtr; cdecl;
   function xmlSecNameSha1(): xmlCharPtr; cdecl;
+  function xmlSecNameSha224(): xmlCharPtr; cdecl;
+  function xmlSecNameSha256(): xmlCharPtr; cdecl;
+  function xmlSecNameSha384(): xmlCharPtr; cdecl;
+  function xmlSecNameSha512(): xmlCharPtr; cdecl;
   function xmlSecNameX509Data(): xmlCharPtr; cdecl;
   function xmlSecNameX509Store(): xmlCharPtr; cdecl;
   function xmlSecNameXPath(): xmlCharPtr; cdecl;
@@ -1619,10 +1662,12 @@ uses
 var
   libHandle: THandle;
 
+// Utility function to make sure procedure entry points are not null
+
 procedure CheckForNil(ptr: Pointer; name:string);
 begin
   if not Assigned(ptr) then
-    raise Exception.Create('"' + name + '" could not be loaded from the dynamic library ' + XMLSEC_SO);
+    raise Exception.Create('"' + name + '" could not be loaded from the dynamic library ' + LIBXMLSEC_SO);
 end;
 
 var
@@ -2031,6 +2076,42 @@ begin
 end;
 
 var
+   pxmlSecHrefHmacSha224: xmlCharPtr;
+
+function xmlSecHrefHmacSha224: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefHmacSha224, 'xmlSecHrefHmacSha224');
+  Result := pxmlSecHrefHmacSha224;
+end;
+
+var
+   pxmlSecHrefHmacSha256: xmlCharPtr;
+
+function xmlSecHrefHmacSha256: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefHmacSha256, 'xmlSecHrefHmacSha256');
+  Result := pxmlSecHrefHmacSha256;
+end;
+
+var
+   pxmlSecHrefHmacSha384: xmlCharPtr;
+
+function xmlSecHrefHmacSha384: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefHmacSha384, 'xmlSecHrefHmacSha384');
+  Result := pxmlSecHrefHmacSha384;
+end;
+
+var
+   pxmlSecHrefHmacSha512: xmlCharPtr;
+
+function xmlSecHrefHmacSha512: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefHmacSha512, 'xmlSecHrefHmacSha512');
+  Result := pxmlSecHrefHmacSha512;
+end;
+
+var
    pxmlSecHrefKWAes128: xmlCharPtr;
 
 function xmlSecHrefKWAes128: xmlCharPtr;
@@ -2064,6 +2145,15 @@ function xmlSecHrefKWDes3: xmlCharPtr;
 begin
   CheckForNil(pxmlSecHrefKWDes3, 'xmlSecHrefKWDes3');
   Result := pxmlSecHrefKWDes3;
+end;
+
+var
+   pxmlSecHrefMd5: xmlCharPtr;
+
+function xmlSecHrefMd5: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefMd5, 'xmlSecHrefMd5');
+  Result := pxmlSecHrefMd5;
 end;
 
 var
@@ -2103,6 +2193,15 @@ begin
 end;
 
 var
+   pxmlSecHrefRsaMd5: xmlCharPtr;
+
+function xmlSecHrefRsaMd5: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefRsaMd5, 'xmlSecHrefRsaMd5');
+  Result := pxmlSecHrefRsaMd5;
+end;
+
+var
    pxmlSecHrefRsaOaep: xmlCharPtr;
 
 function xmlSecHrefRsaOaep: xmlCharPtr;
@@ -2121,12 +2220,57 @@ begin
 end;
 
 var
+   pxmlSecHrefRsaRipemd160: xmlCharPtr;
+
+function xmlSecHrefRsaRipemd160: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefRsaRipemd160, 'xmlSecHrefRsaRipemd160');
+  Result := pxmlSecHrefRsaRipemd160;
+end;
+
+var
    pxmlSecHrefRsaSha1: xmlCharPtr;
 
 function xmlSecHrefRsaSha1: xmlCharPtr;
 begin
   CheckForNil(pxmlSecHrefRsaSha1, 'xmlSecHrefRsaSha1');
   Result := pxmlSecHrefRsaSha1;
+end;
+
+var
+   pxmlSecHrefRsaSha224: xmlCharPtr;
+
+function xmlSecHrefRsaSha224: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefRsaSha224, 'xmlSecHrefRsaSha224');
+  Result := pxmlSecHrefRsaSha224;
+end;
+
+var
+   pxmlSecHrefRsaSha256: xmlCharPtr;
+
+function xmlSecHrefRsaSha256: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefRsaSha256, 'xmlSecHrefRsaSha256');
+  Result := pxmlSecHrefRsaSha256;
+end;
+
+var
+   pxmlSecHrefRsaSha384: xmlCharPtr;
+
+function xmlSecHrefRsaSha384: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefRsaSha384, 'xmlSecHrefRsaSha384');
+  Result := pxmlSecHrefRsaSha384;
+end;
+
+var
+   pxmlSecHrefRsaSha512: xmlCharPtr;
+
+function xmlSecHrefRsaSha512: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefRsaSha512, 'xmlSecHrefRsaSha512');
+  Result := pxmlSecHrefRsaSha512;
 end;
 
 var
@@ -2145,6 +2289,42 @@ function xmlSecHrefSha1: xmlCharPtr;
 begin
   CheckForNil(pxmlSecHrefSha1, 'xmlSecHrefSha1');
   Result := pxmlSecHrefSha1;
+end;
+
+var
+   pxmlSecHrefSha224: xmlCharPtr;
+
+function xmlSecHrefSha224: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefSha224, 'xmlSecHrefSha224');
+  Result := pxmlSecHrefSha224;
+end;
+
+var
+   pxmlSecHrefSha256: xmlCharPtr;
+
+function xmlSecHrefSha256: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefSha256, 'xmlSecHrefSha256');
+  Result := pxmlSecHrefSha256;
+end;
+
+var
+   pxmlSecHrefSha384: xmlCharPtr;
+
+function xmlSecHrefSha384: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefSha384, 'xmlSecHrefSha384');
+  Result := pxmlSecHrefSha384;
+end;
+
+var
+   pxmlSecHrefSha512: xmlCharPtr;
+
+function xmlSecHrefSha512: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefSha512, 'xmlSecHrefSha512');
+  Result := pxmlSecHrefSha512;
 end;
 
 var
@@ -2427,6 +2607,42 @@ begin
 end;
 
 var
+   pxmlSecNameHmacSha224: xmlCharPtr;
+
+function xmlSecNameHmacSha224: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameHmacSha224, 'xmlSecNameHmacSha224');
+  Result := pxmlSecNameHmacSha224;
+end;
+
+var
+   pxmlSecNameHmacSha256: xmlCharPtr;
+
+function xmlSecNameHmacSha256: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameHmacSha256, 'xmlSecNameHmacSha256');
+  Result := pxmlSecNameHmacSha256;
+end;
+
+var
+   pxmlSecNameHmacSha384: xmlCharPtr;
+
+function xmlSecNameHmacSha384: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameHmacSha384, 'xmlSecNameHmacSha384');
+  Result := pxmlSecNameHmacSha384;
+end;
+
+var
+   pxmlSecNameHmacSha512: xmlCharPtr;
+
+function xmlSecNameHmacSha512: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameHmacSha512, 'xmlSecNameHmacSha512');
+  Result := pxmlSecNameHmacSha512;
+end;
+
+var
    pxmlSecNameKWAes128: xmlCharPtr;
 
 function xmlSecNameKWAes128: xmlCharPtr;
@@ -2478,6 +2694,15 @@ function xmlSecNameKeyValue: xmlCharPtr;
 begin
   CheckForNil(pxmlSecNameKeyValue, 'xmlSecNameKeyValue');
   Result := pxmlSecNameKeyValue;
+end;
+
+var
+   pxmlSecNameMd5: xmlCharPtr;
+
+function xmlSecNameMd5: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameMd5, 'xmlSecNameMd5');
+  Result := pxmlSecNameMd5;
 end;
 
 var
@@ -2535,6 +2760,15 @@ begin
 end;
 
 var
+   pxmlSecNameRsaMd5: xmlCharPtr;
+
+function xmlSecNameRsaMd5: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameRsaMd5, 'xmlSecNameRsaMd5');
+  Result := pxmlSecNameRsaMd5;
+end;
+
+var
    pxmlSecNameRsaOaep: xmlCharPtr;
 
 function xmlSecNameRsaOaep: xmlCharPtr;
@@ -2553,12 +2787,57 @@ begin
 end;
 
 var
+   pxmlSecNameRsaRipemd160: xmlCharPtr;
+
+function xmlSecNameRsaRipemd160: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameRsaRipemd160, 'xmlSecNameRsaRipemd160');
+  Result := pxmlSecNameRsaRipemd160;
+end;
+
+var
    pxmlSecNameRsaSha1: xmlCharPtr;
 
 function xmlSecNameRsaSha1: xmlCharPtr;
 begin
   CheckForNil(pxmlSecNameRsaSha1, 'xmlSecNameRsaSha1');
   Result := pxmlSecNameRsaSha1;
+end;
+
+var
+   pxmlSecNameRsaSha224: xmlCharPtr;
+
+function xmlSecNameRsaSha224: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameRsaSha224, 'xmlSecNameRsaSha224');
+  Result := pxmlSecNameRsaSha224;
+end;
+
+var
+   pxmlSecNameRsaSha256: xmlCharPtr;
+
+function xmlSecNameRsaSha256: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameRsaSha256, 'xmlSecNameRsaSha256');
+  Result := pxmlSecNameRsaSha256;
+end;
+
+var
+   pxmlSecNameRsaSha384: xmlCharPtr;
+
+function xmlSecNameRsaSha384: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameRsaSha384, 'xmlSecNameRsaSha384');
+  Result := pxmlSecNameRsaSha384;
+end;
+
+var
+   pxmlSecNameRsaSha512: xmlCharPtr;
+
+function xmlSecNameRsaSha512: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameRsaSha512, 'xmlSecNameRsaSha512');
+  Result := pxmlSecNameRsaSha512;
 end;
 
 var
@@ -2577,6 +2856,42 @@ function xmlSecNameSha1: xmlCharPtr;
 begin
   CheckForNil(pxmlSecNameSha1, 'xmlSecNameSha1');
   Result := pxmlSecNameSha1;
+end;
+
+var
+   pxmlSecNameSha224: xmlCharPtr;
+
+function xmlSecNameSha224: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameSha224, 'xmlSecNameSha224');
+  Result := pxmlSecNameSha224;
+end;
+
+var
+   pxmlSecNameSha256: xmlCharPtr;
+
+function xmlSecNameSha256: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameSha256, 'xmlSecNameSha256');
+  Result := pxmlSecNameSha256;
+end;
+
+var
+   pxmlSecNameSha384: xmlCharPtr;
+
+function xmlSecNameSha384: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameSha384, 'xmlSecNameSha384');
+  Result := pxmlSecNameSha384;
+end;
+
+var
+   pxmlSecNameSha512: xmlCharPtr;
+
+function xmlSecNameSha512: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameSha512, 'xmlSecNameSha512');
+  Result := pxmlSecNameSha512;
 end;
 
 var
@@ -4197,8 +4512,8 @@ initialization
   // but here we need to obtain the addresses of POINTERS to functions. We can
   // get to these addresses (and also those of other data values exported from
   // the DLL) by using GetProcAddress.
-  libHandle := LoadLibrary(XMLSEC_SO);
-  if libHandle <> 0 then
+  libHandle := LoadLibrary(LIBXMLSEC_SO);
+  if libHandle <> 0 then 
   begin
     pxmlSecAttrAlgorithm := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecAttrAlgorithm'));
     pxmlSecAttrApplication := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecAttrApplication'));
@@ -4245,19 +4560,34 @@ initialization
     pxmlSecHrefHmacMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacMd5'));
     pxmlSecHrefHmacRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacRipemd160'));
     pxmlSecHrefHmacSha1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacSha1'));
+    pxmlSecHrefHmacSha224 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacSha224'));
+    pxmlSecHrefHmacSha256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacSha256'));
+    pxmlSecHrefHmacSha384 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacSha384'));
+    pxmlSecHrefHmacSha512 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacSha512'));
     pxmlSecHrefKWAes128 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefKWAes128'));
     pxmlSecHrefKWAes192 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefKWAes192'));
     pxmlSecHrefKWAes256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefKWAes256'));
     pxmlSecHrefKWDes3 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefKWDes3'));
+    pxmlSecHrefMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefMd5'));
     pxmlSecHrefPGPData := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefPGPData'));
     pxmlSecHrefRSAKeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRSAKeyValue'));
     pxmlSecHrefRawX509Cert := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRawX509Cert'));
     pxmlSecHrefRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRipemd160'));
+    pxmlSecHrefRsaMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaMd5'));
     pxmlSecHrefRsaOaep := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaOaep'));
     pxmlSecHrefRsaPkcs1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaPkcs1'));
+    pxmlSecHrefRsaRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaRipemd160'));
     pxmlSecHrefRsaSha1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaSha1'));
+    pxmlSecHrefRsaSha224 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaSha224'));
+    pxmlSecHrefRsaSha256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaSha256'));
+    pxmlSecHrefRsaSha384 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaSha384'));
+    pxmlSecHrefRsaSha512 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefRsaSha512'));
     pxmlSecHrefSPKIData := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefSPKIData'));
     pxmlSecHrefSha1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefSha1'));
+    pxmlSecHrefSha224 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefSha224'));
+    pxmlSecHrefSha256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefSha256'));
+    pxmlSecHrefSha384 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefSha384'));
+    pxmlSecHrefSha512 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefSha512'));
     pxmlSecHrefX509Data := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefX509Data'));
     pxmlSecHrefXslt := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefXslt'));
     pxmlSecKeyBindingReasonIssuerTrust := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecKeyBindingReasonIssuerTrust'));
@@ -4289,23 +4619,38 @@ initialization
     pxmlSecNameHmacMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacMd5'));
     pxmlSecNameHmacRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacRipemd160'));
     pxmlSecNameHmacSha1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacSha1'));
+    pxmlSecNameHmacSha224 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacSha224'));
+    pxmlSecNameHmacSha256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacSha256'));
+    pxmlSecNameHmacSha384 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacSha384'));
+    pxmlSecNameHmacSha512 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacSha512'));
     pxmlSecNameKWAes128 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameKWAes128'));
     pxmlSecNameKWAes192 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameKWAes192'));
     pxmlSecNameKWAes256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameKWAes256'));
     pxmlSecNameKWDes3 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameKWDes3'));
     pxmlSecNameKeyName := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameKeyName'));
     pxmlSecNameKeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameKeyValue'));
+    pxmlSecNameMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameMd5'));
     pxmlSecNameMemBuf := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameMemBuf'));
     pxmlSecNamePGPData := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNamePGPData'));
     pxmlSecNameRSAKeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRSAKeyValue'));
     pxmlSecNameRawX509Cert := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRawX509Cert'));
     pxmlSecNameRetrievalMethod := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRetrievalMethod'));
     pxmlSecNameRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRipemd160'));
+    pxmlSecNameRsaMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaMd5'));
     pxmlSecNameRsaOaep := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaOaep'));
     pxmlSecNameRsaPkcs1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaPkcs1'));
+    pxmlSecNameRsaRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaRipemd160'));
     pxmlSecNameRsaSha1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaSha1'));
+    pxmlSecNameRsaSha224 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaSha224'));
+    pxmlSecNameRsaSha256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaSha256'));
+    pxmlSecNameRsaSha384 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaSha384'));
+    pxmlSecNameRsaSha512 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameRsaSha512'));
     pxmlSecNameSPKIData := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameSPKIData'));
     pxmlSecNameSha1 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameSha1'));
+    pxmlSecNameSha224 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameSha224'));
+    pxmlSecNameSha256 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameSha256'));
+    pxmlSecNameSha384 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameSha384'));
+    pxmlSecNameSha512 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameSha512'));
     pxmlSecNameX509Data := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameX509Data'));
     pxmlSecNameX509Store := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameX509Store'));
     pxmlSecNameXPath := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameXPath'));
@@ -4485,9 +4830,7 @@ initialization
     pxmlSecXkmsSoapFaultReasonUnsupportedVersion := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecXkmsSoapFaultReasonUnsupportedVersion'));
     pxmlSecXkmsSoapSubcodeValueBadMessage := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecXkmsSoapSubcodeValueBadMessage'));
     pxmlSecXkmsSoapSubcodeValueMessageNotSupported := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecXkmsSoapSubcodeValueMessageNotSupported'));
+    FreeLibrary(libHandle);
   end;
 
-finalization
-  if libHandle <> 0 then
-    FreeLibrary(libHandle);
 end.

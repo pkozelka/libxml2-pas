@@ -31,8 +31,8 @@ Mikhail Soukhanov <m.soukhanov@geosys.ru>
 
 VERSION COMPLIANCE
 ------------------
-libxml2: 2.6.19
-libxslt: 1.1.14
+libxml2: 2.6.22
+libxslt: 1.1.15
 libexslt: 0.8.12
 libxmlsec: 1.2.8
 

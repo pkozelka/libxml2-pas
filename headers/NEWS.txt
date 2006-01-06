@@ -1,22 +1,35 @@
 ********************************************************************
 *************************  LATEST CHANGES  *************************
 ********************************************************************
-libxml2-pas 2.6.19:
+libxml2-pas 2.6.22:
 --------------------
-libxslt-pas 1.1.14:
--------------------
-libexslt-pas 0.8.12:
--------------------
-libxmlsec-pas 1.2.8:
-- added support for libxmlsec (Eric Zurcher)
+- now uses xmlCharPtr for pointers to UTF-8 strings, rather than
+  PChar.
 
+libxslt-pas 1.1.15:
+-------------------
+[unchanged]
 ********************************************************************
 *************************  OLDER  CHANGES  *************************
 ********************************************************************
+libxml2-pas 2.6.19:
+--------------------
+
+libxslt-pas 1.1.14:
+-------------------
+
+libexslt-pas 0.8.12:
+-------------------
+
+libxmlsec-pas 1.2.8:
+- added support for libxmlsec (Eric Zurcher)
+
 libxml2-pas 2.6.17:
 --------------------
+
 libxslt-pas 1.1.12:
 -------------------
+
 libexslt-pas 0.8.10:
 -------------------
 - this release uses a totally different approach to generate the
