@@ -1,5 +1,5 @@
 {This file generated automatically from libxml2-api.xml}
-{For libxml2 version: 2.6.22}
+{For libxml2 version: 2.6.26}
 Unit libxml2;
 
 interface
@@ -46,8 +46,9 @@ type
       xmlBufferAllocationSchemePtr = ^xmlBufferAllocationScheme;
       xmlSAXHandlerPtrPtr = ^xmlSAXHandlerPtr;
       xmlExpNodePtrPtr = ^xmlExpNodePtr;
+      xmlSchemaAttributeLinkPtrPtr = ^xmlSchemaAttributeLinkPtr;
 
-          htmlParserOption = (
+      htmlParserOption = (
           HTML_PARSE_RECOVER = 1,
           HTML_PARSE_NOERROR = 32,
           HTML_PARSE_NOWARNING = 64,
@@ -841,6 +842,7 @@ type
           XML_SCHEMAV_CVC_TYPE_2 = 1876,
           XML_SCHEMAV_CVC_IDC = 1877,
           XML_SCHEMAV_CVC_WILDCARD = 1878,
+          XML_SCHEMAV_MISC = 1879,
           XML_XPTR_UNKNOWN_SCHEME = 1900,
           XML_XPTR_CHILDSEQ_START = 1901,
           XML_XPTR_EVAL_FAILED = 1902,
@@ -945,6 +947,11 @@ type
           XML_SCHEMAP_WARN_UNLOCATED_SCHEMA = 3084,
           XML_SCHEMAP_WARN_ATTR_REDECL_PROH = 3085,
           XML_SCHEMAP_WARN_ATTR_POINTLESS_PROH = 3086,
+          XML_SCHEMAP_AG_PROPS_CORRECT = 3087,
+          XML_SCHEMAP_COS_CT_EXTENDS_1_2 = 3088,
+          XML_SCHEMAP_AU_PROPS_CORRECT = 3089,
+          XML_SCHEMAP_A_PROPS_CORRECT_3 = 3090,
+          XML_SCHEMAP_COS_ALL_LIMITED = 3091,
           XML_MODULE_OPEN = 4900,
           XML_MODULE_CLOSE = 4901,
           XML_CHECK_FOUND_ELEMENT = 5000,
@@ -1167,6 +1174,7 @@ type
           XML_SCHEMA_TYPE_IDC_KEY = 23,
           XML_SCHEMA_TYPE_IDC_KEYREF = 24,
           XML_SCHEMA_TYPE_PARTICLE = 25,
+          XML_SCHEMA_TYPE_ATTRIBUTE_USE = 26,
           XML_SCHEMA_FACET_MININCLUSIVE = 1000,
           XML_SCHEMA_FACET_MINEXCLUSIVE = 1001,
           XML_SCHEMA_FACET_MAXINCLUSIVE = 1002,
@@ -1179,7 +1187,8 @@ type
           XML_SCHEMA_FACET_LENGTH = 1009,
           XML_SCHEMA_FACET_MAXLENGTH = 1010,
           XML_SCHEMA_FACET_MINLENGTH = 1011,
-          XML_SCHEMA_EXTRA_QNAMEREF = 2000);
+          XML_SCHEMA_EXTRA_QNAMEREF = 2000,
+          XML_SCHEMA_EXTRA_ATTR_USE_PROHIB = 2001);
 
       xmlSchemaValType = (
           XML_SCHEMAS_UNKNOWN = 0,
@@ -2197,7 +2206,7 @@ actually an xmlCharEncoding}
           name : xmlCharPtr; { schema name}
           targetNamespace : xmlCharPtr; { the target namespace}
           version : xmlCharPtr; {}
-          id : xmlCharPtr; {}
+          id : xmlCharPtr; { Obsolete}
           doc : xmlDocPtr; {}
           annot : xmlSchemaAnnotPtr; {}
           flags : Longint; {}
@@ -2213,8 +2222,8 @@ actually an xmlCharEncoding}
           includes : Pointer; { the includes, this is opaque for now}
           preserve : Longint; { whether to free the document}
           counter : Longint; { used to give ononymous components unique names}
-          idcDef : xmlHashTablePtr; {}
-          volatiles : Pointer; { Deprecated; not used anymore.}
+          idcDef : xmlHashTablePtr; { All identity-constraint defs.}
+          volatiles : Pointer; { Obsolete}
       end;
 
       xmlSchemaAnnot = record
@@ -2223,25 +2232,25 @@ actually an xmlCharEncoding}
       end;
 
       xmlSchemaAttribute = record
-          type_ : xmlSchemaTypeType; { The kind of type}
-          next : xmlSchemaAttributePtr; { the next attribute if in a group ...}
-          name : xmlCharPtr; { name of the declaration or empty if particle}
-          id : xmlCharPtr; {}
-          ref : xmlCharPtr; { the local name of the attribute decl. if a particle}
-          refNs : xmlCharPtr; { the ns URI of the attribute decl. if a particle}
+          type_ : xmlSchemaTypeType; {}
+          next : xmlSchemaAttributePtr; { the next attribute (not used?)}
+          name : xmlCharPtr; { the name of the declaration}
+          id : xmlCharPtr; { Deprecated; not used}
+          ref : xmlCharPtr; { Deprecated; not used}
+          refNs : xmlCharPtr; { Deprecated; not used}
           typeName : xmlCharPtr; { the local name of the type definition}
           typeNs : xmlCharPtr; { the ns URI of the type definition}
           annot : xmlSchemaAnnotPtr; {}
-          base : xmlSchemaTypePtr; { obsolete, not used}
-          occurs : Longint; {}
-          defValue : xmlCharPtr; {}
+          base : xmlSchemaTypePtr; { Deprecated; not used}
+          occurs : Longint; { Deprecated; not used}
+          defValue : xmlCharPtr; { The initial value of the value constraint}
           subtypes : xmlSchemaTypePtr; { the type definition}
           node : xmlNodePtr; {}
           targetNamespace : xmlCharPtr; {}
           flags : Longint; {}
-          refPrefix : xmlCharPtr; {}
-          defVal : xmlSchemaValPtr; {}
-          refDecl : xmlSchemaAttributePtr; {}
+          refPrefix : xmlCharPtr; { Deprecated; not used}
+          defVal : xmlSchemaValPtr; { The compiled value constraint}
+          refDecl : xmlSchemaAttributePtr; { Deprecated; not used}
       end;
 
       xmlSchemaAttributeGroup = record
@@ -2249,16 +2258,17 @@ actually an xmlCharEncoding}
           next : xmlSchemaAttributePtr; { the next attribute if in a group ...}
           name : xmlCharPtr; {}
           id : xmlCharPtr; {}
-          ref : xmlCharPtr; {}
-          refNs : xmlCharPtr; {}
+          ref : xmlCharPtr; { Deprecated; not used}
+          refNs : xmlCharPtr; { Deprecated; not used}
           annot : xmlSchemaAnnotPtr; {}
-          attributes : xmlSchemaAttributePtr; {}
+          attributes : xmlSchemaAttributePtr; { Deprecated; not used}
           node : xmlNodePtr; {}
           flags : Longint; {}
           attributeWildcard : xmlSchemaWildcardPtr; {}
-          refPrefix : xmlCharPtr; {}
-          refItem : xmlSchemaAttributeGroupPtr; { The referenced attribute group}
-          targetNamespace : xmlCharPtr; { xmlSchemaAttributeGroupPtr redef Redefinitions}
+          refPrefix : xmlCharPtr; { Deprecated; not used}
+          refItem : xmlSchemaAttributeGroupPtr; { Deprecated; not used}
+          targetNamespace : xmlCharPtr; {}
+          attrUses : Pointer; {}
       end;
 
       xmlSchemaAttributeLink = record
@@ -2268,17 +2278,17 @@ actually an xmlCharEncoding}
 
       xmlSchemaElement = record
           type_ : xmlSchemaTypeType; { The kind of type}
-          next : xmlSchemaTypePtr; { the next type if in a sequence ...}
+          next : xmlSchemaTypePtr; { Not used?}
           name : xmlCharPtr; {}
-          id : xmlCharPtr; {}
-          ref : xmlCharPtr; { the local name of the element declaration if a particle}
-          refNs : xmlCharPtr; { the ns URI of the element declaration if a particle}
+          id : xmlCharPtr; { Deprecated; not used}
+          ref : xmlCharPtr; { Deprecated; not used}
+          refNs : xmlCharPtr; { Deprecated; not used}
           annot : xmlSchemaAnnotPtr; {}
           subtypes : xmlSchemaTypePtr; { the type definition}
           attributes : xmlSchemaAttributePtr; {}
           node : xmlNodePtr; {}
-          minOccurs : Longint; {}
-          maxOccurs : Longint; {}
+          minOccurs : Longint; { Deprecated; not used}
+          maxOccurs : Longint; { Deprecated; not used}
           flags : Longint; {}
           targetNamespace : xmlCharPtr; {}
           namedType : xmlCharPtr; {}
@@ -2286,26 +2296,27 @@ actually an xmlCharEncoding}
           substGroup : xmlCharPtr; {}
           substGroupNs : xmlCharPtr; {}
           scope : xmlCharPtr; {}
-          value : xmlCharPtr; {}
-          refDecl : xmlSchemaElementPtr; { This will now be used for the substitution group affiliation}
-          contModel : xmlRegexpPtr; {}
+          value : xmlCharPtr; { The original value of the value constraint.}
+          refDecl : xmlSchemaElementPtr; { This will now be used for the
+substitution group affiliation}
+          contModel : xmlRegexpPtr; { Obsolete for WXS, maybe used for RelaxNG}
           contentType : xmlSchemaContentType; {}
-          refPrefix : xmlCharPtr; {}
-          defVal : xmlSchemaValPtr; {}
-          idcs : Pointer; {}
+          refPrefix : xmlCharPtr; { Deprecated; not used}
+          defVal : xmlSchemaValPtr; { The compiled value contraint.}
+          idcs : Pointer; { The identity-constraint defs}
       end;
 
       xmlSchemaFacet = record
           type_ : xmlSchemaTypeType; { The kind of type}
           next : xmlSchemaFacetPtr; { the next type if in a sequence ...}
-          value : xmlCharPtr; {}
-          id : xmlCharPtr; {}
+          value : xmlCharPtr; { The original value}
+          id : xmlCharPtr; { Obsolete}
           annot : xmlSchemaAnnotPtr; {}
           node : xmlNodePtr; {}
-          fixed : Longint; {}
+          fixed : Longint; { XML_SCHEMAS_FACET_PRESERVE, etc.}
           whitespace : Longint; {}
-          val : xmlSchemaValPtr; {}
-          regexp : xmlRegexpPtr; {}
+          val : xmlSchemaValPtr; { The compiled value}
+          regexp : xmlRegexpPtr; { The regex for patterns}
       end;
 
       xmlSchemaFacetLink = record
@@ -2331,37 +2342,38 @@ actually an xmlCharEncoding}
           type_ : xmlSchemaTypeType; { The kind of type}
           next : xmlSchemaTypePtr; { the next type if in a sequence ...}
           name : xmlCharPtr; {}
-          id : xmlCharPtr; {}
-          ref : xmlCharPtr; {}
-          refNs : xmlCharPtr; {}
+          id : xmlCharPtr; { Deprecated; not used}
+          ref : xmlCharPtr; { Deprecated; not used}
+          refNs : xmlCharPtr; { Deprecated; not used}
           annot : xmlSchemaAnnotPtr; {}
           subtypes : xmlSchemaTypePtr; {}
-          attributes : xmlSchemaAttributePtr; {}
+          attributes : xmlSchemaAttributePtr; { Deprecated; not used}
           node : xmlNodePtr; {}
-          minOccurs : Longint; {}
-          maxOccurs : Longint; {}
+          minOccurs : Longint; { Deprecated; not used}
+          maxOccurs : Longint; { Deprecated; not used}
           flags : Longint; {}
           contentType : xmlSchemaContentType; {}
-          base : xmlCharPtr; {}
-          baseNs : xmlCharPtr; {}
-          baseType : xmlSchemaTypePtr; {}
-          facets : xmlSchemaFacetPtr; {}
-          redef : xmlSchemaTypePtr; { possible redefinitions for the type}
-          recurse : Longint; {}
-          attributeUses : xmlSchemaAttributeLinkPtr; {}
+          base : xmlCharPtr; { Base type's local name}
+          baseNs : xmlCharPtr; { Base type's target namespace}
+          baseType : xmlSchemaTypePtr; { The base type component}
+          facets : xmlSchemaFacetPtr; { Local facets}
+          redef : xmlSchemaTypePtr; { Deprecated; not used}
+          recurse : Longint; { Obsolete}
+          attributeUses : xmlSchemaAttributeLinkPtrPtr; { Deprecated; not used}
           attributeWildcard : xmlSchemaWildcardPtr; {}
-          builtInType : Longint; {}
-          memberTypes : xmlSchemaTypeLinkPtr; {}
-          facetSet : xmlSchemaFacetLinkPtr; {}
-          refPrefix : xmlCharPtr; {}
-          contentTypeDef : xmlSchemaTypePtr; {}
-          contModel : xmlRegexpPtr; {}
+          builtInType : Longint; { Type of built-in types.}
+          memberTypes : xmlSchemaTypeLinkPtr; { member-types if a union type.}
+          facetSet : xmlSchemaFacetLinkPtr; { All facets (incl. inherited)}
+          refPrefix : xmlCharPtr; { Deprecated; not used}
+          contentTypeDef : xmlSchemaTypePtr; { Used for the simple content of complex types. Could we use @subtypes for this?}
+          contModel : xmlRegexpPtr; { Holds the automaton of the content model}
           targetNamespace : xmlCharPtr; {}
+          attrUses : Pointer; {}
       end;
 
       xmlSchemaTypeLink = record
           next : xmlSchemaTypeLinkPtr; { the next type link ...}
-          type_ : xmlSchemaTypePtr; { the linked typ}
+          type_ : xmlSchemaTypePtr; { the linked type}
       end;
 
       xmlSchemaVal = record
@@ -2372,11 +2384,11 @@ actually an xmlCharEncoding}
 
       xmlSchemaWildcard = record
           type_ : xmlSchemaTypeType; { The kind of type}
-          id : xmlCharPtr; {}
+          id : xmlCharPtr; { Deprecated; not used}
           annot : xmlSchemaAnnotPtr; {}
           node : xmlNodePtr; {}
-          minOccurs : Longint; {}
-          maxOccurs : Longint; {}
+          minOccurs : Longint; { Deprecated; not used}
+          maxOccurs : Longint; { Deprecated; not used}
           processContents : Longint; {}
           any : Longint; { Indicates if the ns constraint is of ##any}
           nsSet : xmlSchemaWildcardNsPtr; { The list of allowed namespaces}
@@ -2590,7 +2602,8 @@ actually an xmlCharEncoding}
           lastError : xmlError; { the last error}
           debugNode : xmlNodePtr; { the source node XSLT dictionnary}
           dict : xmlDictPtr; { dictionnary if any}
-          flags : Longint; { flags to control compilation}
+          flags : Longint; { flags to control compilation Cache for reusal of XPath objects}
+          cache : Pointer; {}
       end;
 
       xmlXPathFunct = record
@@ -2712,6 +2725,7 @@ actually an xmlCharEncoding}
   procedure htmlDocContentDumpOutput (buf: xmlOutputBufferPtr; cur: xmlDocPtr; const encoding: PChar); cdecl; external LIBXML2_SO;
   function htmlDocDump (f: PFILE; cur: xmlDocPtr) : Longint; cdecl; external LIBXML2_SO;
   procedure htmlDocDumpMemory (cur: xmlDocPtr; mem: xmlCharPtrPtr; size: PInteger); cdecl; external LIBXML2_SO;
+  procedure htmlDocDumpMemoryFormat (cur: xmlDocPtr; mem: xmlCharPtrPtr; size: PInteger; format: Longint); cdecl; external LIBXML2_SO;
   function htmlElementAllowedHere (const parent: htmlElemDescPtr; const elt: xmlCharPtr) : Longint; cdecl; external LIBXML2_SO;
   function htmlElementStatusHere (const parent: htmlElemDescPtr; const elt: htmlElemDescPtr) : htmlStatus; cdecl; external LIBXML2_SO;
   function htmlEncodeEntities (out_: PByte; outlen: PInteger; const in_: PByte; inlen: PInteger; quoteChar: Longint) : Longint; cdecl; external LIBXML2_SO;
@@ -2936,6 +2950,7 @@ actually an xmlCharEncoding}
   function xmlCtxtUseOptions (ctxt: xmlParserCtxtPtr; options: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlCurrentChar (ctxt: xmlParserCtxtPtr; len: PInteger) : Longint; cdecl; external LIBXML2_SO;
   function xmlDOMWrapAdoptNode (ctxt: xmlDOMWrapCtxtPtr; sourceDoc: xmlDocPtr; node: xmlNodePtr; destDoc: xmlDocPtr; destParent: xmlNodePtr; options: Longint) : Longint; cdecl; external LIBXML2_SO;
+  function xmlDOMWrapCloneNode (ctxt: xmlDOMWrapCtxtPtr; sourceDoc: xmlDocPtr; node: xmlNodePtr; resNode: xmlNodePtrPtr; destDoc: xmlDocPtr; destParent: xmlNodePtr; deep: Longint; options: Longint) : Longint; cdecl; external LIBXML2_SO;
   procedure xmlDOMWrapFreeCtxt (ctxt: xmlDOMWrapCtxtPtr); cdecl; external LIBXML2_SO;
   function xmlDOMWrapNewCtxt () : xmlDOMWrapCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlDOMWrapReconcileNamespaces (ctxt: xmlDOMWrapCtxtPtr; elem: xmlNodePtr; options: Longint) : Longint; cdecl; external LIBXML2_SO;
@@ -2995,8 +3010,8 @@ actually an xmlCharEncoding}
   function xmlExpExpDerive (ctxt: xmlExpCtxtPtr; exp: xmlExpNodePtr; sub: xmlExpNodePtr) : xmlExpNodePtr; cdecl; external LIBXML2_SO;
   procedure xmlExpFree (ctxt: xmlExpCtxtPtr; exp: xmlExpNodePtr); cdecl; external LIBXML2_SO;
   procedure xmlExpFreeCtxt (ctxt: xmlExpCtxtPtr); cdecl; external LIBXML2_SO;
-  function xmlExpGetLanguage (ctxt: xmlExpCtxtPtr; exp: xmlExpNodePtr; const list: xmlCharPtrPtr; len: Longint) : Longint; cdecl; external LIBXML2_SO;
-  function xmlExpGetStart (ctxt: xmlExpCtxtPtr; exp: xmlExpNodePtr; const list: xmlCharPtrPtr; len: Longint) : Longint; cdecl; external LIBXML2_SO;
+  function xmlExpGetLanguage (ctxt: xmlExpCtxtPtr; exp: xmlExpNodePtr; const langList: xmlCharPtrPtr; len: Longint) : Longint; cdecl; external LIBXML2_SO;
+  function xmlExpGetStart (ctxt: xmlExpCtxtPtr; exp: xmlExpNodePtr; const tokList: xmlCharPtrPtr; len: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlExpIsNillable (exp: xmlExpNodePtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlExpMaxToken (expr: xmlExpNodePtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlExpNewAtom (ctxt: xmlExpCtxtPtr; const name: xmlCharPtr; len: Longint) : xmlExpNodePtr; cdecl; external LIBXML2_SO;
@@ -3311,6 +3326,7 @@ actually an xmlCharEncoding}
   function xmlNormalizeURIPath (path: PChar) : Longint; cdecl; external LIBXML2_SO;
   function xmlNormalizeWindowsPath (const path: xmlCharPtr) : xmlCharPtr; cdecl; external LIBXML2_SO;
   function xmlOutputBufferClose (out_: xmlOutputBufferPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlOutputBufferCreateBuffer (buffer: xmlBufferPtr; encoder: xmlCharEncodingHandlerPtr) : xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
   function xmlOutputBufferCreateFd (fd: Longint; encoder: xmlCharEncodingHandlerPtr) : xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
   function xmlOutputBufferCreateFile (file_: PFILE; encoder: xmlCharEncodingHandlerPtr) : xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
   function xmlOutputBufferCreateFilename (const URI: PChar; encoder: xmlCharEncodingHandlerPtr; compression: Longint) : xmlOutputBufferPtr; cdecl; external LIBXML2_SO;
@@ -3478,6 +3494,7 @@ actually an xmlCharEncoding}
   function xmlRelaxNGNewValidCtxt (schema: xmlRelaxNGPtr) : xmlRelaxNGValidCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlRelaxNGParse (ctxt: xmlRelaxNGParserCtxtPtr) : xmlRelaxNGPtr; cdecl; external LIBXML2_SO;
   procedure xmlRelaxNGSetParserErrors (ctxt: xmlRelaxNGParserCtxtPtr; err: xmlRelaxNGValidityErrorFunc; warn: xmlRelaxNGValidityWarningFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
+  procedure xmlRelaxNGSetParserStructuredErrors (ctxt: xmlRelaxNGParserCtxtPtr; serror: xmlStructuredErrorFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
   procedure xmlRelaxNGSetValidErrors (ctxt: xmlRelaxNGValidCtxtPtr; err: xmlRelaxNGValidityErrorFunc; warn: xmlRelaxNGValidityWarningFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
   procedure xmlRelaxNGSetValidStructuredErrors (ctxt: xmlRelaxNGValidCtxtPtr; serror: xmlStructuredErrorFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
   function xmlRelaxNGValidateDoc (ctxt: xmlRelaxNGValidCtxtPtr; doc: xmlDocPtr) : Longint; cdecl; external LIBXML2_SO;
@@ -3547,6 +3564,7 @@ actually an xmlCharEncoding}
   function xmlSaveFormatFileTo (buf: xmlOutputBufferPtr; cur: xmlDocPtr; const encoding: PChar; format: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlSaveSetAttrEscape (ctxt: xmlSaveCtxtPtr; escape: xmlCharEncodingOutputFunc) : Longint; cdecl; external LIBXML2_SO;
   function xmlSaveSetEscape (ctxt: xmlSaveCtxtPtr; escape: xmlCharEncodingOutputFunc) : Longint; cdecl; external LIBXML2_SO;
+  function xmlSaveToBuffer (buffer: xmlBufferPtr; const encoding: PChar; options: Longint) : xmlSaveCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlSaveToFd (fd: Longint; const encoding: PChar; options: Longint) : xmlSaveCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlSaveToFilename (const filename: PChar; const encoding: PChar; options: Longint) : xmlSaveCtxtPtr; cdecl; external LIBXML2_SO;
   function xmlSaveToIO (iowrite: xmlOutputWriteCallback; ioclose: xmlOutputCloseCallback; ioctx: Pointer; const encoding: PChar; options: Longint) : xmlSaveCtxtPtr; cdecl; external LIBXML2_SO;
@@ -3591,13 +3609,14 @@ actually an xmlCharEncoding}
   function xmlSchemaSAXPlug (ctxt: xmlSchemaValidCtxtPtr; sax: xmlSAXHandlerPtrPtr; user_data: PPointer) : xmlSchemaSAXPlugPtr; cdecl; external LIBXML2_SO;
   function xmlSchemaSAXUnplug (plug: xmlSchemaSAXPlugPtr) : Longint; cdecl; external LIBXML2_SO;
   procedure xmlSchemaSetParserErrors (ctxt: xmlSchemaParserCtxtPtr; err: xmlSchemaValidityErrorFunc; warn: xmlSchemaValidityWarningFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
+  procedure xmlSchemaSetParserStructuredErrors (ctxt: xmlSchemaParserCtxtPtr; serror: xmlStructuredErrorFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
   procedure xmlSchemaSetValidErrors (ctxt: xmlSchemaValidCtxtPtr; err: xmlSchemaValidityErrorFunc; warn: xmlSchemaValidityWarningFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
   function xmlSchemaSetValidOptions (ctxt: xmlSchemaValidCtxtPtr; options: Longint) : Longint; cdecl; external LIBXML2_SO;
   procedure xmlSchemaSetValidStructuredErrors (ctxt: xmlSchemaValidCtxtPtr; serror: xmlStructuredErrorFunc; ctx: Pointer); cdecl; external LIBXML2_SO;
   function xmlSchemaValPredefTypeNode (type_: xmlSchemaTypePtr; const value: xmlCharPtr; val: xmlSchemaValPtrPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValPredefTypeNodeNoNorm (type_: xmlSchemaTypePtr; const value: xmlCharPtr; val: xmlSchemaValPtrPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidCtxtGetOptions (ctxt: xmlSchemaValidCtxtPtr) : Longint; cdecl; external LIBXML2_SO;
-  function xmlSchemaValidateDoc (ctxt: xmlSchemaValidCtxtPtr; doc: xmlDocPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlSchemaValidateDoc (ctxt: xmlSchemaValidCtxtPtr; instance: xmlDocPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateFacet (base: xmlSchemaTypePtr; facet: xmlSchemaFacetPtr; const value: xmlCharPtr; val: xmlSchemaValPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateFacetWhtsp (facet: xmlSchemaFacetPtr; fws: xmlSchemaWhitespaceValueType; valType: xmlSchemaValType; const value: xmlCharPtr; val: xmlSchemaValPtr; ws: xmlSchemaWhitespaceValueType) : Longint; cdecl; external LIBXML2_SO;
   function xmlSchemaValidateFile (ctxt: xmlSchemaValidCtxtPtr; const filename: PChar; options: Longint) : Longint; cdecl; external LIBXML2_SO;
@@ -3671,6 +3690,8 @@ actually an xmlCharEncoding}
   function xmlStreamPop (stream: xmlStreamCtxtPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlStreamPush (stream: xmlStreamCtxtPtr; const name: xmlCharPtr; const ns: xmlCharPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlStreamPushAttr (stream: xmlStreamCtxtPtr; const name: xmlCharPtr; const ns: xmlCharPtr) : Longint; cdecl; external LIBXML2_SO;
+  function xmlStreamPushNode (stream: xmlStreamCtxtPtr; const name: xmlCharPtr; const ns: xmlCharPtr; nodeType: Longint) : Longint; cdecl; external LIBXML2_SO;
+  function xmlStreamWantsAnyNode (streamCtxt: xmlStreamCtxtPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlStringCurrentChar (ctxt: xmlParserCtxtPtr; const cur: xmlCharPtr; len: PInteger) : Longint; cdecl; external LIBXML2_SO;
   function xmlStringDecodeEntities (ctxt: xmlParserCtxtPtr; const str: xmlCharPtr; what: Longint; end_: xmlChar; end2: xmlChar; end3: xmlChar) : xmlCharPtr; cdecl; external LIBXML2_SO;
   function xmlStringGetNodeList (doc: xmlDocPtr; const value: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXML2_SO;
@@ -3751,6 +3772,7 @@ actually an xmlCharEncoding}
   function xmlTextReaderRelaxNGSetSchema (reader: xmlTextReaderPtr; schema: xmlRelaxNGPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlTextReaderRelaxNGValidate (reader: xmlTextReaderPtr; const rng: PChar) : Longint; cdecl; external LIBXML2_SO;
   function xmlTextReaderSchemaValidate (reader: xmlTextReaderPtr; const xsd: PChar) : Longint; cdecl; external LIBXML2_SO;
+  function xmlTextReaderSchemaValidateCtxt (reader: xmlTextReaderPtr; ctxt: xmlSchemaValidCtxtPtr; options: Longint) : Longint; cdecl; external LIBXML2_SO;
   procedure xmlTextReaderSetErrorHandler (reader: xmlTextReaderPtr; f: xmlTextReaderErrorFunc; arg: Pointer); cdecl; external LIBXML2_SO;
   function xmlTextReaderSetParserProp (reader: xmlTextReaderPtr; prop: Longint; value: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlTextReaderSetSchema (reader: xmlTextReaderPtr; schema: xmlSchemaPtr) : Longint; cdecl; external LIBXML2_SO;
@@ -4032,7 +4054,7 @@ actually an xmlCharEncoding}
   function xmlUnsetProp (node: xmlNodePtr; const name: xmlCharPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlValidBuildContentModel (ctxt: xmlValidCtxtPtr; elem: xmlElementPtr) : Longint; cdecl; external LIBXML2_SO;
   function xmlValidCtxtNormalizeAttributeValue (ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; elem: xmlNodePtr; const name: xmlCharPtr; const value: xmlCharPtr) : xmlCharPtr; cdecl; external LIBXML2_SO;
-  function xmlValidGetPotentialChildren (ctree: xmlElementContentPtr; const list: xmlCharPtrPtr; len: PInteger; max: Longint) : Longint; cdecl; external LIBXML2_SO;
+  function xmlValidGetPotentialChildren (ctree: xmlElementContentPtr; const names: xmlCharPtrPtr; len: PInteger; max: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlValidGetValidElements (prev: xmlNodePtr; next: xmlNodePtr; const names: xmlCharPtrPtr; max: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlValidNormalizeAttributeValue (doc: xmlDocPtr; elem: xmlNodePtr; const name: xmlCharPtr; const value: xmlCharPtr) : xmlCharPtr; cdecl; external LIBXML2_SO;
   function xmlValidateAttributeDecl (ctxt: xmlValidCtxtPtr; doc: xmlDocPtr; attr: xmlAttributePtr) : Longint; cdecl; external LIBXML2_SO;
@@ -4091,6 +4113,7 @@ actually an xmlCharEncoding}
   function xmlXPathCompiledEval (comp: xmlXPathCompExprPtr; ctx: xmlXPathContextPtr) : xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
   procedure xmlXPathConcatFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXML2_SO;
   procedure xmlXPathContainsFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXML2_SO;
+  function xmlXPathContextSetCache (ctxt: xmlXPathContextPtr; active: Longint; value: Longint; options: Longint) : Longint; cdecl; external LIBXML2_SO;
   function xmlXPathConvertBoolean (val: xmlXPathObjectPtr) : xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
   function xmlXPathConvertNumber (val: xmlXPathObjectPtr) : xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
   function xmlXPathConvertString (val: xmlXPathObjectPtr) : xmlXPathObjectPtr; cdecl; external LIBXML2_SO;
