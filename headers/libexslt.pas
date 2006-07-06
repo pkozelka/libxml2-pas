@@ -1,5 +1,5 @@
 {This file generated automatically from libexslt-api.xml}
-{For libexslt version: 0.8.12}
+{For libexslt version: 0.8.13}
 Unit libexslt;
 
 interface
