@@ -1,5 +1,5 @@
 {This file generated (mostly) automatically from libxmlsec-api.xml}
-{For libxmlsec version: 1.2.9}
+{For libxmlsec version: 1.2.10}
 Unit libxmlsec;
 
 interface
@@ -375,6 +375,7 @@ type
           keyDataAesGetKlass : xmlSecCryptoKeyDataGetKlassMethod; {}
           keyDataDesGetKlass : xmlSecCryptoKeyDataGetKlassMethod; {}
           keyDataDsaGetKlass : xmlSecCryptoKeyDataGetKlassMethod; {}
+          keyDataGost2001GetKlass : xmlSecCryptoKeyDataGetKlassMethod; {}
           keyDataHmacGetKlass : xmlSecCryptoKeyDataGetKlassMethod; {}
           keyDataRsaGetKlass : xmlSecCryptoKeyDataGetKlassMethod; {}
           keyDataX509GetKlass : xmlSecCryptoKeyDataGetKlassMethod; {}
@@ -393,6 +394,7 @@ type
           transformDes3CbcGetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformKWDes3GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformDsaSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformGost2001GostR3411_94GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformHmacMd5GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformHmacRipemd160GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformHmacSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
@@ -411,6 +413,7 @@ type
           transformRsaSha512GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformRsaPkcs1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformRsaOaepGetKlass : xmlSecCryptoTransformGetKlassMethod; {}
+          transformGostR3411_94GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformSha1GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformSha224GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
           transformSha256GetKlass : xmlSecCryptoTransformGetKlassMethod; {}
@@ -962,6 +965,7 @@ type
   function xmlSecKeyDataGetIdentifier (data: xmlSecKeyDataPtr) : xmlCharPtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecKeyDataGetSize (data: xmlSecKeyDataPtr) : xmlSecSize; cdecl; external LIBXMLSEC_SO;
   function xmlSecKeyDataGetType (data: xmlSecKeyDataPtr) : xmlSecKeyDataType; cdecl; external LIBXMLSEC_SO;
+  function xmlSecKeyDataGost2001GetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
   function xmlSecKeyDataHmacGetKlass () : xmlSecKeyDataId; cdecl; external LIBXMLSEC_SO;
   procedure xmlSecKeyDataIdListDebugDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
   procedure xmlSecKeyDataIdListDebugXmlDump (list: xmlSecPtrListPtr; output: PFILE); cdecl; external LIBXMLSEC_SO;
@@ -1164,6 +1168,8 @@ type
   function xmlSecTmplX509DataAddIssuerSerial (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTmplX509DataAddSKI (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTmplX509DataAddSubjectName (x509DataNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplX509IssuerSerialAddIssuerName (x509IssuerSerialNode: xmlNodePtr; const issuerName: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplX509IssuerSerialAddSerialNumber (x509IssuerSerialNode: xmlNodePtr; const serial: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformAes128CbcGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformAes192CbcGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformAes256CbcGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
@@ -1208,6 +1214,8 @@ type
   function xmlSecTransformExclC14NWithCommentsGetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformExecute (transform: xmlSecTransformPtr; last: Longint; transformCtx: xmlSecTransformCtxPtr) : Longint; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformGetDataType (transform: xmlSecTransformPtr; mode: xmlSecTransformMode; transformCtx: xmlSecTransformCtxPtr) : xmlSecTransformDataType; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformGost2001GostR3411_94GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTransformGostR3411_94GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformHmacMd5GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformHmacRipemd160GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
   function xmlSecTransformHmacSha1GetKlass () : xmlSecTransformId; cdecl; external LIBXMLSEC_SO;
@@ -1377,6 +1385,9 @@ type
   function xmlSecHrefEnveloped(): xmlCharPtr; cdecl;
   function xmlSecHrefExcC14N(): xmlCharPtr; cdecl;
   function xmlSecHrefExcC14NWithComments(): xmlCharPtr; cdecl;
+  function xmlSecHrefGOST2001KeyValue(): xmlCharPtr; cdecl;
+  function xmlSecHrefGost2001GostR3411_94(): xmlCharPtr; cdecl;
+  function xmlSecHrefGostR3411_94(): xmlCharPtr; cdecl;
   function xmlSecHrefHMACKeyValue(): xmlCharPtr; cdecl;
   function xmlSecHrefHmacMd5(): xmlCharPtr; cdecl;
   function xmlSecHrefHmacRipemd160(): xmlCharPtr; cdecl;
@@ -1436,6 +1447,9 @@ type
   function xmlSecNameEnveloped(): xmlCharPtr; cdecl;
   function xmlSecNameExcC14N(): xmlCharPtr; cdecl;
   function xmlSecNameExcC14NWithComments(): xmlCharPtr; cdecl;
+  function xmlSecNameGOST2001KeyValue(): xmlCharPtr; cdecl;
+  function xmlSecNameGost2001GostR3411_94(): xmlCharPtr; cdecl;
+  function xmlSecNameGostR3411_94(): xmlCharPtr; cdecl;
   function xmlSecNameHMACKeyValue(): xmlCharPtr; cdecl;
   function xmlSecNameHmacMd5(): xmlCharPtr; cdecl;
   function xmlSecNameHmacRipemd160(): xmlCharPtr; cdecl;
@@ -1513,6 +1527,7 @@ type
   function xmlSecNodeFaultCode(): xmlCharPtr; cdecl;
   function xmlSecNodeFaultDetail(): xmlCharPtr; cdecl;
   function xmlSecNodeFaultString(): xmlCharPtr; cdecl;
+  function xmlSecNodeGOST2001KeyValue(): xmlCharPtr; cdecl;
   function xmlSecNodeHMACKeyValue(): xmlCharPtr; cdecl;
   function xmlSecNodeHMACOutputLength(): xmlCharPtr; cdecl;
   function xmlSecNodeHeader(): xmlCharPtr; cdecl;
@@ -2037,6 +2052,33 @@ function xmlSecHrefExcC14NWithComments: xmlCharPtr;
 begin
   CheckForNil(pxmlSecHrefExcC14NWithComments, 'xmlSecHrefExcC14NWithComments');
   Result := pxmlSecHrefExcC14NWithComments;
+end;
+
+var
+   pxmlSecHrefGOST2001KeyValue: xmlCharPtr;
+
+function xmlSecHrefGOST2001KeyValue: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefGOST2001KeyValue, 'xmlSecHrefGOST2001KeyValue');
+  Result := pxmlSecHrefGOST2001KeyValue;
+end;
+
+var
+   pxmlSecHrefGost2001GostR3411_94: xmlCharPtr;
+
+function xmlSecHrefGost2001GostR3411_94: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefGost2001GostR3411_94, 'xmlSecHrefGost2001GostR3411_94');
+  Result := pxmlSecHrefGost2001GostR3411_94;
+end;
+
+var
+   pxmlSecHrefGostR3411_94: xmlCharPtr;
+
+function xmlSecHrefGostR3411_94: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecHrefGostR3411_94, 'xmlSecHrefGostR3411_94');
+  Result := pxmlSecHrefGostR3411_94;
 end;
 
 var
@@ -2568,6 +2610,33 @@ function xmlSecNameExcC14NWithComments: xmlCharPtr;
 begin
   CheckForNil(pxmlSecNameExcC14NWithComments, 'xmlSecNameExcC14NWithComments');
   Result := pxmlSecNameExcC14NWithComments;
+end;
+
+var
+   pxmlSecNameGOST2001KeyValue: xmlCharPtr;
+
+function xmlSecNameGOST2001KeyValue: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameGOST2001KeyValue, 'xmlSecNameGOST2001KeyValue');
+  Result := pxmlSecNameGOST2001KeyValue;
+end;
+
+var
+   pxmlSecNameGost2001GostR3411_94: xmlCharPtr;
+
+function xmlSecNameGost2001GostR3411_94: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameGost2001GostR3411_94, 'xmlSecNameGost2001GostR3411_94');
+  Result := pxmlSecNameGost2001GostR3411_94;
+end;
+
+var
+   pxmlSecNameGostR3411_94: xmlCharPtr;
+
+function xmlSecNameGostR3411_94: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNameGostR3411_94, 'xmlSecNameGostR3411_94');
+  Result := pxmlSecNameGostR3411_94;
 end;
 
 var
@@ -3261,6 +3330,15 @@ function xmlSecNodeFaultString: xmlCharPtr;
 begin
   CheckForNil(pxmlSecNodeFaultString, 'xmlSecNodeFaultString');
   Result := pxmlSecNodeFaultString;
+end;
+
+var
+   pxmlSecNodeGOST2001KeyValue: xmlCharPtr;
+
+function xmlSecNodeGOST2001KeyValue: xmlCharPtr;
+begin
+  CheckForNil(pxmlSecNodeGOST2001KeyValue, 'xmlSecNodeGOST2001KeyValue');
+  Result := pxmlSecNodeGOST2001KeyValue;
 end;
 
 var
@@ -4556,6 +4634,9 @@ initialization
     pxmlSecHrefEnveloped := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefEnveloped'));
     pxmlSecHrefExcC14N := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefExcC14N'));
     pxmlSecHrefExcC14NWithComments := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefExcC14NWithComments'));
+    pxmlSecHrefGOST2001KeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefGOST2001KeyValue'));
+    pxmlSecHrefGost2001GostR3411_94 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefGost2001GostR3411_94'));
+    pxmlSecHrefGostR3411_94 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefGostR3411_94'));
     pxmlSecHrefHMACKeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHMACKeyValue'));
     pxmlSecHrefHmacMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacMd5'));
     pxmlSecHrefHmacRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecHrefHmacRipemd160'));
@@ -4615,6 +4696,9 @@ initialization
     pxmlSecNameEnveloped := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameEnveloped'));
     pxmlSecNameExcC14N := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameExcC14N'));
     pxmlSecNameExcC14NWithComments := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameExcC14NWithComments'));
+    pxmlSecNameGOST2001KeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameGOST2001KeyValue'));
+    pxmlSecNameGost2001GostR3411_94 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameGost2001GostR3411_94'));
+    pxmlSecNameGostR3411_94 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameGostR3411_94'));
     pxmlSecNameHMACKeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHMACKeyValue'));
     pxmlSecNameHmacMd5 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacMd5'));
     pxmlSecNameHmacRipemd160 := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNameHmacRipemd160'));
@@ -4692,6 +4776,7 @@ initialization
     pxmlSecNodeFaultCode := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNodeFaultCode'));
     pxmlSecNodeFaultDetail := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNodeFaultDetail'));
     pxmlSecNodeFaultString := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNodeFaultString'));
+    pxmlSecNodeGOST2001KeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNodeGOST2001KeyValue'));
     pxmlSecNodeHMACKeyValue := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNodeHMACKeyValue'));
     pxmlSecNodeHMACOutputLength := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNodeHMACOutputLength'));
     pxmlSecNodeHeader := xmlCharPtr(GetProcAddress(libHandle, 'xmlSecNodeHeader'));
