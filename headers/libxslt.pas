@@ -1,5 +1,5 @@
 {This file generated automatically from libxslt-api.xml}
-{For libxslt version: 1.1.17}
+{For libxslt version: 1.1.24}
 Unit libxslt;
 
 interface
@@ -55,6 +55,10 @@ type
           XSLT_TRACE_KEYS = 32768,
           XSLT_TRACE_VARIABLES = 65536);
 
+      xsltErrorSeverityType = (
+          XSLT_ERROR_SEVERITY_ERROR = 0,
+          XSLT_ERROR_SEVERITY_WARNING = 1);
+
       xsltLoadType = (
           XSLT_LOAD_START = 0,
           XSLT_LOAD_STYLESHEET = 1,
@@ -94,7 +98,14 @@ type
           XSLT_FUNC_PARAM = 19,
           XSLT_FUNC_VARIABLE = 20,
           XSLT_FUNC_WHEN = 21,
-          XSLT_FUNC_EXTENSION = 22);
+          XSLT_FUNC_EXTENSION = 22,
+          XSLT_FUNC_OTHERWISE = 23,
+          XSLT_FUNC_FALLBACK = 24,
+          XSLT_FUNC_MESSAGE = 25,
+          XSLT_FUNC_INCLUDE = 26,
+          XSLT_FUNC_ATTRSET = 27,
+          XSLT_FUNC_LITERAL_RESULT_ELEMENT = 28,
+          XSLT_FUNC_UNKOWN_FORWARDS_COMPAT = 29);
 
       xsltTransformState = (
           XSLT_STATE_OK = 0,
@@ -102,18 +113,62 @@ type
           XSLT_STATE_STOPPED = 2);
 
        xsltCompMatchPtr = ^xsltCompMatch;
+       xsltCompilerCtxtPtr = ^xsltCompilerCtxt;
+       xsltCompilerNodeInfoPtr = ^xsltCompilerNodeInfo;
        xsltDecimalFormatPtr = ^xsltDecimalFormat;
        xsltDocumentPtr = ^xsltDocument;
+       xsltEffectiveNsPtr = ^xsltEffectiveNs;
        xsltElemPreCompPtr = ^xsltElemPreComp;
        xsltFormatNumberInfoPtr = ^xsltFormatNumberInfo;
+       xsltKeyDefPtr = ^xsltKeyDef;
+       xsltKeyTablePtr = ^xsltKeyTable;
+       xsltNsAliasPtr = ^xsltNsAlias;
+       xsltNsListContainerPtr = ^xsltNsListContainer;
+       xsltNsListPtr = ^xsltNsList;
+       xsltNsMapPtr = ^xsltNsMap;
        xsltNumberDataPtr = ^xsltNumberData;
+       xsltPointerListPtr = ^xsltPointerList;
+       xsltPrincipalStylesheetDataPtr = ^xsltPrincipalStylesheetData;
        xsltRuntimeExtraPtr = ^xsltRuntimeExtra;
        xsltSecurityPrefsPtr = ^xsltSecurityPrefs;
        xsltStackElemPtr = ^xsltStackElem;
+       xsltStyleBasicEmptyItemPtr = ^xsltStyleBasicEmptyItem;
+       xsltStyleBasicExpressionItemPtr = ^xsltStyleBasicExpressionItem;
+       xsltStyleBasicItemVariablePtr = ^xsltStyleBasicItemVariable;
+       xsltStyleItemApplyImportsPtr = ^xsltStyleItemApplyImports;
+       xsltStyleItemApplyTemplatesPtr = ^xsltStyleItemApplyTemplates;
+       xsltStyleItemAttributePtr = ^xsltStyleItemAttribute;
+       xsltStyleItemCallTemplatePtr = ^xsltStyleItemCallTemplate;
+       xsltStyleItemChoosePtr = ^xsltStyleItemChoose;
+       xsltStyleItemCommentPtr = ^xsltStyleItemComment;
+       xsltStyleItemCopyOfPtr = ^xsltStyleItemCopyOf;
+       xsltStyleItemCopyPtr = ^xsltStyleItemCopy;
+       xsltStyleItemDocumentPtr = ^xsltStyleItemDocument;
+       xsltStyleItemElementPtr = ^xsltStyleItemElement;
+       xsltStyleItemExtElementPtr = ^xsltStyleItemExtElement;
+       xsltStyleItemFallbackPtr = ^xsltStyleItemFallback;
+       xsltStyleItemForEachPtr = ^xsltStyleItemForEach;
+       xsltStyleItemIfPtr = ^xsltStyleItemIf;
+       xsltStyleItemIncludePtr = ^xsltStyleItemInclude;
+       xsltStyleItemLRElementInfoPtr = ^xsltStyleItemLRElementInfo;
+       xsltStyleItemMessagePtr = ^xsltStyleItemMessage;
+       xsltStyleItemNumberPtr = ^xsltStyleItemNumber;
+       xsltStyleItemOtherwisePtr = ^xsltStyleItemOtherwise;
+       xsltStyleItemPIPtr = ^xsltStyleItemPI;
+       xsltStyleItemParamPtr = ^xsltStyleItemParam;
+       xsltStyleItemSortPtr = ^xsltStyleItemSort;
+       xsltStyleItemTextPtr = ^xsltStyleItemText;
+       xsltStyleItemUknownPtr = ^xsltStyleItemUknown;
+       xsltStyleItemValueOfPtr = ^xsltStyleItemValueOf;
+       xsltStyleItemVariablePtr = ^xsltStyleItemVariable;
+       xsltStyleItemWhenPtr = ^xsltStyleItemWhen;
+       xsltStyleItemWithParamPtr = ^xsltStyleItemWithParam;
        xsltStylePreCompPtr = ^xsltStylePreComp;
        xsltStylesheetPtr = ^xsltStylesheet;
        xsltTemplatePtr = ^xsltTemplate;
+       xsltTransformCachePtr = ^xsltTransformCache;
        xsltTransformContextPtr = ^xsltTransformContext;
+       xsltVarInfoPtr = ^xsltVarInfo;
       xsltAddCallCallback = function  (templ: xsltTemplatePtr; source: xmlNodePtr) : Longint; cdecl;
         xsltAddCallCallbackPtr = ^xsltAddCallCallback;
 
@@ -159,6 +214,68 @@ type
       xsltCompMatch = record
       end;
 
+      xsltCompilerCtxt = record
+          errorCtxt : Pointer; {* used for error/warning reports; e.g. XSLT_ERROR_SEVERITY_WARNING}
+          errSeverity : xsltErrorSeverityType; {}
+          warnings : Longint; { TODO: number of warnings found at
+compilation}
+          errors : Longint; { TODO: number of errors found at
+compilation}
+          dict : xmlDictPtr; {}
+          style : xsltStylesheetPtr; {}
+          simplified : Longint; { whether this is a simplified stylesheet TODO: structured/unstructured error contexts.}
+          depth : Longint; { Current depth of processing}
+          inode : xsltCompilerNodeInfoPtr; {}
+          inodeList : xsltCompilerNodeInfoPtr; {}
+          inodeLast : xsltCompilerNodeInfoPtr; {}
+          tmpList : xsltPointerListPtr; {* The XSLT version as specified by the stylesheet's root element.
+*}
+          isInclude : Longint; {}
+          hasForwardsCompat : Longint; { whether forwards-compatible mode was used
+in a parsing episode}
+          maxNodeInfos : Longint; { TEMP TODO: just for the interest}
+          maxLREs : Longint; {* In order to keep the old behaviour, applying strict rules of
+* the spec can be turned off. This has effect only on special
+* mechanisms like whitespace-stripping in the stylesheet.
+*}
+          strict_ : Longint; {}
+          psData : xsltPrincipalStylesheetDataPtr; {}
+          xpathCtxt : xmlXPathContextPtr; {}
+          unknownItem : xsltStyleItemUknownPtr; {}
+          hasNsAliases : Longint; { Indicator if there was an xsl:namespace-alias.}
+          nsAliases : xsltNsAliasPtr; {}
+          ivars : xsltVarInfoPtr; { Storage of local in-scope variables/params.}
+          ivar : xsltVarInfoPtr; { topmost local variable/param.}
+      end;
+
+      xsltCompilerNodeInfo = record
+          next : xsltCompilerNodeInfoPtr; {}
+          prev : xsltCompilerNodeInfoPtr; {}
+          node : xmlNodePtr; {}
+          depth : Longint; {}
+          templ : xsltTemplatePtr; { The owning template}
+          category : Longint; { XSLT element, LR-element or
+extension element}
+          type_ : xsltStyleType; {}
+          item : xsltElemPreCompPtr; { The compiled information The current in-scope namespaces}
+          inScopeNs : xsltNsListContainerPtr; { The current excluded result namespaces}
+          exclResultNs : xsltPointerListPtr; { The current extension instruction namespaces}
+          extElemNs : xsltPointerListPtr; { The current info for literal result elements.}
+          litResElemInfo : xsltStyleItemLRElementInfoPtr; {* Set to 1 if in-scope namespaces changed,
+*  or excluded result namespaces changed,
+*  or extension element namespaces changed.
+* This will trigger creation of new infos
+*  for literal result elements.
+*}
+          nsChanged : Longint; {}
+          preserveWhitespace : Longint; {}
+          stripWhitespace : Longint; {}
+          isRoot : Longint; { whether this is the stylesheet's root node}
+          forwardsCompat : Longint; { whether forwards-compatible mode is enabled whether the content of an extension element was processed}
+          extContentHandled : Longint; { the type of the current child}
+          curChildType : xsltStyleType; {}
+      end;
+
       xsltDecimalFormat = record
           next : xsltDecimalFormatPtr; { chained list}
           name : xmlCharPtr; { Used for interpretation of pattern}
@@ -181,13 +298,26 @@ type
           keys : Pointer; { key tables storage}
           includes : xsltDocumentPtr; { subsidiary includes}
           preproc : Longint; { pre-processing already done}
+          nbKeysComputed : Longint; {}
+      end;
+
+      xsltEffectiveNs = record
+          nextInStore : xsltEffectiveNsPtr; { storage next}
+          next : xsltEffectiveNsPtr; { next item in the list}
+          prefix : xmlCharPtr; {}
+          nsName : xmlCharPtr; {* Indicates if eclared on the literal result element; dunno if really
+* needed.
+*}
+          holdByElem : Longint; {}
       end;
 
       xsltElemPreComp = record
-          next : xsltElemPreCompPtr; { chained list}
+          next : xsltElemPreCompPtr; { next item in the global chained
+list hold by xsltStylesheet.}
           type_ : xsltStyleType; { type of the element}
           func : xsltTransformFunction; { handling function}
-          inst : xmlNodePtr; { the instruction end of common part}
+          inst : xmlNodePtr; { the node in the stylesheet's tree
+corresponding to this item end of common part}
           free : xsltElemPreCompDeallocator; { the deallocator}
       end;
 
@@ -201,6 +331,53 @@ type
           add_decimal : char; { Flag for whether decimal point appears in pattern}
           is_multiplier_set : char; { Flag to catch multiple occurences of percent/permille}
           is_negative_pattern : char; { Flag for processing -ve prefix/suffix}
+      end;
+
+      xsltKeyDef = record
+          next : xsltKeyDefPtr; {}
+          inst : xmlNodePtr; {}
+          name : xmlCharPtr; {}
+          nameURI : xmlCharPtr; {}
+          match : xmlCharPtr; {}
+          use : xmlCharPtr; {}
+          comp : xmlXPathCompExprPtr; {}
+          usecomp : xmlXPathCompExprPtr; {}
+          nsList : xmlNsPtrPtr; { the namespaces in scope}
+          nsNr : Longint; { the number of namespaces in scope}
+      end;
+
+      xsltKeyTable = record
+          next : xsltKeyTablePtr; {}
+          name : xmlCharPtr; {}
+          nameURI : xmlCharPtr; {}
+          keys : xmlHashTablePtr; {}
+      end;
+
+      xsltNsAlias = record
+          next : xsltNsAliasPtr; { next in the list}
+          literalNs : xmlNsPtr; {}
+          targetNs : xmlNsPtr; {}
+          docOfTargetNs : xmlDocPtr; {}
+      end;
+
+      xsltNsList = record
+          next : xsltNsListPtr; { next in the list}
+          ns : xmlNsPtr; {}
+      end;
+
+      xsltNsListContainer = record
+          list : xmlNsPtrPtr; {}
+          totalNumber : Longint; {}
+          xpathNumber : Longint; {}
+      end;
+
+      xsltNsMap = record
+          next : xsltNsMapPtr; { next in the list}
+          doc : xmlDocPtr; {}
+          elem : xmlNodePtr; { the element holding the ns-decl}
+          ns : xmlNsPtr; { the xmlNs structure holding the XML namespace name}
+          origNsName : xmlCharPtr; { the original XML namespace name}
+          newNsName : xmlCharPtr; { the mapped XML namespace name}
       end;
 
       xsltNumberData = record
@@ -218,6 +395,25 @@ type
 *}
       end;
 
+      xsltPointerList = record
+          items : PPointer; {}
+          number : Longint; {}
+          size : Longint; {}
+      end;
+
+      xsltPrincipalStylesheetData = record
+          namespaceDict : xmlDictPtr; {* Global list of in-scope namespaces.
+*}
+          inScopeNamespaces : xsltPointerListPtr; {* Global list of information for [xsl:]excluded-result-prefixes.
+*}
+          exclResultNamespaces : xsltPointerListPtr; {* Global list of information for [xsl:]extension-element-prefixes.
+*}
+          extElemNamespaces : xsltPointerListPtr; {}
+          effectiveNs : xsltEffectiveNsPtr; {* Namespace name map to get rid of string comparison of namespace names.
+*}
+          nsMap : xsltNsMapPtr; {}
+      end;
+
       xsltRuntimeExtra = record
           info : Pointer; { pointer to the extra data}
           deallocate : xmlFreeFunc; { pointer to the deallocation routine}
@@ -233,8 +429,156 @@ type
           name : xmlCharPtr; { the local part of the name QName}
           nameURI : xmlCharPtr; { the URI part of the name QName}
           select : xmlCharPtr; { the eval string}
-          tree : xmlNodePtr; { the tree if no eval string or the location}
+          tree : xmlNodePtr; { the sequence constructor if no eval
+string or the location}
           value : xmlXPathObjectPtr; { The value if computed}
+          fragment : xmlDocPtr; { The Result Tree Fragments (needed for XSLT 1.0)
+which are bound to the variable's lifetime.}
+          level : Longint; { the depth in the tree;
+-1 if persistent (e.g. a given xsl:with-param)}
+          context : xsltTransformContextPtr; { The transformation context; needed to cache
+the variables}
+          flags : Longint; {}
+      end;
+
+      xsltStyleBasicEmptyItem = record
+      end;
+
+      xsltStyleBasicExpressionItem = record
+          select : xmlCharPtr; { TODO: Change this to "expression".}
+          comp : xmlXPathCompExprPtr; { TODO: Change this to compExpr.}
+      end;
+
+      xsltStyleBasicItemVariable = record
+          select : xmlCharPtr; {}
+          comp : xmlXPathCompExprPtr; {}
+          name : xmlCharPtr; {}
+          has_name : Longint; {}
+          ns : xmlCharPtr; {}
+          has_ns : Longint; {}
+      end;
+
+      xsltStyleItemApplyTemplates = record
+          mode : xmlCharPtr; { apply-templates}
+          modeURI : xmlCharPtr; { apply-templates}
+          select : xmlCharPtr; { sort, copy-of, value-of, apply-templates}
+          comp : xmlXPathCompExprPtr; { a precompiled XPath expression TODO: with-params}
+      end;
+
+      xsltStyleItemAttribute = record
+          name : xmlCharPtr; {}
+          has_name : Longint; {}
+          ns : xmlCharPtr; {}
+          nsPrefix : xmlCharPtr; {}
+          has_ns : Longint; {}
+      end;
+
+      xsltStyleItemCallTemplate = record
+          templ : xsltTemplatePtr; { call-template}
+          name : xmlCharPtr; { element, attribute, pi}
+          has_name : Longint; { element, attribute, pi}
+          ns : xmlCharPtr; { element}
+          has_ns : Longint; { element TODO: with-params}
+      end;
+
+      xsltStyleItemCopy = record
+          use : xmlCharPtr; { copy, element}
+          has_use : Longint; { copy, element}
+      end;
+
+      xsltStyleItemDocument = record
+          ver11 : Longint; { assigned: in xsltDocumentComp;
+read: nowhere;
+TODO: Check if we need.}
+          filename : xmlCharPtr; { document URL}
+          has_filename : Longint; {}
+      end;
+
+      xsltStyleItemElement = record
+          use : xmlCharPtr; {}
+          has_use : Longint; {}
+          name : xmlCharPtr; {}
+          has_name : Longint; {}
+          ns : xmlCharPtr; {}
+          nsPrefix : xmlCharPtr; {}
+          has_ns : Longint; {}
+      end;
+
+      xsltStyleItemExtElement = record
+          item : xsltElemPreCompPtr; {}
+      end;
+
+      xsltStyleItemIf = record
+          test : xmlCharPtr; { if}
+          comp : xmlXPathCompExprPtr; { a precompiled XPath expression}
+      end;
+
+      xsltStyleItemInclude = record
+          include : xsltDocumentPtr; {}
+      end;
+
+      xsltStyleItemLRElementInfo = record
+          effectiveNs : xsltEffectiveNsPtr; {}
+      end;
+
+      xsltStyleItemMessage = record
+          terminate : Longint; {}
+      end;
+
+      xsltStyleItemNumber = record
+          numdata : xsltNumberData; { number}
+      end;
+
+      xsltStyleItemOtherwise = record
+      end;
+
+      xsltStyleItemPI = record
+          name : xmlCharPtr; {}
+          has_name : Longint; {}
+      end;
+
+      xsltStyleItemParam = record
+          select : xmlCharPtr; {}
+          comp : xmlXPathCompExprPtr; {}
+          name : xmlCharPtr; {}
+          has_name : Longint; {}
+          ns : xmlCharPtr; {}
+          has_ns : Longint; {}
+      end;
+
+      xsltStyleItemSort = record
+          stype : xmlCharPtr; { sort}
+          has_stype : Longint; { sort}
+          number : Longint; { sort}
+          order : xmlCharPtr; { sort}
+          has_order : Longint; { sort}
+          descending : Longint; { sort}
+          lang : xmlCharPtr; { sort}
+          has_lang : Longint; { sort}
+          case_order : xmlCharPtr; { sort}
+          lower_first : Longint; { sort}
+          use : xmlCharPtr; {}
+          has_use : Longint; {}
+          select : xmlCharPtr; { sort, copy-of, value-of, apply-templates}
+          comp : xmlXPathCompExprPtr; { a precompiled XPath expression}
+      end;
+
+      xsltStyleItemText = record
+          noescape : Longint; { text}
+      end;
+
+      xsltStyleItemUknown = record
+      end;
+
+      xsltStyleItemValueOf = record
+          select : xmlCharPtr; {}
+          comp : xmlXPathCompExprPtr; { a precompiled XPath expression}
+          noescape : Longint; {}
+      end;
+
+      xsltStyleItemWhen = record
+          test : xmlCharPtr; {}
+          comp : xmlXPathCompExprPtr; {}
       end;
 
       xsltStylePreComp = record
@@ -299,12 +643,20 @@ informations are stored}
           textMatch : Pointer; { template based on text()}
           piMatch : Pointer; { template based on processing-instruction()}
           commentMatch : Pointer; {* Namespace aliases.
+* NOTE: Not used in the refactored code.
 *}
           nsAliases : xmlHashTablePtr; {* Attribute sets.
 *}
           attributeSets : xmlHashTablePtr; {* Namespaces.
+* TODO: Eliminate this.
 *}
-          nsHash : xmlHashTablePtr; { the set of namespaces in use}
+          nsHash : xmlHashTablePtr; { the set of namespaces in use:
+ATTENTION: This is used for
+execution of XPath expressions; unfortunately
+it restricts the stylesheet to have distinct
+prefixes.
+TODO: We need to get rid of this.
+*}
           nsDefs : Pointer; {* Key definitions.
 *}
           keys : Pointer; {* Output related stuff.
@@ -334,11 +686,12 @@ informations are stored}
           extInfos : xmlHashTablePtr; { the extension data}
           extrasNr : Longint; {* For keeping track of nested includes
 *}
-          includes : xsltDocumentPtr; {* dictionnary: shared between stylesheet, context and documents.
+          includes : xsltDocumentPtr; {* dictionary: shared between stylesheet, context and documents.
 *}
           dict : xmlDictPtr; {* precompiled attribute value templates.
 *}
           attVTs : Pointer; {* if namespace-alias has an alias for the default stylesheet prefix
+* NOTE: Not used in the refactored code.
 *}
           defaultAlias : xmlCharPtr; {* bypass pre-processing (already done) (used in imports)
 *}
@@ -346,7 +699,12 @@ informations are stored}
 *}
           internalized : Longint; {* Literal Result Element as Stylesheet c.f. section 2.3
 *}
-          literal_result : Longint; {}
+          literal_result : Longint; {* The principal stylesheet
+*}
+          principal : xsltStylesheetPtr; {* Compilation context used during compile-time.
+*}
+          compCtxt : xsltCompilerCtxtPtr; { TODO: Change this to (void *).}
+          principalData : xsltPrincipalStylesheetDataPtr; {}
       end;
 
       xsltTemplate = record
@@ -359,11 +717,25 @@ informations are stored}
           mode : xmlCharPtr; { the local part of the mode QName}
           modeURI : xmlCharPtr; { the URI part of the mode QName}
           content : xmlNodePtr; { the template replacement value}
-          elem : xmlNodePtr; { the source element}
+          elem : xmlNodePtr; {* TODO: @inheritedNsNr and @inheritedNs won't be used in the
+*  refactored code.
+*}
           inheritedNsNr : Longint; { number of inherited namespaces}
           inheritedNs : xmlNsPtrPtr; { inherited non-excluded namespaces Profiling informations}
           nbCalls : Longint; { the number of time the template was called}
           time : Cardinal; { the time spent in this template}
+          params : Pointer; { xsl:param instructions}
+      end;
+
+      xsltTransformCache = record
+          RVT : xmlDocPtr; {}
+          nbRVT : Longint; {}
+          stackItems : xsltStackElemPtr; {}
+          nbStackItems : Longint; {}
+          dbgCachedRVTs : Longint; {}
+          dbgReusedRVTs : Longint; {}
+          dbgCachedVars : Longint; {}
+          dbgReusedVars : Longint; {}
       end;
 
       xsltTransformContext = record
@@ -385,7 +757,7 @@ informations are stored}
           mode : xmlCharPtr; { the current mode}
           modeURI : xmlCharPtr; { the current mode URI}
           docList : xsltDocumentPtr; { the document list}
-          document : xsltDocumentPtr; { the current document}
+          document : xsltDocumentPtr; { the current source document; can be NULL if an RTF}
           node : xmlNodePtr; { the current node being processed}
           nodeList : xmlNodeSetPtr; { the current node list xmlNodePtr current;			the node}
           output : xmlDocPtr; { the resulting document}
@@ -411,6 +783,7 @@ informations are stored}
           error : xmlGenericErrorFunc; { a specific error handler}
           errctx : Pointer; { context for the error handler}
           sortfunc : xsltSortFunc; {* handling of temporary Result Value Tree
+* (XSLT 1.0 term: "Result Tree Fragment")
 *}
           tmpRVT : xmlDocPtr; { list of RVT without persistance}
           persistRVT : xmlDocPtr; { list of persistant RVTs}
@@ -422,16 +795,42 @@ informations are stored}
 *}
           debugStatus : Longint; { the context level debug status}
           traceCode : PCardinal; { pointer to the variable holding the mask}
-          parserOptions : Longint; {* dictionnary: shared between stylesheet, context and documents.
+          parserOptions : Longint; {* dictionary: shared between stylesheet, context and documents.
 *}
-          dict : xmlDictPtr; {* temporary storage for doc ptr, currently only used for
-* global var evaluation
-*}
+          dict : xmlDictPtr; {}
           tmpDoc : xmlDocPtr; {* all document text strings are internalized
 *}
           internalized : Longint; {}
+          nbKeys : Longint; {}
+          hasTemplKeyPatterns : Longint; {}
+          currentTemplateRule : xsltTemplatePtr; { the Current Template Rule}
+          initialContextNode : xmlNodePtr; {}
+          initialContextDoc : xmlDocPtr; {}
+          cache : xsltTransformCachePtr; {}
+          contextVariable : Pointer; { the current variable item}
+          localRVT : xmlDocPtr; { list of local tree fragments; will be freed when
+the instruction which created the fragment
+exits}
+          localRVTBase : xmlDocPtr; {}
+          keyInitLevel : Longint; { Needed to catch recursive keys issues}
       end;
 
+      xsltVarInfo = record
+          next : xsltVarInfoPtr; { next in the list}
+          prev : xsltVarInfoPtr; {}
+          depth : Longint; { the depth in the tree}
+          name : xmlCharPtr; {}
+          nsName : xmlCharPtr; {}
+      end;
+
+      xsltStyleItemApplyImports = xsltStyleBasicEmptyItem;
+      xsltStyleItemChoose = xsltStyleBasicEmptyItem;
+      xsltStyleItemComment = xsltStyleBasicEmptyItem;
+      xsltStyleItemCopyOf = xsltStyleBasicExpressionItem;
+      xsltStyleItemFallback = xsltStyleBasicEmptyItem;
+      xsltStyleItemForEach = xsltStyleBasicExpressionItem;
+      xsltStyleItemVariable = xsltStyleBasicItemVariable;
+      xsltStyleItemWithParam = xsltStyleBasicItemVariable;
 
   function xslAddCall (templ: xsltTemplatePtr; source: xmlNodePtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xslDropCall (); cdecl; external LIBXSLT_SO;
@@ -441,55 +840,56 @@ informations are stored}
   function xsltAddTemplate (style: xsltStylesheetPtr; cur: xsltTemplatePtr; const mode: xmlCharPtr; const modeURI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltAllocateExtra (style: xsltStylesheetPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltAllocateExtraCtxt (ctxt: xsltTransformContextPtr) : Longint; cdecl; external LIBXSLT_SO;
-  procedure xsltApplyAttributeSet (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; const attributes: xmlCharPtr); cdecl; external LIBXSLT_SO;
-  procedure xsltApplyImports (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
-  procedure xsltApplyOneTemplate (ctxt: xsltTransformContextPtr; node: xmlNodePtr; list: xmlNodePtr; templ: xsltTemplatePtr; params: xsltStackElemPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltApplyAttributeSet (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; const attrSets: xmlCharPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltApplyImports (ctxt: xsltTransformContextPtr; contextNode: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltApplyOneTemplate (ctxt: xsltTransformContextPtr; contextNode: xmlNodePtr; list: xmlNodePtr; templ: xsltTemplatePtr; params: xsltStackElemPtr); cdecl; external LIBXSLT_SO;
   procedure xsltApplyStripSpaces (ctxt: xsltTransformContextPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
   function xsltApplyStylesheet (style: xsltStylesheetPtr; doc: xmlDocPtr; const params: PPChar) : xmlDocPtr; cdecl; external LIBXSLT_SO;
   function xsltApplyStylesheetUser (style: xsltStylesheetPtr; doc: xmlDocPtr; const params: PPChar; const output: PChar; profile: PFILE; userCtxt: xsltTransformContextPtr) : xmlDocPtr; cdecl; external LIBXSLT_SO;
-  procedure xsltApplyTemplates (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
-  function xsltAttrListTemplateProcess (ctxt: xsltTransformContextPtr; target: xmlNodePtr; cur: xmlAttrPtr) : xmlAttrPtr; cdecl; external LIBXSLT_SO;
-  function xsltAttrTemplateProcess (ctxt: xsltTransformContextPtr; target: xmlNodePtr; cur: xmlAttrPtr) : xmlAttrPtr; cdecl; external LIBXSLT_SO;
+  procedure xsltApplyTemplates (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  function xsltAttrListTemplateProcess (ctxt: xsltTransformContextPtr; target: xmlNodePtr; attrs: xmlAttrPtr) : xmlAttrPtr; cdecl; external LIBXSLT_SO;
+  function xsltAttrTemplateProcess (ctxt: xsltTransformContextPtr; target: xmlNodePtr; attr: xmlAttrPtr) : xmlAttrPtr; cdecl; external LIBXSLT_SO;
   function xsltAttrTemplateValueProcess (ctxt: xsltTransformContextPtr; const str: xmlCharPtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
-  function xsltAttrTemplateValueProcessNode (ctxt: xsltTransformContextPtr; const str: xmlCharPtr; node: xmlNodePtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
+  function xsltAttrTemplateValueProcessNode (ctxt: xsltTransformContextPtr; const str: xmlCharPtr; inst: xmlNodePtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
   procedure xsltAttribute (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   procedure xsltCalibrateAdjust (delta: Longint); cdecl; external LIBXSLT_SO;
-  procedure xsltCallTemplate (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
-  function xsltCheckExtPrefix (style: xsltStylesheetPtr; const prefix: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
+  procedure xsltCallTemplate (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  function xsltCheckExtPrefix (style: xsltStylesheetPtr; const URI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
+  function xsltCheckExtURI (style: xsltStylesheetPtr; const URI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltCheckRead (sec: xsltSecurityPrefsPtr; ctxt: xsltTransformContextPtr; const URL: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltCheckWrite (sec: xsltSecurityPrefsPtr; ctxt: xsltTransformContextPtr; const URL: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
-  procedure xsltChoose (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltChoose (ctxt: xsltTransformContextPtr; contextNode: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   procedure xsltCleanupGlobals (); cdecl; external LIBXSLT_SO;
   procedure xsltCleanupTemplates (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
   procedure xsltComment (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   procedure xsltCompileAttr (style: xsltStylesheetPtr; attr: xmlAttrPtr); cdecl; external LIBXSLT_SO;
   function xsltCompilePattern (const pattern: xmlCharPtr; doc: xmlDocPtr; node: xmlNodePtr; style: xsltStylesheetPtr; runtime: xsltTransformContextPtr) : xsltCompMatchPtr; cdecl; external LIBXSLT_SO;
   function xsltComputeSortResult (ctxt: xsltTransformContextPtr; sort: xmlNodePtr) : xmlXPathObjectPtrPtr; cdecl; external LIBXSLT_SO;
-  procedure xsltCopy (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
-  function xsltCopyNamespace (ctxt: xsltTransformContextPtr; node: xmlNodePtr; cur: xmlNsPtr) : xmlNsPtr; cdecl; external LIBXSLT_SO;
+  procedure xsltCopy (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  function xsltCopyNamespace (ctxt: xsltTransformContextPtr; elem: xmlNodePtr; ns: xmlNsPtr) : xmlNsPtr; cdecl; external LIBXSLT_SO;
   function xsltCopyNamespaceList (ctxt: xsltTransformContextPtr; node: xmlNodePtr; cur: xmlNsPtr) : xmlNsPtr; cdecl; external LIBXSLT_SO;
-  procedure xsltCopyOf (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltCopyOf (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   function xsltCopyTextString (ctxt: xsltTransformContextPtr; target: xmlNodePtr; const string_: xmlCharPtr; noescape: Longint) : xmlNodePtr; cdecl; external LIBXSLT_SO;
   function xsltCreateRVT (ctxt: xsltTransformContextPtr) : xmlDocPtr; cdecl; external LIBXSLT_SO;
   procedure xsltDebug (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   procedure xsltDebugDumpExtensions (output: PFILE); cdecl; external LIBXSLT_SO;
   function xsltDebugGetDefaultTrace () : xsltDebugTraceCodes; cdecl; external LIBXSLT_SO;
   procedure xsltDebugSetDefaultTrace (val: xsltDebugTraceCodes); cdecl; external LIBXSLT_SO;
-  function xsltDecimalFormatGetByName (sheet: xsltStylesheetPtr; name: xmlCharPtr) : xsltDecimalFormatPtr; cdecl; external LIBXSLT_SO;
+  function xsltDecimalFormatGetByName (style: xsltStylesheetPtr; name: xmlCharPtr) : xsltDecimalFormatPtr; cdecl; external LIBXSLT_SO;
   procedure xsltDefaultSortFunction (ctxt: xsltTransformContextPtr; sorts: xmlNodePtrPtr; nbsorts: Longint); cdecl; external LIBXSLT_SO;
   procedure xsltDoSortFunction (ctxt: xsltTransformContextPtr; sorts: xmlNodePtrPtr; nbsorts: Longint); cdecl; external LIBXSLT_SO;
   function xsltDocumentComp (style: xsltStylesheetPtr; inst: xmlNodePtr; function_: xsltTransformFunction) : xsltElemPreCompPtr; cdecl; external LIBXSLT_SO;
-  procedure xsltDocumentElem (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltDocumentElem (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   procedure xsltDocumentFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXSLT_SO;
   procedure xsltDocumentSortFunction (list: xmlNodeSetPtr); cdecl; external LIBXSLT_SO;
-  procedure xsltElement (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltElement (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   procedure xsltElementAvailableFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXSLT_SO;
   function xsltEvalAVT (ctxt: xsltTransformContextPtr; avt: Pointer; node: xmlNodePtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
-  function xsltEvalAttrValueTemplate (ctxt: xsltTransformContextPtr; node: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
+  function xsltEvalAttrValueTemplate (ctxt: xsltTransformContextPtr; inst: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
   function xsltEvalGlobalVariables (ctxt: xsltTransformContextPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltEvalOneUserParam (ctxt: xsltTransformContextPtr; const name: xmlCharPtr; const value: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
-  function xsltEvalStaticAttrValueTemplate (style: xsltStylesheetPtr; node: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr; found: PInteger) : xmlCharPtr; cdecl; external LIBXSLT_SO;
-  function xsltEvalTemplateString (ctxt: xsltTransformContextPtr; node: xmlNodePtr; parent: xmlNodePtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
+  function xsltEvalStaticAttrValueTemplate (style: xsltStylesheetPtr; inst: xmlNodePtr; const name: xmlCharPtr; const ns: xmlCharPtr; found: PInteger) : xmlCharPtr; cdecl; external LIBXSLT_SO;
+  function xsltEvalTemplateString (ctxt: xsltTransformContextPtr; contextNode: xmlNodePtr; inst: xmlNodePtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
   function xsltEvalUserParams (ctxt: xsltTransformContextPtr; const params: PPChar) : Longint; cdecl; external LIBXSLT_SO;
   function xsltEvalXPathPredicate (ctxt: xsltTransformContextPtr; comp: xmlXPathCompExprPtr; nsList: xmlNsPtrPtr; nsNr: Longint) : Longint; cdecl; external LIBXSLT_SO;
   function xsltEvalXPathString (ctxt: xsltTransformContextPtr; comp: xmlXPathCompExprPtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
@@ -500,17 +900,19 @@ informations are stored}
   function xsltExtModuleElementPreComputeLookup (const name: xmlCharPtr; const URI: xmlCharPtr) : xsltPreComputeFunction; cdecl; external LIBXSLT_SO;
   function xsltExtModuleFunctionLookup (const name: xmlCharPtr; const URI: xmlCharPtr) : xmlXPathFunction; cdecl; external LIBXSLT_SO;
   function xsltExtModuleTopLevelLookup (const name: xmlCharPtr; const URI: xmlCharPtr) : xsltTopLevelFunction; cdecl; external LIBXSLT_SO;
+  function xsltExtensionInstructionResultFinalize (ctxt: xsltTransformContextPtr) : Longint; cdecl; external LIBXSLT_SO;
+  function xsltExtensionInstructionResultRegister (ctxt: xsltTransformContextPtr; obj: xmlXPathObjectPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltFindDocument (ctxt: xsltTransformContextPtr; doc: xmlDocPtr) : xsltDocumentPtr; cdecl; external LIBXSLT_SO;
   function xsltFindElemSpaceHandling (ctxt: xsltTransformContextPtr; node: xmlNodePtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltFindTemplate (ctxt: xsltTransformContextPtr; const name: xmlCharPtr; const nameURI: xmlCharPtr) : xsltTemplatePtr; cdecl; external LIBXSLT_SO;
-  procedure xsltForEach (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltForEach (ctxt: xsltTransformContextPtr; contextNode: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   function xsltFormatNumberConversion (self: xsltDecimalFormatPtr; format: xmlCharPtr; number: double; result: xmlCharPtrPtr) : xmlXPathErrorEnum; cdecl; external LIBXSLT_SO;
   procedure xsltFormatNumberFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXSLT_SO;
   procedure xsltFreeAVTList (avt: Pointer); cdecl; external LIBXSLT_SO;
   procedure xsltFreeAttributeSetsHashes (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeCompMatchList (comp: xsltCompMatchPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeCtxtExts (ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
-  procedure xsltFreeDocumentKeys (doc: xsltDocumentPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltFreeDocumentKeys (idoc: xsltDocumentPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeDocuments (ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeExts (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeGlobalVariables (ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
@@ -521,7 +923,7 @@ informations are stored}
   procedure xsltFreeStackElemList (elem: xsltStackElemPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeStyleDocuments (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeStylePreComps (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
-  procedure xsltFreeStylesheet (sheet: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltFreeStylesheet (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeTemplateHashes (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFreeTransformContext (ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
   procedure xsltFunctionAvailableFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXSLT_SO;
@@ -540,19 +942,24 @@ informations are stored}
   function xsltGetQNameURI (node: xmlNodePtr; name: xmlCharPtrPtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
   function xsltGetQNameURI2 (style: xsltStylesheetPtr; node: xmlNodePtr; const name: xmlCharPtrPtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
   function xsltGetSecurityPrefs (sec: xsltSecurityPrefsPtr; option: xsltSecurityOption) : xsltSecurityCheck; cdecl; external LIBXSLT_SO;
-  function xsltGetSpecialNamespace (ctxt: xsltTransformContextPtr; cur: xmlNodePtr; const URI: xmlCharPtr; const prefix: xmlCharPtr; out_: xmlNodePtr) : xmlNsPtr; cdecl; external LIBXSLT_SO;
+  function xsltGetSpecialNamespace (ctxt: xsltTransformContextPtr; invocNode: xmlNodePtr; const nsName: xmlCharPtr; const nsPrefix: xmlCharPtr; target: xmlNodePtr) : xmlNsPtr; cdecl; external LIBXSLT_SO;
   function xsltGetTemplate (ctxt: xsltTransformContextPtr; node: xmlNodePtr; style: xsltStylesheetPtr) : xsltTemplatePtr; cdecl; external LIBXSLT_SO;
   function xsltGetUTF8Char (const utf: PByte; len: PInteger) : Longint; cdecl; external LIBXSLT_SO;
   function xsltGetXIncludeDefault () : Longint; cdecl; external LIBXSLT_SO;
-  procedure xsltIf (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltIf (ctxt: xsltTransformContextPtr; contextNode: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltInit (); cdecl; external LIBXSLT_SO;
+  function xsltInitAllDocKeys (ctxt: xsltTransformContextPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltInitCtxtExts (ctxt: xsltTransformContextPtr) : Longint; cdecl; external LIBXSLT_SO;
-  procedure xsltInitCtxtKeys (ctxt: xsltTransformContextPtr; doc: xsltDocumentPtr); cdecl; external LIBXSLT_SO;
+  function xsltInitCtxtKey (ctxt: xsltTransformContextPtr; idoc: xsltDocumentPtr; keyDef: xsltKeyDefPtr) : Longint; cdecl; external LIBXSLT_SO;
+  procedure xsltInitCtxtKeys (ctxt: xsltTransformContextPtr; idoc: xsltDocumentPtr); cdecl; external LIBXSLT_SO;
   procedure xsltInitElemPreComp (comp: xsltElemPreCompPtr; style: xsltStylesheetPtr; inst: xmlNodePtr; function_: xsltTransformFunction; freeFunc: xsltElemPreCompDeallocator); cdecl; external LIBXSLT_SO;
   function xsltIsBlank (str: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltKeyFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXSLT_SO;
   function xsltLoadDocument (ctxt: xsltTransformContextPtr; const URI: xmlCharPtr) : xsltDocumentPtr; cdecl; external LIBXSLT_SO;
   function xsltLoadStyleDocument (style: xsltStylesheetPtr; const URI: xmlCharPtr) : xsltDocumentPtr; cdecl; external LIBXSLT_SO;
   function xsltLoadStylesheetPI (doc: xmlDocPtr) : xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+  procedure xsltLocalVariablePop (ctxt: xsltTransformContextPtr; limitNr: Longint; level: Longint); cdecl; external LIBXSLT_SO;
+  function xsltLocalVariablePush (ctxt: xsltTransformContextPtr; variable: xsltStackElemPtr; level: Longint) : Longint; cdecl; external LIBXSLT_SO;
   function xsltMatchPattern (ctxt: xsltTransformContextPtr; node: xmlNodePtr; const pattern: xmlCharPtr; ctxtdoc: xmlDocPtr; ctxtnode: xmlNodePtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltMessage (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr); cdecl; external LIBXSLT_SO;
   procedure xsltNamespaceAlias (style: xsltStylesheetPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
@@ -565,25 +972,31 @@ informations are stored}
   function xsltNewTransformContext (style: xsltStylesheetPtr; doc: xmlDocPtr) : xsltTransformContextPtr; cdecl; external LIBXSLT_SO;
   function xsltNextImport (cur: xsltStylesheetPtr) : xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
   procedure xsltNormalizeCompSteps (payload: Pointer; data: Pointer; const name: xmlCharPtr); cdecl; external LIBXSLT_SO;
-  procedure xsltNumber (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltNumber (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   procedure xsltNumberFormat (ctxt: xsltTransformContextPtr; data: xsltNumberDataPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
+  function xsltParseAnyXSLTElem (cctxt: xsltCompilerCtxtPtr; elem: xmlNodePtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltParseGlobalParam (style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
   procedure xsltParseGlobalVariable (style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
+  procedure xsltParseSequenceConstructor (cctxt: xsltCompilerCtxtPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
   procedure xsltParseStylesheetAttributeSet (style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
-  function xsltParseStylesheetCallerParam (ctxt: xsltTransformContextPtr; cur: xmlNodePtr) : xsltStackElemPtr; cdecl; external LIBXSLT_SO;
+  function xsltParseStylesheetCallerParam (ctxt: xsltTransformContextPtr; inst: xmlNodePtr) : xsltStackElemPtr; cdecl; external LIBXSLT_SO;
   function xsltParseStylesheetDoc (doc: xmlDocPtr) : xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
   function xsltParseStylesheetFile (const filename: xmlCharPtr) : xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
   function xsltParseStylesheetImport (style: xsltStylesheetPtr; cur: xmlNodePtr) : Longint; cdecl; external LIBXSLT_SO;
-  function xsltParseStylesheetImportedDoc (doc: xmlDocPtr; style: xsltStylesheetPtr) : xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
+  function xsltParseStylesheetImportedDoc (doc: xmlDocPtr; parentStyle: xsltStylesheetPtr) : xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
   function xsltParseStylesheetInclude (style: xsltStylesheetPtr; cur: xmlNodePtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltParseStylesheetOutput (style: xsltStylesheetPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
   procedure xsltParseStylesheetParam (ctxt: xsltTransformContextPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
   function xsltParseStylesheetProcess (ret: xsltStylesheetPtr; doc: xmlDocPtr) : xsltStylesheetPtr; cdecl; external LIBXSLT_SO;
-  procedure xsltParseStylesheetVariable (ctxt: xsltTransformContextPtr; cur: xmlNodePtr); cdecl; external LIBXSLT_SO;
+  procedure xsltParseStylesheetVariable (ctxt: xsltTransformContextPtr; inst: xmlNodePtr); cdecl; external LIBXSLT_SO;
   procedure xsltParseTemplateContent (style: xsltStylesheetPtr; templ: xmlNodePtr); cdecl; external LIBXSLT_SO;
+  function xsltPointerListAddSize (list: xsltPointerListPtr; item: Pointer; initialSize: Longint) : Longint; cdecl; external LIBXSLT_SO;
+  procedure xsltPointerListClear (list: xsltPointerListPtr); cdecl; external LIBXSLT_SO;
+  function xsltPointerListCreate (initialSize: Longint) : xsltPointerListPtr; cdecl; external LIBXSLT_SO;
+  procedure xsltPointerListFree (list: xsltPointerListPtr); cdecl; external LIBXSLT_SO;
   function xsltPreComputeExtModuleElement (style: xsltStylesheetPtr; inst: xmlNodePtr) : xsltElemPreCompPtr; cdecl; external LIBXSLT_SO;
   procedure xsltPrintErrorContext (ctxt: xsltTransformContextPtr; style: xsltStylesheetPtr; node: xmlNodePtr); cdecl; external LIBXSLT_SO;
-  procedure xsltProcessingInstruction (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltProcessingInstruction (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   function xsltProfileStylesheet (style: xsltStylesheetPtr; doc: xmlDocPtr; const params: PPChar; output: PFILE) : xmlDocPtr; cdecl; external LIBXSLT_SO;
   function xsltQuoteOneUserParam (ctxt: xsltTransformContextPtr; const name: xmlCharPtr; const value: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltQuoteUserParams (ctxt: xsltTransformContextPtr; const params: PPChar) : Longint; cdecl; external LIBXSLT_SO;
@@ -599,10 +1012,13 @@ informations are stored}
   function xsltRegisterExtModuleTopLevel (const name: xmlCharPtr; const URI: xmlCharPtr; function_: xsltTopLevelFunction) : Longint; cdecl; external LIBXSLT_SO;
   function xsltRegisterExtPrefix (style: xsltStylesheetPtr; const prefix: xmlCharPtr; const URI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltRegisterExtras (ctxt: xsltTransformContextPtr); cdecl; external LIBXSLT_SO;
+  function xsltRegisterLocalRVT (ctxt: xsltTransformContextPtr; RVT: xmlDocPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltRegisterPersistRVT (ctxt: xsltTransformContextPtr; RVT: xmlDocPtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltRegisterTestModule (); cdecl; external LIBXSLT_SO;
   function xsltRegisterTmpRVT (ctxt: xsltTransformContextPtr; RVT: xmlDocPtr) : Longint; cdecl; external LIBXSLT_SO;
+  procedure xsltReleaseRVT (ctxt: xsltTransformContextPtr; RVT: xmlDocPtr); cdecl; external LIBXSLT_SO;
   procedure xsltResolveStylesheetAttributeSet (style: xsltStylesheetPtr); cdecl; external LIBXSLT_SO;
+  function xsltRestoreDocumentNamespaces (ns: xsltNsMapPtr; doc: xmlDocPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltRunStylesheet (style: xsltStylesheetPtr; doc: xmlDocPtr; const params: PPChar; const output: PChar; SAX: xmlSAXHandlerPtr; IObuf: xmlOutputBufferPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltRunStylesheetUser (style: xsltStylesheetPtr; doc: xmlDocPtr; const params: PPChar; const output: PChar; SAX: xmlSAXHandlerPtr; IObuf: xmlOutputBufferPtr; profile: PFILE; userCtxt: xsltTransformContextPtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltSaveProfiling (ctxt: xsltTransformContextPtr; output: PFILE); cdecl; external LIBXSLT_SO;
@@ -632,18 +1048,22 @@ informations are stored}
   function xsltSplitQName (dict: xmlDictPtr; const name: xmlCharPtr; const prefix: xmlCharPtrPtr) : xmlCharPtr; cdecl; external LIBXSLT_SO;
   function xsltStyleGetExtData (style: xsltStylesheetPtr; const URI: xmlCharPtr) : Pointer; cdecl; external LIBXSLT_SO;
   procedure xsltStylePreCompute (style: xsltStylesheetPtr; inst: xmlNodePtr); cdecl; external LIBXSLT_SO;
+  function xsltStyleStylesheetLevelGetExtData (style: xsltStylesheetPtr; const URI: xmlCharPtr) : Pointer; cdecl; external LIBXSLT_SO;
   procedure xsltSystemPropertyFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXSLT_SO;
   function xsltTemplateProcess (ctxt: xsltTransformContextPtr; node: xmlNodePtr) : xmlNodePtrPtr; cdecl; external LIBXSLT_SO;
   function xsltTestCompMatchList (ctxt: xsltTransformContextPtr; node: xmlNodePtr; comp: xsltCompMatchPtr) : Longint; cdecl; external LIBXSLT_SO;
   procedure xsltText (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   function xsltTimestamp () : Longint; cdecl; external LIBXSLT_SO;
+  function xsltTransStorageAdd (ctxt: xsltTransformContextPtr; id: Pointer; data: Pointer) : Longint; cdecl; external LIBXSLT_SO;
+  function xsltTransStorageRemove (ctxt: xsltTransformContextPtr; id: Pointer) : Pointer; cdecl; external LIBXSLT_SO;
   procedure xsltTransformError (ctxt: xsltTransformContextPtr; style: xsltStylesheetPtr; node: xmlNodePtr; const msg: PChar); cdecl; varargs; external LIBXSLT_SO;
+  procedure xsltUninit (); cdecl; external LIBXSLT_SO;
   procedure xsltUnparsedEntityURIFunction (ctxt: xmlXPathParserContextPtr; nargs: Longint); cdecl; external LIBXSLT_SO;
   function xsltUnregisterExtModule (const URI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltUnregisterExtModuleElement (const name: xmlCharPtr; const URI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltUnregisterExtModuleFunction (const name: xmlCharPtr; const URI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
   function xsltUnregisterExtModuleTopLevel (const name: xmlCharPtr; const URI: xmlCharPtr) : Longint; cdecl; external LIBXSLT_SO;
-  procedure xsltValueOf (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; comp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
+  procedure xsltValueOf (ctxt: xsltTransformContextPtr; node: xmlNodePtr; inst: xmlNodePtr; castedComp: xsltStylePreCompPtr); cdecl; external LIBXSLT_SO;
   function xsltVariableLookup (ctxt: xsltTransformContextPtr; const name: xmlCharPtr; const ns_uri: xmlCharPtr) : xmlXPathObjectPtr; cdecl; external LIBXSLT_SO;
   function xsltXPathCompile (style: xsltStylesheetPtr; const str: xmlCharPtr) : xmlXPathCompExprPtr; cdecl; external LIBXSLT_SO;
   function xsltXPathFunctionLookup (ctxt: xmlXPathContextPtr; const name: xmlCharPtr; const ns_uri: xmlCharPtr) : xmlXPathFunction; cdecl; external LIBXSLT_SO;
@@ -654,7 +1074,6 @@ var
 var
   __xsltDocDefaultLoader: xsltDocLoaderFuncPtr;
   function xsltEngineVersion(): PChar; cdecl;
-  function xsltExtMarker(): xmlCharPtr; cdecl;
 var
   __xsltGenericDebug: xmlGenericErrorFuncPtr;
 var
@@ -668,6 +1087,10 @@ var
 var
   __xsltMaxDepth: PInteger;
 
+const
+  xsltConstNamespaceNameXSLT = 'http://www.w3.org/1999/XSL/Transform';
+  xsltExtMarker = 'Extension Element';
+  xsltConstXSLTAttrMarker = 'LRE XLST Attr';
 implementation
 uses
 {$IFDEF WIN32}
@@ -696,15 +1119,6 @@ begin
 end;
 
 var
-   pxsltExtMarker: xmlCharPtrPtr;
-
-function xsltExtMarker: xmlCharPtr;
-begin
-  CheckForNil(pxsltExtMarker, 'xsltExtMarker');
-  Result := pxsltExtMarker^;
-end;
-
-var
    pxsltLibxmlVersion: PInteger;
 
 function xsltLibxmlVersion: Longint;
@@ -722,20 +1136,17 @@ begin
   Result := pxsltLibxsltVersion^;
 end;
 
-
-
 initialization
   // The Delphi 'external' directive can be used for functions and procedures,
   // but here we need to obtain the addresses of POINTERS to functions. We can
   // get to these addresses (and also those of other data values exported from
   // the DLL) by using GetProcAddress.
   libHandle := LoadLibrary(LIBXSLT_SO);
-  if libHandle <> 0 then 
+  if libHandle <> 0 then
   begin
     __xslDebugStatus := PInteger(GetProcAddress(libHandle, 'xslDebugStatus'));
     __xsltDocDefaultLoader := xsltDocLoaderFuncPtr(GetProcAddress(libHandle, 'xsltDocDefaultLoader'));
     pxsltEngineVersion := PPChar(GetProcAddress(libHandle, 'xsltEngineVersion'));
-    pxsltExtMarker := xmlCharPtrPtr(GetProcAddress(libHandle, 'xsltExtMarker'));
     __xsltGenericDebug := xmlGenericErrorFuncPtr(GetProcAddress(libHandle, 'xsltGenericDebug'));
     __xsltGenericDebugContext := PPointer(GetProcAddress(libHandle, 'xsltGenericDebugContext'));
     __xsltGenericError := xmlGenericErrorFuncPtr(GetProcAddress(libHandle, 'xsltGenericError'));

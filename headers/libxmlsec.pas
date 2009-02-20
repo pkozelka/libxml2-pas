@@ -1,5 +1,5 @@
 {This file generated (mostly) automatically from libxmlsec-api.xml}
-{For libxmlsec version: 1.2.10}
+{For libxmlsec version: 1.2.11}
 Unit libxmlsec;
 
 interface
@@ -1153,6 +1153,7 @@ type
   function xmlSecTmplSignatureAddObject (signNode: xmlNodePtr; const id: xmlCharPtr; const mimeType: xmlCharPtr; const encoding: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTmplSignatureAddReference (signNode: xmlNodePtr; digestMethodId: xmlSecTransformId; const id: xmlCharPtr; const uri: xmlCharPtr; const type_: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTmplSignatureCreate (doc: xmlDocPtr; c14nMethodId: xmlSecTransformId; signMethodId: xmlSecTransformId; const id: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
+  function xmlSecTmplSignatureCreateNsPref (doc: xmlDocPtr; c14nMethodId: xmlSecTransformId; signMethodId: xmlSecTransformId; const id: xmlCharPtr; const nsPrefix: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTmplSignatureEnsureKeyInfo (signNode: xmlNodePtr; const id: xmlCharPtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTmplSignatureGetC14NMethodNode (signNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;
   function xmlSecTmplSignatureGetSignMethodNode (signNode: xmlNodePtr) : xmlNodePtr; cdecl; external LIBXMLSEC_SO;

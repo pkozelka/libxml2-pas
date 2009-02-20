@@ -148,6 +148,8 @@ type
       xmlParserInputPtrPtr = ^xmlParserInputPtr;
       xmlBufferAllocationSchemePtr = ^xmlBufferAllocationScheme;
       xmlSAXHandlerPtrPtr = ^xmlSAXHandlerPtr;
+      xmlExpNodePtrPtr = ^xmlExpNodePtr;
+      xmlSchemaAttributeLinkPtrPtr = ^xmlSchemaAttributeLinkPtr;
 
     </xsl:text>
   </xsl:when>
@@ -241,7 +243,7 @@ end;
 function xmlXPathNodeSetGetLength(ns: xmlNodeSetPtr): Integer;
 begin
   if Assigned(ns) then
-    Result := ns.nodeNr
+    Result := ns^.nodeNr
   else
     Result := 0
 end;
@@ -250,11 +252,11 @@ function xmlXPathNodeSetItem(ns: xmlNodeSetPtr; index: Integer): xmlNodePtr;
 var
   p: xmlNodePtrPtr;
 begin
-  if (ns = nil) or (index &lt; 0) or (index &gt;= ns.nodeNr) then
+  if (ns = nil) or (index &lt; 0) or (index &gt;= ns^.nodeNr) then
     Result := nil
   else
   begin
-    p := ns.nodeTab;
+    p := ns^.nodeTab;
     Inc(p, index);
     Result := p^;
   end;
@@ -262,7 +264,7 @@ end;
 
 function xmlXPathNodeSetIsEmpty(ns: xmlNodeSetPtr): Boolean;
 begin
-  Result := ((ns = nil) or (ns.nodeNr = 0) or (ns.nodeTab = nil));
+  Result := ((ns = nil) or (ns^.nodeNr = 0) or (ns^.nodeTab = nil));
 end;
 
 </xsl:text>
@@ -736,7 +738,8 @@ end;
                 ($text='set') or
                 ($text='function') or
                 ($text='file') or
-                ($text='mod')">
+				($text='mod') or
+				($text='strict') ">
     <xsl:text>_</xsl:text>
   </xsl:if>
 </xsl:template>
